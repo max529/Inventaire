@@ -1,0 +1,33 @@
+@import '@functions';
+
+:host {
+	border-radius: 4px;
+	color: var(--color-base-content);
+	cursor: pointer;
+	font-size: var(--font-size-md);
+	padding: 3px;
+	position: relative;
+	transition: background-color var(--transition-duration) var(--bezier);
+
+	.hidden {
+		display: none;
+	}
+}
+
+@include eachColor using ($color) {
+	:host([color="#{$color}"]) {
+		background-color: transparent;
+		color: var(--color-#{$color});
+	}
+
+	:host([color="#{$color}"]:hover) {
+		background-color: var(--color-#{$color});
+		color: var(--color-#{$color}-content);
+	}
+}
+
+// @include desktop {
+// 	:host(:hover) {
+// 		background-color: var(--lighter);
+// 	}
+// }

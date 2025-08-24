@@ -1,0 +1,15 @@
+<div class="card">
+    <div class="header">
+        <div class="title">Liste du matériel</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
+            <av-button color="primary" @press="add">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <av-row class="list" @element="listEl">
+            
+        </av-row>
+    </av-scrollable>
+
+</div>

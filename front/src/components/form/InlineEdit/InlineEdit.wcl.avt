@@ -1,0 +1,87 @@
+import { FormElement } from "Aventus@UI:Aventus.Form.package.avt";
+
+export class InlineEdit extends FormElement<string> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @ViewElement()
+    public componentEl!: HTMLSpanElement;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    protected override async validation(): Promise<string[]> {
+        return [];
+    }
+
+    protected override onValueChange(value: string | undefined): void {
+        const actualValue = this.decodeHtmlSpecialChars(this.componentEl.innerText);
+        if(value !== undefined && actualValue !== value) {
+            this.componentEl.innerText = value;
+        }
+    }
+
+
+    /**
+     * 
+     */
+    protected checkKey(e: KeyboardEvent) {
+        if(e.key == 'Enter') {
+            e.preventDefault();
+        }
+    }
+    /**
+    * 
+    */
+    protected change() {
+        const value = this.componentEl?.innerText ? this.decodeHtmlSpecialChars(this.componentEl.innerText) : '';
+        this.triggerChange(value);
+    }
+
+    private decodeHtmlSpecialChars(text: string) {
+        const map = {
+            '&nbsp;': ' ',
+            '&amp;': '&',
+            '&#038;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'",
+            '&#8217;': '’',
+            '&#8216;': '‘',
+            '&#8211;': '–',
+            '&#8212;': '—',
+            '&#8230;': '…',
+            '&#8221;': '”',
+        };
+
+        return text.replace(/\&[\w\d\#]{2,5}\;/g, (m) => map[m as keyof typeof map]);
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.addEventListener("focus", () => {
+            this.componentEl.focus();
+        });
+    }
+
+    //#endregion
+
+}

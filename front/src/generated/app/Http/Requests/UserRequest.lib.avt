@@ -1,0 +1,11 @@
+namespace App.Http.Requests {
+
+	export class UserRequest {
+		public id?: number = undefined;
+		public nom!: string;
+		public prenom!: string;
+		public nom_utilisateur!: string;
+		public mot_passe?: string = undefined;
+	}
+
+}

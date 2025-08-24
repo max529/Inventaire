@@ -1,0 +1,47 @@
+import { ButtonElement } from "Aventus@UI:Aventus.Form.package.avt";
+import type { ColorsType } from "../../../lib/Colors.lib.avt";
+
+export class Button extends ButtonElement implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public color?: ColorsType;
+    @Attribute()
+    public outline!: boolean;
+    @Attribute()
+    public dash!: boolean;
+    @Attribute()
+    public soft!: boolean;
+    @Attribute()
+    public ghost!: boolean;
+    @Attribute()
+    public link!: boolean;
+    @Attribute()
+    public active!: boolean;
+    @Attribute()
+    public disabled!: boolean;
+    @Attribute()
+    public loading!: boolean;
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    //#endregion
+
+}

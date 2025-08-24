@@ -1,0 +1,13 @@
+namespace App.Models {
+
+	@Convertible()
+	export class User extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.User"; }
+		public id!: number;
+		public nom!: string;
+		public prenom!: string;
+		public nom_utilisateur!: string;
+		public mot_passe!: string;
+	}
+
+}

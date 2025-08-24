@@ -1,0 +1,63 @@
+import { PageFormRoute } from "Aventus@UI:Aventus.Navigation.package.avt";
+import { AuthController } from "../../generated/app/Http/Controllers/AuthController.lib.avt";
+import type { LoginRequest } from "../../generated/app/Http/Requests/LoginRequest.lib.avt";
+import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+
+export class LoginPage extends PageFormRoute<typeof AuthController, "login"> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override route(): [typeof AuthController, "login"] {
+        return [AuthController, "login"];
+    }
+    /**
+     * @inheritdoc
+     */
+    public override onResult(result: Aventus.ResultWithError<boolean, Aventus.GenericError<any>> | null): Aventus.Asyncable<void> {
+        if(result?.result) {
+            window.location.href = "/";
+        }
+    }
+    /**
+     * @inheritdoc
+     */
+    protected override formSchema(): Aventus.Form.FormSchema<LoginRequest> {
+        return {
+            nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
+            mot_passe: new Required("Le mot de passe est requis"),
+        };
+    }
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {
+
+        };
+    }
+
+    //#endregion
+
+}

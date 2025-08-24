@@ -1,0 +1,59 @@
+import { Router } from "Aventus@UI:Aventus.Navigation.package.avt";
+import { EquipesPage } from "../pages/EquipesPage/EquipesPage.wcl.avt";
+import { EquipeDetailsPage } from "../pages/EquipeDetailsPage/EquipeDetailsPage.wcl.avt";
+import { UsersPage } from "../pages/UsersPage/UsersPage.wcl.avt";
+import { ModalElement } from "Aventus@UI:Aventus.Modal.package.avt";
+import { MaterielPage } from "../pages/MaterielPage/MaterielPage.wcl.avt";
+import { MaterielDetailsPage } from "../pages/MaterielDetailsPage/MaterielDetailsPage.wcl.avt";
+
+export class Main extends Router implements Aventus.DefaultComponent {
+
+    //#region static
+    public static instance: Main;
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    protected override defineRoutes(): void {
+        this.addRoute("/", EquipesPage);
+        this.addRoute("/equipes/{id:number}", EquipeDetailsPage);
+        this.addRoute("/materiel", MaterielPage);
+        this.addRoute("/materiel/{id:number}", MaterielDetailsPage);
+        this.addRoute("/utilisateurs", UsersPage);
+    }
+
+    public override getSlugs(pattern?: string) {
+        if(!pattern) return super.getSlugs();
+        return this.stateManager.getStateSlugs(pattern);
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        Main.instance = this;
+
+        ModalElement.configure({
+            closeWithClick: false
+        });
+    }
+
+    //#endregion
+
+}

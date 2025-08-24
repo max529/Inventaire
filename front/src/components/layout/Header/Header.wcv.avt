@@ -1,0 +1,11 @@
+<div class="content">
+    <div class="logo">Inventaire FC Vétroz</div>
+    <div class="menu">
+        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
+        <av-link class="item" to="/materiel"  active_pattern="/materiel*">Matériel</av-link>
+        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
+        <div class="item">
+            <mi-icon icon="power_settings_new"></mi-icon>
+        </div>
+    </div>
+</div>

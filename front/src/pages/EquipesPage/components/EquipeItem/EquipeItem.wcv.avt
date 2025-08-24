@@ -1,0 +1,6 @@
+<av-link to="/equipes/{{ this.item.id }}">
+    <div class="name">{{ this.item.nom }}</div>
+    <div class="actions">
+        <mi-icon icon="chevron_right"></mi-icon>
+    </div>
+</av-link>

@@ -1,0 +1,1 @@
+<span contenteditable="true" @keydown="checkKey" @keyup="change" @element="componentEl"></span>

@@ -1,0 +1,25 @@
+@import '@functions';
+
+:host {
+	box-sizing: border-box;
+	display: inline-block;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+:host * {
+	box-sizing: border-box;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+
+@include eachColor using ($color) {
+	.#{$color} {
+		background-color: var(--color-#{$color});
+	}
+
+	.content-#{$color} {
+		color: var(--color-#{$color}-content);
+	}
+}

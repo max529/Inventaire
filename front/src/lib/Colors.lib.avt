@@ -1,0 +1,12 @@
+export const Colors = [
+    'neutral',
+    'primary',
+    'secondary',
+    'accent',
+    'info',
+    'success',
+    'warning',
+    'error'
+] as const;
+
+export type ColorsType = 'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';

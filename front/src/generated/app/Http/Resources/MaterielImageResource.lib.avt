@@ -1,0 +1,9 @@
+namespace App.Http.Resources {
+
+	@Convertible()
+	export class MaterielImageResource {
+		public static get Fullname(): string { return "App.Http.Resources.MaterielImageResource"; }
+		public uri!: number;
+	}
+
+}

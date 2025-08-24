@@ -1,0 +1,11 @@
+import { Equipe } from '../../Models/Equipe.lib.avt';
+import { EquipeRequest } from '../Requests/EquipeRequest.lib.avt';
+import { EquipeResource } from '../Resources/EquipeResource.lib.avt';
+
+namespace App.Http.Controllers {
+
+	export class EquipeController extends AventusPhp.ModelController<Equipe, EquipeRequest, EquipeResource> {
+public override getUri(): string { return "data/equipe"; }
+	}
+
+}

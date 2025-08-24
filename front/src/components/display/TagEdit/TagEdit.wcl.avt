@@ -1,0 +1,47 @@
+import { Callback, NormalizedEvent } from "Aventus@Main:Aventus.package.avt";
+import type { Variation } from "../../../generated/app/Models/Variation.lib.avt";
+import type { InlineEdit } from "../../form/InlineEdit/InlineEdit.wcl.avt";
+
+export class TagEdit extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @ViewElement()
+    protected inlineEl!: InlineEdit;
+    @Watch()
+    public variation!: Variation;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    public onDelete: Callback<(el: TagEdit) => void> = new Callback();
+    /**
+     * 
+     */
+    protected triggerFocus() {
+        this.inlineEl.componentEl.focus();
+    }
+
+    /**
+     * 
+     */
+    protected triggerDelete() {
+        this.onDelete.trigger(this);
+    }
+    //#endregion
+
+}

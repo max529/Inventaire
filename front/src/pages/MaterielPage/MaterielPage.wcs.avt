@@ -1,0 +1,51 @@
+:host {
+	--col-gap: 16px;
+
+	.card {
+		background-color: var(--color-base-100);
+		border-radius: var(--radius-box);
+		box-shadow: var(--elevation-2);
+		display: flex;
+		flex-direction: column;
+		max-height: 100%;
+		padding: 24px;
+		width: 100%;
+
+		.header {
+			align-items: center;
+			display: flex;
+			flex-shrink: 0;
+			gap: 24px;
+			height: 50px;
+			justify-content: space-between;
+			margin-bottom: 24px;
+
+			.title {
+				font-size: var(--font-size-md);
+			}
+
+			.actions {
+				align-items: center;
+				display: flex;
+				gap: 24px;
+
+				av-input {
+					max-width: 300px;
+				}
+			}
+
+
+		}
+
+		.body {
+			flex-grow: 1;
+			min-height: 0;
+			width: 100%;
+			.list {
+				margin: 16px;
+				margin-top: 0;
+				width: calc(100% - 32px);
+			}
+		}
+	}
+}

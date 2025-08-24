@@ -1,0 +1,5 @@
+<div class="name">{{ this.item.nom }} {{ this.item.prenom }}</div>
+<div class="actions">
+    <av-icon-action color="neutral" icon="edit" @press="editItem">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" @press="deleteItem">Suppression</av-icon-action>
+</div>

@@ -1,0 +1,11 @@
+<label for="{{ this.name }}" class="label" @press="focusInput">{{ this.label }}</label>
+<div class="input">
+    <slot name="before"></slot>
+    <input @element="inputEl" type="{{ this.type }}" name="{{ this.name }}" id="{{ this.name }}" placeholder="{{ this.placeholder }}" @focus="onFocus" @blur="onBlur" @input="onInput">
+    <slot name="after"></slot>
+</div>
+<div class="errors">
+    for(let error of this.errors) { 
+        <div>{{ error }}</div>
+    }
+</div>

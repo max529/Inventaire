@@ -1,0 +1,35 @@
+import { ToastElement } from "Aventus@UI:Aventus.Toast.package.avt";
+
+export class Toast extends ToastElement implements Aventus.DefaultComponent {
+
+	//#region static
+	
+	//#endregion
+	
+	
+	//#region props
+	
+	//#endregion
+	
+	
+	//#region variables
+	
+	//#endregion
+	
+	
+	//#region constructor
+	
+	//#endregion
+	
+	
+	//#region methods
+    /**
+     * @inheritdoc
+     */
+    public override setOptions(options: Aventus.Toast.ToastOptions): Aventus.Asyncable<void> {
+        
+    }
+	
+	//#endregion
+	
+}

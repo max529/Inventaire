@@ -1,0 +1,11 @@
+namespace App.Models {
+
+	@Convertible()
+	export class Variation extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.Variation"; }
+		public id!: number;
+		public id_materiel!: number;
+		public nom!: string;
+	}
+
+}

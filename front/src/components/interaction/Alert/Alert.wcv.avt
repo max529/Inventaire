@@ -1,0 +1,4 @@
+<div class="content">{{ this.options.content }}</div>
+<div class="footer">
+    <av-button @press="ok">{{this.options.btnTxt}}</av-button>
+</div>

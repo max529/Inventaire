@@ -1,0 +1,11 @@
+import { Materiel } from '../../Models/Materiel.lib.avt';
+import { MaterielRequest } from '../Requests/MaterielRequest.lib.avt';
+import { MaterielResource } from '../Resources/MaterielResource.lib.avt';
+
+namespace App.Http.Controllers {
+
+	export class MaterielController extends AventusPhp.ModelController<Materiel, MaterielRequest, MaterielResource> {
+public override getUri(): string { return "data/materiel"; }
+	}
+
+}

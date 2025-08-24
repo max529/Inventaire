@@ -1,0 +1,53 @@
+import { Modal, type ModalOptions } from "../Modal/Modal.wcl.avt";
+
+export type AlertOptions = ModalOptions<void> & {
+    content: string,
+    btnTxt: string;
+};
+export class Alert extends Modal<void, AlertOptions> implements Aventus.DefaultComponent {
+
+	//#region static
+	public static async open(options: Partial<AlertOptions>): Promise<void | null> {
+        const alert = new Alert();
+        alert.options = { ...alert.options, ...options };
+        return await Alert._show(alert);
+    }
+	//#endregion
+	
+	
+	//#region props
+	
+	//#endregion
+	
+	
+	//#region variables
+	
+	//#endregion
+	
+	
+	//#region constructor
+	
+	//#endregion
+	
+	
+	//#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): AlertOptions {
+		return {
+            title: "I'm an alert",
+            content: "lorem",
+            btnTxt: "Ok",
+            noClose: true
+        };
+    }
+	/**
+     * 
+     */
+    protected ok() {
+        this.resolve();
+    }
+	//#endregion
+	
+}

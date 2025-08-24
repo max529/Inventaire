@@ -1,0 +1,137 @@
+import { Watcher } from "Aventus@Main:Aventus.package.avt";
+import type { Input } from "../../components/form/Input/Input.wcl.avt";
+import type { User } from "../../generated/app/Models/User.lib.avt";
+import { StringTools } from "../../lib/StringTools.lib.avt";
+import { UserRAM } from "../../ram/User.ram.avt";
+import { UserEditModal } from "./components/UserEditModal/UserEditModal.wcl.avt";
+import { UserItem } from "./components/UserItem/UserItem.wcl.avt";
+import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+
+export class UsersPage extends PageFull implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    public list: UserItem[] = [];
+
+    @ViewElement()
+    protected listEl!: HTMLDivElement;
+    @ViewElement()
+    protected searchEl!: Input;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {};
+    }
+
+    /**
+     * 
+     */
+    protected search() {
+        if(this.searchEl.value) {
+            for(let item of this.list) {
+                item.visible = StringTools.contains(item.item.nom_utilisateur, this.searchEl.value);
+            }
+        }
+        else {
+            for(let item of this.list) {
+                item.visible = true;
+            }
+        }
+
+    }
+
+
+    /**
+     * 
+     */
+    protected async add() {
+        await UserEditModal.open();
+    }
+
+    protected async bindData() {
+        let list = await UserRAM.getInstance().getList();
+        list.sort((a, b) => a.nom.localeCompare(a.nom));
+
+        for(let item of list) {
+            let el = new UserItem();
+            el.item = item;
+            el.visible = this.searchEl.value ? StringTools.contains(item.nom_utilisateur, this.searchEl.value) : true;
+            this.listEl.appendChild(el);
+            this.list.push(el);
+        }
+
+
+        UserRAM.getInstance().onCreated(this.onNewData);
+        UserRAM.getInstance().onUpdated(this.onNewData);
+        UserRAM.getInstance().onDeleted(this.onRemoveData);
+    }
+
+    @BindThis()
+    protected onNewData(user: User) {
+        let itemBefore: UserItem | undefined = undefined;
+        for(let item of this.list) {
+            if(itemBefore == null && user.nom.localeCompare(item.item.nom) < 0) {
+                itemBefore = item;
+            }
+            if(item.item.id == user.id) {
+                item.item = user;
+                Watcher.trigger("UPDATED", item.item);
+                return;
+            }
+        }
+
+        let el = new UserItem();
+        el.item = user;
+        el.visible = this.searchEl.value ? StringTools.contains(user.nom_utilisateur, this.searchEl.value) : true;
+        if(itemBefore) {
+            let index = this.list.indexOf(itemBefore);
+            this.list.splice(index, 0, el);
+            this.listEl.insertBefore(el, itemBefore);
+        }
+        else {
+            this.list.push(el);
+            this.listEl.appendChild(el);
+        }
+
+
+    }
+
+    @BindThis()
+    protected onRemoveData(user: User) {
+        for(let item of this.list) {
+            if(item.item.id == user.id) {
+                item.remove();
+                let index = this.list.indexOf(item);
+                this.list.splice(index, 1);
+                return;
+            }
+        }
+
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.bindData();
+    }
+    //#endregion
+
+}

@@ -1,0 +1,36 @@
+import type { Materiel } from "../../../generated/app/Models/Materiel.lib.avt";
+
+export class MaterielCard extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public visible!: boolean;
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    public item!: Materiel;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected getSrc() {
+        if(this.item.image?.Uri) {
+            return this.item.image?.Uri;
+        }
+        return "/img/default_img.svg";
+    }
+    //#endregion
+
+}

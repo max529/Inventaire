@@ -1,0 +1,65 @@
+import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
+import type { EquipeRequest } from "../../../../generated/app/Http/Requests/EquipeRequest.lib.avt";
+import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+
+export class EquipeEditModal extends Modal<Equipe> implements Aventus.DefaultComponent {
+
+    //#region static
+    public static async open(item?: Equipe): Promise<Equipe | null> {
+        const modal = new EquipeEditModal();
+        modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
+        item = item ? item.clone() : new Equipe();
+        if(!item.id) {
+            item.id = 0;
+        }
+        modal.form.item = item;
+        return await EquipeEditModal._show(modal);
+    }
+    //#endregion
+
+
+    //#region props
+    private form: FormHandler<EquipeRequest>;
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+    public constructor() {
+        super();
+        this.form = Form.create<EquipeRequest>({
+            nom: new Required("Le nom est requis"),
+        });
+    }
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<Equipe> {
+        return { title: "" };
+    }
+
+
+    /**
+     * 
+     */
+    protected async submit() {
+        debugger;
+        const result = await this.form.submit(EquipeRAM.getInstance().saveWithError);
+        if(result?.result) {
+            this.resolve(result.result);
+        }
+    }
+    //#endregion
+
+}

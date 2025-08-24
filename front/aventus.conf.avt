@@ -1,0 +1,39 @@
+{
+	"module": "Inventaire",
+	"componentPrefix": "av",
+	"hideWarnings": true,
+	"build": [
+		{
+			"name": "Main",
+			"src": [
+				"./src/*"
+			],
+			"compile": [
+				{
+					"output": "../public/inventaire.js"
+				}
+			],
+			"dependances": [
+				{
+					"uri": "@AventusUI"
+				},
+				{
+					"uri": "@AventusPhp"
+				},
+				{
+					"uri": "https://store.aventusjs.com/libs/MaterialIcon/1_0_0/MaterialIcon@Main.package.avt"
+				}
+			]
+		}
+	],
+	"static": [
+		{
+			"name": "Main",
+			"input": "./static",
+			"output": "../public"
+		}
+	],
+	"aliases": {
+        "@functions": "./static/css/_functions.gs.avt"
+    }
+}

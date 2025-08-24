@@ -1,0 +1,6 @@
+<div class="title">{{ this.options.title }}</div>
+<av-input label="Nom" :form="this.form.parts.nom"></av-input>
+<div class="actions">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button color="primary" @press="submit">Enregistrer</av-button>
+</div>

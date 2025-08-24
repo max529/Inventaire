@@ -1,0 +1,18 @@
+:host {
+	--col-gap: 12px;
+
+	.title {
+		font-size: var(--font-size-md);
+		margin-bottom: 16px;
+	}
+
+	av-input {
+		margin-bottom: 12px;
+	}
+
+	.actions {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+	}
+}

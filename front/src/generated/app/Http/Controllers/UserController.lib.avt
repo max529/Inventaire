@@ -1,0 +1,11 @@
+import { User } from '../../Models/User.lib.avt';
+import { UserRequest } from '../Requests/UserRequest.lib.avt';
+import { UserResource } from '../Resources/UserResource.lib.avt';
+
+namespace App.Http.Controllers {
+
+	export class UserController extends AventusPhp.ModelController<User, UserRequest, UserResource> {
+public override getUri(): string { return "data/user"; }
+	}
+
+}

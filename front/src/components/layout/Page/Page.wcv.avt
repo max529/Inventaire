@@ -1,0 +1,5 @@
+<av-scrollable class="page-scroll">
+    <div class="content">
+        <slot></slot>
+    </div>
+</av-scrollable>

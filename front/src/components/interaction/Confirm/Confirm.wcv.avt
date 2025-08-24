@@ -1,0 +1,6 @@
+<div class="title">{{ this.options.title }}</div>
+<div class="content">{{ this.options.content }}</div>
+<div class="footer">
+    <av-button @press="no">{{this.options.btnNoTxt}}</av-button>
+    <av-button @press="yes" color="primary">{{this.options.btnYesTxt}}</av-button>
+</div>

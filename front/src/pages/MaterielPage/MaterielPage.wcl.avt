@@ -1,0 +1,138 @@
+import type { Row } from "Aventus@UI:Aventus.Layout.package.avt";
+import type { Input } from "../../components/form/Input/Input.wcl.avt";
+import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+import { MaterielCard } from "./MaterielCard/MaterielCard.wcl.avt";
+import { StringTools } from "../../lib/StringTools.lib.avt";
+import { Main } from "../../Main/Main.wcl.avt";
+import { MaterielRAM } from "../../ram/Materiel.ram.avt";
+import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
+import { Watcher } from "Aventus@Main:Aventus.package.avt";
+
+export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    public list: MaterielCard[] = [];
+
+    @ViewElement()
+    protected listEl!: Row;
+    @ViewElement()
+    protected searchEl!: Input;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {};
+    }
+
+    /**
+    * 
+    */
+    protected search() {
+        if(this.searchEl.value) {
+            for(let item of this.list) {
+                item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
+            }
+        }
+        else {
+            for(let item of this.list) {
+                item.visible = true;
+            }
+        }
+
+    }
+
+
+    /**
+     * 
+     */
+    protected async add() {
+        Main.instance.navigate("/materiel/0");
+    }
+
+    protected async bindData() {
+        let list = await MaterielRAM.getInstance().getList();
+        list.sort((a, b) => a.nom.localeCompare(a.nom));
+
+        for(let item of list) {
+            let el = new MaterielCard();
+            el.item = item;
+            el.visible = this.searchEl.value ? StringTools.contains(item.nom, this.searchEl.value) : true;
+            this.listEl.appendChild(el);
+            this.list.push(el);
+        }
+
+
+        MaterielRAM.getInstance().onCreated(this.onNewData);
+        MaterielRAM.getInstance().onUpdated(this.onNewData);
+        MaterielRAM.getInstance().onDeleted(this.onRemoveData);
+    }
+
+    @BindThis()
+    protected onNewData(materiel: Materiel) {
+        let itemBefore: MaterielCard | undefined = undefined;
+        for(let item of this.list) {
+            if(itemBefore == null && materiel.nom.localeCompare(item.item.nom) < 0) {
+                itemBefore = item;
+            }
+            if(item.item.id == materiel.id) {
+                item.item = materiel;
+                Watcher.trigger("UPDATED", item.item);
+                return;
+            }
+        }
+
+        let el = new MaterielCard();
+        el.item = materiel;
+        el.visible = this.searchEl.value ? StringTools.contains(materiel.nom, this.searchEl.value) : true;
+        if(itemBefore) {
+            let index = this.list.indexOf(itemBefore);
+            this.list.splice(index, 0, el);
+            this.listEl.insertBefore(el, itemBefore);
+        }
+        else {
+            this.list.push(el);
+            this.listEl.appendChild(el);
+        }
+
+
+    }
+
+    @BindThis()
+    protected onRemoveData(materiel: Materiel) {
+        for(let item of this.list) {
+            if(item.item.id == materiel.id) {
+                item.remove();
+                let index = this.list.indexOf(item);
+                this.list.splice(index, 1);
+                return;
+            }
+        }
+
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.bindData();
+    }
+    //#endregion
+
+}

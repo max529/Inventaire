@@ -1,0 +1,31 @@
+import { UserController } from "../generated/app/Http/Controllers/UserController.lib.avt";
+import { User } from "../generated/app/Models/User.lib.avt";
+
+export class UserRAM extends AventusPhp.RamHttp<User> implements Aventus.IRam {
+    /**
+     * @inheritdoc
+     */
+    public override defineRoutes(): AventusPhp.ModelController<User, any, any> {
+        return new UserController();
+    }
+
+    /**
+     * Create a singleton to store data
+     */
+    public static getInstance(): UserRAM {
+        return Aventus.Instance.get(UserRAM);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override defineIndexKey(): keyof User {
+        return 'id';
+    }
+    /**
+     * @inheritdoc
+     */
+    protected override getTypeForData(objJson: Aventus.KeysObject<User> | User): new () => User {
+        return User;
+    }
+}

@@ -1,0 +1,7 @@
+<block name="before">
+    <av-header></av-header>
+</block>
+
+<block name="after">
+    <av-footer></av-footer>
+</block>

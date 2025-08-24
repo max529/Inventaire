@@ -1,0 +1,115 @@
+import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
+import { Page } from "../../components/layout/Page/Page.wcl.avt";
+import { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
+import { MaterielImage } from "../../generated/app/Models/MaterielImage.lib.avt";
+import type { Main } from "../../Main/Main.wcl.avt";
+import { MaterielRAM } from "../../ram/Materiel.ram.avt";
+import type { MaterielRequest } from "../../generated/app/Http/Requests/MaterielRequest.lib.avt";
+import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+import { Variation } from "../../generated/app/Models/Variation.lib.avt";
+import type { NormalizedEvent } from "Aventus@Main:Aventus.package.avt";
+import type { TagEdit } from "../../components/display/TagEdit/TagEdit.wcl.avt";
+
+export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    public form: FormHandler<MaterielRequest>;
+    //#endregion
+
+
+    //#region constructor
+    public constructor() {
+        super();
+        this.form = Form.create<MaterielRequest>({
+            nom: Required,
+            variations: {},
+            image: {}
+        });
+    }
+    //#endregion
+
+
+    //#region methods
+
+    public override async isAllowed(state: Aventus.State, pattern: string, router: Main): Promise<boolean | Aventus.State | string> {
+        const slugs = router.getSlugs(pattern);
+        if(!slugs || typeof slugs['id'] != "number") {
+            return "/materiel";
+        }
+
+        const id = slugs['id'];
+        if(id == 0) {
+            let newItem = new Materiel();
+            newItem.image = new MaterielImage();
+            newItem.variations = [];
+            let v1 = new Variation();
+            v1.nom = "XS";
+            newItem.variations.push(v1);
+            let v2 = new Variation();
+            v2.nom = "S";
+            newItem.variations.push(v2);
+            this.form.item = newItem;
+        }
+        else {
+            const item = await MaterielRAM.getInstance().getById(id);
+
+            if(!item) {
+                return "/materiel";
+            }
+            this.form.item = item;
+        }
+        return true;
+    }
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {};
+    }
+
+
+    /**
+     * 
+     */
+    protected save() {
+        console.log(this.form.item);
+    }
+
+    protected getTitle() {
+        if(this.form.item?.id) {
+            return this.form.item.nom;
+        }
+        return "Création de matériel";
+    }
+
+
+    /**
+     * 
+     */
+    protected addVariation() {
+        // this.form.parts['variations']
+        let v1 = new Variation();
+        v1.nom = "";
+        this.form.item.variations.push(v1);
+    }
+
+    /**
+     * 
+     */
+    protected removeVariation(el: TagEdit) {
+        let index = Number(el.getAttribute("key"));
+        this.form.item.variations.splice(index, 1);
+    }
+    //#endregion
+
+}

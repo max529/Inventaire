@@ -1,0 +1,61 @@
+import { Modal, type ModalOptions } from "../Modal/Modal.wcl.avt";
+
+export type ConfirmOptions = ModalOptions<boolean> & {
+    content: string,
+    btnYesTxt: string;
+    btnNoTxt: string;
+};
+export class Confirm extends Modal<boolean, ConfirmOptions> implements Aventus.DefaultComponent {
+
+	//#region static
+	public static async open(options: Partial<ConfirmOptions>): Promise<boolean | null> {
+        const alert = new Confirm();
+        alert.options = { ...alert.options, ...options };
+        return await Confirm._show(alert);
+    }
+	//#endregion
+	
+	
+	//#region props
+	
+	//#endregion
+	
+	
+	//#region variables
+	
+	//#endregion
+	
+	
+	//#region constructor
+	
+	//#endregion
+	
+	
+	//#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ConfirmOptions {
+        return {
+            title: "",
+            content: "",
+            btnYesTxt: "Oui",
+            btnNoTxt: "Non",
+            noClose: true
+        };
+    }
+	 /**
+     * 
+     */
+    protected no() {
+        this.resolve(false);
+    }
+    /**
+    * 
+    */
+    protected yes() {
+        this.resolve(true);
+    }
+	//#endregion
+	
+}

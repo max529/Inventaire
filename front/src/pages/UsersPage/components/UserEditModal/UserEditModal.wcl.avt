@@ -1,0 +1,70 @@
+import { User } from "../../../../generated/app/Models/User.lib.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
+import type { UserRequest } from "../../../../generated/app/Http/Requests/UserRequest.lib.avt";
+import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+import { UserRAM } from "../../../../ram/User.ram.avt";
+
+
+export class UserEditModal extends Modal<User> implements Aventus.DefaultComponent {
+
+    //#region static
+    public static async open(item?: User): Promise<User | null> {
+        const modal = new UserEditModal();
+        modal.options.title = item ? "Edition d'un utilisateur" : "Création d'un utilisateur";
+        item = item ? item.clone() : new User();
+        modal.form.item = item;
+        return await UserEditModal._show(modal);
+    }
+    //#endregion
+
+
+    //#region props
+    private form: FormHandler<UserRequest>;
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+    public constructor() {
+        super();
+        this.form = Form.create<UserRequest>({
+            nom: new Required("Le nom est requis"),
+            prenom: new Required("Le prénom est requis"),
+            nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
+            mot_passe: (value, name, fct) => {
+                if(this.form.item?.id) {
+                    return true;
+                }
+                return new Required("Le mot de passe est requis").validate(value, "mot_passe", fct);
+            }
+        });
+    }
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<User> {
+        return { title: "" };
+    }
+
+
+    /**
+     * 
+     */
+    protected async submit() {
+        const result = await this.form.submit(UserRAM.getInstance().saveWithError);
+        if(result?.result) {
+            this.resolve(result.result);
+        }
+    }
+    //#endregion
+
+}

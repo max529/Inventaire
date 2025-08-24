@@ -1,0 +1,13 @@
+import { Variation } from '../../Models/Variation.lib.avt';
+import { MaterielImage } from '../../Models/MaterielImage.lib.avt';
+
+namespace App.Http.Requests {
+
+	export class MaterielRequest {
+		public variations!: Variation[];
+		public id?: number = undefined;
+		public nom!: string;
+		public image?: MaterielImage = undefined;
+	}
+
+}

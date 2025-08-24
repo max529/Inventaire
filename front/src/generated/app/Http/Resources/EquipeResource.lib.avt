@@ -1,0 +1,10 @@
+namespace App.Http.Resources {
+
+	@Convertible()
+	export class EquipeResource {
+		public static get Fullname(): string { return "App.Http.Resources.EquipeResource"; }
+		public id!: number;
+		public nom!: string;
+	}
+
+}

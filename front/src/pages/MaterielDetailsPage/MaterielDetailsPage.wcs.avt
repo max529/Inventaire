@@ -1,0 +1,133 @@
+:host {
+	--col-gap: 16px;
+	.content {
+		justify-content: flex-start;
+	}
+	.card {
+		background-color: var(--color-base-100);
+		border-radius: var(--radius-box);
+		box-shadow: var(--elevation-2);
+		display: flex;
+		flex-direction: column;
+		padding: 24px;
+		width: 100%;
+
+		.header {
+			align-items: center;
+			display: flex;
+			flex-shrink: 0;
+			gap: 24px;
+			height: 50px;
+			justify-content: space-between;
+			margin-bottom: 16px;
+
+			.title {
+				font-size: var(--font-size-md);
+			}
+
+			.actions {
+				align-items: center;
+				display: flex;
+				gap: 24px;
+
+				av-input {
+					max-width: 300px;
+				}
+			}
+
+
+		}
+
+		.body {
+			--input-image-height: 150px;
+			width: 100%;
+
+			.contenu {
+				flex-direction: column;
+
+				.tags {
+					margin-top: 16px;
+
+					.label {
+						font-size: calc(var(--font-size) * 0.95);
+						margin-bottom: 6px;
+					}
+
+					.liste {
+						display: flex;
+						flex-wrap: wrap;
+						gap: 6px;
+
+						av-tag {
+							padding-left: 12px;
+						}
+
+						mi-icon {
+							color: var(--color-error);
+							cursor: pointer;
+							font-size: 16px;
+							margin-left: 6px;
+						}
+					}
+				}
+			}
+
+
+		}
+	}
+
+	.by-equipe {
+		margin-top: 24px;
+
+		.list {
+			border: 1px solid var(--color-base-300);
+			border-radius: var(--radius-field);
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+
+			.item {
+				border-top: 1px solid var(--color-base-300);
+				padding: 8px 16px;
+
+				.line {
+					align-items: center;
+					display: flex;
+					gap: 20px;
+
+					.nom {
+						flex-grow: 1;
+						width: 50%;
+					}
+
+					.quantite {
+						flex-grow: 1;
+						width: 50%;
+					}
+
+					.modification {
+						align-items: flex-end;
+						display: flex;
+						flex-direction: column;
+						font-size: var(--font-size-sm);
+
+						av-icon-action {
+							width: fit-content;
+							// transform: translateY(57px);
+						}
+
+						span {
+							transform: translateY(5px);
+							white-space: nowrap;
+						}
+					}
+				}
+
+			}
+
+			.item:first-child {
+				border-top: none;
+			}
+		}
+	}
+}

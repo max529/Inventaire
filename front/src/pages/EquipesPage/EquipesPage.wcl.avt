@@ -1,0 +1,137 @@
+import type { Input } from "../../components/form/Input/Input.wcl.avt";
+import { StringTools } from "../../lib/StringTools.lib.avt";
+import { EquipeEditModal } from "./components/EquipeEditModal/EquipeEditModal.wcl.avt";
+import { EquipeRAM } from "../../ram/Equipe.ram.avt";
+import { EquipeItem } from "./components/EquipeItem/EquipeItem.wcl.avt";
+import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
+import { Watcher } from "Aventus@Main:Aventus.package.avt";
+import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+
+export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    public list: EquipeItem[] = [];
+
+    @ViewElement()
+    protected listEl!: HTMLDivElement;
+    @ViewElement()
+    protected searchEl!: Input;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {};
+    }
+
+    /**
+     * 
+     */
+    protected search() {
+        if(this.searchEl.value) {
+            for(let item of this.list) {
+                item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
+            }
+        }
+        else {
+            for(let item of this.list) {
+                item.visible = true;
+            }
+        }
+
+    }
+
+
+    /**
+     * 
+     */
+    protected async add() {
+        await EquipeEditModal.open();
+    }
+
+    protected async bindData() {
+        let list = await EquipeRAM.getInstance().getList();
+        list.sort((a, b) => a.nom.localeCompare(a.nom));
+
+        for(let item of list) {
+            let el = new EquipeItem();
+            el.item = item;
+            el.visible = this.searchEl.value ? StringTools.contains(item.nom, this.searchEl.value) : true;
+            this.listEl.appendChild(el);
+            this.list.push(el);
+        }
+
+
+        EquipeRAM.getInstance().onCreated(this.onNewData);
+        EquipeRAM.getInstance().onUpdated(this.onNewData);
+        EquipeRAM.getInstance().onDeleted(this.onRemoveData);
+    }
+
+    @BindThis()
+    protected onNewData(newData: Equipe) {
+        let itemBefore: EquipeItem | undefined = undefined;
+        for(let item of this.list) {
+            if(itemBefore == null && newData.nom.localeCompare(item.item.nom) < 0) {
+                itemBefore = item;
+            }
+            if(item.item.id == newData.id) {
+                item.item = newData;
+                Watcher.trigger("UPDATED", item.item);
+                return;
+            }
+        }
+
+        let el = new EquipeItem();
+        el.item = newData;
+        el.visible = this.searchEl.value ? StringTools.contains(newData.nom, this.searchEl.value) : true;
+        if(itemBefore) {
+            let index = this.list.indexOf(itemBefore);
+            this.list.splice(index, 0, el);
+            this.listEl.insertBefore(el, itemBefore);
+        }
+        else {
+            this.list.push(el);
+            this.listEl.appendChild(el);
+        }
+
+
+    }
+
+    @BindThis()
+    protected onRemoveData(Equipe: Equipe) {
+        for(let item of this.list) {
+            if(item.item.id == Equipe.id) {
+                item.remove();
+                let index = this.list.indexOf(item);
+                this.list.splice(index, 1);
+                return;
+            }
+        }
+
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.bindData();
+    }
+    //#endregion
+
+}

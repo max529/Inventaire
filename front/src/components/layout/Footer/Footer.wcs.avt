@@ -1,0 +1,22 @@
+:host {
+	align-items: center;
+	background-color: var(--color-base-100);
+	display: flex;
+	flex-shrink: 0;
+	height: 30px;
+	justify-content: center;
+	width: 100%;
+	box-shadow: var(--elevation-2);
+	z-index: 2;
+
+	.content {
+		align-items: center;
+		color: var(--color-base-content);
+		display: flex;
+		height: 100%;
+		justify-content: space-between;
+		max-width: 1200px;
+		padding: 0 32px;
+		width: 100%;
+	}
+}

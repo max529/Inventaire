@@ -1,0 +1,54 @@
+import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
+import type { User } from "../../../../generated/app/Models/User.lib.avt";
+import { UserRAM } from "../../../../ram/User.ram.avt";
+import { UserEditModal } from "../UserEditModal/UserEditModal.wcl.avt";
+
+export class UserItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public visible!: boolean;
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    @Injectable()
+    public item!: User;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    /**
+     * 
+     */
+    protected async editItem() {
+        await UserEditModal.open(this.item);
+    }
+    /**
+    * 
+    */
+    protected async deleteItem() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
+        });
+
+        if(result) {
+            await UserRAM.getInstance().delete(this.item);
+        }
+    }
+    //#endregion
+
+}

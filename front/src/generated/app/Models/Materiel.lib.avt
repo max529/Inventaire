@@ -1,0 +1,16 @@
+import { MaterielImage } from './MaterielImage.lib.avt';
+import { Variation } from './Variation.lib.avt';
+
+namespace App.Models {
+
+	@Convertible()
+	export class Materiel extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.Materiel"; }
+		public id!: number;
+		public nom!: string;
+		public image?: MaterielImage = undefined;
+		public variations!: Variation[];
+		public tout_monde!: boolean;
+	}
+
+}

@@ -1,0 +1,8 @@
+namespace App.Models {
+
+	@Convertible()
+	export class MaterielImage extends AventusPhp.AventusImage  {
+		public static get Fullname(): string { return "App.Models.MaterielImage"; }
+	}
+
+}

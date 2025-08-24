@@ -1,0 +1,69 @@
+<div class="card">
+    <div class="header">
+        <div class="title">{{ this.getTitle() }}</div>
+        <div class="actions">
+            <av-icon-action color="success" @press="save" icon="save">Enregistrer</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <av-row>
+            <av-col size="6">
+                <av-input-image label="Image" :form="this.form.parts.image"></av-input-image>
+            </av-col>
+            <av-col size="6" class="contenu">
+                <av-input label="Nom du materiel" :form="this.form.parts.nom"></av-input>
+                <div class="tags">
+                    <div class="label">Variations</div>
+                    <div class="liste">
+                        for(let i = 0;i< this.form.item.variations.length;i++) {
+                            @Context('variation', this.form.item.variations[i])
+                            <av-tag-edit :variation="variation" @delete="removeVariation" key="{{i}}"></av-tag-edit>
+                        }
+                        <av-icon-action class="more" icon="add" @press="addVariation">Ajouter une variation</av-icon-action>
+                    </div>
+                </div>
+                <div class="tags">
+                    <div class="label">Pour</div>
+                    <div class="liste">
+                        <av-tag color="accent">
+                            <span>U18</span>
+                            <mi-icon icon="delete"></mi-icon>
+                        </av-tag>
+                        <av-tag color="accent">
+                            <span>U20</span>
+                            <mi-icon icon="delete"></mi-icon>
+                        </av-tag>
+                        <av-icon-action class="more" icon="add">Ajouter une visibilité</av-icon-action>
+                    </div>
+                </div>
+            </av-col>
+        </av-row>
+    </div>
+</div>
+
+if(this.form.item?.id) {
+    <div class="card by-equipe">
+        <div class="header">
+            <div class="title">Liste dans les équipes</div>
+        </div>
+        <div class="body">
+            <div class="list">
+                for(let i =0; i<50;i++) {
+                <div class="item">
+                    <div class="line">
+                        <div class="nom">U18</div>
+                        <div class="quantite">21</div>
+                        <div class="modification">
+                            <div class="actions">
+                                <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
+                                <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                            </div>
+                            <span>Maxime, le 24.08.2025</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    </div>
+}

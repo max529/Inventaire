@@ -1,0 +1,13 @@
+namespace App.Models {
+
+	@Convertible()
+	export class Inventaire extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.Inventaire"; }
+		public id!: number;
+		public id_equipe!: number;
+		public id_materiel!: number;
+		public id_variation?: number = undefined;
+		public quantite!: number;
+	}
+
+}

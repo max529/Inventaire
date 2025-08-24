@@ -1,0 +1,24 @@
+:host {
+	align-items: center;
+	background-color: rgba(30, 30, 30, 0.3);
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	position: fixed;
+	z-index: 60;
+
+	.modal {
+		background-color: var(--color-base-100);
+		border: 1px solid var(--color-base-300);
+		border-radius: 0.75rem;
+		box-shadow: var(--elevation-3);
+		margin: 16px;
+		max-width: 32rem;
+		padding: 1.5rem;
+		position: relative;
+		text-align: left;
+		transform: translateZ(0);
+		transition: all 0.2s ease-in-out;
+		width: 100%;
+	}
+}

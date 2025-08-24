@@ -1,0 +1,14 @@
+import { LoginRequest } from '../Requests/LoginRequest.lib.avt';
+
+namespace App.Http.Controllers {
+
+	export class AuthController extends Aventus.HttpRoute {
+		@BindThis()
+		public async login(body: LoginRequest): Promise<Aventus.ResultWithError<boolean>> {
+			const request = new Aventus.HttpRequest(`${this.getPrefix()}/login`, Aventus.HttpMethod.POST);
+			request.setBody(body);
+			return await request.queryJSON<boolean>(this.router);
+		}
+	}
+
+}

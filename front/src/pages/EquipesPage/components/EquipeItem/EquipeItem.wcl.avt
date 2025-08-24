@@ -1,0 +1,32 @@
+import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+
+export class EquipeItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public visible!: boolean;
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    @Injectable()
+    public item!: Equipe;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    //#endregion
+
+}

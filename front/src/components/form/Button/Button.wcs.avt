@@ -1,0 +1,418 @@
+@import '@functions';
+
+:host {
+	--tw-prose-links: var(--btn-fg);
+	--size: calc(var(--size-field, .25rem)*10);
+	--btn-bg: var(--btn-color, var(--color-base-200));
+	--btn-fg: var(--color-base-content);
+	--btn-p: 1rem;
+	--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));
+	--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);
+	align-items: center;
+	background-color: var(--btn-bg);
+	border-color: var(--btn-border);
+	border-end-end-radius: var(--join-ee, var(--radius-field));
+	border-end-start-radius: var(--join-es, var(--radius-field));
+	border-start-end-radius: var(--join-se, var(--radius-field));
+	border-start-start-radius: var(--join-ss, var(--radius-field));
+	border-style: solid;
+	border-width: var(--border);
+	box-shadow: 0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth)*6%)) inset, var(--btn-shadow);
+	color: var(--btn-fg);
+	cursor: pointer;
+	display: inline-flex;
+	flex-shrink: 0;
+	flex-wrap: nowrap;
+	font-size: var(--fontsize, .875rem);
+	font-weight: 600;
+	gap: .375rem;
+	height: var(--size);
+	justify-content: center;
+	outline-color: var(--btn-color, var(--color-base-content));
+	outline-offset: 2px;
+	padding-inline: var(--btn-p);
+	position: relative;
+	text-align: center;
+	text-shadow: 0 .5px oklch(100% 0 0/calc(var(--depth)*.15));
+	touch-action: manipulation;
+	transition-duration: var(--transition-duration);
+	transition-property: color, background-color, border-color, box-shadow;
+	transition-timing-function: var(--bezier);
+	-webkit-user-select: none;
+	user-select: none;
+	vertical-align: middle;
+	webkit-user-select: none;
+
+	.loader-mask {
+		align-items: center;
+		align-items: stretch;
+		display: none;
+		inset: 0.5rem 1rem;
+		justify-content: center;
+		position: absolute;
+
+		.loader {
+			animation: rotation 1s linear infinite;
+			aspect-ratio: 1;
+			border: 2px solid var(--btn-fg);
+			border-bottom-color: transparent;
+			border-radius: 50000px;
+			display: block;
+			max-height: 100%;
+			max-width: 100%;
+		}
+	}
+}
+
+
+:host([loading]) {
+	slot {
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	.loader-mask {
+		display: flex;
+	}
+}
+
+@media (hover: hover) {
+
+	@supports (color: color-mix(in lab, red, red)) {
+		:host(:hover) {
+			--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%);
+		}
+	}
+
+	:host(:hover) {
+		--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);
+	}
+}
+
+:host(:focus-visible) {
+	isolation: isolate;
+	outline-style: solid;
+	outline-width: 2px;
+}
+
+:host(:active:not([active])) {
+	--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);
+	--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);
+	--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);
+	translate: 0 .5px;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	:host(:active:not([active])) {
+		--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);
+		--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%);
+	}
+}
+
+:host(:disabled),
+:host([disabled]) {
+	--btn-border: #0000;
+	--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);
+	pointer-events: none;
+}
+
+:host(:disabled:not([link])),
+:host(:disabled:not([ghost])),
+:host([disabled]:not([link])),
+:host([disabled]:not([ghost])) {
+	background-color: color-mix(in srgb, var(--color-base-content)10%, transparent);
+	box-shadow: none;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+
+	:host(:disabled:not([link])),
+	:host(:disabled:not([ghost])),
+	:host([disabled]:not([link])),
+	:host([disabled]:not([ghost])) {
+		background-color: color-mix(in oklab, var(--color-base-content)10%, transparent);
+	}
+
+	:host(:disabled),
+	:host([disabled]) {
+		--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);
+	}
+}
+
+@media (hover: hover) {
+	@supports (color: color-mix(in lab, red, red)) {
+
+		:host(:disabled:hover),
+		:host([disabled]:hover) {
+			--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);
+			background-color: color-mix(in oklab, var(--color-neutral)20%, transparent);
+		}
+	}
+
+	:host(:disabled:hover),
+	:host([disabled]:hover) {
+		--btn-border: #0000;
+		--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);
+		background-color: color-mix(in srgb, var(--color-neutral)20%, transparent);
+		pointer-events: none;
+	}
+}
+
+@include eachColor using ($color) {
+	:host([color="#{$color}"]) {
+		--btn-color: var(--color-#{$color});
+		--btn-fg: var(--color-#{$color}-content);
+	}
+}
+
+:host([active]) {
+	--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);
+	--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);
+	isolation: isolate;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	:host([active]) {
+		--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%);
+	}
+}
+
+:host([disabled]),
+:host(:disabled) {
+	--btn-border: #0000;
+	--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);
+	pointer-events: none;
+}
+
+:host([disabled]:not([link])),
+:host([disabled]:not([ghost])),
+:host(:disabled:not([link])),
+:host(:disabled:not([ghost])) {
+	background-color: color-mix(in srgb, var(--color-base-content)10%, transparent);
+	box-shadow: none;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+
+	:host([disabled]:not([link])),
+	:host([disabled]:not([ghost])),
+	:host(:disabled:not([link])),
+	:host(:disabled:not([ghost])) {
+		background-color: color-mix(in oklab, var(--color-base-content)10%, transparent);
+	}
+
+	:host([disabled]),
+	:host([disabled]),
+	:host(:disabled),
+	:host(:disabled) {
+		--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);
+	}
+}
+
+@media (hover: hover) {
+
+	@supports (color: color-mix(in lab, red, red)) {
+
+		:host([disabled]:hover),
+		:host([disabled]:hover),
+		:host(:disabled:hover),
+		:host(:disabled:hover) {
+			--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);
+			background-color: color-mix(in oklab, var(--color-neutral)20%, transparent);
+		}
+	}
+
+	:host([disabled]:hover),
+	:host([disabled]:hover),
+	:host(:disabled:hover),
+	:host(:disabled:hover) {
+		--btn-border: #0000;
+		--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);
+		background-color: color-mix(in srgb, var(--color-neutral)20%, transparent);
+		pointer-events: none;
+	}
+}
+
+
+
+:host([outline]:not([active])),
+:host([outline]:not(:hover)),
+:host([outline]:not(:active:focus)),
+:host([outline]:not(:focus-visible)),
+:host([outline]:not(:disabled)),
+:host([outline]:not([disabled])),
+:host([outline]:not(:checked)) {
+	--btn-shadow: "";
+	--btn-bg: #0000;
+	--btn-fg: var(--btn-color);
+	--btn-border: var(--btn-color);
+}
+
+@media (hover: none) {
+
+	:host([outline]:not([active]):hover),
+	:host([outline]:not(:active:focus):hover),
+	:host([outline]:not(:focus-visible):hover),
+	:host([outline]:not(:disabled):hover),
+	:host([outline]:not([disabled]):hover),
+	:host([outline]:not(:checked):hover) {
+		--btn-shadow: "";
+		--btn-bg: #0000;
+		--btn-fg: var(--btn-color);
+		--btn-border: var(--btn-color);
+	}
+}
+
+:host([soft]:not([active])),
+:host([soft]:not(:hover)),
+:host([soft]:not(:active:focus)),
+:host([soft]:not(:focus-visible)),
+:host([soft]:not(:disabled)),
+:host([soft]:not([disabled])) {
+	--btn-shadow: "";
+	--btn-bg: #0000;
+	--btn-fg: var(--btn-color);
+	--btn-border: var(--btn-color);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+
+	:host([soft]:not([active])),
+	:host([soft]:not(:hover)),
+	:host([soft]:not(:active:focus)),
+	:host([soft]:not(:focus-visible)),
+	:host([soft]:not(:disabled)),
+	:host([soft]:not([disabled])) {
+		--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));
+		--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100));
+	}
+}
+
+@media (hover: none) {
+
+	@supports (color: color-mix(in lab, red, red)) {
+
+		:host([soft]:not([active]):hover),
+		:host([soft]:not(:active:focus):hover),
+		:host([soft]:not(:focus-visible):hover),
+		:host([soft]:not(:disabled):hover),
+		:host([soft]:not([disabled]:hover)) {
+			--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));
+			--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100));
+		}
+	}
+
+	:host([soft]:not([active]):hover),
+	:host([soft]:not(:active:focus):hover),
+	:host([soft]:not(:focus-visible):hover),
+	:host([soft]:not(:disabled):hover),
+	:host([soft]:not([disabled]:hover)) {
+		--btn-shadow: "";
+		--btn-fg: var(--btn-color, var(--color-base-content));
+		--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));
+		--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100));
+	}
+}
+
+
+:host([dash]:not([active])),
+:host([dash]:not(:hover)),
+:host([dash]:not(:active:focus)),
+:host([dash]:not(:focus-visible)),
+:host([dash]:not(:disabled)),
+:host([dash]:not([disabled])),
+:host([dash]:not(:checked)) {
+	--btn-shadow: "";
+	--btn-bg: #0000;
+	--btn-fg: var(--btn-color);
+	--btn-border: var(--btn-color);
+	border-style: dashed;
+}
+
+@media (hover: none) {
+
+	:host([dash]:not([active]):hover),
+	:host([dash]:not(:active:focus):hover),
+	:host([dash]:not(:focus-visible):hover),
+	:host([dash]:not(:disabled):hover),
+	:host([dash]:not([disabled]):hover),
+	:host([dash]:not(:checked):hover) {
+		--btn-shadow: "";
+		--btn-bg: #0000;
+		--btn-fg: var(--btn-color);
+		--btn-border: var(--btn-color);
+		border-style: dashed;
+	}
+}
+
+:host([ghost]:not([active])),
+:host([ghost]:not(:hover)),
+:host([ghost]:not(:active:focus)),
+:host([ghost]:not(:focus-visible)) {
+	--btn-shadow: "";
+	--btn-bg: #0000;
+	--btn-border: #0000;
+}
+
+:host([ghost]:not([active])),
+:host([ghost]:not(:hover)),
+:host([ghost]:not(:active:focus)),
+:host([ghost]:not(:focus-visible)),
+:host([ghost]:not(:disabled)),
+:host([ghost]:not([disabled])) {
+	--btn-fg: currentColor;
+	outline-color: currentColor;
+}
+
+@media (hover: none) {
+
+	:host([ghost]:not([active]):hover),
+	:host([ghost]:not(:active):hover),
+	:host([ghost]:not(:focus-visible):hover),
+	:host([ghost]:not(:disabled):hover),
+	:host([ghost]:not([disabled]):hover) {
+		--btn-shadow: "";
+		--btn-bg: #0000;
+		--btn-border: #0000;
+		--btn-fg: currentColor;
+	}
+}
+
+:host([link]) {
+	--btn-border: #0000;
+	--btn-bg: #0000;
+	--btn-fg: var(--color-primary);
+	--btn-shadow: "";
+	outline-color: currentColor;
+	text-decoration-line: underline;
+}
+
+:host([link][active]),
+:host([link]:hover),
+:host([link]:active:focus),
+:host([link]:focus-visible) {
+	--btn-border: #0000;
+	--btn-bg: #0000;
+	text-decoration-line: underline;
+}
+
+@media (hover: none) {
+
+	:host([link][active]:hover),
+	:host([link]:active:hover),
+	:host([link]:focus-visible:hover),
+	:host([link]:disabled:hover),
+	:host([link][disabled]:hover) {
+		text-decoration-line: none;
+	}
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}

@@ -1,0 +1,77 @@
+import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
+import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
+import { Main } from "../../Main/Main.wcl.avt";
+import { EquipeRAM } from "../../ram/Equipe.ram.avt";
+import { EquipeEditModal } from "../EquipesPage/components/EquipeEditModal/EquipeEditModal.wcl.avt";
+
+export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    public item!: Equipe;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    public override async isAllowed(state: Aventus.State, pattern: string): Promise<string | boolean> {
+        let slugs = Main.instance.getSlugs(pattern);
+        if(!slugs || typeof slugs['id'] != "number")
+            return "/";
+
+        const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
+        if(!equipe)
+            return "/";
+
+        this.item = equipe;
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
+        return {};
+    }
+
+
+    /**
+     * 
+     */
+    protected editItem() {
+        EquipeEditModal.open(this.item);
+    }
+    /**
+    * 
+    */
+    protected async deleteItem() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cette équipe?"
+        });
+
+        if(result) {
+            await EquipeRAM.getInstance().delete(this.item);
+            Main.instance.navigate("/", { replace: true });
+        }
+    }
+
+    //#endregion
+
+}

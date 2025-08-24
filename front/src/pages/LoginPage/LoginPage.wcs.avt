@@ -1,0 +1,64 @@
+:host {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
+
+	.card {
+		background-color: var(--color-base-100);
+		border-radius: var(--radius-box);
+		box-shadow: var(--elevation-3);
+		display: flex;
+		justify-content: stretch;
+		max-width: 700px;
+		overflow: hidden;
+		width: calc(100% - 40px);
+
+		.img {
+			background-image: url('/img/background-foot.jpg');
+			background-position: center center;
+			background-size: cover;
+			width: 300px;
+			flex-shrink: 0;
+		}
+
+		.content {
+			padding: 24px;
+		}
+
+		.title {
+			font-size: var(--font-size-lg);
+			margin-bottom: 24px;
+		}
+
+		av-input {
+			margin-bottom: 12px;
+		}
+
+		.right {
+			display: flex;
+			justify-content: flex-end;
+			margin-top: 8px;
+		}
+	}
+}
+
+:host(:not([visible])) {
+	display: flex;
+}
+
+@media screen and (max-width:800px) {
+
+	:host {
+		.card {
+			flex-direction: column;
+			max-width: 500px;
+
+			.img {
+				height: 200px;
+				width: 100%;
+			}
+		}
+	}
+}
