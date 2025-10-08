@@ -1,0 +1,43 @@
+import { GenericOption } from "../../GenericSelect/GenericOption/GenericOption.wcl.avt";
+import type { SelectData } from "../SelectData.wcl.avt";
+
+export class OptionData<T extends Aventus.IData | number, U extends Aventus.IData> extends GenericOption<T> implements Aventus.DefaultComponent {
+
+        //#region static
+
+        //#endregion
+
+
+        //#region props
+
+        //#endregion
+
+
+        //#region variables
+        //#endregion
+
+
+        //#region constructor
+
+        //#endregion
+
+
+        //#region methods
+        public getText() {
+            return this.innerHTML;
+        }
+
+
+        public async setItem(item: U | undefined) {
+            let select = this.select as SelectData<any>;
+            if(!item) {
+                this.value = undefined;
+                this.innerHTML = '';
+            }
+            else {
+                this.value = await select.optionValue(item);
+                this.innerHTML = await select.optionText(item);
+            }
+        }
+        //#endregion
+    }

@@ -1,0 +1,58 @@
+import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import type { EquipeSelect } from "../EquipeSelect/EquipeSelect.wcl.avt";
+
+export class ModalEquipe extends Modal<Equipe> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    public equipe?: Equipe;
+
+    @ViewElement()
+    protected inputEl!: EquipeSelect;
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<Equipe> {
+        return {
+            title: "Ajout d'une équipe",
+        };
+    }
+
+
+    /**
+     * 
+     */
+    protected save() {
+        if(!this.equipe) {
+			this.inputEl.errors = ["Il faut choisir une équipe"];
+			return;
+		}
+		this.resolve(this.equipe);
+    }
+
+
+    //#endregion
+
+}

@@ -12,5 +12,4 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property float $quantite
  */
 class Inventaire extends AventusModel {
-    public $timestamps = false;
 }

@@ -1,0 +1,66 @@
+import { Callback } from "Aventus@Main:Aventus.package.avt";
+import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
+import { ModalTag } from "../ModalTag/ModalTag.wcl.avt";
+
+export class VariationTag extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @ViewElement()
+    protected componentEl!: HTMLSpanElement;
+    // @Watch()
+    public variation!: Variation;
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    public onDelete: Callback<(el: VariationTag) => void> = new Callback();
+
+
+    /**
+     * 
+     */
+    protected async triggerEdit() {
+        const p = new ModalTag();
+        p.name = this.variation.nom;
+        const result = await p.show();
+        if(result !== null) {
+            this.variation.nom = result;
+            this.componentEl.innerText = result;
+        }
+    }
+    /**
+    * 
+    */
+    protected async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.variation.nom + "?"
+        });
+        if(result) {
+            this.onDelete.trigger(this);
+        }
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.componentEl.innerText = this.variation.nom;
+    }
+    //#endregion
+
+}

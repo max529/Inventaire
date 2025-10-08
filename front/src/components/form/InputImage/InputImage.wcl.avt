@@ -55,11 +55,11 @@ export class InputImage extends FormElement<AventusFile> implements Aventus.Defa
         return [];
     }
     protected setPreview() {
-        if(!this.value?.Uri) {
+        if(!this.value?.uri) {
             this.previewUri = this.no_default_preview ? '' : this.default_preview;
         }
         else {
-            this.previewUri = this.value.Uri;
+            this.previewUri = this.value.uri;
             if(this.deletable) {
                 this.show_delete = true;
             }
@@ -73,14 +73,14 @@ export class InputImage extends FormElement<AventusFile> implements Aventus.Defa
         if(!this.value) return;
         this.errors = [];
         if(this.inputFileEl.files && this.inputFileEl.files.length > 0) {
-            this.value.Upload = this.inputFileEl.files[0];
+            this.value.upload = this.inputFileEl.files[0];
             this.previewUri = URL.createObjectURL(this.inputFileEl.files[0]);
             if(this.deletable) {
                 this.show_delete = true;
             }
         }
         else {
-            this.value.Upload = undefined;
+            this.value.upload = undefined;
             this.previewUri = this.default_preview;
             this.show_delete = false;
         }

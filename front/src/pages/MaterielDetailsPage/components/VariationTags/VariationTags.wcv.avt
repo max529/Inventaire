@@ -1,0 +1,4 @@
+<div class="list" @element="listEl">
+
+</div>
+<av-icon-action class="more" icon="add" @press="addVariation">Ajouter une variation</av-icon-action>

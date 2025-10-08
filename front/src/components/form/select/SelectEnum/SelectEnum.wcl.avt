@@ -1,0 +1,72 @@
+import { GenericSelect } from "../GenericSelect/GenericSelect.wcl.avt";
+import { OptionEnum } from "./OptionEnum/OptionEnum.wcl.avt";
+
+export abstract class SelectEnum<U extends Aventus.Enum> extends GenericSelect<OptionEnum<U>, Aventus.EnumValue<U>> implements Aventus.DefaultComponent {
+
+        //#region static
+
+        //#endregion
+
+
+        //#region props
+        @Attribute()
+        public txt_undefined?: string;
+        //#endregion
+
+
+        //#region variables
+        protected enumEl: U;
+        //#endregion
+
+
+        //#region constructor
+        constructor() {
+            super();
+            this.enumEl = this.defineEnum();
+            this.createOptions();
+        }
+        //#endregion
+
+
+        //#region methods
+        /**
+         * @inheritdoc
+         */
+        protected override itemToText(option: OptionEnum<U>): string {
+            return option.innerHTML;
+        }
+
+        public abstract defineEnum(): U;
+
+        protected getEnumName(value: U[Extract<keyof U, string>]): string {
+            return this.enumEl[value] as string;
+        }
+
+        protected createOptions() {
+            if(this.txt_undefined !== undefined) {
+                let option = new OptionEnum();
+                option.value = undefined;
+                option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
+                this.appendChild(option);
+            }
+            let _enum = this.defineEnum();
+            for(let key in _enum) {
+                if(!key.match(/^\d*$/)) {
+                    let val = _enum[key];
+                    let option = new OptionEnum();
+                    option.value = val;
+                    option.innerHTML = this.getEnumName(val);
+                    this.appendChild(option);
+                }
+            }
+        }
+
+
+
+
+        protected override postCreation(): void {
+            super.postCreation();
+        }
+        //#endregion
+
+    }

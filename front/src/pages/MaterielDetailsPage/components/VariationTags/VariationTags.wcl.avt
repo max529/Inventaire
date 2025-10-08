@@ -1,0 +1,66 @@
+import { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+import { ModalTag } from "../ModalTag/ModalTag.wcl.avt";
+import { VariationTag } from "../VariationTag/VariationTag.wcl.avt";
+
+export class VariationTags extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    @ViewElement()
+    protected listEl!: HTMLDivElement;
+
+    public variations: Variation[] = [];
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    @BindThis()
+    protected onChildDelete(el: VariationTag) {
+        let children = Array.from(this.listEl.children);
+        let index = children.indexOf(el);
+        this.variations.splice(index, 1);
+        this.listEl.removeChild(el);
+    }
+    protected render() {
+        this.listEl.innerHTML = "";
+        for(let variation of this.variations) {
+            let el = new VariationTag();
+            el.variation = variation;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    protected async addVariation() {
+        const p = new ModalTag();
+        const nom = await p.show();
+        if(nom === null) return;
+        const v = new Variation();
+        v.nom = nom;
+        this.variations.push(v);
+        let el = new VariationTag();
+        el.variation = v;
+        el.onDelete.add(this.onChildDelete);
+        this.listEl.appendChild(el);
+    }
+
+    protected override postCreation(): void {
+        this.render();
+    }
+    //#endregion
+
+}

@@ -1,4 +1,0 @@
-<av-tag color="accent" @click="triggerFocus">
-    <span><av-inline-edit @bind="this.variation.nom" @element="inlineEl"></av-inline-edit></span>
-    <mi-icon icon="delete" @press="triggerDelete"></mi-icon>
-</av-tag>

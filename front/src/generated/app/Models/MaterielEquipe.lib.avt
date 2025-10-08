@@ -1,0 +1,16 @@
+import { Equipe } from './Equipe.lib.avt';
+import { Materiel } from './Materiel.lib.avt';
+
+namespace App.Models {
+
+	@Convertible()
+	export class MaterielEquipe extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.MaterielEquipe"; }
+		public id!: number;
+		public id_materiel!: number;
+		public id_equipe!: number;
+		public equipe!: Equipe;
+		public materiel!: Materiel;
+	}
+
+}

@@ -1,0 +1,56 @@
+import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+
+export class ModalTag extends Modal<string> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    public name: string = "";
+
+    @ViewElement()
+    protected inputEl!: Input;
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<string> {
+        return {
+            title: "Edition de variation",
+        };
+    }
+
+
+    /**
+     * 
+     */
+    protected save() {
+        if(!this.name) {
+			this.inputEl.errors = ["Il faut un nom pour la variation"];
+			return;
+		}
+		this.resolve(this.name);
+    }
+
+
+    //#endregion
+
+}

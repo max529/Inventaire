@@ -1,0 +1,8 @@
+<div class="title">{{ this.options.title }}</div>
+<div class="content">
+    <av-equipe-select label="Choix de l'équipe" @bind="this.equipe" @element="inputEl" searchable></av-equipe-select>
+</div>
+<div class="footer">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button @press="save" color="primary">Enregistrer</av-button>
+</div>

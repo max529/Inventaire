@@ -1,0 +1,181 @@
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { GenericSelect } from "../GenericSelect/GenericSelect.wcl.avt";
+import { OptionData } from "./OptionData/OptionData.wcl.avt";
+
+export abstract class SelectData<U extends Aventus.IData, T extends U | number = U, R extends OptionData<T, U> = OptionData<T, U>> extends GenericSelect<R, T> implements Aventus.DefaultComponent {
+
+        //#region static
+
+        //#endregion
+
+
+        //#region props
+        @Attribute()
+        public loading!: boolean;
+        @Attribute()
+        public txt_undefined?: string;
+        //#endregion
+
+
+        //#region variables
+        protected data: Aventus.RamItem<U>[] = [];
+        protected isInit: boolean = false;
+        //#endregion
+
+
+        //#region constructor
+        public constructor() {
+            super();
+        }
+        //#endregion
+
+
+        //#region methods
+        protected override compare(item1: T | undefined, item2: T | undefined): boolean {
+            if(item1 === undefined && item2 === undefined) {
+                return true;
+            }
+            if(item1 === undefined || item2 === undefined) {
+                return false;
+            }
+            if(typeof item1 == 'number' || typeof item2 == 'number') {
+                return item1 == item2;
+            }
+            const key1 = this.defineRam().getId(item1 as U);
+            const key2 = this.defineRam().getId(item2 as U);
+            return key1 == key2;
+        }
+
+        /**
+         * @inheritdoc
+         */
+        protected override itemToText(option: R): string {
+            return option.getText();
+        }
+
+        protected defineOption(): new () => R {
+            return OptionData as unknown as new () => R;
+        }
+
+        private getOption(): R {
+            const cst = this.defineOption();
+            let option = new cst() as R;
+            option.init(this);
+            return option;
+        }
+
+        protected async createOptions() {
+            this.loading = true;
+            this.data = await this.loadData();
+            for(let child of this.children) {
+                child.remove();
+            }
+            if(this.txt_undefined !== undefined) {
+                let option = this.getOption();
+                await option.setItem(undefined);
+                if(this.compare(option.value, this.value)) {
+                    this.selectedOption = option;
+                    this.displayValue = this.itemToText(option);
+                    this.filter();
+                }
+                option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
+                this.appendChild(option);
+            }
+            for(let item of this.data) {
+                let option = this.getOption();
+                await option.setItem(item);
+                if(this.compare(option.value, this.value)) {
+                    this.selectedOption = option;
+                    this.displayValue = this.itemToText(option);
+                    this.filter();
+                }
+                this.appendChild(option);
+            }
+            this.loading = false;
+            this.init();
+        }
+
+
+        protected abstract defineRam(): Aventus.Ram<U>;
+        protected async loadData(): Promise<Aventus.RamItem<U>[]> {
+            const result = await Process.execute(this.defineRam().getListWithError()) ?? [];
+            return result;
+        }
+
+        @InternalProtected()
+        public abstract optionText(item: U): Aventus.Asyncable<string>;
+
+        @InternalProtected()
+        public abstract optionValue(item: U): Aventus.Asyncable<T>;
+
+        @BindThis()
+        protected subscribe() {
+            this.defineRam().onCreated(this.onCreated);
+            this.defineRam().onUpdated(this.onUpdated);
+            this.defineRam().onDeleted(this.onDeleted);
+        }
+
+        @BindThis()
+        protected unsubscribe() {
+            this.defineRam().offCreated(this.onCreated);
+            this.defineRam().offUpdated(this.onUpdated);
+            this.defineRam().offDeleted(this.onDeleted);
+        }
+
+        @BindThis()
+        protected async onCreated(item: Aventus.RamItem<U>) {
+            this.data.push(item);
+            let option = this.getOption();
+            await option.setItem(item);
+            this.appendChild(option);
+            this.loadElementsFromSlot();
+        }
+
+        @BindThis()
+        protected async onDeleted(item: Aventus.RamItem<U>) {
+            for(let i = 0; i < this.options.length; i++) {
+                let option = this.options[i];
+                let value = await this.optionValue(item);
+                if(this.compare(option.value, value)) {
+                    this.options.splice(i, 1);
+                    option.remove();
+                    if(this.compare(this.value, value)) {
+                        this.value = undefined;
+                    }
+                }
+            }
+        }
+
+        @BindThis()
+        protected async onUpdated(item: Aventus.RamItem<U>) {
+            for(let i = 0; i < this.options.length; i++) {
+                let option = this.options[i];
+                if(this.compare(option.value, await this.optionValue(item))) {
+                    option.innerHTML = await this.optionText(item);
+                }
+            }
+        }
+
+        protected async init() {
+            if(!this.isConnected) return;
+            if(this.isInit) return;
+            this.isInit = true;
+            await this.createOptions();
+            super.postCreation();
+            this.subscribe();
+        }
+
+        protected override postDestruction(): void {
+            super.postDestruction();
+            this.unsubscribe();
+        }
+        protected override postConnect(): void {
+        }
+
+
+        protected override postCreation(): void {
+            this.init();
+        }
+        //#endregion
+
+    }

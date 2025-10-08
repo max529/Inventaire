@@ -1,0 +1,1 @@
+<input type="checkbox" @element="inputEl" @change="onSwitch" :disabled="this.disabled">

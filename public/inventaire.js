@@ -31,18 +31,59 @@ if(!Object.hasOwn(window, "AvInstance")) {
 var Aventus;
 (Aventus||(Aventus = {}));
 (function (Aventus) {
+const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Aventus`;
 const _ = {};
 
 
 let _n;
+var HttpErrorCode;
+(function (HttpErrorCode) {
+    HttpErrorCode[HttpErrorCode["unknow"] = 0] = "unknow";
+})(HttpErrorCode || (HttpErrorCode = {}));
+__as1(_, 'HttpErrorCode', HttpErrorCode);
+
+let DateConverter=class DateConverter {
+    static __converter = new DateConverter();
+    static get converter() {
+        return this.__converter;
+    }
+    static set converter(value) {
+        this.__converter = value;
+    }
+    isStringDate(txt) {
+        return /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3,6})Z$/.exec(txt) !== null;
+    }
+    fromString(txt) {
+        return new Date(txt);
+    }
+    toString(date) {
+        if (date.getFullYear() < 100) {
+            return "0001-01-01T00:00:00.000Z";
+        }
+        return date.toISOString();
+    }
+}
+DateConverter.Namespace=`Aventus`;
+__as1(_, 'DateConverter', DateConverter);
+
+var HttpMethod;
+(function (HttpMethod) {
+    HttpMethod["GET"] = "GET";
+    HttpMethod["POST"] = "POST";
+    HttpMethod["DELETE"] = "DELETE";
+    HttpMethod["PUT"] = "PUT";
+    HttpMethod["OPTION"] = "OPTION";
+})(HttpMethod || (HttpMethod = {}));
+__as1(_, 'HttpMethod', HttpMethod);
+
 var RamErrorCode;
 (function (RamErrorCode) {
     RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
     RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
     RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
 })(RamErrorCode || (RamErrorCode = {}));
-_.RamErrorCode=RamErrorCode;
+__as1(_, 'RamErrorCode', RamErrorCode);
 
 let ActionGuard=class ActionGuard {
     /**
@@ -98,58 +139,23 @@ let ActionGuard=class ActionGuard {
     }
 }
 ActionGuard.Namespace=`Aventus`;
-_.ActionGuard=ActionGuard;
-
-var HttpErrorCode;
-(function (HttpErrorCode) {
-    HttpErrorCode[HttpErrorCode["unknow"] = 0] = "unknow";
-})(HttpErrorCode || (HttpErrorCode = {}));
-_.HttpErrorCode=HttpErrorCode;
-
-var HttpMethod;
-(function (HttpMethod) {
-    HttpMethod["GET"] = "GET";
-    HttpMethod["POST"] = "POST";
-    HttpMethod["DELETE"] = "DELETE";
-    HttpMethod["PUT"] = "PUT";
-    HttpMethod["OPTION"] = "OPTION";
-})(HttpMethod || (HttpMethod = {}));
-_.HttpMethod=HttpMethod;
+__as1(_, 'ActionGuard', ActionGuard);
 
 let DragElementXYType= [SVGGElement, SVGRectElement, SVGEllipseElement, SVGTextElement];
-_.DragElementXYType=DragElementXYType;
+__as1(_, 'DragElementXYType', DragElementXYType);
 
 let DragElementLeftTopType= [HTMLElement, SVGSVGElement];
-_.DragElementLeftTopType=DragElementLeftTopType;
+__as1(_, 'DragElementLeftTopType', DragElementLeftTopType);
 
-let DateConverter=class DateConverter {
-    static __converter = new DateConverter();
-    static get converter() {
-        return this.__converter;
-    }
-    static set converter(value) {
-        this.__converter = value;
-    }
-    isStringDate(txt) {
-        return /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(txt) !== null;
-    }
-    fromString(txt) {
-        return new Date(txt);
-    }
-    toString(date) {
-        if (date.getFullYear() < 100) {
-            return "0001-01-01T00:00:00.000Z";
-        }
-        return date.toISOString();
-    }
+let sleep=function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
-DateConverter.Namespace=`Aventus`;
-_.DateConverter=DateConverter;
+__as1(_, 'sleep', sleep);
 
 let isClass=function isClass(v) {
     return typeof v === 'function' && /^\s*class\s+/.test(v.toString());
 }
-_.isClass=isClass;
+__as1(_, 'isClass', isClass);
 
 let ElementExtension=class ElementExtension {
     /**
@@ -426,34 +432,7 @@ let ElementExtension=class ElementExtension {
     }
 }
 ElementExtension.Namespace=`Aventus`;
-_.ElementExtension=ElementExtension;
-
-let Instance=class Instance {
-    static elements = new Map();
-    static get(type) {
-        let result = this.elements.get(type);
-        if (!result) {
-            let cst = type.prototype['constructor'];
-            result = new cst();
-            this.elements.set(type, result);
-        }
-        return result;
-    }
-    static set(el) {
-        let cst = el.constructor;
-        if (this.elements.get(cst)) {
-            return false;
-        }
-        this.elements.set(cst, el);
-        return true;
-    }
-    static destroy(el) {
-        let cst = el.constructor;
-        return this.elements.delete(cst);
-    }
-}
-Instance.Namespace=`Aventus`;
-_.Instance=Instance;
+__as1(_, 'ElementExtension', ElementExtension);
 
 let Style=class Style {
     static instance;
@@ -548,7 +527,7 @@ let Style=class Style {
     }
 }
 Style.Namespace=`Aventus`;
-_.Style=Style;
+__as1(_, 'Style', Style);
 
 let setValueToObject=function setValueToObject(path, obj, value) {
     path = path.replace(/\[(.*?)\]/g, '.$1');
@@ -575,7 +554,7 @@ let setValueToObject=function setValueToObject(path, obj, value) {
         obj[splitted[splitted.length - 1]] = value;
     }
 }
-_.setValueToObject=setValueToObject;
+__as1(_, 'setValueToObject', setValueToObject);
 
 let Mutex=class Mutex {
     /**
@@ -718,7 +697,7 @@ let Mutex=class Mutex {
     }
 }
 Mutex.Namespace=`Aventus`;
-_.Mutex=Mutex;
+__as1(_, 'Mutex', Mutex);
 
 let NormalizedEvent=class NormalizedEvent {
     _event;
@@ -797,7 +776,7 @@ let NormalizedEvent=class NormalizedEvent {
     }
 }
 NormalizedEvent.Namespace=`Aventus`;
-_.NormalizedEvent=NormalizedEvent;
+__as1(_, 'NormalizedEvent', NormalizedEvent);
 
 let Callback=class Callback {
     callbacks = new Map();
@@ -834,7 +813,7 @@ let Callback=class Callback {
     }
 }
 Callback.Namespace=`Aventus`;
-_.Callback=Callback;
+__as1(_, 'Callback', Callback);
 
 let compareObject=function compareObject(obj1, obj2) {
     if (Array.isArray(obj1)) {
@@ -919,7 +898,7 @@ let compareObject=function compareObject(obj1, obj2) {
         return obj1 === obj2;
     }
 }
-_.compareObject=compareObject;
+__as1(_, 'compareObject', compareObject);
 
 let getValueFromObject=function getValueFromObject(path, obj) {
     if (path === undefined) {
@@ -949,7 +928,7 @@ let getValueFromObject=function getValueFromObject(path, obj) {
     }
     return val(splitted[splitted.length - 1]);
 }
-_.getValueFromObject=getValueFromObject;
+__as1(_, 'getValueFromObject', getValueFromObject);
 
 var WatchAction;
 (function (WatchAction) {
@@ -957,7 +936,7 @@ var WatchAction;
     WatchAction[WatchAction["UPDATED"] = 1] = "UPDATED";
     WatchAction[WatchAction["DELETED"] = 2] = "DELETED";
 })(WatchAction || (WatchAction = {}));
-_.WatchAction=WatchAction;
+__as1(_, 'WatchAction', WatchAction);
 
 let Effect=class Effect {
     callbacks = [];
@@ -1072,7 +1051,7 @@ let Effect=class Effect {
     }
 }
 Effect.Namespace=`Aventus`;
-_.Effect=Effect;
+__as1(_, 'Effect', Effect);
 
 let Signal=class Signal {
     __subscribes = [];
@@ -1115,7 +1094,7 @@ let Signal=class Signal {
     }
 }
 Signal.Namespace=`Aventus`;
-_.Signal=Signal;
+__as1(_, 'Signal', Signal);
 
 let Computed=class Computed extends Effect {
     _value;
@@ -1155,7 +1134,7 @@ let Computed=class Computed extends Effect {
     }
 }
 Computed.Namespace=`Aventus`;
-_.Computed=Computed;
+__as1(_, 'Computed', Computed);
 
 let Watcher=class Watcher {
     constructor() { }
@@ -1994,7 +1973,7 @@ let Watcher=class Watcher {
     }
 }
 Watcher.Namespace=`Aventus`;
-_.Watcher=Watcher;
+__as1(_, 'Watcher', Watcher);
 
 let ComputedNoRecomputed=class ComputedNoRecomputed extends Computed {
     init() {
@@ -2012,7 +1991,7 @@ let ComputedNoRecomputed=class ComputedNoRecomputed extends Computed {
     run() { }
 }
 ComputedNoRecomputed.Namespace=`Aventus`;
-_.ComputedNoRecomputed=ComputedNoRecomputed;
+__as1(_, 'ComputedNoRecomputed', ComputedNoRecomputed);
 
 let PressManager=class PressManager {
     static globalConfig = {
@@ -2485,7 +2464,7 @@ let PressManager=class PressManager {
     }
 }
 PressManager.Namespace=`Aventus`;
-_.PressManager=PressManager;
+__as1(_, 'PressManager', PressManager);
 
 let Uri=class Uri {
     static prepare(uri) {
@@ -2563,7 +2542,7 @@ let Uri=class Uri {
     }
 }
 Uri.Namespace=`Aventus`;
-_.Uri=Uri;
+__as1(_, 'Uri', Uri);
 
 let State=class State {
     /**
@@ -2588,7 +2567,7 @@ let State=class State {
     }
 }
 State.Namespace=`Aventus`;
-_.State=State;
+__as1(_, 'State', State);
 
 let EmptyState=class EmptyState extends State {
     localName;
@@ -2604,7 +2583,7 @@ let EmptyState=class EmptyState extends State {
     }
 }
 EmptyState.Namespace=`Aventus`;
-_.EmptyState=EmptyState;
+__as1(_, 'EmptyState', EmptyState);
 
 let StateManager=class StateManager {
     subscribers = {};
@@ -2914,7 +2893,7 @@ let StateManager=class StateManager {
     }
 }
 StateManager.Namespace=`Aventus`;
-_.StateManager=StateManager;
+__as1(_, 'StateManager', StateManager);
 
 let TemplateContext=class TemplateContext {
     data = {};
@@ -3120,7 +3099,7 @@ let TemplateContext=class TemplateContext {
     }
 }
 TemplateContext.Namespace=`Aventus`;
-_.TemplateContext=TemplateContext;
+__as1(_, 'TemplateContext', TemplateContext);
 
 let TemplateInstance=class TemplateInstance {
     context;
@@ -3817,7 +3796,7 @@ let TemplateInstance=class TemplateInstance {
     }
 }
 TemplateInstance.Namespace=`Aventus`;
-_.TemplateInstance=TemplateInstance;
+__as1(_, 'TemplateInstance', TemplateInstance);
 
 let Template=class Template {
     static validatePath(path, pathToCheck) {
@@ -3955,7 +3934,34 @@ let Template=class Template {
     }
 }
 Template.Namespace=`Aventus`;
-_.Template=Template;
+__as1(_, 'Template', Template);
+
+let Instance=class Instance {
+    static elements = new Map();
+    static get(type) {
+        let result = this.elements.get(type);
+        if (!result) {
+            let cst = type.prototype['constructor'];
+            result = new cst();
+            this.elements.set(type, result);
+        }
+        return result;
+    }
+    static set(el) {
+        let cst = el.constructor;
+        if (this.elements.get(cst)) {
+            return false;
+        }
+        this.elements.set(cst, el);
+        return true;
+    }
+    static destroy(el) {
+        let cst = el.constructor;
+        return this.elements.delete(cst);
+    }
+}
+Instance.Namespace=`Aventus`;
+__as1(_, 'Instance', Instance);
 
 let WebComponent=class WebComponent extends HTMLElement {
     /**
@@ -4699,7 +4705,7 @@ let WebComponent=class WebComponent extends HTMLElement {
     }
 }
 WebComponent.Namespace=`Aventus`;
-_.WebComponent=WebComponent;
+__as1(_, 'WebComponent', WebComponent);
 
 let WebComponentInstance=class WebComponentInstance {
     static __allDefinitions = [];
@@ -4772,7 +4778,7 @@ let WebComponentInstance=class WebComponentInstance {
     }
 }
 WebComponentInstance.Namespace=`Aventus`;
-_.WebComponentInstance=WebComponentInstance;
+__as1(_, 'WebComponentInstance', WebComponentInstance);
 
 let ResourceLoader=class ResourceLoader {
     static headerLoaded = {};
@@ -4942,7 +4948,7 @@ let ResourceLoader=class ResourceLoader {
     }
 }
 ResourceLoader.Namespace=`Aventus`;
-_.ResourceLoader=ResourceLoader;
+__as1(_, 'ResourceLoader', ResourceLoader);
 
 let GenericError=class GenericError {
     /**
@@ -4968,7 +4974,7 @@ let GenericError=class GenericError {
     }
 }
 GenericError.Namespace=`Aventus`;
-_.GenericError=GenericError;
+__as1(_, 'GenericError', GenericError);
 
 let VoidWithError=class VoidWithError {
     /**
@@ -5019,7 +5025,7 @@ let VoidWithError=class VoidWithError {
     }
 }
 VoidWithError.Namespace=`Aventus`;
-_.VoidWithError=VoidWithError;
+__as1(_, 'VoidWithError', VoidWithError);
 
 let ResultWithError=class ResultWithError extends VoidWithError {
     /**
@@ -5039,7 +5045,7 @@ let ResultWithError=class ResultWithError extends VoidWithError {
     }
 }
 ResultWithError.Namespace=`Aventus`;
-_.ResultWithError=ResultWithError;
+__as1(_, 'ResultWithError', ResultWithError);
 
 let Json=class Json {
     /**
@@ -5128,207 +5134,7 @@ let Json=class Json {
     }
 }
 Json.Namespace=`Aventus`;
-_.Json=Json;
-
-let ConverterTransform=class ConverterTransform {
-    transform(data) {
-        return this.transformLoop(data);
-    }
-    createInstance(data) {
-        if (data.$type) {
-            let cst = Converter.info.get(data.$type);
-            if (cst) {
-                return new cst();
-            }
-        }
-        return undefined;
-    }
-    beforeTransformObject(obj) {
-    }
-    afterTransformObject(obj) {
-    }
-    transformLoop(data) {
-        if (data === null) {
-            return data;
-        }
-        if (Array.isArray(data)) {
-            let result = [];
-            for (let element of data) {
-                result.push(this.transformLoop(element));
-            }
-            return result;
-        }
-        if (data instanceof Date) {
-            return data;
-        }
-        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
-            let objTemp = this.createInstance(data);
-            if (objTemp) {
-                if (objTemp instanceof Map) {
-                    if (data.values) {
-                        for (const keyValue of data.values) {
-                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                        }
-                    }
-                    return objTemp;
-                }
-                let obj = objTemp;
-                this.beforeTransformObject(obj);
-                if (obj.fromJSON) {
-                    obj = obj.fromJSON(data);
-                }
-                else {
-                    obj = Json.classFromJson(obj, data, {
-                        transformValue: (key, value) => {
-                            if (obj[key] instanceof Date) {
-                                return value ? new Date(value) : null;
-                            }
-                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
-                                return value ? DateConverter.converter.fromString(value) : null;
-                            }
-                            else if (obj[key] instanceof Map) {
-                                let map = new Map();
-                                for (const keyValue of value) {
-                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                                }
-                                return map;
-                            }
-                            else if (obj instanceof Data) {
-                                let cst = obj.constructor;
-                                if (cst.$schema[key] == 'boolean') {
-                                    return value ? true : false;
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'Date') {
-                                    return value ? new Date(value) : null;
-                                }
-                            }
-                            return this.transformLoop(value);
-                        }
-                    });
-                }
-                this.afterTransformObject(obj);
-                return obj;
-            }
-            let result = {};
-            for (let key in data) {
-                result[key] = this.transformLoop(data[key]);
-            }
-            return result;
-        }
-        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
-            return new Date(data);
-        }
-        return data;
-    }
-    copyValuesClass(target, src, options) {
-        const realOptions = {
-            isValidKey: options?.isValidKey ?? (() => true),
-            replaceKey: options?.replaceKey ?? ((key) => key),
-            transformValue: options?.transformValue ?? ((key, value) => value),
-        };
-        this.__classCopyValues(target, src, realOptions);
-    }
-    __classCopyValues(target, src, options) {
-        let props = Object.getOwnPropertyNames(target);
-        for (let prop of props) {
-            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
-            if (propInfo?.writable) {
-                if (options.isValidKey(prop))
-                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-            }
-        }
-        let cstTemp = target.constructor;
-        while (cstTemp.prototype && cstTemp != Object.prototype) {
-            props = Object.getOwnPropertyNames(cstTemp.prototype);
-            for (let prop of props) {
-                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
-                if (propInfo?.set && propInfo.get) {
-                    if (options.isValidKey(prop))
-                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-                }
-            }
-            cstTemp = Object.getPrototypeOf(cstTemp);
-        }
-    }
-}
-ConverterTransform.Namespace=`Aventus`;
-_.ConverterTransform=ConverterTransform;
-
-let Converter=class Converter {
-    /**
-    * Map storing information about registered types.
-    */
-    static info = new Map([["Aventus.Map", Map]]);
-    /**
-    * Map storing schemas for registered types.
-    */
-    static schema = new Map();
-    /**
-     * Internal converter instance.
-     */
-    static __converter = new ConverterTransform();
-    /**
-     * Getter for the internal converter instance.
-     */
-    static get converterTransform() {
-        return this.__converter;
-    }
-    /**
-    * Sets the converter instance.
-    * @param converter The converter instance to set.
-    */
-    static setConverter(converter) {
-        this.__converter = converter;
-    }
-    /**
-    * Registers a unique string type for any class.
-    * @param $type The unique string type identifier.
-    * @param cst The constructor function for the class.
-    * @param schema Optional schema for the registered type.
-    */
-    static register($type, cst, schema) {
-        this.info.set($type, cst);
-        if (schema) {
-            this.schema.set($type, schema);
-        }
-    }
-    /**
-     * Transforms the provided data using the current converter instance.
-     * @template T
-     * @param {*} data The data to transform.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
-     * @returns {T} Returns the transformed data.
-     */
-    static transform(data, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.transform(data);
-    }
-    /**
-     * Copies values from one class instance to another using the current converter instance.
-     * @template T
-     * @param {T} to The destination class instance to copy values into.
-     * @param {T} from The source class instance to copy values from.
-     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
-     * @returns {T} Returns the destination class instance with copied values.
-     */
-    static copyValuesClass(to, from, options, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.copyValuesClass(to, from, options);
-    }
-}
-Converter.Namespace=`Aventus`;
-_.Converter=Converter;
+__as1(_, 'Json', Json);
 
 let Data=class Data {
     /**
@@ -5378,7 +5184,7 @@ let Data=class Data {
     }
 }
 Data.Namespace=`Aventus`;
-_.Data=Data;
+__as1(_, 'Data', Data);
 
 let ResizeObserver=class ResizeObserver {
     callback;
@@ -5508,7 +5314,7 @@ let ResizeObserver=class ResizeObserver {
     }
 }
 ResizeObserver.Namespace=`Aventus`;
-_.ResizeObserver=ResizeObserver;
+__as1(_, 'ResizeObserver', ResizeObserver);
 
 let Animation=class Animation {
     /**
@@ -5596,7 +5402,7 @@ let Animation=class Animation {
     }
 }
 Animation.Namespace=`Aventus`;
-_.Animation=Animation;
+__as1(_, 'Animation', Animation);
 
 let DragAndDrop=class DragAndDrop {
     /**
@@ -5753,7 +5559,14 @@ let DragAndDrop=class DragAndDrop {
             }
         }
         this.draggableElement = draggableElement;
-        return this.options.onStart(e);
+        const result = this.options.onStart(e);
+        if (result !== false) {
+            document.body.style.userSelect = 'none';
+            if (window.getSelection) {
+                window.getSelection()?.removeAllRanges();
+            }
+        }
+        return result;
     }
     onDrag(e) {
         if (!this.isEnable) {
@@ -5783,6 +5596,7 @@ let DragAndDrop=class DragAndDrop {
         if (!this.isEnable) {
             return;
         }
+        document.body.style.userSelect = '';
         let targets = this.options.useMouseFinalPosition ? this.getMatchingTargetsWithMousePosition({
             x: e.clientX,
             y: e.clientY
@@ -6159,317 +5973,22 @@ let DragAndDrop=class DragAndDrop {
     }
 }
 DragAndDrop.Namespace=`Aventus`;
-_.DragAndDrop=DragAndDrop;
-
-let HttpError=class HttpError extends GenericError {
-}
-HttpError.Namespace=`Aventus`;
-_.HttpError=HttpError;
-
-let HttpRequest=class HttpRequest {
-    static options;
-    static configure(options) {
-        this.options = options;
-    }
-    request;
-    url;
-    constructor(url, method = HttpMethod.GET, body) {
-        this.url = url;
-        this.request = {};
-        this.setMethod(method);
-        this.prepareBody(body);
-    }
-    setUrl(url) {
-        this.url = url;
-    }
-    toString() {
-        return this.url + " : " + JSON.stringify(this.request);
-    }
-    setBody(body) {
-        this.prepareBody(body);
-    }
-    setMethod(method) {
-        this.request.method = method;
-    }
-    objectToFormData(obj, formData, parentKey) {
-        formData = formData || new FormData();
-        let byPass = obj;
-        if (byPass.__isProxy) {
-            obj = byPass.getTarget();
-        }
-        const keys = obj.toJSON ? Object.keys(obj.toJSON()) : Object.keys(obj);
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            let value = obj[key];
-            const newKey = parentKey ? `${parentKey}[${key}]` : key;
-            if (value instanceof Date) {
-                formData.append(newKey, DateConverter.converter.toString(value));
-            }
-            else if (typeof value === 'object' &&
-                value !== null &&
-                !(value instanceof File)) {
-                if (Array.isArray(value)) {
-                    for (let j = 0; j < value.length; j++) {
-                        const arrayKey = `${newKey}[${j}]`;
-                        this.objectToFormData({ [arrayKey]: value[j] }, formData);
-                    }
-                }
-                else {
-                    this.objectToFormData(value, formData, newKey);
-                }
-            }
-            else {
-                if (value === undefined || value === null) {
-                    value = "";
-                }
-                else if (Watcher.is(value)) {
-                    value = Watcher.extract(value);
-                }
-                formData.append(newKey, value);
-            }
-        }
-        return formData;
-    }
-    jsonReplacer(key, value) {
-        if (this[key] instanceof Date) {
-            return DateConverter.converter.toString(this[key]);
-        }
-        return value;
-    }
-    prepareBody(data) {
-        if (!data) {
-            return;
-        }
-        else if (data instanceof FormData) {
-            this.request.body = data;
-        }
-        else {
-            let useFormData = false;
-            const analyseFormData = (obj) => {
-                for (let key in obj) {
-                    if (obj[key] instanceof File) {
-                        useFormData = true;
-                        break;
-                    }
-                    else if (Array.isArray(obj[key]) && obj[key].length > 0 && obj[key][0] instanceof File) {
-                        useFormData = true;
-                        break;
-                    }
-                    else if (typeof obj[key] == 'object' && !Array.isArray(obj[key]) && !(obj[key] instanceof Date)) {
-                        analyseFormData(obj[key]);
-                        if (useFormData) {
-                            break;
-                        }
-                    }
-                }
-            };
-            analyseFormData(data);
-            if (useFormData) {
-                this.request.body = this.objectToFormData(data);
-            }
-            else {
-                this.request.body = JSON.stringify(data, this.jsonReplacer);
-                this.setHeader("Content-Type", "Application/json");
-            }
-        }
-    }
-    setHeader(name, value) {
-        if (!this.request.headers) {
-            this.request.headers = [];
-        }
-        this.request.headers.push([name, value]);
-    }
-    setCredentials(credentials) {
-        this.request.credentials = credentials;
-    }
-    async _query(router) {
-        let result = new ResultWithError();
-        try {
-            if (!this.url.startsWith("/")) {
-                this.url = "/" + this.url;
-            }
-            if (HttpRequest.options?.beforeSend) {
-                const beforeSendResult = await HttpRequest.options.beforeSend(this);
-                result.errors = beforeSendResult.errors;
-            }
-            const fullUrl = router ? router.options.url + this.url : this.url;
-            result.result = await fetch(fullUrl, this.request);
-        }
-        catch (e) {
-            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
-        }
-        return result;
-    }
-    async query(router) {
-        let result = await this._query(router);
-        if (HttpRequest.options?.responseMiddleware) {
-            result = await HttpRequest.options.responseMiddleware(result, this);
-        }
-        return result;
-    }
-    async queryVoid(router) {
-        let resultTemp = await this._query(router);
-        let result = new VoidWithError();
-        if (!resultTemp.success) {
-            result.errors = resultTemp.errors;
-            return result;
-        }
-        try {
-            if (!resultTemp.result) {
-                return result;
-            }
-            if (resultTemp.result.status != 204) {
-                let tempResult = Converter.transform(await resultTemp.result.json());
-                if (tempResult instanceof VoidWithError) {
-                    for (let error of tempResult.errors) {
-                        result.errors.push(error);
-                    }
-                }
-            }
-        }
-        catch (e) {
-        }
-        if (HttpRequest.options?.responseMiddleware) {
-            result = await HttpRequest.options.responseMiddleware(result, this);
-        }
-        return result;
-    }
-    async queryJSON(router) {
-        let resultTemp = await this._query(router);
-        let result = new ResultWithError();
-        if (!resultTemp.success) {
-            result.errors = resultTemp.errors;
-            return result;
-        }
-        try {
-            if (!resultTemp.result) {
-                return result;
-            }
-            let tempResult = Converter.transform(await resultTemp.result.json());
-            if (tempResult instanceof VoidWithError) {
-                for (let error of tempResult.errors) {
-                    result.errors.push(error);
-                }
-                if (tempResult instanceof ResultWithError) {
-                    result.result = tempResult.result;
-                }
-            }
-            else {
-                result.result = tempResult;
-            }
-        }
-        catch (e) {
-            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
-        }
-        if (HttpRequest.options?.responseMiddleware) {
-            result = await HttpRequest.options.responseMiddleware(result, this);
-        }
-        return result;
-    }
-    async queryTxt(router) {
-        let resultTemp = await this._query(router);
-        let result = new ResultWithError();
-        if (!resultTemp.success) {
-            result.errors = resultTemp.errors;
-            return result;
-        }
-        try {
-            if (!resultTemp.result) {
-                return result;
-            }
-            result.result = await resultTemp.result.text();
-        }
-        catch (e) {
-            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
-        }
-        if (HttpRequest.options?.responseMiddleware) {
-            result = await HttpRequest.options.responseMiddleware(result, this);
-        }
-        return result;
-    }
-    async queryBlob(router) {
-        let resultTemp = await this._query(router);
-        let result = new ResultWithError();
-        if (!resultTemp.success) {
-            result.errors = resultTemp.errors;
-            return result;
-        }
-        try {
-            if (!resultTemp.result) {
-                return result;
-            }
-            result.result = await resultTemp.result.blob();
-        }
-        catch (e) {
-            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
-        }
-        if (HttpRequest.options?.responseMiddleware) {
-            result = await HttpRequest.options.responseMiddleware(result, this);
-        }
-        return result;
-    }
-}
-HttpRequest.Namespace=`Aventus`;
-_.HttpRequest=HttpRequest;
-
-let HttpRouter=class HttpRouter {
-    options;
-    constructor() {
-        this.options = this.defineOptions(this.defaultOptionsValue());
-    }
-    defaultOptionsValue() {
-        return {
-            url: location.protocol + "//" + location.host
-        };
-    }
-    defineOptions(options) {
-        return options;
-    }
-    async get(url) {
-        return await new HttpRequest(url).queryJSON(this);
-    }
-    async post(url, data) {
-        return await new HttpRequest(url, HttpMethod.POST, data).queryJSON(this);
-    }
-    async put(url, data) {
-        return await new HttpRequest(url, HttpMethod.PUT, data).queryJSON(this);
-    }
-    async delete(url, data) {
-        return await new HttpRequest(url, HttpMethod.DELETE, data).queryJSON(this);
-    }
-    async option(url, data) {
-        return await new HttpRequest(url, HttpMethod.OPTION, data).queryJSON(this);
-    }
-}
-HttpRouter.Namespace=`Aventus`;
-_.HttpRouter=HttpRouter;
-
-let HttpRoute=class HttpRoute {
-    router;
-    constructor(router) {
-        this.router = router ?? new HttpRouter();
-    }
-    getPrefix() {
-        return "";
-    }
-}
-HttpRoute.Namespace=`Aventus`;
-_.HttpRoute=HttpRoute;
+__as1(_, 'DragAndDrop', DragAndDrop);
 
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
-_.RamError=RamError;
+__as1(_, 'RamError', RamError);
 
 let VoidRamWithError=class VoidRamWithError extends VoidWithError {
 }
 VoidRamWithError.Namespace=`Aventus`;
-_.VoidRamWithError=VoidRamWithError;
+__as1(_, 'VoidRamWithError', VoidRamWithError);
 
 let ResultRamWithError=class ResultRamWithError extends ResultWithError {
 }
 ResultRamWithError.Namespace=`Aventus`;
-_.ResultRamWithError=ResultRamWithError;
+__as1(_, 'ResultRamWithError', ResultRamWithError);
 
 let GenericRam=class GenericRam {
     /**
@@ -7343,12 +6862,499 @@ let GenericRam=class GenericRam {
     async afterDeleteList(result) { }
 }
 GenericRam.Namespace=`Aventus`;
-_.GenericRam=GenericRam;
+__as1(_, 'GenericRam', GenericRam);
 
 let Ram=class Ram extends GenericRam {
 }
 Ram.Namespace=`Aventus`;
-_.Ram=Ram;
+__as1(_, 'Ram', Ram);
+
+let HttpError=class HttpError extends GenericError {
+}
+HttpError.Namespace=`Aventus`;
+__as1(_, 'HttpError', HttpError);
+
+let ConverterTransform=class ConverterTransform {
+    transform(data) {
+        return this.transformLoop(data);
+    }
+    createInstance(data) {
+        if (data.$type) {
+            let cst = Converter.info.get(data.$type);
+            if (cst) {
+                return new cst();
+            }
+        }
+        return undefined;
+    }
+    beforeTransformObject(obj) {
+    }
+    afterTransformObject(obj) {
+    }
+    transformLoop(data) {
+        if (data === null) {
+            return data;
+        }
+        if (Array.isArray(data)) {
+            let result = [];
+            for (let element of data) {
+                result.push(this.transformLoop(element));
+            }
+            return result;
+        }
+        if (data instanceof Date) {
+            return data;
+        }
+        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
+            let objTemp = this.createInstance(data);
+            if (objTemp) {
+                if (objTemp instanceof Map) {
+                    if (data.values) {
+                        for (const keyValue of data.values) {
+                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                        }
+                    }
+                    return objTemp;
+                }
+                let obj = objTemp;
+                this.beforeTransformObject(obj);
+                if (obj.fromJSON) {
+                    obj = obj.fromJSON(data);
+                }
+                else {
+                    obj = Json.classFromJson(obj, data, {
+                        transformValue: (key, value) => {
+                            if (obj[key] instanceof Date) {
+                                return value ? new Date(value) : null;
+                            }
+                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
+                                return value ? DateConverter.converter.fromString(value) : null;
+                            }
+                            else if (obj[key] instanceof Map) {
+                                let map = new Map();
+                                if ("$type" in value && value['$type'] == "Aventus.Map") {
+                                    value = value.values;
+                                }
+                                for (const keyValue of value) {
+                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                                }
+                                return map;
+                            }
+                            else if (obj instanceof Data) {
+                                let cst = obj.constructor;
+                                if (cst.$schema[key] == 'boolean') {
+                                    return value ? true : false;
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'Date') {
+                                    return value ? new Date(value) : null;
+                                }
+                            }
+                            return this.transformLoop(value);
+                        }
+                    });
+                }
+                this.afterTransformObject(obj);
+                return obj;
+            }
+            let result = {};
+            for (let key in data) {
+                result[key] = this.transformLoop(data[key]);
+            }
+            return result;
+        }
+        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
+            return new Date(data);
+        }
+        return data;
+    }
+    copyValuesClass(target, src, options) {
+        const realOptions = {
+            isValidKey: options?.isValidKey ?? (() => true),
+            replaceKey: options?.replaceKey ?? ((key) => key),
+            transformValue: options?.transformValue ?? ((key, value) => value),
+        };
+        this.__classCopyValues(target, src, realOptions);
+    }
+    __classCopyValues(target, src, options) {
+        let props = Object.getOwnPropertyNames(target);
+        for (let prop of props) {
+            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
+            if (propInfo?.writable) {
+                if (options.isValidKey(prop))
+                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+            }
+        }
+        let cstTemp = target.constructor;
+        while (cstTemp.prototype && cstTemp != Object.prototype) {
+            props = Object.getOwnPropertyNames(cstTemp.prototype);
+            for (let prop of props) {
+                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
+                if (propInfo?.set && propInfo.get) {
+                    if (options.isValidKey(prop))
+                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+                }
+            }
+            cstTemp = Object.getPrototypeOf(cstTemp);
+        }
+    }
+}
+ConverterTransform.Namespace=`Aventus`;
+__as1(_, 'ConverterTransform', ConverterTransform);
+
+let Converter=class Converter {
+    /**
+    * Map storing information about registered types.
+    */
+    static info = new Map([["Aventus.Map", Map]]);
+    /**
+    * Map storing schemas for registered types.
+    */
+    static schema = new Map();
+    /**
+     * Internal converter instance.
+     */
+    static __converter = new ConverterTransform();
+    /**
+     * Getter for the internal converter instance.
+     */
+    static get converterTransform() {
+        return this.__converter;
+    }
+    /**
+    * Sets the converter instance.
+    * @param converter The converter instance to set.
+    */
+    static setConverter(converter) {
+        this.__converter = converter;
+    }
+    /**
+    * Registers a unique string type for any class.
+    * @param $type The unique string type identifier.
+    * @param cst The constructor function for the class.
+    * @param schema Optional schema for the registered type.
+    */
+    static register($type, cst, schema) {
+        this.info.set($type, cst);
+        if (schema) {
+            this.schema.set($type, schema);
+        }
+    }
+    /**
+     * Transforms the provided data using the current converter instance.
+     * @template T
+     * @param {*} data The data to transform.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
+     * @returns {T} Returns the transformed data.
+     */
+    static transform(data, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.transform(data);
+    }
+    /**
+     * Copies values from one class instance to another using the current converter instance.
+     * @template T
+     * @param {T} to The destination class instance to copy values into.
+     * @param {T} from The source class instance to copy values from.
+     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
+     * @returns {T} Returns the destination class instance with copied values.
+     */
+    static copyValuesClass(to, from, options, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.copyValuesClass(to, from, options);
+    }
+}
+Converter.Namespace=`Aventus`;
+__as1(_, 'Converter', Converter);
+
+let HttpRequest=class HttpRequest {
+    static options;
+    static configure(options) {
+        this.options = options;
+    }
+    request;
+    url;
+    constructor(url, method = HttpMethod.GET, body) {
+        this.url = url;
+        this.request = {};
+        this.setMethod(method);
+        this.prepareBody(body);
+    }
+    setUrl(url) {
+        this.url = url;
+    }
+    toString() {
+        return this.url + " : " + JSON.stringify(this.request);
+    }
+    setBody(body) {
+        this.prepareBody(body);
+    }
+    setMethod(method) {
+        this.request.method = method;
+    }
+    objectToFormData(obj, formData, parentKey) {
+        formData = formData || new FormData();
+        let byPass = obj;
+        if (byPass.__isProxy) {
+            obj = byPass.getTarget();
+        }
+        const keys = obj.toJSON ? Object.keys(obj.toJSON()) : Object.keys(obj);
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            let value = obj[key];
+            const newKey = parentKey ? `${parentKey}[${key}]` : key;
+            if (value instanceof Date) {
+                formData.append(newKey, DateConverter.converter.toString(value));
+            }
+            else if (typeof value === 'object' &&
+                value !== null &&
+                !(value instanceof File)) {
+                if (Array.isArray(value)) {
+                    for (let j = 0; j < value.length; j++) {
+                        const arrayKey = `${newKey}[${j}]`;
+                        this.objectToFormData({ [arrayKey]: value[j] }, formData);
+                    }
+                }
+                else {
+                    this.objectToFormData(value, formData, newKey);
+                }
+            }
+            else {
+                if (value === undefined || value === null) {
+                    value = "";
+                }
+                else if (Watcher.is(value)) {
+                    value = Watcher.extract(value);
+                }
+                formData.append(newKey, value);
+            }
+        }
+        return formData;
+    }
+    jsonReplacer(key, value) {
+        if (this[key] instanceof Date) {
+            return DateConverter.converter.toString(this[key]);
+        }
+        return value;
+    }
+    prepareBody(data) {
+        if (!data) {
+            return;
+        }
+        else if (data instanceof FormData) {
+            this.request.body = data;
+        }
+        else {
+            let useFormData = false;
+            const analyseFormData = (obj) => {
+                for (let key in obj) {
+                    if (obj[key] instanceof File) {
+                        useFormData = true;
+                        break;
+                    }
+                    else if (Array.isArray(obj[key]) && obj[key].length > 0 && obj[key][0] instanceof File) {
+                        useFormData = true;
+                        break;
+                    }
+                    else if (typeof obj[key] == 'object' && !Array.isArray(obj[key]) && !(obj[key] instanceof Date)) {
+                        analyseFormData(obj[key]);
+                        if (useFormData) {
+                            break;
+                        }
+                    }
+                }
+            };
+            analyseFormData(data);
+            if (useFormData) {
+                this.request.body = this.objectToFormData(data);
+            }
+            else {
+                this.request.body = JSON.stringify(data, this.jsonReplacer);
+                this.setHeader("Content-Type", "Application/json");
+            }
+        }
+    }
+    setHeader(name, value) {
+        if (!this.request.headers) {
+            this.request.headers = [];
+        }
+        this.request.headers.push([name, value]);
+    }
+    setCredentials(credentials) {
+        this.request.credentials = credentials;
+    }
+    async _query(router) {
+        let result = new ResultWithError();
+        try {
+            const isFull = this.url.match("https?://");
+            if (!this.url.startsWith("/") && !isFull) {
+                this.url = "/" + this.url;
+            }
+            if (HttpRequest.options?.beforeSend) {
+                const beforeSendResult = await HttpRequest.options.beforeSend(this);
+                result.errors = beforeSendResult.errors;
+            }
+            const fullUrl = isFull ? this.url : router ? router.options.url + this.url : this.url;
+            result.result = await fetch(fullUrl, this.request);
+        }
+        catch (e) {
+            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
+        }
+        return result;
+    }
+    async query(router) {
+        let result = await this._query(router);
+        if (HttpRequest.options?.responseMiddleware) {
+            result = await HttpRequest.options.responseMiddleware(result, this);
+        }
+        return result;
+    }
+    async queryVoid(router) {
+        let resultTemp = await this.query(router);
+        let result = new VoidWithError();
+        if (!resultTemp.success) {
+            result.errors = resultTemp.errors;
+            return result;
+        }
+        try {
+            if (!resultTemp.result) {
+                return result;
+            }
+            if (resultTemp.result.status != 204) {
+                let tempResult = Converter.transform(await resultTemp.result.json());
+                if (tempResult instanceof VoidWithError) {
+                    for (let error of tempResult.errors) {
+                        result.errors.push(error);
+                    }
+                }
+            }
+        }
+        catch (e) {
+        }
+        return result;
+    }
+    async queryJSON(router) {
+        let resultTemp = await this.query(router);
+        let result = new ResultWithError();
+        if (!resultTemp.success) {
+            result.errors = resultTemp.errors;
+            return result;
+        }
+        try {
+            if (!resultTemp.result) {
+                return result;
+            }
+            let tempResult = Converter.transform(await resultTemp.result.json());
+            if (tempResult instanceof VoidWithError) {
+                for (let error of tempResult.errors) {
+                    result.errors.push(error);
+                }
+                if (tempResult instanceof ResultWithError) {
+                    result.result = tempResult.result;
+                }
+            }
+            else {
+                result.result = tempResult;
+            }
+        }
+        catch (e) {
+            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
+        }
+        return result;
+    }
+    async queryTxt(router) {
+        let resultTemp = await this.query(router);
+        let result = new ResultWithError();
+        if (!resultTemp.success) {
+            result.errors = resultTemp.errors;
+            return result;
+        }
+        try {
+            if (!resultTemp.result) {
+                return result;
+            }
+            result.result = await resultTemp.result.text();
+        }
+        catch (e) {
+            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
+        }
+        return result;
+    }
+    async queryBlob(router) {
+        let resultTemp = await this.query(router);
+        let result = new ResultWithError();
+        if (!resultTemp.success) {
+            result.errors = resultTemp.errors;
+            return result;
+        }
+        try {
+            if (!resultTemp.result) {
+                return result;
+            }
+            result.result = await resultTemp.result.blob();
+        }
+        catch (e) {
+            result.errors.push(new HttpError(HttpErrorCode.unknow, e));
+        }
+        return result;
+    }
+}
+HttpRequest.Namespace=`Aventus`;
+__as1(_, 'HttpRequest', HttpRequest);
+
+let HttpRouter=class HttpRouter {
+    options;
+    constructor() {
+        this.options = this.defineOptions(this.defaultOptionsValue());
+    }
+    defaultOptionsValue() {
+        return {
+            url: location.protocol + "//" + location.host
+        };
+    }
+    defineOptions(options) {
+        return options;
+    }
+    async get(url) {
+        return await new HttpRequest(url).queryJSON(this);
+    }
+    async post(url, data) {
+        return await new HttpRequest(url, HttpMethod.POST, data).queryJSON(this);
+    }
+    async put(url, data) {
+        return await new HttpRequest(url, HttpMethod.PUT, data).queryJSON(this);
+    }
+    async delete(url, data) {
+        return await new HttpRequest(url, HttpMethod.DELETE, data).queryJSON(this);
+    }
+    async option(url, data) {
+        return await new HttpRequest(url, HttpMethod.OPTION, data).queryJSON(this);
+    }
+}
+HttpRouter.Namespace=`Aventus`;
+__as1(_, 'HttpRouter', HttpRouter);
+
+let HttpRoute=class HttpRoute {
+    router;
+    constructor(router) {
+        this.router = router ?? new HttpRouter();
+    }
+    getPrefix() {
+        return "";
+    }
+}
+HttpRoute.Namespace=`Aventus`;
+__as1(_, 'HttpRoute', HttpRoute);
 
 
 for(let key in _) { Aventus[key] = _[key] }
@@ -7357,6 +7363,7 @@ for(let key in _) { Aventus[key] = _[key] }
 var MaterialIcon;
 (MaterialIcon||(MaterialIcon = {}));
 (function (MaterialIcon) {
+const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `MaterialIcon`;
 const _ = {};
 
@@ -7460,7 +7467,7 @@ const Icon = class Icon extends Aventus.WebComponent {
 }
 Icon.Namespace=`MaterialIcon`;
 Icon.Tag=`mi-icon`;
-_.Icon=Icon;
+__as1(_, 'Icon', Icon);
 if(!window.customElements.get('mi-icon')){window.customElements.define('mi-icon', Icon);Aventus.WebComponentInstance.registerDefinition(Icon);}
 
 
@@ -7470,6 +7477,7 @@ for(let key in _) { MaterialIcon[key] = _[key] }
 var AventusPhp;
 (AventusPhp||(AventusPhp = {}));
 (function (AventusPhp) {
+const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `AventusPhp`;
 const _ = {};
 
@@ -7481,7 +7489,7 @@ let AventusError=class AventusError extends Aventus.GenericError {
 AventusError.Namespace=`AventusPhp`;
 AventusError.$schema={...(Aventus.GenericError?.$schema ?? {}), };
 Aventus.Converter.register(AventusError.Fullname, AventusError);
-_.AventusError=AventusError;
+__as1(_, 'AventusError', AventusError);
 
 let LaravelResult=class LaravelResult extends Aventus.ResultWithError {
     static get Fullname() { return "Aventus.Laraventus.Helpers.LaravelResult"; }
@@ -7489,46 +7497,24 @@ let LaravelResult=class LaravelResult extends Aventus.ResultWithError {
 LaravelResult.Namespace=`AventusPhp`;
 LaravelResult.$schema={...(Aventus.ResultWithError?.$schema ?? {}), };
 Aventus.Converter.register(LaravelResult.Fullname, LaravelResult);
-_.LaravelResult=LaravelResult;
+__as1(_, 'LaravelResult', LaravelResult);
 
-let ModelController=class ModelController extends Aventus.HttpRoute {
-    constructor(router) {
-        super(router);
-        this.index = this.index.bind(this);
-        this.store = this.store.bind(this);
-        this.show = this.show.bind(this);
-        this.update = this.update.bind(this);
-        this.destroy = this.destroy.bind(this);
-    }
-    async index() {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}`, Aventus.HttpMethod.GET);
-        return await request.queryJSON(this.router);
-    }
-    async store(body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}`, Aventus.HttpMethod.POST);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-    async show(id) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.GET);
-        return await request.queryJSON(this.router);
-    }
-    async update(id, body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.PUT);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-    async destroy(id) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.DELETE);
-        return await request.queryJSON(this.router);
-    }
+let IdsManyRequest=class IdsManyRequest {
+    ids = [];
 }
-ModelController.Namespace=`AventusPhp`;
-_.ModelController=ModelController;
+IdsManyRequest.Namespace=`AventusPhp`;
+__as1(_, 'IdsManyRequest', IdsManyRequest);
+
+let ItemsManyRequest=class ItemsManyRequest {
+    items;
+}
+ItemsManyRequest.Namespace=`AventusPhp`;
+__as1(_, 'ItemsManyRequest', ItemsManyRequest);
 
 let AventusFile=class AventusFile {
-    Uri;
-    Upload;
+    static get Fullname() { return "Aventus.Laraventus.Models.AventusFile"; }
+    uri;
+    upload;
     /**
      * Get the unique type for the data. Define it as the namespace + class name
      */
@@ -7559,12 +7545,79 @@ let AventusFile=class AventusFile {
     }
 }
 AventusFile.Namespace=`AventusPhp`;
-_.AventusFile=AventusFile;
+__as1(_, 'AventusFile', AventusFile);
 
 let AventusImage=class AventusImage extends AventusFile {
+    static get Fullname() { return "Aventus.Laraventus.Models.AventusImage"; }
 }
 AventusImage.Namespace=`AventusPhp`;
-_.AventusImage=AventusImage;
+__as1(_, 'AventusImage', AventusImage);
+
+let ModelController=class ModelController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.index = this.index.bind(this);
+        this.store = this.store.bind(this);
+        this.storeMany = this.storeMany.bind(this);
+        this.show = this.show.bind(this);
+        this.showMany = this.showMany.bind(this);
+        this.update = this.update.bind(this);
+        this.updateMany = this.updateMany.bind(this);
+        this.destroy = this.destroy.bind(this);
+        this.destroyMany = this.destroyMany.bind(this);
+    }
+    async index() {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}`, Aventus.HttpMethod.GET);
+        return await request.queryJSON(this.router);
+    }
+    async store(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+    async storeMany(body) {
+        const requestBody = new ItemsManyRequest();
+        requestBody.items = body;
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/many`, Aventus.HttpMethod.POST);
+        request.setBody(requestBody);
+        return await request.queryJSON(this.router);
+    }
+    async show(id) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.GET);
+        return await request.queryJSON(this.router);
+    }
+    async showMany(ids) {
+        const requestBody = new IdsManyRequest();
+        requestBody.ids = ids;
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/show_many`, Aventus.HttpMethod.POST);
+        return await request.queryJSON(this.router);
+    }
+    async update(id, body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.PUT);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+    async updateMany(body) {
+        const requestBody = new ItemsManyRequest();
+        requestBody.items = body;
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/many`, Aventus.HttpMethod.PUT);
+        request.setBody(requestBody);
+        return await request.queryJSON(this.router);
+    }
+    async destroy(id) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.DELETE);
+        return await request.queryJSON(this.router);
+    }
+    async destroyMany(ids) {
+        const requestBody = new IdsManyRequest();
+        requestBody.ids = ids;
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/many`, Aventus.HttpMethod.DELETE);
+        request.setBody(requestBody);
+        return await request.queryJSON(this.router);
+    }
+}
+ModelController.Namespace=`AventusPhp`;
+__as1(_, 'ModelController', ModelController);
 
 let RamCompletor=class RamCompletor {
     objects = [];
@@ -7642,7 +7695,7 @@ let RamCompletor=class RamCompletor {
     }
 }
 RamCompletor.Namespace=`AventusPhp`;
-_.RamCompletor=RamCompletor;
+__as1(_, 'RamCompletor', RamCompletor);
 
 let RamHttp=class RamHttp extends Aventus.Ram {
     getAllDone = false;
@@ -7690,19 +7743,33 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             }
         }
     }
-    // protected override async beforeGetByIds(ids: number[], result: Aventus.ResultRamWithError<Aventus.RamItem<T>[]>): Promise<void> {
-    //     for(let id of ids) {
-    //         if(!this.records.has(id)) {
-    //             missingIds.push(id);
-    //     if(missingIds.length > 0) {
-    //         let response = await this.routes.GetByIds({ ids: missingIds });
-    //         if(response.success && response.result) {
-    //             for(let item of response.result) {
-    //                 let resultTemp: Aventus.ResultRamWithError<Aventus.RamItem<T>> = new Aventus.ResultRamWithError();
-    //                 await this.addOrUpdateData(item, resultTemp);
-    //                 if(!resultTemp.success || !resultTemp.result) {
-    //                 else if(!result.result.includes(resultTemp.result)) {
-    //                     result.result.push(resultTemp.result);
+    async beforeGetByIds(ids, result) {
+        let missingIds = [];
+        for (let id of ids) {
+            if (!this.records.has(id)) {
+                missingIds.push(id);
+            }
+        }
+        if (missingIds.length > 0) {
+            result.result = [];
+            let response = await this.routes.showMany(missingIds);
+            if (response.success && response.result) {
+                for (let item of response.result) {
+                    let resultTemp = new Aventus.ResultRamWithError();
+                    await this.addOrUpdateData(item, resultTemp);
+                    if (!resultTemp.success || !resultTemp.result) {
+                        result.errors = [...result.errors, ...resultTemp.errors];
+                    }
+                    else if (!result.result.includes(resultTemp.result)) {
+                        result.result.push(resultTemp.result);
+                    }
+                }
+            }
+            else {
+                result.errors = [...result.errors, ...response.errors];
+            }
+        }
+    }
     complete(objects, error) {
         return new RamCompletor(objects, error);
     }
@@ -7718,11 +7785,18 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             result.errors = [...result.errors, ...response.errors];
         }
     }
-    // protected override async beforeCreateList(list: T[], result: Aventus.ResultRamWithError<Aventus.RamItem<T>[]>): Promise<void> {
-    //     let response = await this.routes.CreateMany({ list });
-    //     if(response.success && response.result) {
-    //         for(let element of response.result) {
-    //             result.result.push(this.getObjectForRam(element));
+    async beforeCreateList(list, result) {
+        let response = await this.routes.storeMany(list);
+        if (response.success && response.result) {
+            result.result = [];
+            for (let element of response.result) {
+                result.result.push(this.getObjectForRam(element));
+            }
+        }
+        else {
+            result.errors = [...result.errors, ...response.errors];
+        }
+    }
     async beforeUpdateItem(item, fromList, result) {
         if (fromList) {
             return;
@@ -7735,11 +7809,18 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             result.errors = [...result.errors, ...response.errors];
         }
     }
-    // protected override async beforeUpdateList(list: T[], result: Aventus.ResultRamWithError<Aventus.RamItem<T>[]>): Promise<void> {
-    //     let response = await this.routes.UpdateMany({ list });
-    //     if(response.success && response.result) {
-    //         for(let element of response.result) {
-    //             result.result.push(this.getObjectForRam(element));
+    async beforeUpdateList(list, result) {
+        let response = await this.routes.updateMany(list);
+        if (response.success && response.result) {
+            result.result = [];
+            for (let element of response.result) {
+                result.result.push(this.getObjectForRam(element));
+            }
+        }
+        else {
+            result.errors = [...result.errors, ...response.errors];
+        }
+    }
     async beforeDeleteItem(item, fromList, result) {
         if (fromList) {
             return;
@@ -7749,9 +7830,15 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             result.errors = [...result.errors, ...response.errors];
         }
     }
+    async beforeDeleteList(list, result) {
+        let response = await this.routes.destroyMany(list.map(t => t.id));
+        if (!response.success) {
+            result.errors = [...result.errors, ...response.errors];
+        }
+    }
 }
 RamHttp.Namespace=`AventusPhp`;
-_.RamHttp=RamHttp;
+__as1(_, 'RamHttp', RamHttp);
 
 
 for(let key in _) { AventusPhp[key] = _[key] }
@@ -7760,6 +7847,7 @@ for(let key in _) { AventusPhp[key] = _[key] }
 var Aventus;
 (Aventus||(Aventus = {}));
 (function (Aventus) {
+const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Aventus`;
 const _ = {};
 
@@ -7805,8 +7893,30 @@ Layout.Row = class Row extends Aventus.WebComponent {
 }
 Layout.Row.Namespace=`Aventus.Layout`;
 Layout.Row.Tag=`av-row`;
-_.Layout.Row=Layout.Row;
+__as1(_.Layout, 'Row', Layout.Row);
 if(!window.customElements.get('av-row')){window.customElements.define('av-row', Layout.Row);Aventus.WebComponentInstance.registerDefinition(Layout.Row);}
+
+(function (SpecialTouch) {
+    SpecialTouch[SpecialTouch["Backspace"] = 0] = "Backspace";
+    SpecialTouch[SpecialTouch["Insert"] = 1] = "Insert";
+    SpecialTouch[SpecialTouch["End"] = 2] = "End";
+    SpecialTouch[SpecialTouch["PageDown"] = 3] = "PageDown";
+    SpecialTouch[SpecialTouch["PageUp"] = 4] = "PageUp";
+    SpecialTouch[SpecialTouch["Escape"] = 5] = "Escape";
+    SpecialTouch[SpecialTouch["AltGraph"] = 6] = "AltGraph";
+    SpecialTouch[SpecialTouch["Control"] = 7] = "Control";
+    SpecialTouch[SpecialTouch["Alt"] = 8] = "Alt";
+    SpecialTouch[SpecialTouch["Shift"] = 9] = "Shift";
+    SpecialTouch[SpecialTouch["CapsLock"] = 10] = "CapsLock";
+    SpecialTouch[SpecialTouch["Tab"] = 11] = "Tab";
+    SpecialTouch[SpecialTouch["Delete"] = 12] = "Delete";
+    SpecialTouch[SpecialTouch["ArrowRight"] = 13] = "ArrowRight";
+    SpecialTouch[SpecialTouch["ArrowLeft"] = 14] = "ArrowLeft";
+    SpecialTouch[SpecialTouch["ArrowUp"] = 15] = "ArrowUp";
+    SpecialTouch[SpecialTouch["ArrowDown"] = 16] = "ArrowDown";
+    SpecialTouch[SpecialTouch["Enter"] = 17] = "Enter";
+})(Lib.SpecialTouch || (Lib.SpecialTouch = {}));
+__as1(_.Lib, 'SpecialTouch', Lib.SpecialTouch);
 
 let Tracker=class Tracker {
     velocityMultiplier = window.devicePixelRatio;
@@ -7846,29 +7956,7 @@ let Tracker=class Tracker {
     }
 }
 Tracker.Namespace=`Aventus`;
-_.Tracker=Tracker;
-
-(function (SpecialTouch) {
-    SpecialTouch[SpecialTouch["Backspace"] = 0] = "Backspace";
-    SpecialTouch[SpecialTouch["Insert"] = 1] = "Insert";
-    SpecialTouch[SpecialTouch["End"] = 2] = "End";
-    SpecialTouch[SpecialTouch["PageDown"] = 3] = "PageDown";
-    SpecialTouch[SpecialTouch["PageUp"] = 4] = "PageUp";
-    SpecialTouch[SpecialTouch["Escape"] = 5] = "Escape";
-    SpecialTouch[SpecialTouch["AltGraph"] = 6] = "AltGraph";
-    SpecialTouch[SpecialTouch["Control"] = 7] = "Control";
-    SpecialTouch[SpecialTouch["Alt"] = 8] = "Alt";
-    SpecialTouch[SpecialTouch["Shift"] = 9] = "Shift";
-    SpecialTouch[SpecialTouch["CapsLock"] = 10] = "CapsLock";
-    SpecialTouch[SpecialTouch["Tab"] = 11] = "Tab";
-    SpecialTouch[SpecialTouch["Delete"] = 12] = "Delete";
-    SpecialTouch[SpecialTouch["ArrowRight"] = 13] = "ArrowRight";
-    SpecialTouch[SpecialTouch["ArrowLeft"] = 14] = "ArrowLeft";
-    SpecialTouch[SpecialTouch["ArrowUp"] = 15] = "ArrowUp";
-    SpecialTouch[SpecialTouch["ArrowDown"] = 16] = "ArrowDown";
-    SpecialTouch[SpecialTouch["Enter"] = 17] = "Enter";
-})(Lib.SpecialTouch || (Lib.SpecialTouch = {}));
-_.Lib.SpecialTouch=Lib.SpecialTouch;
+__as1(_, 'Tracker', Tracker);
 
 const Img = class Img extends Aventus.WebComponent {
     static get observedAttributes() {return ["src", "mode"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -8047,7 +8135,7 @@ const Img = class Img extends Aventus.WebComponent {
 }
 Img.Namespace=`Aventus`;
 Img.Tag=`av-img`;
-_.Img=Img;
+__as1(_, 'Img', Img);
 if(!window.customElements.get('av-img')){window.customElements.define('av-img', Img);Aventus.WebComponentInstance.registerDefinition(Img);}
 
 let RouterStateManager=class RouterStateManager extends Aventus.StateManager {
@@ -8056,7 +8144,7 @@ let RouterStateManager=class RouterStateManager extends Aventus.StateManager {
     }
 }
 RouterStateManager.Namespace=`Aventus`;
-_.RouterStateManager=RouterStateManager;
+__as1(_, 'RouterStateManager', RouterStateManager);
 
 Navigation.Link = class Link extends Aventus.WebComponent {
     get 'to'() { return this.getStringAttr('to') }
@@ -8102,7 +8190,7 @@ Navigation.Link = class Link extends Aventus.WebComponent {
             element: this,
             onPress: () => {
                 if (this.to === undefined)
-                    return;
+                    return false;
                 let to = this.to;
                 if (this.to.startsWith(".")) {
                     to = Aventus.Instance.get(RouterStateManager).getState()?.name ?? "";
@@ -8113,6 +8201,7 @@ Navigation.Link = class Link extends Aventus.WebComponent {
                     to = Aventus.Uri.normalize(to);
                 }
                 Aventus.State.activate(to, Aventus.Instance.get(RouterStateManager));
+                return true;
             }
         });
     }
@@ -8147,10 +8236,10 @@ Navigation.Link = class Link extends Aventus.WebComponent {
 }
 Navigation.Link.Namespace=`Aventus.Navigation`;
 Navigation.Link.Tag=`av-link`;
-_.Navigation.Link=Navigation.Link;
+__as1(_.Navigation, 'Link', Navigation.Link);
 if(!window.customElements.get('av-link')){window.customElements.define('av-link', Navigation.Link);Aventus.WebComponentInstance.registerDefinition(Navigation.Link);}
 
-_n = Navigation.Page;Navigation.Page = class Page extends Aventus.WebComponent {
+Navigation.Page = class Page extends Aventus.WebComponent {
     static get observedAttributes() {return ["visible"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
     get 'visible'() { return this.getBoolProp('visible') }
     set 'visible'(val) { this.setBoolAttr('visible', val) }    router;
@@ -8207,8 +8296,8 @@ _n = Navigation.Page;Navigation.Page = class Page extends Aventus.WebComponent 
     }
 }
 Navigation.Page.Namespace=`Aventus.Navigation`;
-_.Navigation.Page=Navigation.Page;
-Object.assign(Navigation.Page, _n);
+__as1(_.Navigation, 'Page', Navigation.Page);
+
 Navigation.Default404 = class Default404 extends Navigation.Page {
     static __style = `:host{align-items:center;height:100%;justify-content:center;width:100%}:host h1{font-size:48px;text-align:center}:host([visible]){display:flex}`;
     __getStatic() {
@@ -8235,29 +8324,60 @@ Navigation.Default404 = class Default404 extends Navigation.Page {
 }
 Navigation.Default404.Namespace=`Aventus.Navigation`;
 Navigation.Default404.Tag=`av-default-404`;
-_.Navigation.Default404=Navigation.Default404;
+__as1(_.Navigation, 'Default404', Navigation.Default404);
 if(!window.customElements.get('av-default-404')){window.customElements.define('av-default-404', Navigation.Default404);Aventus.WebComponentInstance.registerDefinition(Navigation.Default404);}
 
-Form.ButtonElement = class ButtonElement extends Aventus.WebComponent {
-    static get observedAttributes() {return ["type"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
-    get 'type'() { return this.getStringProp('type') }
-    set 'type'(val) { this.setStringAttr('type', val) }    static get formAssociated() { return true; }
+Form.FormElement = class FormElement extends Aventus.WebComponent {
+    static get observedAttributes() {return ["disabled"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'has_errors'() { return this.getBoolAttr('has_errors') }
+    set 'has_errors'(val) { this.setBoolAttr('has_errors', val) }    get 'disabled'() { return this.getBoolProp('disabled') }
+    set 'disabled'(val) { this.setBoolAttr('disabled', val) }    get 'value'() {
+						return this.__watch["value"];
+					}
+					set 'value'(val) {
+						this.__watch["value"] = val;
+					}get 'errors'() {
+						return this.__watch["errors"];
+					}
+					set 'errors'(val) {
+						this.__watch["errors"] = val;
+					}    static get formAssociated() { return true; }
+    _form;
+    get form() {
+        return this._form;
+    }
+    set form(value) {
+        this.unlinkFormPart();
+        this._form = value;
+        this.linkFormPart();
+    }
     internals;
+    canLinkValueToForm = false;
     handler = undefined;
+    onChange = new Aventus.Callback();
+    __registerWatchesActions() {
+    this.__addWatchesActions("value", ((target) => {
+    target.onValueChange(target.value);
+}));this.__addWatchesActions("errors", ((target) => {
+    target.onErrorsChange();
+}));    super.__registerWatchesActions();
+}
     static __style = ``;
     constructor() {
         super();
         this.internals = this.attachInternals();
-        if (this.constructor == ButtonElement) {
+        if (this.constructor == FormElement) {
             throw "can't instanciate an abstract class";
         }
+        this.refreshValueFromForm = this.refreshValueFromForm.bind(this);
+        this.onFormValidation = this.onFormValidation.bind(this);
     }
     __getStatic() {
-        return ButtonElement;
+        return FormElement;
     }
     __getStyle() {
         let arrStyle = super.__getStyle();
-        arrStyle.push(ButtonElement.__style);
+        arrStyle.push(FormElement.__style);
         return arrStyle;
     }
     __getHtml() {
@@ -8267,48 +8387,120 @@ Form.ButtonElement = class ButtonElement extends Aventus.WebComponent {
     });
 }
     getClassName() {
-        return "ButtonElement";
+        return "FormElement";
     }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('type')){ this['type'] = 'button'; } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('type'); }
-    async triggerSubmit() {
-        if (this.type == "submit") {
-            if ("loading" in this) {
-                if (this.loading)
-                    return;
-                this.loading = true;
-            }
-            if (this.internals.form) {
-                this.internals.form.requestSubmit();
-            }
-            else if (this.handler) {
-                await this.handler.requestSubmit();
-                if ("loading" in this) {
-                    this.loading = false;
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('has_errors')) { this.attributeChangedCallback('has_errors', false, false); }if(!this.hasAttribute('disabled')) { this.attributeChangedCallback('disabled', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["value"] = undefined;w["errors"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('form');this.__upgradeProperty('has_errors');this.__upgradeProperty('disabled');this.__correctGetter('value');this.__correctGetter('errors'); }
+    __listBoolProps() { return ["has_errors","disabled"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    refreshValueFromForm() {
+        if (this._form) {
+            this.errors = [];
+            this.value = this._form.value.get();
+        }
+    }
+    unlinkFormPart() {
+        if (this._form) {
+            this._form.unregister(this);
+            this._form.onValueChange.remove(this.refreshValueFromForm);
+            this._form.onValidation.remove(this.onFormValidation);
+        }
+    }
+    linkFormPart() {
+        if (this._form) {
+            this._form.register(this);
+            this._form.onValueChange.add(this.refreshValueFromForm);
+            this._form.onValidation.add(this.onFormValidation);
+            this.refreshValueFromForm();
+        }
+        else {
+            this.value = undefined;
+        }
+    }
+    async onFormValidation(errors) {
+        let _errors = await this.validation();
+        if (_errors.length == 0) {
+            _errors = errors;
+        }
+        else if (errors.length > 0) {
+            for (let error of errors) {
+                if (!_errors.includes(error)) {
+                    _errors.push(error);
                 }
             }
         }
+        this.errors = _errors;
+        return this.errors;
+    }
+    async validate() {
+        if (!this.form) {
+            this.errors = await this.validation();
+            return this.errors.length == 0;
+        }
+        return await this.form.test();
+    }
+    async validation() {
+        return [];
+    }
+    clearErrors() {
+        this.errors = [];
+    }
+    triggerChange(value) {
+        this.value = value;
+        this.onChange.trigger(this.value);
+        if (this.form) {
+            this.form.value.set(this.value);
+        }
+    }
+    onValueChange(value) {
+        this.linkValueToForm();
+    }
+    onErrorsChange() {
+        this.has_errors = this.errors.length > 0;
+        this.linkErrorToForm();
+    }
+    linkErrorToForm() {
+        if (!this.canLinkValueToForm)
+            return;
+        if (this.has_errors) {
+            this.internals.setValidity({
+                customError: true
+            }, this.errors.join(' & '));
+        }
+        else {
+            this.internals.setValidity({});
+        }
+    }
+    linkValueToForm() {
+        if (!this.canLinkValueToForm)
+            return;
+        if (this.value === undefined) {
+            this.internals.setFormValue(null);
+        }
+        else {
+            this.internals.setFormValue(this.value + '');
+        }
+    }
+    formAssociatedCallback(form) {
+        this.canLinkValueToForm = true;
+        this.linkValueToForm();
+        this.linkErrorToForm();
+        this.validate();
+    }
+    formDisabledCallback(disabled) {
+        this.disabled = disabled;
     }
     postCreation() {
         super.postCreation();
-        this.handler = this.findParentByType(_.Form.Form.formElements)?.registerSubmit(this);
-        if (this.type == "submit") {
-            new Aventus.PressManager({
-                element: this,
-                onPress: () => {
-                    this.triggerSubmit();
-                }
-            });
-            this.addEventListener("keyup", (e) => {
-                if (e.key == 'Enter') {
-                    this.triggerSubmit();
-                }
-            });
-        }
+        let handler = this.findParentByType(_.Form.Form.formElements)?.registerElement(this);
+    }
+    postDestruction() {
+        super.postDestruction();
+        this.unlinkFormPart();
     }
 }
-Form.ButtonElement.Namespace=`Aventus.Form`;
-_.Form.ButtonElement=Form.ButtonElement;
+Form.FormElement.Namespace=`Aventus.Form`;
+__as1(_.Form, 'FormElement', Form.FormElement);
 
 Form.Form = class Form extends Aventus.WebComponent {
     static get defaultConfig() {
@@ -8391,8 +8583,60 @@ Form.Form = class Form extends Aventus.WebComponent {
 }
 Form.Form.Namespace=`Aventus.Form`;
 Form.Form.Tag=`av-form`;
-_.Form.Form=Form.Form;
+__as1(_.Form, 'Form', Form.Form);
 if(!window.customElements.get('av-form')){window.customElements.define('av-form', Form.Form);Aventus.WebComponentInstance.registerDefinition(Form.Form);}
+
+Form.Validator=class Validator {
+    constructor() { this.validate = this.validate.bind(this); }
+    static async Test(validators, value, name, globalValidation) {
+        if (!Array.isArray(validators)) {
+            validators = [validators];
+        }
+        let result = [];
+        for (let validator of validators) {
+            let resultTemp = new validator();
+            const temp = await resultTemp.validate(value, name, globalValidation);
+            if (temp === false) {
+                result.push('Le champs n\'est pas valide');
+            }
+            else if (Array.isArray(temp)) {
+                for (let error of temp) {
+                    result.push(error);
+                }
+            }
+            else if (typeof temp == 'string') {
+                result.push(temp);
+            }
+        }
+        return result.length == 0 ? undefined : result;
+    }
+}
+Form.Validator.Namespace=`Aventus.Form`;
+__as1(_.Form, 'Validator', Form.Validator);
+
+Form.Validators.Required=class Required extends _.Form.Validator {
+    static msg = "Le champs {name} est requis";
+    _msg;
+    constructor(msg) {
+        super();
+        this._msg = msg ?? Form.Validators.Required.msg;
+    }
+    /**
+     * @inheritdoc
+     */
+    validate(value, name, globalValidation) {
+        const txt = this._msg.replace(/\{ *name *\}/g, name);
+        if (value === undefined || value === null) {
+            return txt;
+        }
+        if (typeof value == 'string' && value.trim() == "") {
+            return txt;
+        }
+        return true;
+    }
+}
+Form.Validators.Required.Namespace=`Aventus.Form.Validators`;
+__as1(_.Form.Validators, 'Required', Form.Validators.Required);
 
 Navigation.PageForm = class PageForm extends Navigation.Page {
     _form;
@@ -8431,11 +8675,25 @@ Navigation.PageForm = class PageForm extends Navigation.Page {
     }
     pageConfig() {
         return {
-            submitWithEnter: true
+            submitWithEnter: true,
+            autoLoading: true
         };
     }
     async submit() {
-        return await this.defineSubmit((fct) => this.form.submit(fct));
+        this.setLoading(true);
+        const result = await this.defineSubmit((fct) => this.form.submit(fct));
+        this.setLoading(false);
+        return result;
+    }
+    setLoading(isLoading) {
+        const autoLoading = this.pageConfig().autoLoading;
+        if (autoLoading) {
+            for (let btn of this.btns) {
+                if ("loading" in btn) {
+                    btn.loading = isLoading;
+                }
+            }
+        }
     }
     checkEnter(e) {
         if (e.key == "Enter") {
@@ -8462,63 +8720,11 @@ Navigation.PageForm = class PageForm extends Navigation.Page {
     }
 }
 Navigation.PageForm.Namespace=`Aventus.Navigation`;
-_.Navigation.PageForm=Navigation.PageForm;
-
-Form.Validator=class Validator {
-    constructor() { this.validate = this.validate.bind(this); }
-    static async Test(validators, value, name, globalValidation) {
-        if (!Array.isArray(validators)) {
-            validators = [validators];
-        }
-        let result = [];
-        for (let validator of validators) {
-            let resultTemp = new validator();
-            const temp = await resultTemp.validate(value, name, globalValidation);
-            if (temp === false) {
-                result.push('Le champs n\'est pas valide');
-            }
-            else if (Array.isArray(temp)) {
-                for (let error of temp) {
-                    result.push(error);
-                }
-            }
-            else if (typeof temp == 'string') {
-                result.push(temp);
-            }
-        }
-        return result.length == 0 ? undefined : result;
-    }
-}
-Form.Validator.Namespace=`Aventus.Form`;
-_.Form.Validator=Form.Validator;
-
-Form.Validators.Required=class Required extends _.Form.Validator {
-    static msg = "Le champs {name} est requis";
-    _msg;
-    constructor(msg) {
-        super();
-        this._msg = msg ?? Form.Validators.Required.msg;
-    }
-    /**
-     * @inheritdoc
-     */
-    validate(value, name, globalValidation) {
-        const txt = this._msg.replace(/\{ *name *\}/g, name);
-        if (value === undefined || value === null) {
-            return txt;
-        }
-        if (typeof value == 'string' && value.trim() == "") {
-            return txt;
-        }
-        return true;
-    }
-}
-Form.Validators.Required.Namespace=`Aventus.Form.Validators`;
-_.Form.Validators.Required=Form.Validators.Required;
+__as1(_.Navigation, 'PageForm', Navigation.PageForm);
 
 Form.FormHandler=class FormHandler {
     static _globalConfig;
-    static _IFormElements = [_.Form.Form, Navigation.PageForm];
+    static _IFormElements = [Form.Form, Navigation.PageForm];
     __watcher;
     get item() {
         return this.__watcher.item;
@@ -8864,59 +9070,28 @@ Form.FormHandler=class FormHandler {
     }
 }
 Form.FormHandler.Namespace=`Aventus.Form`;
-_.Form.FormHandler=Form.FormHandler;
+__as1(_.Form, 'FormHandler', Form.FormHandler);
 
-Form.FormElement = class FormElement extends Aventus.WebComponent {
-    static get observedAttributes() {return ["disabled"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
-    get 'has_errors'() { return this.getBoolAttr('has_errors') }
-    set 'has_errors'(val) { this.setBoolAttr('has_errors', val) }    get 'disabled'() { return this.getBoolProp('disabled') }
-    set 'disabled'(val) { this.setBoolAttr('disabled', val) }    get 'value'() {
-						return this.__watch["value"];
-					}
-					set 'value'(val) {
-						this.__watch["value"] = val;
-					}get 'errors'() {
-						return this.__watch["errors"];
-					}
-					set 'errors'(val) {
-						this.__watch["errors"] = val;
-					}    static get formAssociated() { return true; }
-    _form;
-    get form() {
-        return this._form;
-    }
-    set form(value) {
-        this.unlinkFormPart();
-        this._form = value;
-        this.linkFormPart();
-    }
+Form.ButtonElement = class ButtonElement extends Aventus.WebComponent {
+    static get observedAttributes() {return ["type"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'type'() { return this.getStringProp('type') }
+    set 'type'(val) { this.setStringAttr('type', val) }    static get formAssociated() { return true; }
     internals;
-    canLinkValueToForm = false;
     handler = undefined;
-    onChange = new Aventus.Callback();
-    __registerWatchesActions() {
-    this.__addWatchesActions("value", ((target) => {
-    target.onValueChange(target.value);
-}));this.__addWatchesActions("errors", ((target) => {
-    target.onErrorsChange();
-}));    super.__registerWatchesActions();
-}
     static __style = ``;
     constructor() {
         super();
         this.internals = this.attachInternals();
-        if (this.constructor == FormElement) {
+        if (this.constructor == ButtonElement) {
             throw "can't instanciate an abstract class";
         }
-        this.refreshValueFromForm = this.refreshValueFromForm.bind(this);
-        this.onFormValidation = this.onFormValidation.bind(this);
     }
     __getStatic() {
-        return FormElement;
+        return ButtonElement;
     }
     __getStyle() {
         let arrStyle = super.__getStyle();
-        arrStyle.push(FormElement.__style);
+        arrStyle.push(ButtonElement.__style);
         return arrStyle;
     }
     __getHtml() {
@@ -8926,766 +9101,48 @@ Form.FormElement = class FormElement extends Aventus.WebComponent {
     });
 }
     getClassName() {
-        return "FormElement";
+        return "ButtonElement";
     }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('has_errors')) { this.attributeChangedCallback('has_errors', false, false); }if(!this.hasAttribute('disabled')) { this.attributeChangedCallback('disabled', false, false); } }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["value"] = undefined;w["errors"] = []; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('form');this.__upgradeProperty('has_errors');this.__upgradeProperty('disabled');this.__correctGetter('value');this.__correctGetter('errors'); }
-    __listBoolProps() { return ["has_errors","disabled"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    refreshValueFromForm() {
-        if (this._form) {
-            this.errors = [];
-            this.value = this._form.value.get();
-        }
-    }
-    unlinkFormPart() {
-        if (this._form) {
-            this._form.unregister(this);
-            this._form.onValueChange.remove(this.refreshValueFromForm);
-            this._form.onValidation.remove(this.onFormValidation);
-        }
-    }
-    linkFormPart() {
-        if (this._form) {
-            this._form.register(this);
-            this._form.onValueChange.add(this.refreshValueFromForm);
-            this._form.onValidation.add(this.onFormValidation);
-            this.refreshValueFromForm();
-        }
-        else {
-            this.value = undefined;
-        }
-    }
-    async onFormValidation(errors) {
-        let _errors = await this.validation();
-        if (_errors.length == 0) {
-            _errors = errors;
-        }
-        else if (errors.length > 0) {
-            for (let error of errors) {
-                if (!_errors.includes(error)) {
-                    _errors.push(error);
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('type')){ this['type'] = 'button'; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('type'); }
+    async triggerSubmit() {
+        if (this.type == "submit") {
+            if ("loading" in this) {
+                if (this.loading)
+                    return;
+                this.loading = true;
+            }
+            if (this.internals.form) {
+                this.internals.form.requestSubmit();
+            }
+            else if (this.handler) {
+                await this.handler.requestSubmit();
+                if ("loading" in this) {
+                    this.loading = false;
                 }
             }
         }
-        this.errors = _errors;
-        return this.errors;
-    }
-    async validate() {
-        if (!this.form) {
-            this.errors = await this.validation();
-            return this.errors.length == 0;
-        }
-        return await this.form.test();
-    }
-    clearErrors() {
-        this.errors = [];
-    }
-    triggerChange(value) {
-        this.value = value;
-        this.onChange.trigger(this.value);
-        if (this.form) {
-            this.form.value.set(this.value);
-        }
-    }
-    onValueChange(value) {
-        this.linkValueToForm();
-    }
-    onErrorsChange() {
-        this.has_errors = this.errors.length > 0;
-        this.linkErrorToForm();
-    }
-    linkErrorToForm() {
-        if (!this.canLinkValueToForm)
-            return;
-        if (this.has_errors) {
-            this.internals.setValidity({
-                customError: true
-            }, this.errors.join(' & '));
-        }
-        else {
-            this.internals.setValidity({});
-        }
-    }
-    linkValueToForm() {
-        if (!this.canLinkValueToForm)
-            return;
-        if (this.value === undefined) {
-            this.internals.setFormValue(null);
-        }
-        else {
-            this.internals.setFormValue(this.value + '');
-        }
-    }
-    formAssociatedCallback(form) {
-        this.canLinkValueToForm = true;
-        this.linkValueToForm();
-        this.linkErrorToForm();
-        this.validate();
-    }
-    formDisabledCallback(disabled) {
-        this.disabled = disabled;
     }
     postCreation() {
         super.postCreation();
-        let handler = this.findParentByType(_.Form.Form.formElements)?.registerElement(this);
-    }
-    postDestruction() {
-        super.postDestruction();
-        this.unlinkFormPart();
-    }
-}
-Form.FormElement.Namespace=`Aventus.Form`;
-_.Form.FormElement=Form.FormElement;
-
-Toast.ToastElement = class ToastElement extends Aventus.WebComponent {
-    get 'position'() { return this.getStringAttr('position') }
-    set 'position'(val) { this.setStringAttr('position', val) }get 'delay'() { return this.getNumberAttr('delay') }
-    set 'delay'(val) { this.setNumberAttr('delay', val) }get 'is_active'() { return this.getBoolAttr('is_active') }
-    set 'is_active'(val) { this.setBoolAttr('is_active', val) }    showAsked = false;
-    onHideCallback = () => { };
-    timeout = 0;
-    isTransition = false;
-    waitTransitionCbs = [];
-    static __style = `:host{position:absolute}:host(:not([is_active])){opacity:0;visibility:hidden}:host([position="bottom left"]){bottom:var(--_toast-space-bottom);left:0px}:host([position="top left"]){left:var(--_toast-space-left);top:var(--_toast-space-top)}:host([position="bottom right"]){bottom:var(--_toast-space-bottom);right:var(--_toast-space-right)}:host([position="top right"]){right:var(--_toast-space-right);top:var(--_toast-space-top)}:host([position=top]){left:50%;top:var(--_toast-space-top);transform:translateX(-50%)}:host([position=bottom]){bottom:var(--_toast-space-bottom);left:50%;transform:translateX(-50%)}`;
-    constructor() {
-        super();
-        if (this.constructor == ToastElement) {
-            throw "can't instanciate an abstract class";
-        }
-    }
-    __getStatic() {
-        return ToastElement;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ToastElement.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "ToastElement";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('position')){ this['position'] = _.Toast.ToastManager.defaultPosition; }if(!this.hasAttribute('delay')){ this['delay'] = _.Toast.ToastManager.defaultDelay; }if(!this.hasAttribute('is_active')) { this.attributeChangedCallback('is_active', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('position');this.__upgradeProperty('delay');this.__upgradeProperty('is_active'); }
-    __listBoolProps() { return ["is_active"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    _setOptions(options) {
-        if (options.position !== undefined)
-            this.position = options.position;
-        if (options.delay !== undefined)
-            this.delay = options.delay;
-        return this.setOptions(options);
-    }
-    show(onHideCallback) {
-        this.onHideCallback = onHideCallback;
-        if (this.isReady) {
-            this.is_active = true;
-            this.startDelay();
-        }
-        else {
-            this.showAsked = true;
-        }
-    }
-    startDelay() {
-        if (this.delay > 0) {
-            this.timeout = setTimeout(() => {
-                this.close();
-            }, this.delay);
-        }
-    }
-    async close() {
-        if (this.onHideCallback) {
-            this.is_active = false;
-            this.onHideCallback(false);
-            this.remove();
-        }
-    }
-    addTransition() {
-        this.addEventListener("transitionStart", (e) => {
-            this.isTransition = true;
-        });
-        this.addEventListener("transitionEnd", () => {
-            this.isTransition = false;
-            let cbs = [...this.waitTransitionCbs];
-            this.waitTransitionCbs = [];
-            for (let cb of cbs) {
-                cb();
-            }
-        });
-    }
-    waitTransition() {
-        if (this.isTransition) {
-            return new Promise((resolve) => {
-                this.waitTransitionCbs.push(resolve);
-            });
-        }
-        return new Promise((resolve) => {
-            resolve();
-        });
-    }
-    postCreation() {
-        if (this.showAsked) {
-            this.is_active = true;
-            this.startDelay();
-        }
-    }
-    static add(options) {
-        return _.Toast.ToastManager.add(options);
-    }
-}
-Toast.ToastElement.Namespace=`Aventus.Toast`;
-_.Toast.ToastElement=Toast.ToastElement;
-
-Lib.ShortcutManager=class ShortcutManager {
-    static memory = {};
-    static autoPrevents = [];
-    static isInit = false;
-    static arrayKeys = [];
-    static options = new Map();
-    static replacingMemory = {};
-    static isTxt(touch) {
-        return touch.match(/[a-zA-Z0-9_\+\-]/g);
-    }
-    static getText(combinaison) {
-        let allTouches = [];
-        for (let touch of combinaison) {
-            let realTouch = "";
-            if (typeof touch == "number" && Lib.SpecialTouch[touch] !== undefined) {
-                realTouch = Lib.SpecialTouch[touch];
-            }
-            else if (this.isTxt(touch)) {
-                realTouch = touch;
-            }
-            else {
-                throw "I can't use " + touch + " to add a shortcut";
-            }
-            allTouches.push(realTouch);
-        }
-        allTouches.sort();
-        return allTouches.join("+");
-    }
-    static subscribe(combinaison, cb, options) {
-        if (!Array.isArray(combinaison)) {
-            combinaison = [combinaison];
-        }
-        let key = this.getText(combinaison);
-        if (options?.replaceTemp) {
-            if (Lib.ShortcutManager.memory[key]) {
-                if (!this.replacingMemory[key]) {
-                    this.replacingMemory[key] = [];
-                }
-                this.replacingMemory[key].push(Lib.ShortcutManager.memory[key]);
-                delete Lib.ShortcutManager.memory[key];
-            }
-        }
-        if (!Lib.ShortcutManager.memory[key]) {
-            Lib.ShortcutManager.memory[key] = [];
-        }
-        if (!Lib.ShortcutManager.memory[key].includes(cb)) {
-            Lib.ShortcutManager.memory[key].push(cb);
-            if (options) {
-                this.options.set(cb, options);
-            }
-        }
-        if (!Lib.ShortcutManager.isInit) {
-            Lib.ShortcutManager.init();
-        }
-    }
-    static unsubscribe(combinaison, cb) {
-        if (!Array.isArray(combinaison)) {
-            combinaison = [combinaison];
-        }
-        let key = this.getText(combinaison);
-        if (Lib.ShortcutManager.memory[key]) {
-            let index = Lib.ShortcutManager.memory[key].indexOf(cb);
-            if (index != -1) {
-                Lib.ShortcutManager.memory[key].splice(index, 1);
-                let options = this.options.get(cb);
-                if (options) {
-                    this.options.delete(cb);
-                }
-                if (Lib.ShortcutManager.memory[key].length == 0) {
-                    delete Lib.ShortcutManager.memory[key];
-                    if (options?.replaceTemp) {
-                        if (this.replacingMemory[key]) {
-                            if (this.replacingMemory[key].length > 0) {
-                                Lib.ShortcutManager.memory[key] = this.replacingMemory[key].pop();
-                                if (this.replacingMemory[key].length == 0) {
-                                    delete this.replacingMemory[key];
-                                }
-                            }
-                            else {
-                                delete this.replacingMemory[key];
-                            }
-                        }
-                    }
-                }
-                if (Object.keys(Lib.ShortcutManager.memory).length == 0 && Lib.ShortcutManager.isInit) {
-                    //ShortcutManager.uninit();
-                }
-            }
-        }
-    }
-    static onKeyDown(e) {
-        if (e.ctrlKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Control];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (e.altKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Alt];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (e.shiftKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Shift];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (this.isTxt(e.key) && !this.arrayKeys.includes(e.key)) {
-            this.arrayKeys.push(e.key);
-        }
-        else if (Lib.SpecialTouch[e.key] !== undefined && !this.arrayKeys.includes(e.key)) {
-            this.arrayKeys.push(e.key);
-        }
-        this.arrayKeys.sort();
-        let key = this.arrayKeys.join("+");
-        if (Lib.ShortcutManager.memory[key]) {
-            let preventDefault = true;
-            for (let cb of Lib.ShortcutManager.memory[key]) {
-                let options = this.options.get(cb);
-                if (options && options.preventDefault === false) {
-                    preventDefault = false;
-                }
-            }
-            this.arrayKeys = [];
-            for (let cb of Lib.ShortcutManager.memory[key]) {
-                const result = cb();
-                if (result === false) {
-                    preventDefault = result;
-                }
-            }
-            if (preventDefault) {
-                e.preventDefault();
-            }
-        }
-        else if (Lib.ShortcutManager.autoPrevents.includes(key)) {
-            e.preventDefault();
-        }
-    }
-    static onKeyUp(e) {
-        let index = this.arrayKeys.indexOf(e.key);
-        if (index != -1) {
-            this.arrayKeys.splice(index, 1);
-        }
-    }
-    static init() {
-        if (Lib.ShortcutManager.isInit)
-            return;
-        Lib.ShortcutManager.isInit = true;
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-        Lib.ShortcutManager.autoPrevents = [
-            this.getText([Lib.SpecialTouch.Control, "s"]),
-            this.getText([Lib.SpecialTouch.Control, "p"]),
-            this.getText([Lib.SpecialTouch.Control, "l"]),
-            this.getText([Lib.SpecialTouch.Control, "k"]),
-            this.getText([Lib.SpecialTouch.Control, "j"]),
-            this.getText([Lib.SpecialTouch.Control, "h"]),
-            this.getText([Lib.SpecialTouch.Control, "g"]),
-            this.getText([Lib.SpecialTouch.Control, "f"]),
-            this.getText([Lib.SpecialTouch.Control, "d"]),
-            this.getText([Lib.SpecialTouch.Control, "o"]),
-            this.getText([Lib.SpecialTouch.Control, "u"]),
-            this.getText([Lib.SpecialTouch.Control, "e"]),
-        ];
-        window.addEventListener("blur", () => {
-            this.arrayKeys = [];
-        });
-        document.body.addEventListener("keydown", this.onKeyDown);
-        document.body.addEventListener("keyup", this.onKeyUp);
-    }
-    static uninit() {
-        document.body.removeEventListener("keydown", this.onKeyDown);
-        document.body.removeEventListener("keyup", this.onKeyUp);
-        this.arrayKeys = [];
-        Lib.ShortcutManager.isInit = false;
-    }
-}
-Lib.ShortcutManager.Namespace=`Aventus.Lib`;
-_.Lib.ShortcutManager=Lib.ShortcutManager;
-
-Modal.ModalElement = class ModalElement extends Aventus.WebComponent {
-    get 'options'() {
-						return this.__watch["options"];
-					}
-					set 'options'(val) {
-						this.__watch["options"] = val;
-					}    static defaultCloseWithEsc = true;
-    static defaultCloseWithClick = true;
-    static defaultRejectValue = null;
-    cb;
-    pressManagerClickClose;
-    pressManagerPrevent;
-    __registerWatchesActions() {
-    this.__addWatchesActions("options", ((target, action, path, value) => {
-    target.onOptionsChanged();
-}));    super.__registerWatchesActions();
-}
-    static __style = `:host{align-items:center;display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:#fff;padding:1.5rem;position:relative}`;
-    constructor() {
-        super();
-        this.options = this.configure();
-        if (this.options.closeWithClick === undefined)
-            this.options.closeWithClick = Modal.ModalElement.defaultCloseWithClick;
-        if (this.options.closeWithEsc === undefined)
-            this.options.closeWithEsc = Modal.ModalElement.defaultCloseWithEsc;
-        if (!Object.hasOwn(this.options, "rejectValue")) {
-            this.options.rejectValue = Modal.ModalElement.defaultRejectValue;
-        }
-        if (this.constructor == ModalElement) {
-            throw "can't instanciate an abstract class";
-        }
-        this.close = this.close.bind(this);
-        this.reject = this.reject.bind(this);
-        this.resolve = this.resolve.bind(this);
-    }
-    __getStatic() {
-        return ModalElement;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalElement.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="modal" _id="modalelement_0">	<slot></slot></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "modalEl",
-      "ids": [
-        "modalelement_0"
-      ]
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalElement";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["options"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('options'); }
-    onOptionsChanged() { }
-    init(cb) {
-        this.cb = cb;
-        if (this.options.closeWithEsc) {
-            Lib.ShortcutManager.subscribe(Lib.SpecialTouch.Escape, this.reject, { replaceTemp: true });
-        }
-        if (this.options.closeWithClick) {
-            this.pressManagerClickClose = new Aventus.PressManager({
+        this.handler = this.findParentByType(_.Form.Form.formElements)?.registerSubmit(this);
+        if (this.type == "submit") {
+            new Aventus.PressManager({
                 element: this,
                 onPress: () => {
-                    this.reject();
+                    this.triggerSubmit();
                 }
             });
-            this.pressManagerPrevent = new Aventus.PressManager({
-                element: this.modalEl,
-                onPress: () => { }
+            this.addEventListener("keyup", (e) => {
+                if (e.key == 'Enter') {
+                    this.triggerSubmit();
+                }
             });
-        }
-    }
-    close() {
-        Lib.ShortcutManager.unsubscribe(Lib.SpecialTouch.Escape, this.reject);
-        this.pressManagerClickClose?.destroy();
-        this.pressManagerPrevent?.destroy();
-        this.remove();
-    }
-    reject(no_close) {
-        if (this.cb) {
-            this.cb(this.options.rejectValue ?? null);
-        }
-        if (no_close !== true) {
-            this.close();
-        }
-    }
-    resolve(response, no_close) {
-        if (this.cb) {
-            this.cb(response);
-        }
-        if (no_close !== true) {
-            this.close();
-        }
-    }
-    static configure(options) {
-        if (options.closeWithClick !== undefined)
-            this.defaultCloseWithClick = options.closeWithClick;
-        if (options.closeWithEsc !== undefined)
-            this.defaultCloseWithEsc = options.closeWithEsc;
-        if (!Object.hasOwn(options, "rejectValue")) {
-            this.defaultRejectValue = options.rejectValue;
-        }
-    }
-    static _show(modal, element) {
-        return new Promise((resolve) => {
-            modal.init((response) => {
-                resolve(response);
-            });
-            if (!element) {
-                element = document.body;
-            }
-            element.appendChild(modal);
-        });
-    }
-}
-Modal.ModalElement.Namespace=`Aventus.Modal`;
-_.Modal.ModalElement=Modal.ModalElement;
-
-Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
-    get 'gap'() { return this.getNumberAttr('gap') }
-    set 'gap'(val) { this.setNumberAttr('gap', val) }get 'not_main'() { return this.getBoolAttr('not_main') }
-    set 'not_main'(val) { this.setBoolAttr('not_main', val) }    static defaultToast;
-    static defaultToastManager;
-    static defaultPosition = 'top right';
-    static defaultDelay = 5000;
-    static heightLimitPercent = 100;
-    static instance;
-    activeToasts = {
-        top: [],
-        'top left': [],
-        'bottom left': [],
-        bottom: [],
-        'bottom right': [],
-        'top right': [],
-    };
-    waitingToasts = {
-        top: [],
-        'top left': [],
-        'bottom left': [],
-        bottom: [],
-        'bottom right': [],
-        'top right': [],
-    };
-    get containerHeight() {
-        return this.offsetHeight;
-    }
-    get heightLimit() {
-        return this.containerHeight * Toast.ToastManager.heightLimitPercent / 100;
-    }
-    mutex = new Aventus.Mutex();
-    static __style = `:host{--_toast-space-bottom: var(--toast-space-bottom, 20px);--_toast-space-top: var(--toast-space-top, 20px);--_toast-space-right: var(--toast-space-right, 10px);--_toast-space-left: var(--toast-space-left, 10px)}:host{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:50}:host ::slotted(*){pointer-events:auto}`;
-    __getStatic() {
-        return ToastManager;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ToastManager.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "ToastManager";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('gap')){ this['gap'] = 10; }if(!this.hasAttribute('not_main')) { this.attributeChangedCallback('not_main', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('containerHeight');this.__correctGetter('heightLimit');this.__upgradeProperty('gap');this.__upgradeProperty('not_main'); }
-    __listBoolProps() { return ["not_main"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    async add(toast) {
-        await this.mutex.waitOne();
-        console.log("inside");
-        let realToast;
-        if (toast instanceof _.Toast.ToastElement) {
-            realToast = toast;
-        }
-        else {
-            if (!Toast.ToastManager.defaultToast)
-                throw "No default toast. Try ToastManager.configure()";
-            realToast = new Toast.ToastManager.defaultToast();
-            await realToast._setOptions(toast);
-        }
-        this.appendChild(realToast);
-        if (realToast.position == "bottom") {
-            return this._notifyBottom(realToast, true);
-        }
-        else if (realToast.position == "bottom left") {
-            return this._notifyBottomLeft(realToast, true);
-        }
-        else if (realToast.position == "top left") {
-            return this._notifyTopLeft(realToast, true);
-        }
-        else if (realToast.position == "bottom right") {
-            return this._notifyBottomRight(realToast, true);
-        }
-        else if (realToast.position == "top right") {
-            return this._notifyTopRight(realToast, true);
-        }
-        else if (realToast.position == "top") {
-            return this._notifyTop(realToast, true);
-        }
-        return false;
-    }
-    _calculateBottom(toast, firstTime, position, from) {
-        return new Promise((resolve) => {
-            let height = toast.offsetHeight;
-            let containerHeight = this.containerHeight;
-            const _remove = (result) => {
-                let index = this.activeToasts[position].indexOf(toast);
-                if (index > -1) {
-                    this.activeToasts[position].splice(index, 1);
-                }
-                if (this.waitingToasts[position].length > 0) {
-                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
-                    this._calculateBottom(nextNotif, false, position, index);
-                }
-                else {
-                    let containerHeight = this.containerHeight;
-                    for (let i = 0; i < index; i++) {
-                        let notif = this.activeToasts[position][i];
-                        let bottom = containerHeight - (notif.offsetTop + notif.offsetHeight);
-                        notif.style.bottom = bottom - height - this.gap + 'px';
-                    }
-                }
-                resolve(result);
-            };
-            let length = this.activeToasts[position].length;
-            if (length == 0) {
-                this.activeToasts[position].push(toast);
-                toast.show(_remove);
-            }
-            else {
-                let totHeight = 0;
-                for (let t of this.activeToasts[position]) {
-                    totHeight += t.offsetHeight + this.gap;
-                }
-                if (totHeight + height < this.heightLimit) {
-                    for (let i = from; i < this.activeToasts[position].length; i++) {
-                        let t = this.activeToasts[position][i];
-                        let bottom = containerHeight - (t.offsetTop + t.offsetHeight);
-                        t.style.bottom = bottom + height + this.gap + 'px';
-                    }
-                    this.activeToasts[position].push(toast);
-                    toast.show(_remove);
-                }
-                else if (firstTime) {
-                    this.waitingToasts[position].push(toast);
-                }
-            }
-        });
-    }
-    _calculateTop(toast, firstTime, position, from) {
-        return new Promise(async (resolve) => {
-            let height = toast.offsetHeight;
-            const _remove = (result) => {
-                let index = this.activeToasts[position].indexOf(toast);
-                if (index > -1) {
-                    this.activeToasts[position].splice(index, 1);
-                }
-                if (this.waitingToasts[position].length > 0) {
-                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
-                    this._calculateTop(nextNotif, false, position, index);
-                }
-                else {
-                    for (let i = 0; i < index; i++) {
-                        let notif = this.activeToasts[position][i];
-                        let top = (notif.offsetTop - height - this.gap);
-                        notif.style.top = top + 'px';
-                    }
-                }
-                resolve(result);
-            };
-            let length = this.activeToasts[position].length;
-            if (length == 0) {
-                this.activeToasts[position].push(toast);
-                toast.show(_remove);
-            }
-            else {
-                let totHeight = 0;
-                for (let notif of this.activeToasts[position]) {
-                    await notif.waitTransition();
-                    console.log(notif.offsetHeight);
-                    totHeight += notif.offsetHeight + this.gap;
-                }
-                if (totHeight + height < this.heightLimit) {
-                    for (let i = from; i < this.activeToasts[position].length; i++) {
-                        let notif = this.activeToasts[position][i];
-                        await notif.waitTransition();
-                        let top = (notif.offsetTop + notif.offsetHeight);
-                        notif.style.top = top + this.gap + 'px';
-                    }
-                    this.activeToasts[position].push(toast);
-                    toast.show(_remove);
-                }
-                else if (firstTime) {
-                    this.waitingToasts[position].push(toast);
-                }
-            }
-            console.log("outside");
-            this.mutex.release();
-            return;
-        });
-    }
-    async _notifyBottomRight(toast, firstTime) {
-        return await this._calculateBottom(toast, firstTime, "bottom right", 0);
-    }
-    async _notifyTopRight(toast, firstTime) {
-        return await this._calculateTop(toast, firstTime, "top right", 0);
-    }
-    async _notifyBottomLeft(toast, firstTime) {
-        return await this._calculateBottom(toast, firstTime, "bottom left", 0);
-    }
-    async _notifyTopLeft(toast, firstTime) {
-        return await this._calculateTop(toast, firstTime, "top left", 0);
-    }
-    async _notifyTop(toast, firstTime, from = 0) {
-        return await this._calculateTop(toast, firstTime, "top", 0);
-    }
-    async _notifyBottom(toast, firstTime, from = 0) {
-        return await this._calculateBottom(toast, firstTime, "bottom", from);
-    }
-    postConnect() {
-        super.postConnect();
-        if (!Toast.ToastManager.instance && !this.not_main) {
-            Toast.ToastManager.instance = this;
-        }
-    }
-    postDisonnect() {
-        if (Toast.ToastManager.instance == this) {
-            Toast.ToastManager.instance = undefined;
-        }
-    }
-    static add(toast) {
-        if (!this.instance) {
-            this.instance = this.defaultToastManager ? new this.defaultToastManager() : new Toast.ToastManager();
-            document.body.appendChild(this.instance);
-        }
-        return this.instance.add(toast);
-    }
-    static configure(options) {
-        for (let key in options) {
-            if (options[key] !== undefined)
-                this[key] = options[key];
         }
     }
 }
-Toast.ToastManager.Namespace=`Aventus.Toast`;
-Toast.ToastManager.Tag=`av-toast-manager`;
-_.Toast.ToastManager=Toast.ToastManager;
-if(!window.customElements.get('av-toast-manager')){window.customElements.define('av-toast-manager', Toast.ToastManager);Aventus.WebComponentInstance.registerDefinition(Toast.ToastManager);}
+Form.ButtonElement.Namespace=`Aventus.Form`;
+__as1(_.Form, 'ButtonElement', Form.ButtonElement);
 
 let TouchRecord=class TouchRecord {
     _activeTouchID;
@@ -9819,7 +9276,7 @@ let TouchRecord=class TouchRecord {
     }
 }
 TouchRecord.Namespace=`Aventus`;
-_.TouchRecord=TouchRecord;
+__as1(_, 'TouchRecord', TouchRecord);
 
 Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
     static get observedAttributes() {return ["zoom"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -10697,8 +10154,685 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
 }
 Layout.Scrollable.Namespace=`Aventus.Layout`;
 Layout.Scrollable.Tag=`av-scrollable`;
-_.Layout.Scrollable=Layout.Scrollable;
+__as1(_.Layout, 'Scrollable', Layout.Scrollable);
 if(!window.customElements.get('av-scrollable')){window.customElements.define('av-scrollable', Layout.Scrollable);Aventus.WebComponentInstance.registerDefinition(Layout.Scrollable);}
+
+let Process=class Process {
+    static handleErrors;
+    static configure(config) {
+        this.handleErrors = config.handleErrors;
+    }
+    static async execute(prom) {
+        const queryResult = await prom;
+        return await this.parseErrors(queryResult);
+    }
+    static async parseErrors(result) {
+        if (result.errors.length > 0) {
+            if (this.handleErrors) {
+                let msg = result.errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                this.handleErrors(msg, result.errors);
+            }
+            return undefined;
+        }
+        if (result instanceof Aventus.ResultWithError)
+            return result.result;
+        return undefined;
+    }
+}
+Process.Namespace=`Aventus`;
+__as1(_, 'Process', Process);
+
+Toast.ToastElement = class ToastElement extends Aventus.WebComponent {
+    get 'position'() { return this.getStringAttr('position') }
+    set 'position'(val) { this.setStringAttr('position', val) }get 'delay'() { return this.getNumberAttr('delay') }
+    set 'delay'(val) { this.setNumberAttr('delay', val) }get 'is_active'() { return this.getBoolAttr('is_active') }
+    set 'is_active'(val) { this.setBoolAttr('is_active', val) }    showAsked = false;
+    onHideCallback = () => { };
+    timeout = 0;
+    isTransition = false;
+    waitTransitionCbs = [];
+    static __style = `:host{position:absolute}:host(:not([is_active])){opacity:0;visibility:hidden}:host([position="bottom left"]){bottom:var(--_toast-space-bottom);left:0px}:host([position="top left"]){left:var(--_toast-space-left);top:var(--_toast-space-top)}:host([position="bottom right"]){bottom:var(--_toast-space-bottom);right:var(--_toast-space-right)}:host([position="top right"]){right:var(--_toast-space-right);top:var(--_toast-space-top)}:host([position=top]){left:50%;top:var(--_toast-space-top);transform:translateX(-50%)}:host([position=bottom]){bottom:var(--_toast-space-bottom);left:50%;transform:translateX(-50%)}`;
+    constructor() {
+        super();
+        if (this.constructor == ToastElement) {
+            throw "can't instanciate an abstract class";
+        }
+    }
+    __getStatic() {
+        return ToastElement;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ToastElement.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "ToastElement";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('position')){ this['position'] = _.Toast.ToastManager.defaultPosition; }if(!this.hasAttribute('delay')){ this['delay'] = _.Toast.ToastManager.defaultDelay; }if(!this.hasAttribute('is_active')) { this.attributeChangedCallback('is_active', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('position');this.__upgradeProperty('delay');this.__upgradeProperty('is_active'); }
+    __listBoolProps() { return ["is_active"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    _setOptions(options) {
+        if (options.position !== undefined)
+            this.position = options.position;
+        if (options.delay !== undefined)
+            this.delay = options.delay;
+        return this.setOptions(options);
+    }
+    show(onHideCallback) {
+        this.onHideCallback = onHideCallback;
+        if (this.isReady) {
+            this.is_active = true;
+            this.startDelay();
+        }
+        else {
+            this.showAsked = true;
+        }
+    }
+    startDelay() {
+        if (this.delay > 0) {
+            this.timeout = setTimeout(() => {
+                this.close();
+            }, this.delay);
+        }
+    }
+    async close() {
+        if (this.onHideCallback) {
+            this.is_active = false;
+            this.onHideCallback(false);
+            this.remove();
+        }
+    }
+    addTransition() {
+        this.addEventListener("transitionStart", (e) => {
+            this.isTransition = true;
+        });
+        this.addEventListener("transitionEnd", () => {
+            this.isTransition = false;
+            let cbs = [...this.waitTransitionCbs];
+            this.waitTransitionCbs = [];
+            for (let cb of cbs) {
+                cb();
+            }
+        });
+    }
+    waitTransition() {
+        if (this.isTransition) {
+            return new Promise((resolve) => {
+                this.waitTransitionCbs.push(resolve);
+            });
+        }
+        return new Promise((resolve) => {
+            resolve();
+        });
+    }
+    postCreation() {
+        if (this.showAsked) {
+            this.is_active = true;
+            this.startDelay();
+        }
+    }
+    static add(options) {
+        return _.Toast.ToastManager.add(options);
+    }
+}
+Toast.ToastElement.Namespace=`Aventus.Toast`;
+__as1(_.Toast, 'ToastElement', Toast.ToastElement);
+
+Lib.ShortcutManager=class ShortcutManager {
+    static memory = {};
+    static autoPrevents = [];
+    static isInit = false;
+    static arrayKeys = [];
+    static options = new Map();
+    static replacingMemory = {};
+    static isTxt(touch) {
+        return touch.match(/[a-zA-Z0-9_\+\-]/g);
+    }
+    static getText(combinaison) {
+        let allTouches = [];
+        for (let touch of combinaison) {
+            let realTouch = "";
+            if (typeof touch == "number" && Lib.SpecialTouch[touch] !== undefined) {
+                realTouch = Lib.SpecialTouch[touch];
+            }
+            else if (this.isTxt(touch)) {
+                realTouch = touch;
+            }
+            else {
+                throw "I can't use " + touch + " to add a shortcut";
+            }
+            allTouches.push(realTouch);
+        }
+        allTouches.sort();
+        return allTouches.join("+");
+    }
+    static subscribe(combinaison, cb, options) {
+        if (!Array.isArray(combinaison)) {
+            combinaison = [combinaison];
+        }
+        let key = this.getText(combinaison);
+        if (options?.replaceTemp) {
+            if (Lib.ShortcutManager.memory[key]) {
+                if (!this.replacingMemory[key]) {
+                    this.replacingMemory[key] = [];
+                }
+                this.replacingMemory[key].push(Lib.ShortcutManager.memory[key]);
+                delete Lib.ShortcutManager.memory[key];
+            }
+        }
+        if (!Lib.ShortcutManager.memory[key]) {
+            Lib.ShortcutManager.memory[key] = [];
+        }
+        if (!Lib.ShortcutManager.memory[key].includes(cb)) {
+            Lib.ShortcutManager.memory[key].push(cb);
+            if (options) {
+                this.options.set(cb, options);
+            }
+        }
+        if (!Lib.ShortcutManager.isInit) {
+            Lib.ShortcutManager.init();
+        }
+    }
+    static unsubscribe(combinaison, cb) {
+        if (!Array.isArray(combinaison)) {
+            combinaison = [combinaison];
+        }
+        let key = this.getText(combinaison);
+        if (Lib.ShortcutManager.memory[key]) {
+            let index = Lib.ShortcutManager.memory[key].indexOf(cb);
+            if (index != -1) {
+                Lib.ShortcutManager.memory[key].splice(index, 1);
+                let options = this.options.get(cb);
+                if (options) {
+                    this.options.delete(cb);
+                }
+                if (Lib.ShortcutManager.memory[key].length == 0) {
+                    delete Lib.ShortcutManager.memory[key];
+                    if (options?.replaceTemp) {
+                        if (this.replacingMemory[key]) {
+                            if (this.replacingMemory[key].length > 0) {
+                                Lib.ShortcutManager.memory[key] = this.replacingMemory[key].pop();
+                                if (this.replacingMemory[key].length == 0) {
+                                    delete this.replacingMemory[key];
+                                }
+                            }
+                            else {
+                                delete this.replacingMemory[key];
+                            }
+                        }
+                    }
+                }
+                if (Object.keys(Lib.ShortcutManager.memory).length == 0 && Lib.ShortcutManager.isInit) {
+                    //ShortcutManager.uninit();
+                }
+            }
+        }
+    }
+    static onKeyDown(e) {
+        if (e.ctrlKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Control];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (e.altKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Alt];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (e.shiftKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Shift];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (this.isTxt(e.key) && !this.arrayKeys.includes(e.key)) {
+            this.arrayKeys.push(e.key);
+        }
+        else if (Lib.SpecialTouch[e.key] !== undefined && !this.arrayKeys.includes(e.key)) {
+            this.arrayKeys.push(e.key);
+        }
+        this.arrayKeys.sort();
+        let key = this.arrayKeys.join("+");
+        if (Lib.ShortcutManager.memory[key]) {
+            let preventDefault = true;
+            for (let cb of Lib.ShortcutManager.memory[key]) {
+                let options = this.options.get(cb);
+                if (options && options.preventDefault === false) {
+                    preventDefault = false;
+                }
+            }
+            this.arrayKeys = [];
+            for (let cb of Lib.ShortcutManager.memory[key]) {
+                const result = cb();
+                if (result === false) {
+                    preventDefault = result;
+                }
+            }
+            if (preventDefault) {
+                e.preventDefault();
+            }
+        }
+        else if (Lib.ShortcutManager.autoPrevents.includes(key)) {
+            e.preventDefault();
+        }
+    }
+    static onKeyUp(e) {
+        let index = this.arrayKeys.indexOf(e.key);
+        if (index != -1) {
+            this.arrayKeys.splice(index, 1);
+        }
+    }
+    static init() {
+        if (Lib.ShortcutManager.isInit)
+            return;
+        Lib.ShortcutManager.isInit = true;
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+        Lib.ShortcutManager.autoPrevents = [
+            this.getText([Lib.SpecialTouch.Control, "s"]),
+            this.getText([Lib.SpecialTouch.Control, "p"]),
+            this.getText([Lib.SpecialTouch.Control, "l"]),
+            this.getText([Lib.SpecialTouch.Control, "k"]),
+            this.getText([Lib.SpecialTouch.Control, "j"]),
+            this.getText([Lib.SpecialTouch.Control, "h"]),
+            this.getText([Lib.SpecialTouch.Control, "g"]),
+            this.getText([Lib.SpecialTouch.Control, "f"]),
+            this.getText([Lib.SpecialTouch.Control, "d"]),
+            this.getText([Lib.SpecialTouch.Control, "o"]),
+            this.getText([Lib.SpecialTouch.Control, "u"]),
+            this.getText([Lib.SpecialTouch.Control, "e"]),
+        ];
+        window.addEventListener("blur", () => {
+            this.arrayKeys = [];
+        });
+        document.body.addEventListener("keydown", this.onKeyDown);
+        document.body.addEventListener("keyup", this.onKeyUp);
+    }
+    static uninit() {
+        document.body.removeEventListener("keydown", this.onKeyDown);
+        document.body.removeEventListener("keyup", this.onKeyUp);
+        this.arrayKeys = [];
+        Lib.ShortcutManager.isInit = false;
+    }
+}
+Lib.ShortcutManager.Namespace=`Aventus.Lib`;
+__as1(_.Lib, 'ShortcutManager', Lib.ShortcutManager);
+
+Modal.ModalElement = class ModalElement extends Aventus.WebComponent {
+    get 'options'() {
+						return this.__watch["options"];
+					}
+					set 'options'(val) {
+						this.__watch["options"] = val;
+					}    static defaultCloseWithEsc = true;
+    static defaultCloseWithClick = true;
+    static defaultRejectValue = null;
+    cb;
+    pressManagerClickClose;
+    pressManagerPrevent;
+    __registerWatchesActions() {
+    this.__addWatchesActions("options", ((target, action, path, value) => {
+    target.onOptionsChanged();
+}));    super.__registerWatchesActions();
+}
+    static __style = `:host{align-items:center;display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:#fff;padding:1.5rem;position:relative}`;
+    constructor() {
+        super();
+        this.options = this.configure();
+        if (this.options.closeWithClick === undefined)
+            this.options.closeWithClick = Modal.ModalElement.defaultCloseWithClick;
+        if (this.options.closeWithEsc === undefined)
+            this.options.closeWithEsc = Modal.ModalElement.defaultCloseWithEsc;
+        if (!Object.hasOwn(this.options, "rejectValue")) {
+            this.options.rejectValue = Modal.ModalElement.defaultRejectValue;
+        }
+        if (this.constructor == ModalElement) {
+            throw "can't instanciate an abstract class";
+        }
+        this.close = this.close.bind(this);
+        this.reject = this.reject.bind(this);
+        this.resolve = this.resolve.bind(this);
+    }
+    __getStatic() {
+        return ModalElement;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalElement.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<div class="modal" _id="modalelement_0">	<slot></slot></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "modalEl",
+      "ids": [
+        "modalelement_0"
+      ]
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalElement";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["options"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('options'); }
+    onOptionsChanged() { }
+    init(cb) {
+        this.cb = cb;
+        if (this.options.closeWithEsc) {
+            Lib.ShortcutManager.subscribe(Lib.SpecialTouch.Escape, this.reject, { replaceTemp: true });
+        }
+        if (this.options.closeWithClick) {
+            this.pressManagerClickClose = new Aventus.PressManager({
+                element: this,
+                onPress: () => {
+                    this.reject();
+                }
+            });
+            this.pressManagerPrevent = new Aventus.PressManager({
+                element: this.modalEl,
+                onPress: () => { }
+            });
+        }
+    }
+    show(element) {
+        return Modal.ModalElement._show(this, element);
+    }
+    close() {
+        Lib.ShortcutManager.unsubscribe(Lib.SpecialTouch.Escape, this.reject);
+        this.pressManagerClickClose?.destroy();
+        this.pressManagerPrevent?.destroy();
+        this.remove();
+    }
+    reject(no_close) {
+        if (this.cb) {
+            this.cb(this.options.rejectValue ?? null);
+        }
+        if (no_close !== true) {
+            this.close();
+        }
+    }
+    resolve(response, no_close) {
+        if (this.cb) {
+            this.cb(response);
+        }
+        if (no_close !== true) {
+            this.close();
+        }
+    }
+    static configure(options) {
+        if (options.closeWithClick !== undefined)
+            this.defaultCloseWithClick = options.closeWithClick;
+        if (options.closeWithEsc !== undefined)
+            this.defaultCloseWithEsc = options.closeWithEsc;
+        if (!Object.hasOwn(options, "rejectValue")) {
+            this.defaultRejectValue = options.rejectValue;
+        }
+    }
+    static _show(modal, element) {
+        return new Promise((resolve) => {
+            modal.init((response) => {
+                resolve(response);
+            });
+            if (!element) {
+                element = document.body;
+            }
+            element.appendChild(modal);
+        });
+    }
+}
+Modal.ModalElement.Namespace=`Aventus.Modal`;
+__as1(_.Modal, 'ModalElement', Modal.ModalElement);
+
+Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
+    get 'gap'() { return this.getNumberAttr('gap') }
+    set 'gap'(val) { this.setNumberAttr('gap', val) }get 'not_main'() { return this.getBoolAttr('not_main') }
+    set 'not_main'(val) { this.setBoolAttr('not_main', val) }    static defaultToast;
+    static defaultToastManager;
+    static defaultPosition = 'top right';
+    static defaultDelay = 5000;
+    static heightLimitPercent = 100;
+    static instance;
+    activeToasts = {
+        top: [],
+        'top left': [],
+        'bottom left': [],
+        bottom: [],
+        'bottom right': [],
+        'top right': [],
+    };
+    waitingToasts = {
+        top: [],
+        'top left': [],
+        'bottom left': [],
+        bottom: [],
+        'bottom right': [],
+        'top right': [],
+    };
+    get containerHeight() {
+        return this.offsetHeight;
+    }
+    get heightLimit() {
+        return this.containerHeight * Toast.ToastManager.heightLimitPercent / 100;
+    }
+    mutex = new Aventus.Mutex();
+    static __style = `:host{--_toast-space-bottom: var(--toast-space-bottom, 20px);--_toast-space-top: var(--toast-space-top, 20px);--_toast-space-right: var(--toast-space-right, 10px);--_toast-space-left: var(--toast-space-left, 10px)}:host{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:50}:host ::slotted(*){pointer-events:auto}`;
+    __getStatic() {
+        return ToastManager;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ToastManager.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "ToastManager";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('gap')){ this['gap'] = 10; }if(!this.hasAttribute('not_main')) { this.attributeChangedCallback('not_main', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('containerHeight');this.__correctGetter('heightLimit');this.__upgradeProperty('gap');this.__upgradeProperty('not_main'); }
+    __listBoolProps() { return ["not_main"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    async add(toast) {
+        await this.mutex.waitOne();
+        console.log("inside");
+        let realToast;
+        if (toast instanceof _.Toast.ToastElement) {
+            realToast = toast;
+        }
+        else {
+            if (!Toast.ToastManager.defaultToast)
+                throw "No default toast. Try ToastManager.configure()";
+            realToast = new Toast.ToastManager.defaultToast();
+            await realToast._setOptions(toast);
+        }
+        this.appendChild(realToast);
+        if (realToast.position == "bottom") {
+            return this._notifyBottom(realToast, true);
+        }
+        else if (realToast.position == "bottom left") {
+            return this._notifyBottomLeft(realToast, true);
+        }
+        else if (realToast.position == "top left") {
+            return this._notifyTopLeft(realToast, true);
+        }
+        else if (realToast.position == "bottom right") {
+            return this._notifyBottomRight(realToast, true);
+        }
+        else if (realToast.position == "top right") {
+            return this._notifyTopRight(realToast, true);
+        }
+        else if (realToast.position == "top") {
+            return this._notifyTop(realToast, true);
+        }
+        return false;
+    }
+    _calculateBottom(toast, firstTime, position, from) {
+        return new Promise((resolve) => {
+            let height = toast.offsetHeight;
+            let containerHeight = this.containerHeight;
+            const _remove = (result) => {
+                let index = this.activeToasts[position].indexOf(toast);
+                if (index > -1) {
+                    this.activeToasts[position].splice(index, 1);
+                }
+                if (this.waitingToasts[position].length > 0) {
+                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
+                    this._calculateBottom(nextNotif, false, position, index);
+                }
+                else {
+                    let containerHeight = this.containerHeight;
+                    for (let i = 0; i < index; i++) {
+                        let notif = this.activeToasts[position][i];
+                        let bottom = containerHeight - (notif.offsetTop + notif.offsetHeight);
+                        notif.style.bottom = bottom - height - this.gap + 'px';
+                    }
+                }
+                resolve(result);
+            };
+            let length = this.activeToasts[position].length;
+            if (length == 0) {
+                this.activeToasts[position].push(toast);
+                toast.show(_remove);
+            }
+            else {
+                let totHeight = 0;
+                for (let t of this.activeToasts[position]) {
+                    totHeight += t.offsetHeight + this.gap;
+                }
+                if (totHeight + height < this.heightLimit) {
+                    for (let i = from; i < this.activeToasts[position].length; i++) {
+                        let t = this.activeToasts[position][i];
+                        let bottom = containerHeight - (t.offsetTop + t.offsetHeight);
+                        t.style.bottom = bottom + height + this.gap + 'px';
+                    }
+                    this.activeToasts[position].push(toast);
+                    toast.show(_remove);
+                }
+                else if (firstTime) {
+                    this.waitingToasts[position].push(toast);
+                }
+            }
+        });
+    }
+    _calculateTop(toast, firstTime, position, from) {
+        return new Promise(async (resolve) => {
+            let height = toast.offsetHeight;
+            const _remove = (result) => {
+                let index = this.activeToasts[position].indexOf(toast);
+                if (index > -1) {
+                    this.activeToasts[position].splice(index, 1);
+                }
+                if (this.waitingToasts[position].length > 0) {
+                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
+                    this._calculateTop(nextNotif, false, position, index);
+                }
+                else {
+                    for (let i = 0; i < index; i++) {
+                        let notif = this.activeToasts[position][i];
+                        let top = (notif.offsetTop - height - this.gap);
+                        notif.style.top = top + 'px';
+                    }
+                }
+                resolve(result);
+            };
+            let length = this.activeToasts[position].length;
+            if (length == 0) {
+                this.activeToasts[position].push(toast);
+                toast.show(_remove);
+            }
+            else {
+                let totHeight = 0;
+                for (let notif of this.activeToasts[position]) {
+                    await notif.waitTransition();
+                    console.log(notif.offsetHeight);
+                    totHeight += notif.offsetHeight + this.gap;
+                }
+                if (totHeight + height < this.heightLimit) {
+                    for (let i = from; i < this.activeToasts[position].length; i++) {
+                        let notif = this.activeToasts[position][i];
+                        await notif.waitTransition();
+                        let top = (notif.offsetTop + notif.offsetHeight);
+                        notif.style.top = top + this.gap + 'px';
+                    }
+                    this.activeToasts[position].push(toast);
+                    toast.show(_remove);
+                }
+                else if (firstTime) {
+                    this.waitingToasts[position].push(toast);
+                }
+            }
+            console.log("outside");
+            this.mutex.release();
+            return;
+        });
+    }
+    async _notifyBottomRight(toast, firstTime) {
+        return await this._calculateBottom(toast, firstTime, "bottom right", 0);
+    }
+    async _notifyTopRight(toast, firstTime) {
+        return await this._calculateTop(toast, firstTime, "top right", 0);
+    }
+    async _notifyBottomLeft(toast, firstTime) {
+        return await this._calculateBottom(toast, firstTime, "bottom left", 0);
+    }
+    async _notifyTopLeft(toast, firstTime) {
+        return await this._calculateTop(toast, firstTime, "top left", 0);
+    }
+    async _notifyTop(toast, firstTime, from = 0) {
+        return await this._calculateTop(toast, firstTime, "top", 0);
+    }
+    async _notifyBottom(toast, firstTime, from = 0) {
+        return await this._calculateBottom(toast, firstTime, "bottom", from);
+    }
+    postConnect() {
+        super.postConnect();
+        if (!Toast.ToastManager.instance && !this.not_main) {
+            Toast.ToastManager.instance = this;
+        }
+    }
+    postDisonnect() {
+        if (Toast.ToastManager.instance == this) {
+            Toast.ToastManager.instance = undefined;
+        }
+    }
+    static add(toast) {
+        if (!this.instance) {
+            this.instance = this.defaultToastManager ? new this.defaultToastManager() : new Toast.ToastManager();
+            document.body.appendChild(this.instance);
+        }
+        return this.instance.add(toast);
+    }
+    static configure(options) {
+        for (let key in options) {
+            if (options[key] !== undefined)
+                this[key] = options[key];
+        }
+    }
+}
+Toast.ToastManager.Namespace=`Aventus.Toast`;
+Toast.ToastManager.Tag=`av-toast-manager`;
+__as1(_.Toast, 'ToastManager', Toast.ToastManager);
+if(!window.customElements.get('av-toast-manager')){window.customElements.define('av-toast-manager', Toast.ToastManager);Aventus.WebComponentInstance.registerDefinition(Toast.ToastManager);}
 
 Navigation.Router = class Router extends Aventus.WebComponent {
     static page404 = _.Navigation.Default404;
@@ -10945,7 +11079,7 @@ Navigation.Router = class Router extends Aventus.WebComponent {
     }
 }
 Navigation.Router.Namespace=`Aventus.Navigation`;
-_.Navigation.Router=Navigation.Router;
+__as1(_.Navigation, 'Router', Navigation.Router);
 
 Layout.Col = class Col extends Aventus.WebComponent {
     get 'use_container'() { return this.getBoolAttr('use_container') }
@@ -10997,7 +11131,7 @@ Layout.Col = class Col extends Aventus.WebComponent {
 }
 Layout.Col.Namespace=`Aventus.Layout`;
 Layout.Col.Tag=`av-col`;
-_.Layout.Col=Layout.Col;
+__as1(_.Layout, 'Col', Layout.Col);
 if(!window.customElements.get('av-col')){window.customElements.define('av-col', Layout.Col);Aventus.WebComponentInstance.registerDefinition(Layout.Col);}
 
 Navigation.PageFormRoute = class PageFormRoute extends Navigation.PageForm {
@@ -11028,8 +11162,24 @@ Navigation.PageFormRoute = class PageFormRoute extends Navigation.PageForm {
     async defineSubmit(submit) {
         await this.beforeSubmit();
         const info = this.route();
-        const router = new info[0];
-        const key = info[1];
+        let router;
+        let key = "";
+        if (Array.isArray(info)) {
+            router = new info[0];
+            key = info[1];
+        }
+        else {
+            router = new info;
+            const fcts = Object.getOwnPropertyNames(info.prototype).filter(m => m !== "constructor");
+            if (fcts.length == 1) {
+                key = fcts[0];
+            }
+            else {
+                const result = new Aventus.VoidWithError();
+                result.errors.push(new Aventus.GenericError(500, "More than one fonction is defined"));
+                return result;
+            }
+        }
         const result = await submit(router[key]);
         this.onResult(result);
         return result;
@@ -11037,7 +11187,7 @@ Navigation.PageFormRoute = class PageFormRoute extends Navigation.PageForm {
     beforeSubmit() { }
 }
 Navigation.PageFormRoute.Namespace=`Aventus.Navigation`;
-_.Navigation.PageFormRoute=Navigation.PageFormRoute;
+__as1(_.Navigation, 'PageFormRoute', Navigation.PageFormRoute);
 
 
 for(let key in _) { Aventus[key] = _[key] }
@@ -11046,6 +11196,7 @@ for(let key in _) { Aventus[key] = _[key] }
 var Inventaire;
 (Inventaire||(Inventaire = {}));
 (function (Inventaire) {
+const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Inventaire`;
 const _ = {};
 Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.neutral{background-color:var(--color-neutral)}.content-neutral{color:var(--color-neutral-content)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.accent{background-color:var(--color-accent)}.content-accent{color:var(--color-accent-content)}.info{background-color:var(--color-info)}.content-info{color:var(--color-info-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}`)
@@ -11086,7 +11237,7 @@ let StringTools=class StringTools {
     }
 }
 StringTools.Namespace=`Inventaire`;
-_.StringTools=StringTools;
+__as1(_, 'StringTools', StringTools);
 
 let Colors= [
     'neutral',
@@ -11098,7 +11249,7 @@ let Colors= [
     'warning',
     'error'
 ];
-_.Colors=Colors;
+__as1(_, 'Colors', Colors);
 
 App.Models.Inventaire=class Inventaire extends Aventus.Data {
     static get Fullname() { return "App.Models.Inventaire"; }
@@ -11111,7 +11262,7 @@ App.Models.Inventaire=class Inventaire extends Aventus.Data {
 App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
 App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number"};
 Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
-_.App.Models.Inventaire=App.Models.Inventaire;
+__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
 
 App.Http.Resources.MaterielImageResource=class MaterielImageResource {
     static get Fullname() { return "App.Http.Resources.MaterielImageResource"; }
@@ -11120,7 +11271,7 @@ App.Http.Resources.MaterielImageResource=class MaterielImageResource {
 App.Http.Resources.MaterielImageResource.Namespace=`Inventaire.App.Http.Resources`;
 App.Http.Resources.MaterielImageResource.$schema={"uri":"number"};
 Aventus.Converter.register(App.Http.Resources.MaterielImageResource.Fullname, App.Http.Resources.MaterielImageResource);
-_.App.Http.Resources.MaterielImageResource=App.Http.Resources.MaterielImageResource;
+__as1(_.App.Http.Resources, 'MaterielImageResource', App.Http.Resources.MaterielImageResource);
 
 App.Http.Resources.UserResource=class UserResource {
     static get Fullname() { return "App.Http.Resources.UserResource"; }
@@ -11132,7 +11283,7 @@ App.Http.Resources.UserResource=class UserResource {
 App.Http.Resources.UserResource.Namespace=`Inventaire.App.Http.Resources`;
 App.Http.Resources.UserResource.$schema={"id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
 Aventus.Converter.register(App.Http.Resources.UserResource.Fullname, App.Http.Resources.UserResource);
-_.App.Http.Resources.UserResource=App.Http.Resources.UserResource;
+__as1(_.App.Http.Resources, 'UserResource', App.Http.Resources.UserResource);
 
 App.Http.Requests.UserRequest=class UserRequest {
     id = undefined;
@@ -11142,7 +11293,7 @@ App.Http.Requests.UserRequest=class UserRequest {
     mot_passe = undefined;
 }
 App.Http.Requests.UserRequest.Namespace=`Inventaire.App.Http.Requests`;
-_.App.Http.Requests.UserRequest=App.Http.Requests.UserRequest;
+__as1(_.App.Http.Requests, 'UserRequest', App.Http.Requests.UserRequest);
 
 App.Models.User=class User extends Aventus.Data {
     static get Fullname() { return "App.Models.User"; }
@@ -11155,7 +11306,18 @@ App.Models.User=class User extends Aventus.Data {
 App.Models.User.Namespace=`Inventaire.App.Models`;
 App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string"};
 Aventus.Converter.register(App.Models.User.Fullname, App.Models.User);
-_.App.Models.User=App.Models.User;
+__as1(_.App.Models, 'User', App.Models.User);
+
+App.Models.Variation=class Variation extends Aventus.Data {
+    static get Fullname() { return "App.Models.Variation"; }
+    id;
+    id_materiel;
+    nom;
+}
+App.Models.Variation.Namespace=`Inventaire.App.Models`;
+App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","nom":"string"};
+Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
+__as1(_.App.Models, 'Variation', App.Models.Variation);
 
 App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
     static get Fullname() { return "App.Models.MaterielImage"; }
@@ -11163,7 +11325,19 @@ App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
 App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
 App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
 Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
-_.App.Models.MaterielImage=App.Models.MaterielImage;
+__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
+
+App.Http.Resources.MaterielResource=class MaterielResource {
+    static get Fullname() { return "App.Http.Resources.MaterielResource"; }
+    variations;
+    id;
+    nom;
+    image = new _.App.Models.MaterielImage();
+}
+App.Http.Resources.MaterielResource.Namespace=`Inventaire.App.Http.Resources`;
+App.Http.Resources.MaterielResource.$schema={"variations":"Inventaire.App.Models.Variation[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage"};
+Aventus.Converter.register(App.Http.Resources.MaterielResource.Fullname, App.Http.Resources.MaterielResource);
+__as1(_.App.Http.Resources, 'MaterielResource', App.Http.Resources.MaterielResource);
 
 App.Http.Resources.EquipeResource=class EquipeResource {
     static get Fullname() { return "App.Http.Resources.EquipeResource"; }
@@ -11173,14 +11347,14 @@ App.Http.Resources.EquipeResource=class EquipeResource {
 App.Http.Resources.EquipeResource.Namespace=`Inventaire.App.Http.Resources`;
 App.Http.Resources.EquipeResource.$schema={"id":"number","nom":"string"};
 Aventus.Converter.register(App.Http.Resources.EquipeResource.Fullname, App.Http.Resources.EquipeResource);
-_.App.Http.Resources.EquipeResource=App.Http.Resources.EquipeResource;
+__as1(_.App.Http.Resources, 'EquipeResource', App.Http.Resources.EquipeResource);
 
 App.Http.Requests.EquipeRequest=class EquipeRequest {
     id = undefined;
     nom;
 }
 App.Http.Requests.EquipeRequest.Namespace=`Inventaire.App.Http.Requests`;
-_.App.Http.Requests.EquipeRequest=App.Http.Requests.EquipeRequest;
+__as1(_.App.Http.Requests, 'EquipeRequest', App.Http.Requests.EquipeRequest);
 
 App.Models.Equipe=class Equipe extends Aventus.Data {
     static get Fullname() { return "App.Models.Equipe"; }
@@ -11190,7 +11364,7 @@ App.Models.Equipe=class Equipe extends Aventus.Data {
 App.Models.Equipe.Namespace=`Inventaire.App.Models`;
 App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
 Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
-_.App.Models.Equipe=App.Models.Equipe;
+__as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
 const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -11244,15 +11418,39 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
 }
 EquipeItem.Namespace=`Inventaire`;
 EquipeItem.Tag=`av-equipe-item`;
-_.EquipeItem=EquipeItem;
+__as1(_, 'EquipeItem', EquipeItem);
 if(!window.customElements.get('av-equipe-item')){window.customElements.define('av-equipe-item', EquipeItem);Aventus.WebComponentInstance.registerDefinition(EquipeItem);}
+
+App.Models.MaterielEquipe=class MaterielEquipe extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielEquipe"; }
+    id;
+    id_materiel;
+    id_equipe;
+    equipe;
+    materiel;
+}
+App.Models.MaterielEquipe.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielEquipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_equipe":"number","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.Materiel"};
+Aventus.Converter.register(App.Models.MaterielEquipe.Fullname, App.Models.MaterielEquipe);
+__as1(_.App.Models, 'MaterielEquipe', App.Models.MaterielEquipe);
+
+App.Http.Requests.MaterielRequest=class MaterielRequest {
+    variations;
+    equipes;
+    id = undefined;
+    nom;
+    image = undefined;
+    tout_monde;
+}
+App.Http.Requests.MaterielRequest.Namespace=`Inventaire.App.Http.Requests`;
+__as1(_.App.Http.Requests, 'MaterielRequest', App.Http.Requests.MaterielRequest);
 
 App.Http.Requests.LoginRequest=class LoginRequest {
     nom_utilisateur;
     mot_passe;
 }
 App.Http.Requests.LoginRequest.Namespace=`Inventaire.App.Http.Requests`;
-_.App.Http.Requests.LoginRequest=App.Http.Requests.LoginRequest;
+__as1(_.App.Http.Requests, 'LoginRequest', App.Http.Requests.LoginRequest);
 
 const PageFull = class PageFull extends Aventus.Navigation.Page {
     static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}`;
@@ -11281,7 +11479,7 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     }
 }
 PageFull.Namespace=`Inventaire`;
-_.PageFull=PageFull;
+__as1(_, 'PageFull', PageFull);
 
 const Page = class Page extends Aventus.Navigation.Page {
     static __style = `:host{height:100%;width:100%}:host .page-scroll{height:100%;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;margin:auto;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}`;
@@ -11310,7 +11508,7 @@ const Page = class Page extends Aventus.Navigation.Page {
     }
 }
 Page.Namespace=`Inventaire`;
-_.Page=Page;
+__as1(_, 'Page', Page);
 
 const Header = class Header extends Aventus.WebComponent {
     static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo{font-size:var(--font-size-md)}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}`;
@@ -11333,7 +11531,7 @@ const Header = class Header extends Aventus.WebComponent {
 }
 Header.Namespace=`Inventaire`;
 Header.Tag=`av-header`;
-_.Header=Header;
+__as1(_, 'Header', Header);
 if(!window.customElements.get('av-header')){window.customElements.define('av-header', Header);Aventus.WebComponentInstance.registerDefinition(Header);}
 
 const Footer = class Footer extends Aventus.WebComponent {
@@ -11358,7 +11556,7 @@ const Footer = class Footer extends Aventus.WebComponent {
 }
 Footer.Namespace=`Inventaire`;
 Footer.Tag=`av-footer`;
-_.Footer=Footer;
+__as1(_, 'Footer', Footer);
 if(!window.customElements.get('av-footer')){window.customElements.define('av-footer', Footer);Aventus.WebComponentInstance.registerDefinition(Footer);}
 
 const Toast = class Toast extends Aventus.Toast.ToastElement {
@@ -11385,7 +11583,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
 }
 Toast.Namespace=`Inventaire`;
 Toast.Tag=`av-toast`;
-_.Toast=Toast;
+__as1(_, 'Toast', Toast);
 if(!window.customElements.get('av-toast')){window.customElements.define('av-toast', Toast);Aventus.WebComponentInstance.registerDefinition(Toast);}
 
 const Modal = class Modal extends Aventus.Modal.ModalElement {
@@ -11415,7 +11613,7 @@ const Modal = class Modal extends Aventus.Modal.ModalElement {
     }
 }
 Modal.Namespace=`Inventaire`;
-_.Modal=Modal;
+__as1(_, 'Modal', Modal);
 
 const Confirm = class Confirm extends Modal {
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
@@ -11500,8 +11698,166 @@ const Confirm = class Confirm extends Modal {
 }
 Confirm.Namespace=`Inventaire`;
 Confirm.Tag=`av-confirm`;
-_.Confirm=Confirm;
+__as1(_, 'Confirm', Confirm);
 if(!window.customElements.get('av-confirm')){window.customElements.define('av-confirm', Confirm);Aventus.WebComponentInstance.registerDefinition(Confirm);}
+
+const EquipeTag = class EquipeTag extends Aventus.WebComponent {
+    equipe;
+    onDelete = new Aventus.Callback();
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
+    __getStatic() {
+        return EquipeTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">    <span _id="equipetag_0"></span>    <mi-icon icon="delete" _id="equipetag_1"></mi-icon></av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "componentEl",
+      "ids": [
+        "equipetag_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "equipetag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipeTag";
+    }
+    decodeHtmlSpecialChars(text) {
+        const map = {
+            '&nbsp;': ' ',
+            '&amp;': '&',
+            '&#038;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'",
+            '&#8217;': '’',
+            '&#8216;': '‘',
+            '&#8211;': '–',
+            '&#8212;': '—',
+            '&#8230;': '…',
+            '&#8221;': '”',
+        };
+        return text.replace(/\&[\w\d\#]{2,5}\;/g, (m) => map[m]);
+    }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.nom);
+    }
+}
+EquipeTag.Namespace=`Inventaire`;
+EquipeTag.Tag=`av-equipe-tag`;
+__as1(_, 'EquipeTag', EquipeTag);
+if(!window.customElements.get('av-equipe-tag')){window.customElements.define('av-equipe-tag', EquipeTag);Aventus.WebComponentInstance.registerDefinition(EquipeTag);}
+
+const Toggle = class Toggle extends Aventus.Form.FormElement {
+    static get observedAttributes() {return ["checked"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'checked'() { return this.getBoolProp('checked') }
+    set 'checked'(val) { this.setBoolAttr('checked', val) }    __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("checked", ((target) => {
+    target.value = target.checked;
+})); }
+    static __style = `:host{--radius-selector-max: calc(var(--radius-selector) + var(--radius-selector) + var(--radius-selector));--input-color: color-mix(in srgb, var(--color-base-content)50%, #0000);--toggle-p: calc(var(--size)*.125);--size: calc(var(--size-selector, .25rem)*6);display:contents}:host input{-webkit-appearance:none;-moz-appearance:none;appearance:none;border:var(--border) solid currentColor;border-radius:calc(var(--radius-selector) + min(var(--toggle-p),var(--radius-selector-max)) + min(var(--border),var(--radius-selector-max)));box-shadow:0 1px color-mix(in oklab, currentColor calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset;color:var(--input-color);cursor:pointer;display:inline-grid;flex-shrink:0;font-feature-settings:inherit;font-variation-settings:inherit;grid-template-columns:0fr 1fr 1fr;height:var(--size);letter-spacing:inherit;margin:0;opacity:1;padding:var(--toggle-p);place-content:center;position:relative;transition:color .3s,grid-template-columns .2s;-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none;width:calc(var(--size)*2 - (var(--border) + var(--toggle-p))*2)}:host input:before{--tw-content: "";aspect-ratio:1;background-color:currentColor;background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:0 solid;border-radius:var(--radius-selector);box-shadow:0 -1px oklch(0% 0 0/calc(var(--depth) * 0.1)) inset,0 8px 0 -4px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset,0 1px color-mix(in oklab, currentColor calc(var(--depth) * 10%), rgba(0, 0, 0, 0));box-sizing:border-box;content:var(--tw-content);grid-column-start:2;grid-row-start:1;height:100%;inset-inline-start:0;margin:0;padding:0;position:relative;transition:background-color .1s,translate .2s,inset-inline-start .2s;translate:0}:host input:checked{--input-color: var(--color-base-content);background-color:var(--color-base-100);grid-template-columns:1fr 1fr 0fr}:host input:checked:before{background-color:currentColor}:host input:focus-visible,:host input:has(:focus-visible){outline:2px solid;outline-offset:2px}:host input:indeterminate{grid-template-columns:.5fr 1fr .5fr}:host input:disabled{cursor:not-allowed;opacity:.3}:host input:disabled:before{background-color:rgba(0,0,0,0);border:var(--border) solid currentColor}:host([disabled]) input{cursor:not-allowed;opacity:.3}:host([disabled]) input:before{background-color:rgba(0,0,0,0);border:var(--border) solid currentColor}@supports(color: color-mix(in lab, red, red)){:host input{--input-color: color-mix(in oklab, var(--color-base-content)50%, #0000)}}@media(forced-colors: active){:host input:before{outline-offset:-1px;outline-style:var(--tw-outline-style);outline-width:1px}}@media print{:host input:before{outline:.25rem solid;outline-offset:-1rem}}`;
+    __getStatic() {
+        return Toggle;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Toggle.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<input type="checkbox" _id="toggle_0" />` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "toggle_0"
+      ]
+    }
+  ],
+  "injection": [
+    {
+      "id": "toggle_0",
+      "injectionName": "disabled",
+      "inject": (c) => c.comp.__b00ec36b9fd2aa633151e13d36b20993method0(),
+      "once": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "change",
+      "id": "toggle_0",
+      "fct": (e, c) => c.comp.onSwitch(e)
+    }
+  ]
+}); }
+    getClassName() {
+        return "Toggle";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('checked')) { this.attributeChangedCallback('checked', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('checked'); }
+    __listBoolProps() { return ["checked"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    onValueChange(value) {
+        this.inputEl.checked = value ?? false;
+        this.checked = value ?? false;
+    }
+    onSwitch() {
+        this.triggerChange(this.inputEl.checked);
+    }
+    __b00ec36b9fd2aa633151e13d36b20993method0() {
+        return this.disabled;
+    }
+}
+Toggle.Namespace=`Inventaire`;
+Toggle.Tag=`av-toggle`;
+__as1(_, 'Toggle', Toggle);
+if(!window.customElements.get('av-toggle')){window.customElements.define('av-toggle', Toggle);Aventus.WebComponentInstance.registerDefinition(Toggle);}
+
+let Style=class Style {
+    static lockVariable(el, prop, source) {
+        if (!source) {
+            source = el;
+        }
+        const computed = getComputedStyle(source);
+        let value = computed.getPropertyValue(prop.replace("--", "--_"));
+        if (!value) {
+            value = computed.getPropertyValue(prop);
+        }
+        el.style.setProperty(prop, value);
+    }
+    static unlockVariable(el, prop) {
+        el.style.removeProperty(prop);
+    }
+}
+Style.Namespace=`Inventaire`;
+__as1(_, 'Style', Style);
 
 const InputImage = class InputImage extends Aventus.Form.FormElement {
     static get observedAttributes() {return ["label", "default_preview", "no_default_preview"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -11609,11 +11965,11 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
         return [];
     }
     setPreview() {
-        if (!this.value?.Uri) {
+        if (!this.value?.uri) {
             this.previewUri = this.no_default_preview ? '' : this.default_preview;
         }
         else {
-            this.previewUri = this.value.Uri;
+            this.previewUri = this.value.uri;
             if (this.deletable) {
                 this.show_delete = true;
             }
@@ -11624,14 +11980,14 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
             return;
         this.errors = [];
         if (this.inputFileEl.files && this.inputFileEl.files.length > 0) {
-            this.value.Upload = this.inputFileEl.files[0];
+            this.value.upload = this.inputFileEl.files[0];
             this.previewUri = URL.createObjectURL(this.inputFileEl.files[0]);
             if (this.deletable) {
                 this.show_delete = true;
             }
         }
         else {
-            this.value.Upload = undefined;
+            this.value.upload = undefined;
             this.previewUri = this.default_preview;
             this.show_delete = false;
         }
@@ -11663,40 +12019,8 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
 }
 InputImage.Namespace=`Inventaire`;
 InputImage.Tag=`av-input-image`;
-_.InputImage=InputImage;
+__as1(_, 'InputImage', InputImage);
 if(!window.customElements.get('av-input-image')){window.customElements.define('av-input-image', InputImage);Aventus.WebComponentInstance.registerDefinition(InputImage);}
-
-App.Models.Variation=class Variation extends Aventus.Data {
-    static get Fullname() { return "App.Models.Variation"; }
-    id;
-    id_materiel;
-    nom;
-}
-App.Models.Variation.Namespace=`Inventaire.App.Models`;
-App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","nom":"string"};
-Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
-_.App.Models.Variation=App.Models.Variation;
-
-App.Http.Resources.MaterielResource=class MaterielResource {
-    static get Fullname() { return "App.Http.Resources.MaterielResource"; }
-    variations;
-    id;
-    nom;
-    image = new _.App.Models.MaterielImage();
-}
-App.Http.Resources.MaterielResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.MaterielResource.$schema={"variations":"Inventaire.App.Models.Variation[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage"};
-Aventus.Converter.register(App.Http.Resources.MaterielResource.Fullname, App.Http.Resources.MaterielResource);
-_.App.Http.Resources.MaterielResource=App.Http.Resources.MaterielResource;
-
-App.Http.Requests.MaterielRequest=class MaterielRequest {
-    variations;
-    id = undefined;
-    nom;
-    image = undefined;
-}
-App.Http.Requests.MaterielRequest.Namespace=`Inventaire.App.Http.Requests`;
-_.App.Http.Requests.MaterielRequest=App.Http.Requests.MaterielRequest;
 
 const InlineEdit = class InlineEdit extends Aventus.Form.FormElement {
     static __style = `:host span{display:inline-flex;height:100%;min-width:5px}`;
@@ -11783,7 +12107,7 @@ const InlineEdit = class InlineEdit extends Aventus.Form.FormElement {
 }
 InlineEdit.Namespace=`Inventaire`;
 InlineEdit.Tag=`av-inline-edit`;
-_.InlineEdit=InlineEdit;
+__as1(_, 'InlineEdit', InlineEdit);
 if(!window.customElements.get('av-inline-edit')){window.customElements.define('av-inline-edit', InlineEdit);Aventus.WebComponentInstance.registerDefinition(InlineEdit);}
 
 const Input = class Input extends Aventus.Form.FormElement {
@@ -11887,9 +12211,6 @@ const Input = class Input extends Aventus.Form.FormElement {
     }
     __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('color')){ this['color'] = undefined; }if(!this.hasAttribute('type')){ this['type'] = "text"; }if(!this.hasAttribute('placeholder')){ this['placeholder'] = undefined; }if(!this.hasAttribute('name')){ this['name'] = undefined; }if(!this.hasAttribute('label')){ this['label'] = undefined; }if(!this.hasAttribute('value')){ this['value'] = ""; } }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('color');this.__upgradeProperty('type');this.__upgradeProperty('placeholder');this.__upgradeProperty('name');this.__upgradeProperty('label');this.__upgradeProperty('value'); }
-    async validation() {
-        return [];
-    }
     focusInput() {
         this.inputEl.focus();
     }
@@ -11925,8 +12246,247 @@ const Input = class Input extends Aventus.Form.FormElement {
 }
 Input.Namespace=`Inventaire`;
 Input.Tag=`av-input`;
-_.Input=Input;
+__as1(_, 'Input', Input);
 if(!window.customElements.get('av-input')){window.customElements.define('av-input', Input);Aventus.WebComponentInstance.registerDefinition(Input);}
+
+const ModalTag = class ModalTag extends Modal {
+    get 'name'() {
+						return this.__watch["name"];
+					}
+					set 'name'(val) {
+						this.__watch["name"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("name");    super.__registerWatchesActions();
+}
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modaltag_1"
+      ]
+    }
+  ],
+  "content": {
+    "modaltag_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modaltag_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod1(),
+      "extract": (c, v) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modaltag_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modaltag_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalTag";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["name"] = ""; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('name'); }
+    configure() {
+        return {
+            title: "Edition de variation",
+        };
+    }
+    save() {
+        if (!this.name) {
+            this.inputEl.errors = ["Il faut un nom pour la variation"];
+            return;
+        }
+        this.resolve(this.name);
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod0() {
+        return this.options.title;
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod1() {
+        return this.name;
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod2(v) {
+        if (this) {
+            this.name = v;
+        }
+    }
+}
+ModalTag.Namespace=`Inventaire`;
+ModalTag.Tag=`av-modal-tag`;
+__as1(_, 'ModalTag', ModalTag);
+if(!window.customElements.get('av-modal-tag')){window.customElements.define('av-modal-tag', ModalTag);Aventus.WebComponentInstance.registerDefinition(ModalTag);}
+
+const VariationTag = class VariationTag extends Aventus.WebComponent {
+    variation;
+    onDelete = new Aventus.Callback();
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-neutral)}`;
+    __getStatic() {
+        return VariationTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "componentEl",
+      "ids": [
+        "variationtag_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationtag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerEdit(e, pressInstance); }
+    },
+    {
+      "id": "variationtag_2",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationTag";
+    }
+    async triggerEdit() {
+        const p = new ModalTag();
+        p.name = this.variation.nom;
+        const result = await p.show();
+        if (result !== null) {
+            this.variation.nom = result;
+            this.componentEl.innerText = result;
+        }
+    }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.variation.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.componentEl.innerText = this.variation.nom;
+    }
+}
+VariationTag.Namespace=`Inventaire`;
+VariationTag.Tag=`av-variation-tag`;
+__as1(_, 'VariationTag', VariationTag);
+if(!window.customElements.get('av-variation-tag')){window.customElements.define('av-variation-tag', VariationTag);Aventus.WebComponentInstance.registerDefinition(VariationTag);}
+
+const VariationTags = class VariationTags extends Aventus.WebComponent {
+    variations = [];
+    static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
+    constructor() {
+        super();
+        this.onChildDelete = this.onChildDelete.bind(this);
+    }
+    __getStatic() {
+        return VariationTags;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationTags.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "listEl",
+      "ids": [
+        "variationtags_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationtags_1",
+      "onPress": (e, pressInstance, c) => { c.comp.addVariation(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationTags";
+    }
+    onChildDelete(el) {
+        let children = Array.from(this.listEl.children);
+        let index = children.indexOf(el);
+        this.variations.splice(index, 1);
+        this.listEl.removeChild(el);
+    }
+    render() {
+        this.listEl.innerHTML = "";
+        for (let variation of this.variations) {
+            let el = new VariationTag();
+            el.variation = variation;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    async addVariation() {
+        const p = new ModalTag();
+        const nom = await p.show();
+        if (nom === null)
+            return;
+        const v = new App.Models.Variation();
+        v.nom = nom;
+        this.variations.push(v);
+        let el = new VariationTag();
+        el.variation = v;
+        el.onDelete.add(this.onChildDelete);
+        this.listEl.appendChild(el);
+    }
+    postCreation() {
+        this.render();
+    }
+}
+VariationTags.Namespace=`Inventaire`;
+VariationTags.Tag=`av-variation-tags`;
+__as1(_, 'VariationTags', VariationTags);
+if(!window.customElements.get('av-variation-tags')){window.customElements.define('av-variation-tags', VariationTags);Aventus.WebComponentInstance.registerDefinition(VariationTags);}
 
 const Button = class Button extends Aventus.Form.ButtonElement {
     get 'color'() { return this.getStringAttr('color') }
@@ -11962,7 +12522,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
 }
 Button.Namespace=`Inventaire`;
 Button.Tag=`av-button`;
-_.Button=Button;
+__as1(_, 'Button', Button);
 if(!window.customElements.get('av-button')){window.customElements.define('av-button', Button);Aventus.WebComponentInstance.registerDefinition(Button);}
 
 const Tag = class Tag extends Aventus.WebComponent {
@@ -11990,7 +12550,7 @@ const Tag = class Tag extends Aventus.WebComponent {
 }
 Tag.Namespace=`Inventaire`;
 Tag.Tag=`av-tag`;
-_.Tag=Tag;
+__as1(_, 'Tag', Tag);
 if(!window.customElements.get('av-tag')){window.customElements.define('av-tag', Tag);Aventus.WebComponentInstance.registerDefinition(Tag);}
 
 const Tooltip = class Tooltip extends Aventus.WebComponent {
@@ -12202,7 +12762,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
 }
 Tooltip.Namespace=`Inventaire`;
 Tooltip.Tag=`av-tooltip`;
-_.Tooltip=Tooltip;
+__as1(_, 'Tooltip', Tooltip);
 if(!window.customElements.get('av-tooltip')){window.customElements.define('av-tooltip', Tooltip);Aventus.WebComponentInstance.registerDefinition(Tooltip);}
 
 const IconAction = class IconAction extends MaterialIcon.Icon {
@@ -12294,93 +12854,730 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
 }
 IconAction.Namespace=`Inventaire`;
 IconAction.Tag=`av-icon-action`;
-_.IconAction=IconAction;
+__as1(_, 'IconAction', IconAction);
 if(!window.customElements.get('av-icon-action')){window.customElements.define('av-icon-action', IconAction);Aventus.WebComponentInstance.registerDefinition(IconAction);}
 
-const TagEdit = class TagEdit extends Aventus.WebComponent {
-    get 'variation'() {
-						return this.__watch["variation"];
-					}
-					set 'variation'(val) {
-						this.__watch["variation"] = val;
-					}    onDelete = new Aventus.Callback();
-    __registerWatchesActions() {
-    this.__addWatchesActions("variation");    super.__registerWatchesActions();
-}
-    static __style = `:host av-tag{padding-left:12px}:host mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
+const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
+    get 'open'() { return this.getBoolAttr('open') }
+    set 'open'(val) { this.setBoolAttr('open', val) }    select;
+    onOpen = new Aventus.Callback();
+    isAnimating = false;
+    firstOpen = true;
+    static __style = `:host{--_options-container-background: var(--options-container-background, var(--form-element-background, white));--_options-container-border-radius: var(--options-container-border-radius, var(--form-element-border-radius, 0));--_options-container-box-shadow: var(--options-container-box-shadow, var(--elevation-2))}:host{background-color:var(--_options-container-background);border-radius:var(--_options-container-border-radius);box-shadow:var(--_options-container-box-shadow);display:grid;grid-template-rows:0fr;left:0;overflow:hidden;position:absolute;top:0;transition:.2s ease-in-out grid-template-rows;z-index:800}:host av-scrollable .container{display:flex;flex-direction:column}:host([open]){grid-template-rows:1fr}`;
     __getStatic() {
-        return TagEdit;
+        return OptionsContainer;
     }
     __getStyle() {
         let arrStyle = super.__getStyle();
-        arrStyle.push(TagEdit.__style);
+        arrStyle.push(OptionsContainer.__style);
         return arrStyle;
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent" _id="tagedit_0">    <span><av-inline-edit _id="tagedit_1"></av-inline-edit></span>    <mi-icon icon="delete" _id="tagedit_2"></mi-icon></av-tag>` }
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
+    });
+}
+    getClassName() {
+        return "OptionsContainer";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('open')) { this.attributeChangedCallback('open', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('open'); }
+    __listBoolProps() { return ["open"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    init(select) {
+        this.select = select;
+    }
+    async show(container) {
+        if (!container) {
+            container = document.body;
+        }
+        if (this.firstOpen) {
+            Style.lockVariable(this, "--options-container-background");
+        }
+        let box = this.select.getBoundingClientRect();
+        let boxInput = this.select.inputEl.getBoundingClientRect();
+        let contBox = container.getBoundingClientRect();
+        let newTop = boxInput.top + boxInput.height + 2;
+        let maxHeight = contBox.height - newTop - 10;
+        this.style.width = box.width + 'px';
+        this.style.top = newTop + 'px';
+        this.style.left = box.left + 'px';
+        this.style.maxHeight = maxHeight + 'px';
+        container.appendChild(this);
+        await Aventus.sleep(10);
+        this.open = true;
+        this.onOpen.trigger(true);
+    }
+    hide() {
+        this.open = false;
+        this.onOpen.trigger(false);
+    }
+    addAnimationEnd() {
+        this.addEventListener("transitionstart", (event) => {
+            this.isAnimating = true;
+        });
+        this.addEventListener("transitionend", (event) => {
+            this.isAnimating = false;
+            if (!this.open) {
+                this.parentElement?.removeChild(this);
+            }
+        });
+    }
+    postCreation() {
+        this.addAnimationEnd();
+        this.setAttribute("tabindex", "-1");
+    }
+}
+OptionsContainer.Namespace=`Inventaire`;
+OptionsContainer.Tag=`av-options-container`;
+__as1(_, 'OptionsContainer', OptionsContainer);
+if(!window.customElements.get('av-options-container')){window.customElements.define('av-options-container', OptionsContainer);Aventus.WebComponentInstance.registerDefinition(OptionsContainer);}
+
+const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
+    static get observedAttributes() {return ["label", "placeholder", "icon", "searchable"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'open'() { return this.getBoolAttr('open') }
+    set 'open'(val) { this.setBoolAttr('open', val) }    get 'label'() { return this.getStringProp('label') }
+    set 'label'(val) { this.setStringAttr('label', val) }get 'placeholder'() { return this.getStringProp('placeholder') }
+    set 'placeholder'(val) { this.setStringAttr('placeholder', val) }get 'icon'() { return this.getStringProp('icon') }
+    set 'icon'(val) { this.setStringAttr('icon', val) }get 'searchable'() { return this.getBoolProp('searchable') }
+    set 'searchable'(val) { this.setBoolAttr('searchable', val) }    get 'displayValue'() {
+						return this.__watch["displayValue"];
+					}
+					set 'displayValue'(val) {
+						this.__watch["displayValue"] = val;
+					}get 'value'() {
+						return this.__watch["value"];
+					}
+					set 'value'(val) {
+						this.__watch["value"] = val;
+					}    selectedOption;
+    options = [];
+    optionsInited = false;
+    __registerWatchesActions() {
+    this.__addWatchesActions("displayValue", ((target, action, path, value) => {
+    target.inputEl.value = target.displayValue;
+}));this.__addWatchesActions("value", ((target) => {
+    target.onInternalValueChanged();
+}));    super.__registerWatchesActions();
+}
+    __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("searchable", ((target) => {
+    if (target.searchable) {
+        target.inputEl.removeAttribute("disabled");
+    }
+    else {
+        target.inputEl.setAttribute("disabled", "disabled");
+    }
+})); }
+    static __style = `:host{--_select-height: var(--select-height, 30px);--_select-background-color: var(--select-background-color, var(--form-element-background, white));--_select-icon-height: var(--select-icon-height, calc(var(--_select-height) / 2));--_select-error-logo-size: var(--select-error-logo-size, calc(var(--_select-height) / 2));--_select-font-size: var(--select-font-size, var(--form-element-font-size, 16px));--_select-font-size-label: var(--select-font-size-label, var(--form-element-font-size-label, calc(var(--_select-font-size) * 0.95)));--_select-select-border: var(--select-select-border, var(--form-element-border, 1px solid var(--lighter-active)));--_generic-select-border-radius: var(--generic-select-border-radius, var(--form-element-border-radius, 0));--_select-caret-height: var(--select-caret-height, calc(var(--_select-height) / 2));--_select-caret-color: var(--select-caret-color, var(--form-element-color))}:host{min-width:100px;width:100%}:host label{cursor:pointer;display:none;font-size:var(--_select-font-size-label);margin-bottom:5px;margin-left:3px}:host .input{align-items:center;background-color:var(--_select-background-color);border:var(--_select-select-border);border-radius:var(--_generic-select-border-radius);cursor:pointer;display:flex;height:var(--_select-height);padding:0 10px;width:100%}:host .input .icon{display:none;height:var(--_select-icon-height);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--_select-caret-color);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:var(--_select-caret-height);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{background-color:rgba(0,0,0,0);border:none;color:var(--text-color);display:block;flex-grow:1;font-size:var(--_select-font-size);height:100%;margin:0;opacity:1;outline:none;padding:5px 0;padding-right:10px;-webkit-text-fill-color:var(--text-color);width:100%}:host .input .error-logo{align-items:center;background-color:var(--red);border-radius:var(--border-radius-round);color:#fff;display:none;flex-shrink:0;font-size:calc(var(--_select-error-logo-size) - 5px);height:var(--_select-error-logo-size);justify-content:center;width:var(--_select-error-logo-size)}:host .errors{color:var(--red);display:none;font-size:var(--font-size-sm);line-height:1.1;margin:10px;margin-bottom:0px}:host .errors div{margin:5px 0}:host .hidden{display:none}:host([has_errors]) .input{border:1px solid var(--red)}:host([has_errors]) .input .error-logo{display:flex}:host([has_errors]) .errors{display:block}:host([icon]:not([icon=""])) .input .icon{display:block}:host([label]:not([label=""])) label{display:flex}:host([open]) .input .caret{transform:rotate(-270deg)}`;
+    constructor() {
+        super();
+        if (this.constructor == GenericSelect) {
+            throw "can't instanciate an abstract class";
+        }
+    }
+    __getStatic() {
+        return GenericSelect;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(GenericSelect.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <div class="error-logo">!</div>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "elements": [
     {
-      "name": "inlineEl",
+      "name": "inputEl",
       "ids": [
-        "tagedit_1"
+        "genericselect_3"
+      ]
+    },
+    {
+      "name": "optionsContainer",
+      "ids": [
+        "genericselect_6"
       ]
     }
   ],
-  "bindings": [
-    {
-      "id": "tagedit_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__d23b979c03f7b8615d6768738d440e1fmethod0(),
-      "extract": (c, v) => c.comp.__d23b979c03f7b8615d6768738d440e1fmethod1(v),
-      "once": true,
-      "isCallback": true
+  "content": {
+    "genericselect_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method1())}`,
+      "once": true
+    },
+    "genericselect_2°src": {
+      "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method2())}`,
+      "once": true
+    },
+    "genericselect_3°placeholder": {
+      "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method3())}`,
+      "once": true
     }
-  ],
+  },
   "events": [
     {
-      "eventName": "click",
-      "id": "tagedit_0",
-      "fct": (e, c) => c.comp.triggerFocus(e)
+      "eventName": "input",
+      "id": "genericselect_3",
+      "fct": (e, c) => c.comp.filter(e)
+    },
+    {
+      "eventName": "onOpen",
+      "id": "genericselect_6",
+      "fct": (c, ...args) => c.comp.syncCaret.apply(c.comp, ...args),
+      "isCallback": true
     }
   ],
   "pressEvents": [
     {
-      "id": "tagedit_2",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+      "id": "genericselect_0",
+      "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
+    },
+    {
+      "id": "genericselect_1",
+      "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-}); }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+  "content": {
+    "genericselect_5°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'genericselect_4',
+                    template: templ0,
+                simple:{data: "this.errors",item:"error"}}); }
     getClassName() {
-        return "TagEdit";
+        return "GenericSelect";
     }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["variation"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation'); }
-    triggerFocus() {
-        this.inlineEl.componentEl.focus();
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('open')) { this.attributeChangedCallback('open', false, false); }if(!this.hasAttribute('label')){ this['label'] = undefined; }if(!this.hasAttribute('placeholder')){ this['placeholder'] = undefined; }if(!this.hasAttribute('icon')){ this['icon'] = undefined; }if(!this.hasAttribute('searchable')) { this.attributeChangedCallback('searchable', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["displayValue"] = "";w["value"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('open');this.__upgradeProperty('label');this.__upgradeProperty('placeholder');this.__upgradeProperty('icon');this.__upgradeProperty('searchable');this.__correctGetter('displayValue');this.__correctGetter('value'); }
+    __listBoolProps() { return ["open","searchable"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    compare(item1, item2) {
+        return item1 == item2;
     }
-    triggerDelete() {
-        this.onDelete.trigger(this);
+    onInternalValueChanged() {
+        if (!this.optionsInited)
+            return;
+        let found = false;
+        for (let option of this.options) {
+            if (this.compare(option.value, this.value)) {
+                found = true;
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+                break;
+            }
+        }
+        if (!found) {
+            this.selectedOption = undefined;
+            this.displayValue = this.placeholder ?? '';
+            this.filter();
+        }
     }
-    __d23b979c03f7b8615d6768738d440e1fmethod0() {
-        return this.variation.nom;
+    setValueFromOption(option) {
+        this.selectedOption = option;
+        this.value = option.value;
+        this.displayValue = this.itemToText(option);
+        this.hideOptions();
+        this.onChange.trigger(this.value);
+        this.filter();
+        if (this.form) {
+            this.form.value.set(this.value);
+        }
     }
-    __d23b979c03f7b8615d6768738d440e1fmethod1(v) {
-        if (this.variation) {
-            this.variation.nom = v;
+    removeErrors() {
+        this.errors = [];
+    }
+    loadElementsFromSlot() {
+        let elements = this.getElementsInSlot();
+        for (let element of elements) {
+            if (element instanceof GenericOption) {
+                this.options.push(element);
+                element.init(this);
+                this.optionsContainer.appendChild(element);
+            }
+        }
+    }
+    showOptions() {
+        if (!this.open) {
+            this.removeErrors();
+            this.optionsContainer.show();
+        }
+        if (!this.searchable) {
+            setTimeout(() => {
+                this.optionsContainer.focus({ preventScroll: true });
+            }, 100);
+        }
+    }
+    hideOptions() {
+        setTimeout(() => {
+            this.optionsContainer.blur();
+        }, 50);
+    }
+    syncCaret(open) {
+        this.open = open;
+    }
+    filter() {
+        if (this.searchable) {
+            let value = this.inputEl.value.toLowerCase();
+            for (let option of this.options) {
+                option.filter(value);
+            }
+        }
+    }
+    manageFocus() {
+        let blurTimeout = 0;
+        ;
+        let blur = () => {
+            blurTimeout = setTimeout(() => {
+                this.optionsContainer.hide();
+            }, 50);
+        };
+        this.inputEl.addEventListener("blur", () => {
+            blur();
+        });
+        this.optionsContainer.addEventListener("blur", () => {
+            blur();
+        });
+        this.inputEl.addEventListener("focus", () => {
+            clearTimeout(blurTimeout);
+        });
+        this.optionsContainer.addEventListener("focus", () => {
+            clearTimeout(blurTimeout);
+        });
+    }
+    postDestruction() {
+        super.postDestruction();
+        this.optionsContainer.remove();
+    }
+    postCreation() {
+        this.manageFocus();
+        this.optionsContainer.init(this);
+        this.loadElementsFromSlot();
+        this.optionsInited = true;
+        this.onInternalValueChanged();
+        this.shadowRoot.removeChild(this.optionsContainer);
+    }
+    __355bb3ba36f1d9f73b205609b2c794f0method1() {
+        return this.label;
+    }
+    __355bb3ba36f1d9f73b205609b2c794f0method2() {
+        return this.icon;
+    }
+    __355bb3ba36f1d9f73b205609b2c794f0method3() {
+        return this.placeholder;
+    }
+    __355bb3ba36f1d9f73b205609b2c794f0method4(error) {
+        return error;
+    }
+}
+GenericSelect.Namespace=`Inventaire`;
+__as1(_, 'GenericSelect', GenericSelect);
+
+const SelectData = class SelectData extends GenericSelect {
+    get 'loading'() { return this.getBoolAttr('loading') }
+    set 'loading'(val) { this.setBoolAttr('loading', val) }get 'txt_undefined'() { return this.getStringAttr('txt_undefined') }
+    set 'txt_undefined'(val) { this.setStringAttr('txt_undefined', val) }    data = [];
+    isInit = false;
+    static __style = ``;
+    constructor() {
+        super();
+        if (this.constructor == SelectData) {
+            throw "can't instanciate an abstract class";
+        }
+        this.subscribe = this.subscribe.bind(this);
+        this.unsubscribe = this.unsubscribe.bind(this);
+        this.onCreated = this.onCreated.bind(this);
+        this.onDeleted = this.onDeleted.bind(this);
+        this.onUpdated = this.onUpdated.bind(this);
+    }
+    __getStatic() {
+        return SelectData;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(SelectData.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "SelectData";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('loading')) { this.attributeChangedCallback('loading', false, false); }if(!this.hasAttribute('txt_undefined')){ this['txt_undefined'] = undefined; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('loading');this.__upgradeProperty('txt_undefined'); }
+    __listBoolProps() { return ["loading"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    compare(item1, item2) {
+        if (item1 === undefined && item2 === undefined) {
+            return true;
+        }
+        if (item1 === undefined || item2 === undefined) {
+            return false;
+        }
+        if (typeof item1 == 'number' || typeof item2 == 'number') {
+            return item1 == item2;
+        }
+        const key1 = this.defineRam().getId(item1);
+        const key2 = this.defineRam().getId(item2);
+        return key1 == key2;
+    }
+    itemToText(option) {
+        return option.getText();
+    }
+    defineOption() {
+        return OptionData;
+    }
+    getOption() {
+        const cst = this.defineOption();
+        let option = new cst();
+        option.init(this);
+        return option;
+    }
+    async createOptions() {
+        this.loading = true;
+        this.data = await this.loadData();
+        for (let child of this.children) {
+            child.remove();
+        }
+        if (this.txt_undefined !== undefined) {
+            let option = this.getOption();
+            await option.setItem(undefined);
+            if (this.compare(option.value, this.value)) {
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+            }
+            option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
+            this.appendChild(option);
+        }
+        for (let item of this.data) {
+            let option = this.getOption();
+            await option.setItem(item);
+            if (this.compare(option.value, this.value)) {
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+            }
+            this.appendChild(option);
+        }
+        this.loading = false;
+        this.init();
+    }
+    async loadData() {
+        const result = await Aventus.Process.execute(this.defineRam().getListWithError()) ?? [];
+        return result;
+    }
+    subscribe() {
+        this.defineRam().onCreated(this.onCreated);
+        this.defineRam().onUpdated(this.onUpdated);
+        this.defineRam().onDeleted(this.onDeleted);
+    }
+    unsubscribe() {
+        this.defineRam().offCreated(this.onCreated);
+        this.defineRam().offUpdated(this.onUpdated);
+        this.defineRam().offDeleted(this.onDeleted);
+    }
+    async onCreated(item) {
+        this.data.push(item);
+        let option = this.getOption();
+        await option.setItem(item);
+        this.appendChild(option);
+        this.loadElementsFromSlot();
+    }
+    async onDeleted(item) {
+        for (let i = 0; i < this.options.length; i++) {
+            let option = this.options[i];
+            let value = await this.optionValue(item);
+            if (this.compare(option.value, value)) {
+                this.options.splice(i, 1);
+                option.remove();
+                if (this.compare(this.value, value)) {
+                    this.value = undefined;
+                }
+            }
+        }
+    }
+    async onUpdated(item) {
+        for (let i = 0; i < this.options.length; i++) {
+            let option = this.options[i];
+            if (this.compare(option.value, await this.optionValue(item))) {
+                option.innerHTML = await this.optionText(item);
+            }
+        }
+    }
+    async init() {
+        if (!this.isConnected)
+            return;
+        if (this.isInit)
+            return;
+        this.isInit = true;
+        await this.createOptions();
+        super.postCreation();
+        this.subscribe();
+    }
+    postDestruction() {
+        super.postDestruction();
+        this.unsubscribe();
+    }
+    postConnect() {
+    }
+    postCreation() {
+        this.init();
+    }
+}
+SelectData.Namespace=`Inventaire`;
+__as1(_, 'SelectData', SelectData);
+
+const GenericOption = class GenericOption extends Aventus.WebComponent {
+    value;
+    select;
+    static __style = `:host{--_option-font-size: var(--option-font-size, var(--form-element-font-size, 16px))}:host{padding:5px 10px;font-size:var(--_option-font-size);cursor:pointer;transition:background-color .2s linear}:host(:hover){background-color:var(--form-element-background-active)}`;
+    __getStatic() {
+        return GenericOption;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(GenericOption.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "GenericOption";
+    }
+    init(select) {
+        this.select = select;
+    }
+    filter(text) {
+        if (this.innerText.toLowerCase().includes(text)) {
+            this.style.display = "";
+        }
+        else {
+            this.style.display = "none";
+        }
+    }
+    postCreation() {
+        new Aventus.PressManager({
+            element: this,
+            onPress: () => {
+                this.select.setValueFromOption(this);
+            }
+        });
+    }
+}
+GenericOption.Namespace=`Inventaire`;
+GenericOption.Tag=`av-generic-option`;
+__as1(_, 'GenericOption', GenericOption);
+if(!window.customElements.get('av-generic-option')){window.customElements.define('av-generic-option', GenericOption);Aventus.WebComponentInstance.registerDefinition(GenericOption);}
+
+const OptionEnum = class OptionEnum extends GenericOption {
+    value = undefined;
+    static __style = ``;
+    __getStatic() {
+        return OptionEnum;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(OptionEnum.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "OptionEnum";
+    }
+}
+OptionEnum.Namespace=`Inventaire`;
+OptionEnum.Tag=`av-option-enum`;
+__as1(_, 'OptionEnum', OptionEnum);
+if(!window.customElements.get('av-option-enum')){window.customElements.define('av-option-enum', OptionEnum);Aventus.WebComponentInstance.registerDefinition(OptionEnum);}
+
+const SelectEnum = class SelectEnum extends GenericSelect {
+    get 'txt_undefined'() { return this.getStringAttr('txt_undefined') }
+    set 'txt_undefined'(val) { this.setStringAttr('txt_undefined', val) }    enumEl;
+    static __style = ``;
+    constructor() {
+        super();
+        this.enumEl = this.defineEnum();
+        this.createOptions();
+        if (this.constructor == SelectEnum) {
+            throw "can't instanciate an abstract class";
+        }
+    }
+    __getStatic() {
+        return SelectEnum;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(SelectEnum.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "SelectEnum";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('txt_undefined')){ this['txt_undefined'] = undefined; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('txt_undefined'); }
+    itemToText(option) {
+        return option.innerHTML;
+    }
+    getEnumName(value) {
+        return this.enumEl[value];
+    }
+    createOptions() {
+        if (this.txt_undefined !== undefined) {
+            let option = new OptionEnum();
+            option.value = undefined;
+            option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
+            this.appendChild(option);
+        }
+        let _enum = this.defineEnum();
+        for (let key in _enum) {
+            if (!key.match(/^\d*$/)) {
+                let val = _enum[key];
+                let option = new OptionEnum();
+                option.value = val;
+                option.innerHTML = this.getEnumName(val);
+                this.appendChild(option);
+            }
+        }
+    }
+    postCreation() {
+        super.postCreation();
+    }
+}
+SelectEnum.Namespace=`Inventaire`;
+__as1(_, 'SelectEnum', SelectEnum);
+
+const Option = class Option extends GenericOption {
+    static get observedAttributes() {return ["value"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'value'() { return this.getStringProp('value') }
+    set 'value'(val) { this.setStringAttr('value', val) }    static __style = ``;
+    __getStatic() {
+        return Option;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Option.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "Option";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('value')){ this['value'] = undefined; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('value'); }
+}
+Option.Namespace=`Inventaire`;
+Option.Tag=`av-option`;
+__as1(_, 'Option', Option);
+if(!window.customElements.get('av-option')){window.customElements.define('av-option', Option);Aventus.WebComponentInstance.registerDefinition(Option);}
+
+const Select = class Select extends GenericSelect {
+    static get observedAttributes() {return ["value"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'value'() { return this.getStringProp('value') }
+    set 'value'(val) { this.setStringAttr('value', val) }    __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("value", ((target) => {
+    target.onInternalValueChanged();
+})); }
+    static __style = ``;
+    __getStatic() {
+        return Select;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Select.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "Select";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('value')){ this['value'] = ""; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('value'); }
+    itemToText(option) {
+        // if(option.value !== undefined) {
+        //     return option.value
+        // }
+        return option.innerHTML.replace(/&nbsp;/g, " ");
+    }
+}
+Select.Namespace=`Inventaire`;
+Select.Tag=`av-select`;
+__as1(_, 'Select', Select);
+if(!window.customElements.get('av-select')){window.customElements.define('av-select', Select);Aventus.WebComponentInstance.registerDefinition(Select);}
+
+const OptionData = class OptionData extends GenericOption {
+    static __style = ``;
+    __getStatic() {
+        return OptionData;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(OptionData.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "OptionData";
+    }
+    getText() {
+        return this.innerHTML;
+    }
+    async setItem(item) {
+        let select = this.select;
+        if (!item) {
+            this.value = undefined;
+            this.innerHTML = '';
+        }
+        else {
+            this.value = await select.optionValue(item);
+            this.innerHTML = await select.optionText(item);
         }
     }
 }
-TagEdit.Namespace=`Inventaire`;
-TagEdit.Tag=`av-tag-edit`;
-_.TagEdit=TagEdit;
-if(!window.customElements.get('av-tag-edit')){window.customElements.define('av-tag-edit', TagEdit);Aventus.WebComponentInstance.registerDefinition(TagEdit);}
+OptionData.Namespace=`Inventaire`;
+OptionData.Tag=`av-option-data`;
+__as1(_, 'OptionData', OptionData);
+if(!window.customElements.get('av-option-data')){window.customElements.define('av-option-data', OptionData);Aventus.WebComponentInstance.registerDefinition(OptionData);}
 
 const Alert = class Alert extends Modal {
     static __style = `:host .content{line-break:anywhere}:host .footer{display:flex;justify-content:flex-end;margin-top:1rem}`;
@@ -12443,7 +13640,7 @@ const Alert = class Alert extends Modal {
 }
 Alert.Namespace=`Inventaire`;
 Alert.Tag=`av-alert`;
-_.Alert=Alert;
+__as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
 
 App.Http.Controllers.AuthController=class AuthController extends Aventus.HttpRoute {
@@ -12458,7 +13655,7 @@ App.Http.Controllers.AuthController=class AuthController extends Aventus.HttpRou
     }
 }
 App.Http.Controllers.AuthController.Namespace=`Inventaire.App.Http.Controllers`;
-_.App.Http.Controllers.AuthController=App.Http.Controllers.AuthController;
+__as1(_.App.Http.Controllers, 'AuthController', App.Http.Controllers.AuthController);
 
 const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     static __style = `:host{align-items:center;display:flex;height:100%;justify-content:center;width:100%}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-3);display:flex;justify-content:stretch;max-width:700px;overflow:hidden;width:calc(100% - 40px)}:host .card .img{background-image:url("/img/background-foot.jpg");background-position:center center;background-size:cover;width:300px;flex-shrink:0}:host .card .content{padding:24px}:host .card .title{font-size:var(--font-size-lg);margin-bottom:24px}:host .card av-input{margin-bottom:12px}:host .card .right{display:flex;justify-content:flex-end;margin-top:8px}:host(:not([visible])){display:flex}@media screen and (max-width: 800px){:host .card{flex-direction:column;max-width:500px}:host .card .img{height:200px;width:100%}}`;
@@ -12520,14 +13717,14 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
 }
 LoginPage.Namespace=`Inventaire`;
 LoginPage.Tag=`av-login-page`;
-_.LoginPage=LoginPage;
+__as1(_, 'LoginPage', LoginPage);
 if(!window.customElements.get('av-login-page')){window.customElements.define('av-login-page', LoginPage);Aventus.WebComponentInstance.registerDefinition(LoginPage);}
 
 App.Http.Controllers.EquipeController=class EquipeController extends AventusPhp.ModelController {
     getUri() { return "data/equipe"; }
 }
 App.Http.Controllers.EquipeController.Namespace=`Inventaire.App.Http.Controllers`;
-_.App.Http.Controllers.EquipeController=App.Http.Controllers.EquipeController;
+__as1(_.App.Http.Controllers, 'EquipeController', App.Http.Controllers.EquipeController);
 
 let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
     /**
@@ -12556,7 +13753,137 @@ let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
     }
 }
 EquipeRAM.Namespace=`Inventaire`;
-_.EquipeRAM=EquipeRAM;
+__as1(_, 'EquipeRAM', EquipeRAM);
+
+const EquipeSelect = class EquipeSelect extends SelectData {
+    static __style = ``;
+    __getStatic() {
+        return EquipeSelect;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeSelect.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "EquipeSelect";
+    }
+    defineRam() {
+        return EquipeRAM.getInstance();
+    }
+    optionText(item) {
+        return item.nom;
+    }
+    optionValue(item) {
+        return item;
+    }
+}
+EquipeSelect.Namespace=`Inventaire`;
+EquipeSelect.Tag=`av-equipe-select`;
+__as1(_, 'EquipeSelect', EquipeSelect);
+if(!window.customElements.get('av-equipe-select')){window.customElements.define('av-equipe-select', EquipeSelect);Aventus.WebComponentInstance.registerDefinition(EquipeSelect);}
+
+const ModalEquipe = class ModalEquipe extends Modal {
+    get 'equipe'() {
+						return this.__watch["equipe"];
+					}
+					set 'equipe'(val) {
+						this.__watch["equipe"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("equipe");    super.__registerWatchesActions();
+}
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalEquipe;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalEquipe.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalequipe_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalequipe_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__392051980c1cd9dd7440f855fabdee56method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalequipe_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__392051980c1cd9dd7440f855fabdee56method1(),
+      "extract": (c, v) => c.comp.__392051980c1cd9dd7440f855fabdee56method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalequipe_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalequipe_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalEquipe";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe'); }
+    configure() {
+        return {
+            title: "Ajout d'une équipe",
+        };
+    }
+    save() {
+        if (!this.equipe) {
+            this.inputEl.errors = ["Il faut choisir une équipe"];
+            return;
+        }
+        this.resolve(this.equipe);
+    }
+    __392051980c1cd9dd7440f855fabdee56method0() {
+        return this.options.title;
+    }
+    __392051980c1cd9dd7440f855fabdee56method1() {
+        return this.equipe;
+    }
+    __392051980c1cd9dd7440f855fabdee56method2(v) {
+        if (this) {
+            this.equipe = v;
+        }
+    }
+}
+ModalEquipe.Namespace=`Inventaire`;
+ModalEquipe.Tag=`av-modal-equipe`;
+__as1(_, 'ModalEquipe', ModalEquipe);
+if(!window.customElements.get('av-modal-equipe')){window.customElements.define('av-modal-equipe', ModalEquipe);Aventus.WebComponentInstance.registerDefinition(ModalEquipe);}
 
 App.Models.Materiel=class Materiel extends Aventus.Data {
     static get Fullname() { return "App.Models.Materiel"; }
@@ -12565,11 +13892,12 @@ App.Models.Materiel=class Materiel extends Aventus.Data {
     image = undefined;
     variations;
     tout_monde;
+    equipes;
 }
 App.Models.Materiel.Namespace=`Inventaire.App.Models`;
-App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.Variation[]","tout_monde":"boolean"};
+App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.Variation[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
 Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
-_.App.Models.Materiel=App.Models.Materiel;
+__as1(_.App.Models, 'Materiel', App.Models.Materiel);
 
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -12644,8 +13972,8 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
     __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     getSrc() {
-        if (this.item.image?.Uri) {
-            return this.item.image?.Uri;
+        if (this.item.image?.uri) {
+            return this.item.image?.uri;
         }
         return "/img/default_img.svg";
     }
@@ -12659,7 +13987,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         return variation.nom;
     }
     __98d262679bf6afafa524060227ae1154method6(equipe) {
-        return equipe.nom;
+        return equipe.equipe.nom;
     }
     __98d262679bf6afafa524060227ae1154method1() {
         return this.item.tout_monde;
@@ -12667,14 +13995,14 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
 }
 MaterielCard.Namespace=`Inventaire`;
 MaterielCard.Tag=`av-materiel-card`;
-_.MaterielCard=MaterielCard;
+__as1(_, 'MaterielCard', MaterielCard);
 if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
 
 App.Http.Controllers.MaterielController=class MaterielController extends AventusPhp.ModelController {
     getUri() { return "data/materiel"; }
 }
 App.Http.Controllers.MaterielController.Namespace=`Inventaire.App.Http.Controllers`;
-_.App.Http.Controllers.MaterielController=App.Http.Controllers.MaterielController;
+__as1(_.App.Http.Controllers, 'MaterielController', App.Http.Controllers.MaterielController);
 
 let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
     /**
@@ -12703,17 +14031,19 @@ let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
     }
 }
 MaterielRAM.Namespace=`Inventaire`;
-_.MaterielRAM=MaterielRAM;
+__as1(_, 'MaterielRAM', MaterielRAM);
 
 const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     form;
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}:host .by-equipe .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .by-equipe .list .item .line{align-items:center;display:flex;gap:20px}:host .by-equipe .list .item .line .nom{flex-grow:1;width:50%}:host .by-equipe .list .item .line .quantite{flex-grow:1;width:50%}:host .by-equipe .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .by-equipe .list .item .line .modification av-icon-action{width:fit-content}:host .by-equipe .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .by-equipe .list .item:first-child{border-top:none}`;
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}:host .by-equipe .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .by-equipe .list .item .line{align-items:center;display:flex;gap:20px}:host .by-equipe .list .item .line .nom{flex-grow:1;width:50%}:host .by-equipe .list .item .line .quantite{flex-grow:1;width:50%}:host .by-equipe .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .by-equipe .list .item .line .modification av-icon-action{width:fit-content}:host .by-equipe .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .by-equipe .list .item:first-child{border-top:none}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
             nom: Aventus.Form.Validators.Required,
             variations: {},
-            image: {}
+            image: {},
+            tout_monde: {},
+            equipes: {}
         });
     }
     __getStatic() {
@@ -12726,13 +14056,13 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="materieldetailspage_0"></div>        <div class="actions">            <av-icon-action color="success" icon="save" _id="materieldetailspage_1">Enregistrer</av-icon-action>        </div>    </div>    <div class="body">        <av-row>            <av-col size="6">                <av-input-image label="Image" _id="materieldetailspage_2"></av-input-image>            </av-col>            <av-col size="6" class="contenu">                <av-input label="Nom du materiel" _id="materieldetailspage_3"></av-input>                <div class="tags">                    <div class="label">Variations</div>                    <div class="liste">                        <template _id="materieldetailspage_4"></template>                        <av-icon-action class="more" icon="add" _id="materieldetailspage_6">Ajouter une variation</av-icon-action>                    </div>                </div>                <div class="tags">                    <div class="label">Pour</div>                    <div class="liste">                        <av-tag color="accent">                            <span>U18</span>                            <mi-icon icon="delete"></mi-icon>                        </av-tag>                        <av-tag color="accent">                            <span>U20</span>                            <mi-icon icon="delete"></mi-icon>                        </av-tag>                        <av-icon-action class="more" icon="add">Ajouter une visibilité</av-icon-action>                    </div>                </div>            </av-col>        </av-row>    </div></div><template _id="materieldetailspage_7"></template>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="materieldetailspage_0"></div>        <div class="actions">            <av-icon-action color="success" icon="save" _id="materieldetailspage_1">Enregistrer</av-icon-action>        </div>    </div>    <div class="body">        <av-row>            <av-col size="6">                <av-input-image label="Image" _id="materieldetailspage_2"></av-input-image>            </av-col>            <av-col size="6" class="contenu">                <av-input label="Nom du materiel" _id="materieldetailspage_3"></av-input>                <div class="tags">                    <div class="label">Variations</div>                    <av-variation-tags _id="materieldetailspage_4"></av-variation-tags>                </div>                <div class="tags">                    <div class="label pour">                        <span class="main-label">Pour :</span>                        <div class="toggle">                            <span class="sub-label" _id="materieldetailspage_5">Equipe spécifique</span>                            <av-toggle _id="materieldetailspage_6"></av-toggle>                            <span class="sub-label" _id="materieldetailspage_7">Tout le monde</span>                        </div>                    </div>                    <template _id="materieldetailspage_8"></template>                </div>            </av-col>        </av-row>    </div></div><template _id="materieldetailspage_10"></template>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materieldetailspage_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5())}`,
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4())}`,
       "once": true
     }
   },
@@ -12740,13 +14070,25 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     {
       "id": "materieldetailspage_2",
       "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
       "once": true
     },
     {
       "id": "materieldetailspage_3",
       "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_4",
+      "injectionName": "variations",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_6",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
       "once": true
     }
   ],
@@ -12756,49 +14098,37 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     },
     {
-      "id": "materieldetailspage_6",
-      "onPress": (e, pressInstance, c) => { c.comp.addVariation(e, pressInstance); }
+      "id": "materieldetailspage_5",
+      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_7",
+      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                            <av-tag-edit _id="materieldetailspage_5"></av-tag-edit>                        `);templ0.setActions({
-  "content": {
-    "materieldetailspage_5°key": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(c.data.i))}`,
-      "once": true
-    }
-  },
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                        <av-equipe-tags _id="materieldetailspage_9"></av-equipe-tags>                    `);templ0.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_5",
-      "injectionName": "variation",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(c.data.variation),
+      "id": "materieldetailspage_9",
+      "injectionName": "equipes",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(),
       "once": true
     }
-  ],
-  "events": [
-    {
-      "eventName": "onDelete",
-      "id": "materieldetailspage_5",
-      "fct": (c, ...args) => c.comp.removeVariation.apply(c.comp, ...args),
-      "isCallback": true
-    }
-  ],
-  "contextEdits": [
-    {
-      "fct": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(c.data.i)
-    }
   ]
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'materieldetailspage_4',
-                    template: templ0,
-                simple:{data: "this.form.item.variations",index:"i"}});const templ2 = new Aventus.Template(this);templ2.setTemplate(`    <div class="card by-equipe">        <div class="header">            <div class="title">Liste dans les équipes</div>        </div>        <div class="body">            <div class="list">                <template _id="materieldetailspage_8"></template>            </div>        </div>    </div>`);const templ3 = new Aventus.Template(this);templ3.setTemplate(`                <div class="item">                    <div class="line">                        <div class="nom">U18</div>                        <div class="quantite">21</div>                        <div class="modification">                            <div class="actions">                                <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>                                <av-icon-action color="info" icon="history">Historique</av-icon-action>                            </div>                            <span>Maxime, le 24.08.2025</span>                        </div>                    </div>                </div>            `);templ2.addLoop({
+});this.__getStatic().__template.addIf({
                     anchorId: 'materieldetailspage_8',
-                    template: templ3,
-                func: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4()});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_7',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`    <div class="card by-equipe">        <div class="header">            <div class="title">Liste dans les équipes</div>        </div>        <div class="body">            <div class="list">                <template _id="materieldetailspage_11"></template>            </div>        </div>    </div>    `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                     <div class="item">                        <div class="line">                            <div class="nom">U18</div>                            <div class="quantite">21</div>                            <div class="modification">                                <div class="actions">                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>                                </div>                                <span>Maxime, le 24.08.2025</span>                            </div>                        </div>                    </div>                `);templ1.addLoop({
+                    anchorId: 'materieldetailspage_11',
+                    template: templ2,
+                func: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3()});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_10',
                     parts: [{
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod2(),
-                    template: templ2
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
+                    template: templ1
                 }]
             }); }
     getClassName() {
@@ -12820,6 +14150,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             let v2 = new App.Models.Variation();
             v2.nom = "S";
             newItem.variations.push(v2);
+            newItem.equipes = [];
             this.form.item = newItem;
         }
         else {
@@ -12836,6 +14167,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     save() {
         console.log(this.form.item);
+        MaterielRAM.getInstance().saveWithError(this.form.item);
     }
     getTitle() {
         if (this.form.item?.id) {
@@ -12843,17 +14175,13 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         }
         return "Création de matériel";
     }
-    addVariation() {
-        // this.form.parts['variations']
-        let v1 = new App.Models.Variation();
-        v1.nom = "";
-        this.form.item.variations.push(v1);
+    setToutMonde() {
+        this.form.item.tout_monde = true;
     }
-    removeVariation(el) {
-        let index = Number(el.getAttribute("key"));
-        this.form.item.variations.splice(index, 1);
+    unsetToutMonde() {
+        this.form.item.tout_monde = false;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
         let i = 0;
         return {
             transform: () => {
@@ -12867,38 +14195,41 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             }
         };
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
         return this.getTitle();
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9(i) {
-        return i;
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
+        return !this.form.item.tout_monde;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod2() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
         return this.form.item?.id;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1(i) {
-        return { 'variation': this.form.item.variations[i] };
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
         return this.form.parts.image;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
         return this.form.parts.nom;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8(variation) {
-        return variation;
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+        return this.form.item.variations;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
+        return this.form.parts.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
+        return this.form.item.equipes;
     }
 }
 MaterielDetailsPage.Namespace=`Inventaire`;
 MaterielDetailsPage.Tag=`av-materiel-details-page`;
-_.MaterielDetailsPage=MaterielDetailsPage;
+__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
 if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
 
 App.Http.Controllers.UserController=class UserController extends AventusPhp.ModelController {
     getUri() { return "data/user"; }
 }
 App.Http.Controllers.UserController.Namespace=`Inventaire.App.Http.Controllers`;
-_.App.Http.Controllers.UserController=App.Http.Controllers.UserController;
+__as1(_.App.Http.Controllers, 'UserController', App.Http.Controllers.UserController);
 
 let UserRAM=class UserRAM extends AventusPhp.RamHttp {
     /**
@@ -12927,7 +14258,7 @@ let UserRAM=class UserRAM extends AventusPhp.RamHttp {
     }
 }
 UserRAM.Namespace=`Inventaire`;
-_.UserRAM=UserRAM;
+__as1(_, 'UserRAM', UserRAM);
 
 const EquipeEditModal = class EquipeEditModal extends Modal {
     form;
@@ -12984,7 +14315,6 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
         return { title: "" };
     }
     async submit() {
-        debugger;
         const result = await this.form.submit(EquipeRAM.getInstance().saveWithError);
         if (result?.result) {
             this.resolve(result.result);
@@ -13009,7 +14339,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
 }
 EquipeEditModal.Namespace=`Inventaire`;
 EquipeEditModal.Tag=`av-equipe-edit-modal`;
-_.EquipeEditModal=EquipeEditModal;
+__as1(_, 'EquipeEditModal', EquipeEditModal);
 if(!window.customElements.get('av-equipe-edit-modal')){window.customElements.define('av-equipe-edit-modal', EquipeEditModal);Aventus.WebComponentInstance.registerDefinition(EquipeEditModal);}
 
 const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
@@ -13118,7 +14448,7 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
 }
 EquipeDetailsPage.Namespace=`Inventaire`;
 EquipeDetailsPage.Tag=`av-equipe-details-page`;
-_.EquipeDetailsPage=EquipeDetailsPage;
+__as1(_, 'EquipeDetailsPage', EquipeDetailsPage);
 if(!window.customElements.get('av-equipe-details-page')){window.customElements.define('av-equipe-details-page', EquipeDetailsPage);Aventus.WebComponentInstance.registerDefinition(EquipeDetailsPage);}
 
 const EquipesPage = class EquipesPage extends PageFull {
@@ -13249,7 +14579,7 @@ const EquipesPage = class EquipesPage extends PageFull {
 }
 EquipesPage.Namespace=`Inventaire`;
 EquipesPage.Tag=`av-equipes-page`;
-_.EquipesPage=EquipesPage;
+__as1(_, 'EquipesPage', EquipesPage);
 if(!window.customElements.get('av-equipes-page')){window.customElements.define('av-equipes-page', EquipesPage);Aventus.WebComponentInstance.registerDefinition(EquipesPage);}
 
 const MaterielPage = class MaterielPage extends PageFull {
@@ -13380,7 +14710,7 @@ const MaterielPage = class MaterielPage extends PageFull {
 }
 MaterielPage.Namespace=`Inventaire`;
 MaterielPage.Tag=`av-materiel-page`;
-_.MaterielPage=MaterielPage;
+__as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
 
 const UserEditModal = class UserEditModal extends Modal {
@@ -13494,7 +14824,7 @@ const UserEditModal = class UserEditModal extends Modal {
 }
 UserEditModal.Namespace=`Inventaire`;
 UserEditModal.Tag=`av-user-edit-modal`;
-_.UserEditModal=UserEditModal;
+__as1(_, 'UserEditModal', UserEditModal);
 if(!window.customElements.get('av-user-edit-modal')){window.customElements.define('av-user-edit-modal', UserEditModal);Aventus.WebComponentInstance.registerDefinition(UserEditModal);}
 
 const UserItem = class UserItem extends Aventus.WebComponent {
@@ -13567,7 +14897,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
 }
 UserItem.Namespace=`Inventaire`;
 UserItem.Tag=`av-user-item`;
-_.UserItem=UserItem;
+__as1(_, 'UserItem', UserItem);
 if(!window.customElements.get('av-user-item')){window.customElements.define('av-user-item', UserItem);Aventus.WebComponentInstance.registerDefinition(UserItem);}
 
 const UsersPage = class UsersPage extends PageFull {
@@ -13698,7 +15028,7 @@ const UsersPage = class UsersPage extends PageFull {
 }
 UsersPage.Namespace=`Inventaire`;
 UsersPage.Tag=`av-users-page`;
-_.UsersPage=UsersPage;
+__as1(_, 'UsersPage', UsersPage);
 if(!window.customElements.get('av-users-page')){window.customElements.define('av-users-page', UsersPage);Aventus.WebComponentInstance.registerDefinition(UsersPage);}
 
 const Main = class Main extends Aventus.Navigation.Router {
@@ -13742,8 +15072,82 @@ const Main = class Main extends Aventus.Navigation.Router {
 }
 Main.Namespace=`Inventaire`;
 Main.Tag=`av-main`;
-_.Main=Main;
+__as1(_, 'Main', Main);
 if(!window.customElements.get('av-main')){window.customElements.define('av-main', Main);Aventus.WebComponentInstance.registerDefinition(Main);}
+
+const EquipeTags = class EquipeTags extends Aventus.WebComponent {
+    equipes = [];
+    static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
+    constructor() {
+        super();
+        this.onChildDelete = this.onChildDelete.bind(this);
+    }
+    __getStatic() {
+        return EquipeTags;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeTags.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "listEl",
+      "ids": [
+        "equipetags_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "equipetags_1",
+      "onPress": (e, pressInstance, c) => { c.comp.addEquipe(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipeTags";
+    }
+    onChildDelete(el) {
+        let children = Array.from(this.listEl.children);
+        let index = children.indexOf(el);
+        this.equipes.splice(index, 1);
+        this.listEl.removeChild(el);
+    }
+    render() {
+        this.listEl.innerHTML = "";
+        for (let equipe of this.equipes) {
+            let el = new EquipeTag();
+            el.equipe = equipe;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    async addEquipe() {
+        const p = new ModalEquipe();
+        const equipe = await p.show();
+        if (equipe !== null) {
+            this.equipes.push(equipe);
+            let el = new EquipeTag();
+            el.equipe = equipe;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    postCreation() {
+        this.render();
+    }
+}
+EquipeTags.Namespace=`Inventaire`;
+EquipeTags.Tag=`av-equipe-tags`;
+__as1(_, 'EquipeTags', EquipeTags);
+if(!window.customElements.get('av-equipe-tags')){window.customElements.define('av-equipe-tags', EquipeTags);Aventus.WebComponentInstance.registerDefinition(EquipeTags);}
 
 
 for(let key in _) { Inventaire[key] = _[key] }

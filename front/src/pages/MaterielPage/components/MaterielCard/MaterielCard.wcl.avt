@@ -1,4 +1,4 @@
-import type { Materiel } from "../../../generated/app/Models/Materiel.lib.avt";
+import type { Materiel } from "../../../../generated/app/Models/Materiel.lib.avt";
 
 export class MaterielCard extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -26,8 +26,8 @@ export class MaterielCard extends Aventus.WebComponent implements Aventus.Defaul
 
     //#region methods
     protected getSrc() {
-        if(this.item.image?.Uri) {
-            return this.item.image?.Uri;
+        if(this.item.image?.uri) {
+            return this.item.image?.uri;
         }
         return "/img/default_img.svg";
     }

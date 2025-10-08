@@ -9,5 +9,4 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $nom
  */
 class Equipe extends AventusModel {
-    public $timestamps = false;
 }

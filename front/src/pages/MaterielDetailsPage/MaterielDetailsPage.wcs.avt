@@ -1,8 +1,10 @@
 :host {
 	--col-gap: 16px;
+
 	.content {
 		justify-content: flex-start;
 	}
+
 	.card {
 		background-color: var(--color-base-100);
 		border-radius: var(--radius-box);
@@ -49,8 +51,25 @@
 					margin-top: 16px;
 
 					.label {
+						align-items: center;
+						display: flex;
 						font-size: calc(var(--font-size) * 0.95);
 						margin-bottom: 6px;
+
+						.toggle {
+							align-items: center;
+							display: flex;
+							gap: 6px;
+						}
+
+						.main-label {
+							margin-right: 16px;
+						}
+
+						.sub-label {
+							cursor: pointer;
+							font-size: calc(var(--font-size) * 0.9);
+						}
 					}
 
 					.liste {

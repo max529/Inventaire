@@ -44,6 +44,12 @@ return new class extends Migration
             $table->foreignId('id_variation')->nullable()->constrained('variations');
             $table->float('quantite');
         });
+
+        Schema::create("materiel_equipes", function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_equipe')->constrained('equipes');
+            $table->foreignId('id_materiel')->constrained('materiels');
+        });
     }
 
     /**
@@ -51,6 +57,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropDatabaseIfExists("materiel_equipes");
         Schema::dropDatabaseIfExists("inventaires");
         Schema::dropDatabaseIfExists("equipes");
         Schema::dropDatabaseIfExists("articles");

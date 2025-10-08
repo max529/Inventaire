@@ -1,13 +1,15 @@
 import { MaterielController } from "../generated/app/Http/Controllers/MaterielController.lib.avt";
+import { MaterielResource } from "../generated/app/Http/Resources/MaterielResource.lib.avt";
 import { Materiel } from "../generated/app/Models/Materiel.lib.avt";
 
-export class MaterielRAM extends AventusPhp.RamHttp<Materiel> implements Aventus.IRam {
+export class MaterielRAM extends AventusPhp.RamHttp<MaterielController> implements Aventus.IRam {
     /**
      * @inheritdoc
      */
-    public override defineRoutes(): AventusPhp.ModelController<Materiel, any, any> {
+    public override defineRoutes(): MaterielController {
         return new MaterielController();
     }
+   
 
     /**
      * Create a singleton to store data

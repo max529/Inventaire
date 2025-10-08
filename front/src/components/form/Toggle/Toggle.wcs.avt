@@ -1,0 +1,129 @@
+:host {
+	--radius-selector-max: calc(var(--radius-selector) + var(--radius-selector) + var(--radius-selector));
+	--input-color: color-mix(in srgb, var(--color-base-content)50%, #0000);
+	--toggle-p: calc(var(--size)*.125);
+	--size: calc(var(--size-selector, .25rem)*6);
+	display: contents;
+
+	input {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		border: var(--border)solid currentColor;
+		border-radius: calc(var(--radius-selector) + min(var(--toggle-p), var(--radius-selector-max)) + min(var(--border), var(--radius-selector-max)));
+		box-shadow: 0 1px color-mix(in oklab, currentColor calc(var(--depth)*10%), #0000) inset;
+		color: var(--input-color);
+		cursor: pointer;
+		display: inline-grid;
+		flex-shrink: 0;
+		font-feature-settings: inherit;
+		font-variation-settings: inherit;
+		grid-template-columns: 0fr 1fr 1fr;
+		height: var(--size);
+		letter-spacing: inherit;
+		margin: 0;
+		opacity: 1;
+		padding: var(--toggle-p);
+		place-content: center;
+		position: relative;
+		transition: color .3s, grid-template-columns .2s;
+		-webkit-user-select: none;
+		user-select: none;
+		vertical-align: middle;
+		webkit-user-select: none;
+		width: calc((var(--size)*2) - (var(--border) + var(--toggle-p))*2);
+
+	}
+
+	input:before {
+		--tw-content: "";
+		aspect-ratio: 1;
+		background-color: currentColor;
+		background-image: none, var(--fx-noise);
+		background-size: auto, calc(var(--noise)*100%);
+		border: 0 solid;
+		border-radius: var(--radius-selector);
+		box-shadow: 0 -1px oklch(0% 0 0/calc(var(--depth)*.1)) inset, 0 8px 0 -4px oklch(100% 0 0/calc(var(--depth)*.1)) inset, 0 1px color-mix(in oklab, currentColor calc(var(--depth)*10%), #0000);
+		box-sizing: border-box;
+		content: var(--tw-content);
+		grid-column-start: 2;
+		grid-row-start: 1;
+		height: 100%;
+		inset-inline-start: 0;
+		margin: 0;
+		padding: 0;
+		position: relative;
+		transition: background-color .1s, translate .2s, inset-inline-start .2s;
+		translate: 0;
+	}
+
+	input:checked {
+		--input-color: var(--color-base-content);
+		background-color: var(--color-base-100);
+		grid-template-columns: 1fr 1fr 0fr;
+	}
+
+	input:checked:before {
+		background-color: currentColor;
+
+	}
+
+	input:focus-visible,
+	input:has(:focus-visible) {
+		outline: 2px solid;
+		outline-offset: 2px;
+	}
+
+	input:indeterminate {
+		grid-template-columns: .5fr 1fr .5fr;
+	}
+
+	input:disabled {
+		cursor: not-allowed;
+		opacity: .3;
+	}
+
+	input:disabled:before {
+		background-color: #0000;
+		border: var(--border)solid currentColor;
+	}
+}
+
+:host([disabled]) {
+	input {
+		cursor: not-allowed;
+		opacity: .3;
+	}
+
+	input:before {
+		background-color: #0000;
+		border: var(--border)solid currentColor;
+	}
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+	:host {
+		input {
+			--input-color: color-mix(in oklab, var(--color-base-content)50%, #0000);
+		}
+	}
+}
+
+@media (forced-colors:active) {
+	:host {
+		input:before {
+			outline-offset: -1px;
+			outline-style: var(--tw-outline-style);
+			outline-width: 1px;
+		}
+	}
+}
+
+@media print {
+	:host {
+		input:before {
+			outline: .25rem solid;
+			outline-offset: -1rem;
+		}
+	}
+}

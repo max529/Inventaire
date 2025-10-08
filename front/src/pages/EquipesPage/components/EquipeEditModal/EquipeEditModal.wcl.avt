@@ -54,7 +54,6 @@ export class EquipeEditModal extends Modal<Equipe> implements Aventus.DefaultCom
      * 
      */
     protected async submit() {
-        debugger;
         const result = await this.form.submit(EquipeRAM.getInstance().saveWithError);
         if(result?.result) {
             this.resolve(result.result);

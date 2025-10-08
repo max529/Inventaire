@@ -1,3 +1,4 @@
+import { Ram } from "Aventus@Main:Aventus.package.avt";
 import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
 import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
@@ -38,6 +39,7 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
         const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
         if(!equipe)
             return "/";
+
 
         this.item = equipe;
         return true;

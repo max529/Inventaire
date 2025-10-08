@@ -14,27 +14,20 @@
                 <av-input label="Nom du materiel" :form="this.form.parts.nom"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>
-                    <div class="liste">
-                        for(let i = 0;i< this.form.item.variations.length;i++) {
-                            @Context('variation', this.form.item.variations[i])
-                            <av-tag-edit :variation="variation" @delete="removeVariation" key="{{i}}"></av-tag-edit>
-                        }
-                        <av-icon-action class="more" icon="add" @press="addVariation">Ajouter une variation</av-icon-action>
-                    </div>
+                    <av-variation-tags :variations="this.form.item.variations"></av-variation-tags>
                 </div>
                 <div class="tags">
-                    <div class="label">Pour</div>
-                    <div class="liste">
-                        <av-tag color="accent">
-                            <span>U18</span>
-                            <mi-icon icon="delete"></mi-icon>
-                        </av-tag>
-                        <av-tag color="accent">
-                            <span>U20</span>
-                            <mi-icon icon="delete"></mi-icon>
-                        </av-tag>
-                        <av-icon-action class="more" icon="add">Ajouter une visibilité</av-icon-action>
+                    <div class="label pour">
+                        <span class="main-label">Pour :</span>
+                        <div class="toggle">
+                            <span class="sub-label"  @press="unsetToutMonde">Equipe spécifique</span>
+                            <av-toggle :form="this.form.parts.tout_monde"></av-toggle>
+                            <span class="sub-label" @press="setToutMonde">Tout le monde</span>
+                        </div>
                     </div>
+                    if(!this.form.item.tout_monde) {
+                        <av-equipe-tags :equipes="this.form.item.equipes"></av-equipe-tags>
+                    }
                 </div>
             </av-col>
         </av-row>
@@ -48,22 +41,22 @@ if(this.form.item?.id) {
         </div>
         <div class="body">
             <div class="list">
-                for(let i =0; i<50;i++) {
-                <div class="item">
-                    <div class="line">
-                        <div class="nom">U18</div>
-                        <div class="quantite">21</div>
-                        <div class="modification">
-                            <div class="actions">
-                                <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
-                                <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                for(let i = 0; i < 50; i++) { 
+                    <div class="item">
+                        <div class="line">
+                            <div class="nom">U18</div>
+                            <div class="quantite">21</div>
+                            <div class="modification">
+                                <div class="actions">
+                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
+                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                                </div>
+                                <span>Maxime, le 24.08.2025</span>
                             </div>
-                            <span>Maxime, le 24.08.2025</span>
                         </div>
                     </div>
-                </div>
-            }
+                }
             </div>
         </div>
     </div>
-}
+    <

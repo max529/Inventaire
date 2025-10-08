@@ -15,6 +15,4 @@ use Aventus\Laraventus\Models\AventusModel;
 class User extends AventusModel {
     #[NoExport]
     public static User $current;
-
-    public $timestamps = false;
 }

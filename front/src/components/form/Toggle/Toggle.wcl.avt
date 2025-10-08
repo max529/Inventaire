@@ -1,0 +1,43 @@
+import { FormElement } from "Aventus@UI:Aventus.Form.package.avt";
+
+export class Toggle extends FormElement<boolean> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Property((target: Toggle) => {
+        target.value = target.checked;
+    })
+    public checked!: boolean;
+    //#endregion
+
+
+    //#region variables
+    @ViewElement()
+    protected inputEl!: HTMLInputElement;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected override onValueChange(value: boolean | undefined): void {
+        this.inputEl.checked = value ?? false;
+        this.checked = value ?? false;
+    }
+
+    /**
+     * 
+     */
+    protected onSwitch() {
+        this.triggerChange(this.inputEl.checked);
+    }
+    //#endregion
+
+}

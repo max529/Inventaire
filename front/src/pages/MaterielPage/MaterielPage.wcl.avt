@@ -1,7 +1,7 @@
 import type { Row } from "Aventus@UI:Aventus.Layout.package.avt";
 import type { Input } from "../../components/form/Input/Input.wcl.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
-import { MaterielCard } from "./MaterielCard/MaterielCard.wcl.avt";
+import { MaterielCard } from "./components/MaterielCard/MaterielCard.wcl.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
 import { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";

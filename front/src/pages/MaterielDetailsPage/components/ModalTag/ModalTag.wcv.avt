@@ -1,0 +1,8 @@
+<div class="title">{{ this.options.title }}</div>
+<div class="content">
+    <av-input label="Nom de la variation" @bind="this.name" @element="inputEl"></av-input>
+</div>
+<div class="footer">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button @press="save" color="primary">Enregistrer</av-button>
+</div>

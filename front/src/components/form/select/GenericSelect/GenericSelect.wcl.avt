@@ -1,0 +1,200 @@
+import { FormElement } from "Aventus@UI:Aventus.Form.package.avt";
+import { GenericOption } from "./GenericOption/GenericOption.wcl.avt";
+import type { OptionsContainer } from "./OptionsContainer/OptionsContainer.wcl.avt";
+
+export type ExtractTypeOption<X extends GenericOption<U>, U> = X extends GenericOption<infer U> ? U : never;
+
+export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeOption<T, any>> extends FormElement<U> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Property()
+    public label?: string;
+    @Property()
+    public placeholder?: string;
+
+    @Property()
+    public icon?: string;
+
+    @Attribute()
+    public open!: boolean;
+
+    @Property((target: GenericSelect<T, U>) => {
+        if(target.searchable) {
+            target.inputEl.removeAttribute("disabled");
+        }
+        else {
+            target.inputEl.setAttribute("disabled", "disabled");
+        }
+    })
+    public searchable: boolean = false;
+    //#endregion
+
+
+    //#region variables
+    @Watch((target: GenericSelect<T, U>, action: Aventus.WatchAction, path: string, value: any) => {
+        target.inputEl.value = target.displayValue;
+    })
+    public displayValue: string = "";
+
+    @ViewElement()
+    public inputEl!: HTMLInputElement;
+    @ViewElement()
+    protected optionsContainer!: OptionsContainer;
+
+    public selectedOption?: T;
+    @Watch((target: GenericSelect<T, U>) => {
+        target.onInternalValueChanged();
+    })
+    public override value: U | undefined = undefined;
+
+    protected options: T[] = [];
+
+    protected optionsInited: boolean = false;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected abstract itemToText(option: T): string;
+
+    protected compare(item1: U | undefined, item2: U | undefined) {
+        return item1 == item2;
+    }
+    protected onInternalValueChanged() {
+        if(!this.optionsInited) return;
+        let found = false;
+        for(let option of this.options) {
+            if(this.compare(option.value, this.value)) {
+                found = true;
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+                break;
+            }
+        }
+
+        if(!found) {
+            this.selectedOption = undefined;
+            this.displayValue = this.placeholder ?? '';
+            this.filter();
+        }
+    }
+
+    @InternalProtected()
+    public setValueFromOption(option: T) {
+        this.selectedOption = option;
+        this.value = option.value;
+        this.displayValue = this.itemToText(option);
+        this.hideOptions();
+        this.onChange.trigger(this.value);
+        this.filter();
+        if(this.form) {
+            this.form.value.set(this.value);
+        }
+    }
+
+    /**
+     * 
+     */
+    protected removeErrors() {
+        this.errors = [];
+    }
+
+    protected loadElementsFromSlot() {
+        let elements = this.getElementsInSlot();
+        for(let element of elements) {
+            if(element instanceof GenericOption) {
+                this.options.push(element as T);
+                element.init(this);
+                this.optionsContainer.appendChild(element);
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    protected showOptions() {
+        if(!this.open) {
+            this.removeErrors();
+            this.optionsContainer.show();
+        }
+        if(!this.searchable) {
+            setTimeout(() => {
+                this.optionsContainer.focus({ preventScroll: true });
+            }, 100);
+        }
+    }
+
+    protected hideOptions() {
+        setTimeout(() => {
+            this.optionsContainer.blur();
+        }, 50);
+    }
+
+    /**
+     * 
+     */
+    protected syncCaret(open: boolean) {
+        this.open = open;
+    }
+
+    /**
+     * 
+     */
+    protected filter() {
+        if(this.searchable) {
+            let value = this.inputEl.value.toLowerCase();
+            for(let option of this.options) {
+                option.filter(value);
+            }
+        }
+    }
+
+    protected manageFocus() {
+        let blurTimeout: number = 0;;
+        let blur = () => {
+            blurTimeout = setTimeout(() => {
+                this.optionsContainer.hide();
+            }, 50);
+        };
+        this.inputEl.addEventListener("blur", () => {
+            blur();
+        });
+        this.optionsContainer.addEventListener("blur", () => {
+            blur();
+        });
+        this.inputEl.addEventListener("focus", () => {
+            clearTimeout(blurTimeout);
+        });
+        this.optionsContainer.addEventListener("focus", () => {
+            clearTimeout(blurTimeout);
+        });
+    }
+
+
+    protected override postDestruction(): void {
+        super.postDestruction();
+        this.optionsContainer.remove();
+    }
+
+    protected override postCreation(): void {
+        this.manageFocus();
+        this.optionsContainer.init(this);
+        this.loadElementsFromSlot();
+        this.optionsInited = true;
+        this.onInternalValueChanged();
+        this.shadowRoot.removeChild(this.optionsContainer)
+    }
+    //#endregion
+
+}

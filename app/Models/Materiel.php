@@ -13,12 +13,10 @@ use App\Models\MaterielImage;
  * @property ?MaterielImage $image
  * @property Variation[] $variations
  * @property bool $tout_monde
+ * @property MaterielEquipe[] $equipes
  */
 class Materiel extends AventusModel
 {
-    public $timestamps = false;
-
-
     protected $casts = [
         "image" => MaterielImage::class
     ];
@@ -27,5 +25,10 @@ class Materiel extends AventusModel
     public function variations(): HasMany
     {
         return $this->hasMany(Variation::class, "id_materiel");
+    }
+
+    public function equipes(): HasMany
+    {
+        return $this->hasMany(MaterielEquipe::class, "id_materiel");
     }
 }

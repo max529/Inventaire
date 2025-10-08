@@ -10,5 +10,4 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $nom
  */
 class Variation extends AventusModel {
-    public $timestamps = false;
 }

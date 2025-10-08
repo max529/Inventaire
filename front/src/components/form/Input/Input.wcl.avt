@@ -40,12 +40,6 @@ export class Input extends FormElement<string> implements Aventus.DefaultCompone
 
 
     //#region methods
-    /**
-     * @inheritdoc
-     */
-    protected override async validation(): Promise<string[]> {
-        return [];
-    }
 
     /**
      * 

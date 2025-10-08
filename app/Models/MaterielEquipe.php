@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Aventus\Laraventus\Models\AventusModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/**
+ * @property int $id
+ * @property int $id_materiel
+ * @property int $id_equipe
+ * @property Equipe $equipe
+ * @property Materiel $materiel
+ */
+class MaterielEquipe extends AventusModel {
+
+    public function equipe(): BelongsTo
+    {
+        return $this->belongsTo(Equipe::class, "id_equipe");
+    }
+
+    public function materiel(): BelongsTo
+    {
+        return $this->belongsTo(Materiel::class, "id_materiel");
+    }
+
+
+}

@@ -1,0 +1,42 @@
+import { GenericSelect } from "../GenericSelect/GenericSelect.wcl.avt";
+import type { Option } from "./Option/Option.wcl.avt";
+
+export class Select extends GenericSelect<Option> implements Aventus.DefaultComponent {
+
+        //#region static
+
+        //#endregion
+
+
+        //#region props
+        @Property((target: Select) => {
+            target.onInternalValueChanged();
+        })
+        public override value: string = "";
+        //#endregion
+
+
+        //#region variables
+
+        //#endregion
+
+
+        //#region constructor
+
+        //#endregion
+
+
+        //#region methods
+        /**
+         * @inheritdoc
+         */
+        protected override itemToText(option: Option): string {
+            // if(option.value !== undefined) {
+            //     return option.value
+            // }
+            return option.innerHTML.replace(/&nbsp;/g, " ");
+        }
+
+        //#endregion
+
+    }

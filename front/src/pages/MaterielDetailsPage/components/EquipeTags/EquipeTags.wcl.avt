@@ -1,0 +1,66 @@
+import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import { EquipeTag } from "../EquipeTag/EquipeTag.wcl.avt";
+import { ModalEquipe } from "../ModalEquipe/ModalEquipe.wcl.avt";
+
+export class EquipeTags extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    @ViewElement()
+    protected listEl!: HTMLDivElement;
+
+    public equipes: Equipe[] = [];
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    @BindThis()
+    protected onChildDelete(el: EquipeTag) {
+        let children = Array.from(this.listEl.children);
+        let index = children.indexOf(el);
+        this.equipes.splice(index, 1);
+        this.listEl.removeChild(el);
+    }
+    protected render() {
+        this.listEl.innerHTML = "";
+        for(let equipe of this.equipes) {
+            let el = new EquipeTag();
+            el.equipe = equipe;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    protected async addEquipe() {
+        const p = new ModalEquipe();
+        const equipe = await p.show();
+        if(equipe !== null) {
+            this.equipes.push(equipe);
+            let el = new EquipeTag();
+            el.equipe = equipe;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+
+    protected override postCreation(): void {
+        this.render();
+    }
+    //#endregion
+
+}

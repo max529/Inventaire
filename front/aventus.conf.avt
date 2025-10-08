@@ -13,17 +13,12 @@
 					"output": "../public/inventaire.js"
 				}
 			],
-			"dependances": [
-				{
-					"uri": "@AventusUI"
-				},
-				{
-					"uri": "@AventusPhp"
-				},
-				{
-					"uri": "https://store.aventusjs.com/libs/MaterialIcon/1_0_0/MaterialIcon@Main.package.avt"
-				}
-			]
+			"dependances": {
+				"Aventus@Main": {},
+				"Aventus@UI": {},
+				"Aventus@Php": {},
+				"MaterialIcon": "1.0.0"
+			}
 		}
 	],
 	"static": [

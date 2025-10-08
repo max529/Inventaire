@@ -1,6 +1,6 @@
-import { Icon, type IconType } from "MaterialIcon@Main#1.0.0:MaterialIcon.package.avt";
 import { Tooltip } from "../Tooltip/Tooltip.wcl.avt";
 import type { ColorsType } from "../../../lib/Colors.lib.avt";
+import { Icon, type IconType } from "MaterialIcon:MaterialIcon.package.avt";
 
 @OverrideView()
 export class IconAction extends Icon implements Aventus.DefaultComponent {

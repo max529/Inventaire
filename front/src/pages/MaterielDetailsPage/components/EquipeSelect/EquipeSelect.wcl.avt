@@ -1,0 +1,49 @@
+import { SelectData } from "../../../../components/form/select/SelectData/SelectData.wcl.avt";
+import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
+
+export class EquipeSelect extends SelectData<Equipe> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    protected override defineRam(): Aventus.Ram<Equipe, Equipe> {
+        return EquipeRAM.getInstance();
+    }
+    /**
+     * @inheritdoc
+     */
+    public override optionText(item: Equipe): Aventus.Asyncable<string> {
+		return item.nom;
+	}
+    /**
+     * @inheritdoc
+     */
+    public override optionValue(item: Equipe): Aventus.Asyncable<Equipe> {
+        return item;
+    }
+
+    //#endregion
+
+}

@@ -11,8 +11,8 @@
             "version": "0.0.1",
             "dist": {
                 "type": "path",
-                "url": "D:/Aventus/LarAventus/src",
-                "reference": "cd740059bfa20160627ada915f25dfcb8ea5b563"
+                "url": "D:/Aventus/LarAventus/Laraventus",
+                "reference": "28fa9eb9ccaf6392feb4b614d2e3edefba045843"
             },
             "require": {
                 "illuminate/container": "^12.0",
@@ -21,6 +21,13 @@
                 "laravel/framework": "^12.0"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Aventus\\Laraventus\\ServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Aventus\\Laraventus\\": "src/"

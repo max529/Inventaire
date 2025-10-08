@@ -7,8 +7,6 @@ import { MaterielRAM } from "../../ram/Materiel.ram.avt";
 import type { MaterielRequest } from "../../generated/app/Http/Requests/MaterielRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { Variation } from "../../generated/app/Models/Variation.lib.avt";
-import type { NormalizedEvent } from "Aventus@Main:Aventus.package.avt";
-import type { TagEdit } from "../../components/display/TagEdit/TagEdit.wcl.avt";
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -33,7 +31,9 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         this.form = Form.create<MaterielRequest>({
             nom: Required,
             variations: {},
-            image: {}
+            image: {},
+            tout_monde: {},
+            equipes: {}
         });
     }
     //#endregion
@@ -58,6 +58,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             let v2 = new Variation();
             v2.nom = "S";
             newItem.variations.push(v2);
+            newItem.equipes = [];
             this.form.item = newItem;
         }
         else {
@@ -83,6 +84,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
      */
     protected save() {
         console.log(this.form.item);
+        MaterielRAM.getInstance().saveWithError(this.form.item)
     }
 
     protected getTitle() {
@@ -96,20 +98,16 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     /**
      * 
      */
-    protected addVariation() {
-        // this.form.parts['variations']
-        let v1 = new Variation();
-        v1.nom = "";
-        this.form.item.variations.push(v1);
+    protected setToutMonde() {
+        this.form.item.tout_monde = true;
+    }
+    /**
+    * 
+    */
+    protected unsetToutMonde() {
+        this.form.item.tout_monde = false;
     }
 
-    /**
-     * 
-     */
-    protected removeVariation(el: TagEdit) {
-        let index = Number(el.getAttribute("key"));
-        this.form.item.variations.splice(index, 1);
-    }
     //#endregion
 
 }
