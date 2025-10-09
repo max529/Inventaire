@@ -4,18 +4,19 @@ import { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
 import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
 import type { EquipeRequest } from "../../../../generated/app/Http/Requests/EquipeRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+import { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
 
-export class EquipeEditModal extends Modal<Equipe> implements Aventus.DefaultComponent {
+export class EquipeEditModal extends Modal<EquipeResource> implements Aventus.DefaultComponent {
 
     //#region static
-    public static async open(item?: Equipe): Promise<Equipe | null> {
+    public static async open(item?: EquipeResource): Promise<EquipeResource | null> {
         const modal = new EquipeEditModal();
         modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
-        item = item ? item.clone() : new Equipe();
-        if(!item.id) {
-            item.id = 0;
+        const clone = item ? item.clone() : new EquipeResource();
+        if(!clone.id) {
+            clone.id = 0;
         }
-        modal.form.item = item;
+        modal.form.item = EquipeRAM.getInstance().toRequest(clone);
         return await EquipeEditModal._show(modal);
     }
     //#endregion

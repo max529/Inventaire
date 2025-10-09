@@ -1,4 +1,4 @@
-import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
 
 export class EquipeItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -16,7 +16,7 @@ export class EquipeItem extends Aventus.WebComponent implements Aventus.DefaultC
     //#region variables
     @Watch()
     @Injectable()
-    public item!: Equipe;
+    public item!: EquipeResource;
     //#endregion
 
 

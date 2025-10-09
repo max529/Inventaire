@@ -11,7 +11,7 @@
             "version": "0.0.1",
             "dist": {
                 "type": "path",
-                "url": "D:/Aventus/LarAventus/Laraventus",
+                "url": "C:/Projets/av/Laraventus/Laraventus",
                 "reference": "28fa9eb9ccaf6392feb4b614d2e3edefba045843"
             },
             "require": {

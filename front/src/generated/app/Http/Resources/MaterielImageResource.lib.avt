@@ -1,8 +1,8 @@
 namespace App.Http.Resources {
 
 	@Convertible()
-	export class MaterielImageResource {
-		public static get Fullname(): string { return "App.Http.Resources.MaterielImageResource"; }
+	export class MaterielImageResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Resources.MaterielImageResource"; }
 		public uri!: number;
 	}
 

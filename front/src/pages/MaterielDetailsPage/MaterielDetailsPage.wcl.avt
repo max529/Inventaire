@@ -4,7 +4,7 @@ import { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
 import { MaterielImage } from "../../generated/app/Models/MaterielImage.lib.avt";
 import type { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";
-import type { MaterielRequest } from "../../generated/app/Http/Requests/MaterielRequest.lib.avt";
+import { MaterielRequest } from "../../generated/app/Http/Requests/MaterielRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { Variation } from "../../generated/app/Models/Variation.lib.avt";
 
@@ -49,7 +49,9 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
         const id = slugs['id'];
         if(id == 0) {
-            let newItem = new Materiel();
+            let newItem = new MaterielRequest();
+            newItem.id = 0;
+            newItem.tout_monde = true;
             newItem.image = new MaterielImage();
             newItem.variations = [];
             let v1 = new Variation();
@@ -62,12 +64,13 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             this.form.item = newItem;
         }
         else {
-            const item = await MaterielRAM.getInstance().getById(id);
+            const ram = MaterielRAM.getInstance();
+            const item = await ram.getById(id);
 
             if(!item) {
                 return "/materiel";
             }
-            this.form.item = item;
+            this.form.item = ram.toRequest(item);
         }
         return true;
     }
@@ -82,9 +85,9 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     /**
      * 
      */
-    protected save() {
+    protected async save() {
         console.log(this.form.item);
-        MaterielRAM.getInstance().saveWithError(this.form.item)
+        await this.form.execute(MaterielRAM.getInstance().saveWithError)
     }
 
     protected getTitle() {

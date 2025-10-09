@@ -1,11 +1,11 @@
 import { UserController } from "../generated/app/Http/Controllers/UserController.lib.avt";
-import { User } from "../generated/app/Models/User.lib.avt";
+import type { UserResource } from "../generated/app/Http/Resources/UserResource.lib.avt";
 
-export class UserRAM extends AventusPhp.RamHttp<User> implements Aventus.IRam {
+export class UserRAM extends AventusPhp.RamHttp<UserController> implements Aventus.IRam {
     /**
      * @inheritdoc
      */
-    public override defineRoutes(): AventusPhp.ModelController<User, any, any> {
+    public override defineRoutes(): UserController {
         return new UserController();
     }
 
@@ -19,13 +19,7 @@ export class UserRAM extends AventusPhp.RamHttp<User> implements Aventus.IRam {
     /**
      * @inheritdoc
      */
-    public override defineIndexKey(): keyof User {
+    public override defineIndexKey(): keyof UserResource {
         return 'id';
-    }
-    /**
-     * @inheritdoc
-     */
-    protected override getTypeForData(objJson: Aventus.KeysObject<User> | User): new () => User {
-        return User;
     }
 }

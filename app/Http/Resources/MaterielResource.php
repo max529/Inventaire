@@ -11,6 +11,7 @@ use Aventus\Laraventus\Resources\AventusModelResource;
 /**
  * @extends AventusModelResource<Materiel>
  * @property Variation[] $variations
+ * @property EquipeResource[] $equipes
  */
 class MaterielResource extends AventusModelResource
 {
@@ -19,12 +20,16 @@ class MaterielResource extends AventusModelResource
     #[DefaultValueRaw("new MaterielImage()")]
     public MaterielImage $image;
     public array $variations;
+    public bool $tout_monde;
+    public array $equipes;
 
     protected function bind($item): void
     {
         $this->id = $item->id;
         $this->nom = $item->nom;
         $this->image = $item->image;
-        $this->variations = $item->variations;
+        $this->variations = $item->variations->toArray();
+        $this->tout_monde = $item->tout_monde;
+        $this->equipes = EquipeResource::collection($item->equipes);
     }
 }

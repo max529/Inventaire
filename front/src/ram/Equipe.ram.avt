@@ -1,13 +1,14 @@
 import { EquipeController } from "../generated/app/Http/Controllers/EquipeController.lib.avt";
-import { Equipe } from "../generated/app/Models/Equipe.lib.avt";
+import type { EquipeResource } from "../generated/app/Http/Resources/EquipeResource.lib.avt";
 
-export class EquipeRAM extends AventusPhp.RamHttp<Equipe> implements Aventus.IRam {
+export class EquipeRAM extends AventusPhp.RamHttp<EquipeController> implements Aventus.IRam {
     /**
      * @inheritdoc
      */
-    public override defineRoutes(): AventusPhp.ModelController<Equipe, any, any> {
-        return new EquipeController()
+    public override defineRoutes(): EquipeController {
+        return new EquipeController();
     }
+   
 
 	/**
 	 * Create a singleton to store data
@@ -19,13 +20,8 @@ export class EquipeRAM extends AventusPhp.RamHttp<Equipe> implements Aventus.IRa
 	/**
 	 * @inheritdoc
 	 */
-	public override defineIndexKey(): keyof Equipe {
+	public override defineIndexKey(): keyof EquipeResource {
 		return 'id';
 	}
-	/**
-	 * @inheritdoc
-	 */
-	protected override getTypeForData(objJson: Aventus.KeysObject<Equipe> | Equipe): new () => Equipe {
-		return Equipe;
-	}
+	
 }

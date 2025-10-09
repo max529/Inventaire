@@ -6,19 +6,22 @@ use Aventus\Laraventus\Models\AventusModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Variation;
 use App\Models\MaterielImage;
+use Aventus\Laraventus\Casts\ToBoolCast;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @property int $id
  * @property string $nom
  * @property ?MaterielImage $image
- * @property Variation[] $variations
+ * @property Collection<Variation> $variations
  * @property bool $tout_monde
- * @property MaterielEquipe[] $equipes
+ * @property Collection<MaterielEquipe> $equipes
  */
 class Materiel extends AventusModel
 {
     protected $casts = [
-        "image" => MaterielImage::class
+        "image" => MaterielImage::class,
+        "tout_monde" => ToBoolCast::class
     ];
 
 

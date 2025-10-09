@@ -1,8 +1,8 @@
 namespace App.Http.Resources {
 
 	@Convertible()
-	export class EquipeResource {
-		public static get Fullname(): string { return "App.Http.Resources.EquipeResource"; }
+	export class EquipeResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Resources.EquipeResource"; }
 		public id!: number;
 		public nom!: string;
 	}

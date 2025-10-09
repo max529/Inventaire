@@ -1,4 +1,5 @@
 import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
+import type { UserResource } from "../../../../generated/app/Http/Resources/UserResource.lib.avt";
 import type { User } from "../../../../generated/app/Models/User.lib.avt";
 import { UserRAM } from "../../../../ram/User.ram.avt";
 import { UserEditModal } from "../UserEditModal/UserEditModal.wcl.avt";
@@ -19,7 +20,7 @@ export class UserItem extends Aventus.WebComponent implements Aventus.DefaultCom
     //#region variables
     @Watch()
     @Injectable()
-    public item!: User;
+    public item!: UserResource;
     //#endregion
 
 

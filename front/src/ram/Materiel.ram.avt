@@ -21,13 +21,8 @@ export class MaterielRAM extends AventusPhp.RamHttp<MaterielController> implemen
     /**
      * @inheritdoc
      */
-    public override defineIndexKey(): keyof Materiel {
+    public override defineIndexKey(): keyof MaterielResource {
         return 'id';
     }
-    /**
-     * @inheritdoc
-     */
-    protected override getTypeForData(objJson: Aventus.KeysObject<Materiel> | Materiel): new () => Materiel {
-        return Materiel;
-    }
+    
 }

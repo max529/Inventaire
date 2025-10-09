@@ -434,6 +434,33 @@ let ElementExtension=class ElementExtension {
 ElementExtension.Namespace=`Aventus`;
 __as1(_, 'ElementExtension', ElementExtension);
 
+let Instance=class Instance {
+    static elements = new Map();
+    static get(type) {
+        let result = this.elements.get(type);
+        if (!result) {
+            let cst = type.prototype['constructor'];
+            result = new cst();
+            this.elements.set(type, result);
+        }
+        return result;
+    }
+    static set(el) {
+        let cst = el.constructor;
+        if (this.elements.get(cst)) {
+            return false;
+        }
+        this.elements.set(cst, el);
+        return true;
+    }
+    static destroy(el) {
+        let cst = el.constructor;
+        return this.elements.delete(cst);
+    }
+}
+Instance.Namespace=`Aventus`;
+__as1(_, 'Instance', Instance);
+
 let Style=class Style {
     static instance;
     static noAnimation;
@@ -3936,33 +3963,6 @@ let Template=class Template {
 Template.Namespace=`Aventus`;
 __as1(_, 'Template', Template);
 
-let Instance=class Instance {
-    static elements = new Map();
-    static get(type) {
-        let result = this.elements.get(type);
-        if (!result) {
-            let cst = type.prototype['constructor'];
-            result = new cst();
-            this.elements.set(type, result);
-        }
-        return result;
-    }
-    static set(el) {
-        let cst = el.constructor;
-        if (this.elements.get(cst)) {
-            return false;
-        }
-        this.elements.set(cst, el);
-        return true;
-    }
-    static destroy(el) {
-        let cst = el.constructor;
-        return this.elements.delete(cst);
-    }
-}
-Instance.Namespace=`Aventus`;
-__as1(_, 'Instance', Instance);
-
 let WebComponent=class WebComponent extends HTMLElement {
     /**
      * Add attributes informations
@@ -5562,9 +5562,6 @@ let DragAndDrop=class DragAndDrop {
         const result = this.options.onStart(e);
         if (result !== false) {
             document.body.style.userSelect = 'none';
-            if (window.getSelection) {
-                window.getSelection()?.removeAllRanges();
-            }
         }
         return result;
     }
@@ -6450,7 +6447,6 @@ let GenericRam=class GenericRam {
         }
         return new Map();
     }
-    ;
     /**
      * Get all elements inside the Ram
      */
@@ -6466,7 +6462,6 @@ let GenericRam=class GenericRam {
             return action;
         });
     }
-    ;
     /**
      * Trigger before getting all items inside Ram
      */
@@ -7615,114 +7610,423 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
         request.setBody(requestBody);
         return await request.queryJSON(this.router);
     }
+    toRequest(resource) {
+        const Request = this.getRequest();
+        const result = new Request();
+        Aventus.Json.classFromJson(result, resource, {
+            replaceUndefined: true
+        });
+        return result;
+    }
 }
 ModelController.Namespace=`AventusPhp`;
 __as1(_, 'ModelController', ModelController);
 
-let RamCompletor=class RamCompletor {
-    objects = [];
-    fields = [];
-    error;
-    constructor(objects, error) {
-        if (!objects) {
-            objects = [];
+let GenericRamHttp=class GenericRamHttp {
+    /**
+     * The current namespace
+     */
+    static Namespace = "";
+    // public static get Namespace(): string { return ""; }
+    /**
+     * Get the unique type for the data. Define it as the namespace + class name
+     */
+    static get Fullname() { return this.Namespace + "." + this.name; }
+    subscribers = {
+        created: [],
+        updated: [],
+        deleted: [],
+    };
+    recordsSubscribers = new Map();
+    /**
+     * List of stored item by index key
+     */
+    records = new Map();
+    actionGuard = new Aventus.ActionGuard();
+    routes;
+    getAllDone = false;
+    constructor() {
+        if (this.constructor == Aventus.GenericRam) {
+            throw "can't instanciate an abstract class";
         }
-        else if (!Array.isArray(objects)) {
-            objects = [objects];
+        this.routes = this.defineRoutes();
+        this.getIdWithError = this.getIdWithError.bind(this);
+        this.getId = this.getId.bind(this);
+        this.save = this.save.bind(this);
+        this.saveWithError = this.saveWithError.bind(this);
+        this.onCreated = this.onCreated.bind(this);
+        this.offCreated = this.offCreated.bind(this);
+        this.onUpdated = this.onUpdated.bind(this);
+        this.offUpdated = this.offUpdated.bind(this);
+        this.onDeleted = this.onDeleted.bind(this);
+        this.offDeleted = this.offDeleted.bind(this);
+        this.get = this.get.bind(this);
+        this.getWithError = this.getWithError.bind(this);
+        this.getById = this.getById.bind(this);
+        this.getByIdWithError = this.getByIdWithError.bind(this);
+        this.getByIds = this.getByIds.bind(this);
+        this.getByIdsWithError = this.getByIdsWithError.bind(this);
+        this.getAll = this.getAll.bind(this);
+        this.getAllWithError = this.getAllWithError.bind(this);
+        this.getList = this.getList.bind(this);
+        this.getListWithError = this.getListWithError.bind(this);
+        this.createList = this.createList.bind(this);
+        this.createListWithError = this.createListWithError.bind(this);
+        this.create = this.create.bind(this);
+        this.createWithError = this.createWithError.bind(this);
+        this.updateList = this.updateList.bind(this);
+        this.updateListWithError = this.updateListWithError.bind(this);
+        this.update = this.update.bind(this);
+        this.updateWithError = this.updateWithError.bind(this);
+        this.deleteList = this.deleteList.bind(this);
+        this.deleteListWithError = this.deleteListWithError.bind(this);
+        this.delete = this.delete.bind(this);
+        this.deleteWithError = this.deleteWithError.bind(this);
+        this.deleteById = this.deleteById.bind(this);
+        this.deleteByIdWithError = this.deleteByIdWithError.bind(this);
+    }
+    /**
+     * Get item id
+     */
+    getIdWithError(item) {
+        let action = new Aventus.ResultRamWithError();
+        let idTemp = item[this.defineIndexKey()];
+        if (idTemp !== undefined) {
+            action.result = idTemp;
         }
-        this.objects = objects;
-        this.error = error;
+        else {
+            action.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noId, "no key found for item"));
+        }
+        return action;
     }
-    add(field) {
-        this.fields.push(field);
-        return this;
+    /**
+     * Get item id
+     */
+    getId(item) {
+        let result = this.getIdWithError(item);
+        if (result.success) {
+            return result.result;
+        }
+        throw 'no key found for item';
     }
-    async run() {
-        const objects = this.objects;
-        const fields = this.fields;
-        const result = new Aventus.VoidWithError();
-        if (objects.length == 0)
-            return result;
-        const listIds = {};
-        const mapRecords = {};
-        for (let field of fields) {
-            let objKey = field.obj;
-            let idKey = field.id;
-            listIds[objKey] = [];
-            mapRecords[objKey] = {};
-            for (let value of objects) {
-                if (value[idKey]) {
-                    const listId = listIds[objKey];
-                    const mapRecord = mapRecords[objKey];
-                    if (value[objKey])
-                        continue;
-                    if (!listId.includes(value[idKey]))
-                        listId.push(value[idKey]);
-                    if (!mapRecord[value[idKey]]) {
-                        mapRecord[value[idKey]] = [];
-                    }
-                    mapRecord[value[idKey]].push(value);
+    isResource(item) {
+        const ResourceType = this.routes.getResource();
+        return item instanceof ResourceType;
+    }
+    toRequest(resource) {
+        return this.routes.toRequest(resource);
+    }
+    /**
+     * Prevent adding Watch element
+     */
+    removeWatch(element) {
+        let byPass = element;
+        if (byPass.__isProxy) {
+            return byPass.getTarget();
+        }
+        return element;
+    }
+    /**
+     * Add function update, onUpdate, offUpdate, delete, onDelete, offDelete
+     */
+    addRamAction(Base) {
+        let that = this;
+        return class ActionClass extends Base {
+            static get className() {
+                return Base.className || Base.name;
+            }
+            get className() {
+                return Base.className || Base.name;
+            }
+            async update(newData) {
+                let id = that.getId(this);
+                let oldData = that.records.get(id);
+                if (oldData) {
+                    let result = await that.update(newData);
+                    return result;
+                }
+                return undefined;
+            }
+            async updateWithError(newData) {
+                const result = new Aventus.ResultRamWithError();
+                let queryId = that.getIdWithError(this);
+                if (!queryId.success || !queryId.result) {
+                    result.errors = queryId.errors;
+                    return result;
+                }
+                let oldData = that.records.get(queryId.result);
+                if (oldData) {
+                    let result = await that.updateWithError(newData);
+                    return result;
+                }
+                result.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "Can't find this item inside the ram"));
+                return result;
+            }
+            onUpdate(callback) {
+                let id = that.getId(this);
+                if (!that.recordsSubscribers.has(id)) {
+                    that.recordsSubscribers.set(id, {
+                        created: [],
+                        updated: [],
+                        deleted: []
+                    });
+                }
+                let sub = that.recordsSubscribers.get(id);
+                if (sub && !sub.updated.includes(callback)) {
+                    sub.updated.push(callback);
                 }
             }
-        }
-        for (let field of fields) {
-            let objKey = field.obj;
-            if (!listIds[objKey] || !mapRecords[objKey])
-                continue;
-            const listId = listIds[objKey];
-            const mapRecord = mapRecords[objKey];
-            if (listId.length > 0) {
-                const ram = Aventus.Instance.get(field.ram);
-                const query = await ram.getByIdsWithError(listId);
-                if (query.success && query.result) {
-                    for (let item of query.result) {
-                        if (mapRecord[item.Id]) {
-                            for (let record of mapRecord[item.Id]) {
-                                record[objKey] = item;
-                            }
-                        }
+            offUpdate(callback) {
+                let id = that.getId(this);
+                let sub = that.recordsSubscribers.get(id);
+                if (sub) {
+                    let index = sub.updated.indexOf(callback);
+                    if (index != -1) {
+                        sub.updated.splice(index, 1);
                     }
+                }
+            }
+            async delete() {
+                let id = that.getId(this);
+                await that.deleteById(id);
+            }
+            async deleteWithError() {
+                const result = new Aventus.VoidRamWithError();
+                let queryId = that.getIdWithError(this);
+                if (!queryId.success || !queryId.result) {
+                    result.errors = queryId.errors;
+                    return result;
+                }
+                const queryDelete = await that.deleteByIdWithError(queryId.result);
+                result.errors = queryDelete.errors;
+                return result;
+            }
+            onDelete(callback) {
+                let id = that.getId(this);
+                if (!that.recordsSubscribers.has(id)) {
+                    that.recordsSubscribers.set(id, {
+                        created: [],
+                        updated: [],
+                        deleted: []
+                    });
+                }
+                let sub = that.recordsSubscribers.get(id);
+                if (sub && !sub.deleted.includes(callback)) {
+                    sub.deleted.push(callback);
+                }
+            }
+            offDelete(callback) {
+                let id = that.getId(this);
+                let sub = that.recordsSubscribers.get(id);
+                if (sub) {
+                    let index = sub.deleted.indexOf(callback);
+                    if (index != -1) {
+                        sub.deleted.splice(index, 1);
+                    }
+                }
+            }
+        };
+    }
+    getTypeForData(objJson) {
+        return this.routes.getResource();
+    }
+    /**
+     * Transform the object into the object stored inside Ram
+     */
+    getObjectForRam(objJson) {
+        let T = this.addRamAction(this.getTypeForData(objJson));
+        let item = new T();
+        this.mergeObject(item, objJson);
+        return item;
+    }
+    /**
+     * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
+     */
+    async addOrUpdateData(item, result) {
+        let resultTemp = null;
+        try {
+            let idWithError = this.getIdWithError(item);
+            if (idWithError.success && idWithError.result !== undefined) {
+                let id = idWithError.result;
+                if (this.records.has(id)) {
+                    let uniqueRecord = this.records.get(id);
+                    await this.beforeRecordSet(uniqueRecord);
+                    this.mergeObject(uniqueRecord, item);
+                    await this.afterRecordSet(uniqueRecord);
+                    resultTemp = 'updated';
                 }
                 else {
-                    result.errors = [...result.errors, ...query.errors];
-                    if (this.error) {
-                        this.error.errors = [...this.error.errors, ...query.errors];
-                    }
+                    let realObject = this.getObjectForRam(item);
+                    await this.beforeRecordSet(realObject);
+                    this.records.set(id, realObject);
+                    await this.afterRecordSet(realObject);
+                    resultTemp = 'created';
                 }
-            }
-        }
-        return result;
-    }
-}
-RamCompletor.Namespace=`AventusPhp`;
-__as1(_, 'RamCompletor', RamCompletor);
-
-let RamHttp=class RamHttp extends Aventus.Ram {
-    getAllDone = false;
-    routes;
-    constructor() {
-        super();
-        this.routes = this.defineRoutes();
-    }
-    async beforeGetAll(result) {
-        if (!this.getAllDone) {
-            let response = await this.routes.index();
-            if (response.success && response.result) {
-                for (let item of response.result) {
-                    let resultTemp = new Aventus.ResultRamWithError();
-                    await this.addOrUpdateData(item, resultTemp);
-                    if (!resultTemp.success) {
-                        result.errors = [...result.errors, ...resultTemp.errors];
-                    }
-                }
-                this.getAllDone = true;
+                result.result = this.records.get(id);
             }
             else {
-                result.errors = [...result.errors, ...response.errors];
+                result.errors = [...result.errors, ...idWithError.errors];
+                resultTemp = null;
+            }
+        }
+        catch (e) {
+            result.errors.push(new Aventus.RamError(Aventus.RamErrorCode.unknow, e));
+            resultTemp = null;
+        }
+        return resultTemp;
+    }
+    /**
+     * Merge object and create real instance of class
+     */
+    mergeObject(item, objJson, options) {
+        if (!item) {
+            return;
+        }
+        if (!options) {
+            options = {
+                replaceUndefined: true
+            };
+        }
+        Aventus.Json.classFromJson(item, objJson, options);
+    }
+    /**
+     * Create or update the item
+     */
+    async save(item, ...args) {
+        let action = await this.saveWithError(item, ...args);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    /**
+     * Create or update the item
+     */
+    async saveWithError(item, ...args) {
+        let action = new Aventus.ResultRamWithError();
+        let resultTemp = await this.getIdWithError(item);
+        if (resultTemp.success && resultTemp.result !== undefined) {
+            if (resultTemp.result) {
+                return this.updateWithError(item, ...args);
+            }
+            else {
+                return this.createWithError(item, ...args);
+            }
+        }
+        else {
+            action.errors = resultTemp.errors;
+        }
+        return action;
+    }
+    async beforeRecordSet(item) { }
+    async afterRecordSet(item) { }
+    async beforeRecordDelete(item) { }
+    async afterRecordDelete(item) { }
+    publish(type, data) {
+        let callbacks = [...this.subscribers[type]];
+        for (let callback of callbacks) {
+            callback(data);
+        }
+        let sub = this.recordsSubscribers.get(this.getId(data));
+        if (sub) {
+            let localCallbacks = [...sub[type]];
+            for (let localCallback of localCallbacks) {
+                localCallback(data);
             }
         }
     }
-    async beforeGetById(id, result) {
+    subscribe(type, cb) {
+        if (!this.subscribers[type].includes(cb)) {
+            this.subscribers[type].push(cb);
+        }
+    }
+    unsubscribe(type, cb) {
+        let index = this.subscribers[type].indexOf(cb);
+        if (index != -1) {
+            this.subscribers[type].splice(index, 1);
+        }
+    }
+    /**
+    * Add a callback that ll be triggered when a new item is stored
+    */
+    onCreated(cb) {
+        this.subscribe('created', cb);
+    }
+    /**
+     * Remove a created callback
+     */
+    offCreated(cb) {
+        this.unsubscribe('created', cb);
+    }
+    /**
+     * Add a callback that ll be triggered when an item is updated
+     */
+    onUpdated(cb) {
+        this.subscribe('updated', cb);
+    }
+    /**
+     * Remove an updated callback
+     */
+    offUpdated(cb) {
+        this.unsubscribe('updated', cb);
+    }
+    /**
+     * Add a callback that ll be triggered when an item is deleted
+     */
+    onDeleted(cb) {
+        this.subscribe('deleted', cb);
+    }
+    /**
+     * Remove an deleted callback
+     */
+    offDeleted(cb) {
+        this.unsubscribe('deleted', cb);
+    }
+    /**
+     * Get an item by id if exist (alias for getById)
+     */
+    async get(id) {
+        return await this.getById(id);
+    }
+    ;
+    /**
+     * Get an item by id if exist (alias for getById)
+     */
+    async getWithError(id) {
+        return await this.getByIdWithError(id);
+    }
+    ;
+    /**
+     * Get an item by id if exist
+     */
+    async getById(id) {
+        let action = await this.getByIdWithError(id);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    /**
+     * Get an item by id if exist
+     */
+    async getByIdWithError(id) {
+        return this.actionGuard.run(['getByIdWithError', id], async () => {
+            let action = new Aventus.ResultRamWithError();
+            await this.beforeGetById(id, action);
+            await this.queryGetById(id, action);
+            if (action.success) {
+                if (this.records.has(id)) {
+                    action.result = this.records.get(id);
+                    await this.afterGetById(action);
+                }
+                else {
+                    action.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "can't find the item " + id + " inside ram"));
+                }
+            }
+            return action;
+        });
+    }
+    async queryGetById(id, result) {
         if (this.records.has(id)) {
             return;
         }
@@ -7743,7 +8047,54 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             }
         }
     }
-    async beforeGetByIds(ids, result) {
+    /**
+     * Trigger before getting an item by id
+     */
+    async beforeGetById(id, result) { }
+    ;
+    /**
+     * Trigger after getting an item by id
+     */
+    async afterGetById(result) { }
+    ;
+    /**
+     * Get multiple items by ids
+     */
+    async getByIds(ids) {
+        let result = await this.getByIdsWithError(ids);
+        if (result.success) {
+            return result.result ?? [];
+        }
+        return [];
+    }
+    /**
+     * Get multiple items by ids
+     */
+    async getByIdsWithError(ids) {
+        return this.actionGuard.run(['getByIdsWithError', ids], async () => {
+            let action = new Aventus.ResultRamWithError();
+            action.result = [];
+            await this.queryGetByIds(ids, action);
+            await this.beforeGetByIds(ids, action);
+            if (action.success) {
+                action.result = [];
+                for (let id of ids) {
+                    let rec = this.records.get(id);
+                    if (rec) {
+                        action.result.push(rec);
+                    }
+                    else {
+                        action.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "can't find the item " + id + " inside ram"));
+                    }
+                }
+                if (action.success) {
+                    await this.afterGetByIds(action);
+                }
+            }
+            return action;
+        });
+    }
+    async queryGetByIds(ids, result) {
         let missingIds = [];
         for (let id of ids) {
             if (!this.records.has(id)) {
@@ -7770,22 +8121,189 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             }
         }
     }
-    complete(objects, error) {
-        return new RamCompletor(objects, error);
-    }
-    async beforeCreateItem(item, fromList, result) {
-        if (fromList) {
-            return;
+    /**
+     * Trigger before getting a list of items by id
+     */
+    async beforeGetByIds(ids, result) { }
+    ;
+    /**
+     * Trigger after getting a list of items by id
+     */
+    async afterGetByIds(result) { }
+    ;
+    /**
+     * Get all elements inside the Ram
+     */
+    async getAll() {
+        let result = await this.getAllWithError();
+        if (result.success) {
+            return result.result ?? new Map();
         }
-        let response = await this.routes.store(item);
-        if (response.success && response.result) {
-            result.result = this.getObjectForRam(response.result);
+        return new Map();
+    }
+    /**
+     * Get all elements inside the Ram
+     */
+    async getAllWithError() {
+        return this.actionGuard.run(['getAllWithError'], async () => {
+            let action = new Aventus.ResultRamWithError();
+            action.result = new Map();
+            await this.beforeGetAll(action);
+            await this.queryGetAll(action);
+            if (action.success) {
+                action.result = this.records;
+                await this.afterGetAll(action);
+            }
+            return action;
+        });
+    }
+    async queryGetAll(result) {
+        if (!this.getAllDone) {
+            let response = await this.routes.index();
+            if (response.success && response.result) {
+                for (let item of response.result) {
+                    let resultTemp = new Aventus.ResultRamWithError();
+                    await this.addOrUpdateData(item, resultTemp);
+                    if (!resultTemp.success) {
+                        result.errors = [...result.errors, ...resultTemp.errors];
+                    }
+                }
+                this.getAllDone = true;
+            }
+            else {
+                result.errors = [...result.errors, ...response.errors];
+            }
+        }
+    }
+    /**
+     * Trigger before getting all items inside Ram
+     */
+    async beforeGetAll(result) { }
+    ;
+    /**
+     * Trigger after getting all items inside Ram
+     */
+    async afterGetAll(result) { }
+    ;
+    /**
+     * Get all elements inside the Ram
+     */
+    async getList() {
+        let data = await this.getAll();
+        return Array.from(data.values());
+    }
+    ;
+    /**
+     * Get all elements inside the Ram
+     */
+    async getListWithError() {
+        let action = new Aventus.ResultRamWithError();
+        action.result = [];
+        let result = await this.getAllWithError();
+        if (result.success) {
+            if (result.result) {
+                action.result = Array.from(result.result.values());
+            }
+            else {
+                action.result = [];
+            }
         }
         else {
-            result.errors = [...result.errors, ...response.errors];
+            action.errors = result.errors;
         }
+        return action;
     }
-    async beforeCreateList(list, result) {
+    /**
+     * Create a list of items inside ram
+     */
+    async createList(list) {
+        let result = await this.createListWithError(list);
+        return result.result ?? [];
+    }
+    /**
+     * Create a list of items inside ram
+     */
+    async createListWithError(list) {
+        list = this.removeWatch(list);
+        let actionTemp = new Aventus.ResultRamWithError();
+        actionTemp.result = [];
+        await this.beforeCreateList(list, actionTemp);
+        let action = await this.queryCreateList(list, actionTemp);
+        if (!action.result) {
+            action.result = [];
+        }
+        if (action.success && action.result.length > 0) {
+            const resources = action.result;
+            action.result = [];
+            for (let resource of resources) {
+                let resultItem = await this._create(resource, true);
+                if (resultItem.success && resultItem.result) {
+                    action.result.push(resultItem.result);
+                }
+                else {
+                    action.errors = [...action.errors, ...resultItem.errors];
+                }
+            }
+            if (action.success) {
+                await this.afterCreateList(action);
+            }
+        }
+        return action;
+    }
+    /**
+     * Create an item inside ram
+     */
+    async create(item, ...args) {
+        let action = await this.createWithError(item, args);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    /**
+     * Create an item inside ram
+     */
+    async createWithError(item, ...args) {
+        return await this._create(item, false);
+    }
+    async _create(item, fromList) {
+        item = this.removeWatch(item);
+        return this.actionGuard.run(['_create', item], async () => {
+            let actionTemp = new Aventus.ResultRamWithError();
+            let action;
+            await this.beforeCreateItem(item, fromList, actionTemp);
+            if (this.isResource(item)) {
+                action = new Aventus.ResultRamWithError();
+                action.errors = actionTemp.errors;
+            }
+            else {
+                action = await this.queryCreateItem(item, fromList, actionTemp);
+            }
+            if (action.success && action.result) {
+                const resource = action.result;
+                let resultTemp = this.getIdWithError(resource);
+                if (resultTemp.success) {
+                    await this.addOrUpdateData(resource, action);
+                    if (!action.success) {
+                        return action;
+                    }
+                    await this.afterCreateItem(action, fromList);
+                    if (!action.success) {
+                        action.result = undefined;
+                    }
+                    else if (action.result) {
+                        this.publish('created', resource);
+                    }
+                }
+                else {
+                    action.errors = resultTemp.errors;
+                }
+            }
+            return action;
+        });
+    }
+    async queryCreateList(list, resultTemp) {
+        const result = new Aventus.ResultRamWithError();
         let response = await this.routes.storeMany(list);
         if (response.success && response.result) {
             result.result = [];
@@ -7796,20 +8314,151 @@ let RamHttp=class RamHttp extends Aventus.Ram {
         else {
             result.errors = [...result.errors, ...response.errors];
         }
+        return result;
     }
-    async beforeUpdateItem(item, fromList, result) {
+    /**
+     * Trigger before creating a list of items
+     */
+    async beforeCreateList(list, result) {
+    }
+    async queryCreateItem(item, fromList, resultTemp) {
+        const result = new Aventus.ResultRamWithError();
+        result.errors = resultTemp.errors;
         if (fromList) {
-            return;
+            return result;
         }
-        let response = await this.routes.update(item.id, item);
+        let response = await this.routes.store(item);
         if (response.success && response.result) {
             result.result = this.getObjectForRam(response.result);
         }
         else {
             result.errors = [...result.errors, ...response.errors];
         }
+        return result;
     }
-    async beforeUpdateList(list, result) {
+    /**
+     * Trigger before creating an item
+     */
+    async beforeCreateItem(item, fromList, result) {
+    }
+    /**
+     * Trigger after creating an item
+     */
+    async afterCreateItem(result, fromList) {
+    }
+    /**
+     * Trigger after creating a list of items
+     */
+    async afterCreateList(result) {
+    }
+    /**
+     * Update a list of items inside ram
+     */
+    async updateList(list) {
+        let result = await this.updateListWithError(list);
+        return result.result ?? [];
+    }
+    ;
+    /**
+     * Update a list of items inside ram
+     */
+    async updateListWithError(list) {
+        list = this.removeWatch(list);
+        let actionTemp = new Aventus.ResultRamWithError();
+        actionTemp.result = [];
+        await this.beforeUpdateList(list, actionTemp);
+        let action = await this.queryUpdateList(list, actionTemp);
+        if (!action.result) {
+            action.result = [];
+        }
+        if (action.success && action.result.length > 0) {
+            const resources = action.result;
+            action.result = [];
+            for (let resource of resources) {
+                let resultItem = await this._update(resource, true);
+                if (resultItem.success && resultItem.result) {
+                    action.result.push(resultItem.result);
+                }
+                else {
+                    action.errors = [...action.errors, ...resultItem.errors];
+                }
+            }
+            if (action.success) {
+                await this.afterUpdateList(action);
+            }
+        }
+        return action;
+    }
+    ;
+    /**
+     * Update an item inside ram
+     */
+    async update(item, ...args) {
+        let action = await this.updateWithError(item, args);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    /**
+     * Update an item inside ram
+     */
+    async updateWithError(item, ...args) {
+        return await this._update(item, false);
+    }
+    async _update(item, fromList) {
+        item = this.removeWatch(item);
+        return this.actionGuard.run(['_update', item], async () => {
+            let actionTemp = new Aventus.ResultRamWithError();
+            let resultTemp = await this.getIdWithError(item);
+            let actionError = new Aventus.ResultRamWithError();
+            if (resultTemp.success && resultTemp.result !== undefined) {
+                let key = resultTemp.result;
+                if (this.records.has(key)) {
+                    if (this.records.get(key) == item) {
+                        console.warn("You are updating the same item. You should clone the object first to avoid weird effect");
+                    }
+                    await this.beforeUpdateItem(item, fromList, actionTemp);
+                    let action;
+                    if (this.isResource(item)) {
+                        action = new Aventus.ResultRamWithError();
+                        action.errors = actionTemp.errors;
+                    }
+                    else {
+                        action = await this.queryUpdateItem(item, fromList, actionTemp);
+                    }
+                    if (!action.success) {
+                        return action;
+                    }
+                    if (action.result) {
+                        const resource = action.result;
+                        await this.addOrUpdateData(resource, action);
+                        if (!action.success) {
+                            return action;
+                        }
+                        await this.afterUpdateItem(action, fromList);
+                        if (!action.success) {
+                            action.result = undefined;
+                        }
+                        else if (action.result) {
+                            this.publish('updated', action.result);
+                        }
+                    }
+                    return action;
+                }
+                else {
+                    actionError.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "can't update the item " + key + " because it wasn't found inside ram"));
+                }
+            }
+            else {
+                actionError.errors = resultTemp.errors;
+            }
+            return actionError;
+        });
+    }
+    async queryUpdateList(list, resultTemp) {
+        const result = new Aventus.ResultRamWithError();
+        result.errors = resultTemp.errors;
         let response = await this.routes.updateMany(list);
         if (response.success && response.result) {
             result.result = [];
@@ -7820,8 +8469,169 @@ let RamHttp=class RamHttp extends Aventus.Ram {
         else {
             result.errors = [...result.errors, ...response.errors];
         }
+        return result;
     }
-    async beforeDeleteItem(item, fromList, result) {
+    /**
+     * Trigger before updating a list of items
+     */
+    async beforeUpdateList(list, result) {
+    }
+    async queryUpdateItem(item, fromList, resultTemp) {
+        const result = new Aventus.ResultRamWithError();
+        result.errors = resultTemp.errors;
+        if (fromList) {
+            return result;
+        }
+        let response = await this.routes.update(item.id, item);
+        if (response.success && response.result) {
+            result.result = this.getObjectForRam(response.result);
+        }
+        else {
+            result.errors = [...result.errors, ...response.errors];
+        }
+        return result;
+    }
+    /**
+    * Trigger before updating an item
+    */
+    async beforeUpdateItem(item, fromList, result) {
+    }
+    /**
+     * Trigger after updating an item
+     */
+    async afterUpdateItem(result, fromList) {
+    }
+    /**
+     * Trigger after updating a list of items
+     */
+    async afterUpdateList(result) {
+    }
+    /**
+     * Delete a list of items inside ram
+     */
+    async deleteList(list) {
+        let result = await this.deleteListWithError(list);
+        return result.result ?? [];
+    }
+    ;
+    /**
+     * Delete a list of items inside ram
+     */
+    async deleteListWithError(list) {
+        list = this.removeWatch(list);
+        let action = new Aventus.ResultRamWithError();
+        action.result = [];
+        let deleteResult = new Aventus.VoidWithError();
+        await this.beforeDeleteList(list, deleteResult);
+        await this.queryDeleteList(list, deleteResult);
+        if (!deleteResult.success) {
+            action.errors = deleteResult.errors;
+        }
+        for (let item of list) {
+            let resultItem = await this._delete(item, true);
+            if (resultItem.success && resultItem.result) {
+                action.result.push(resultItem.result);
+            }
+            else {
+                action.errors = [...action.errors, ...resultItem.errors];
+            }
+        }
+        if (action.success) {
+            await this.afterDeleteList(action);
+        }
+        return action;
+    }
+    ;
+    /**
+     * Delete an item inside ram
+     */
+    async delete(item, ...args) {
+        let action = await this.deleteWithError(item, args);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    ;
+    /**
+    * Delete an item inside ram
+    */
+    async deleteWithError(item, ...args) {
+        return await this._delete(item, false);
+    }
+    ;
+    /**
+     * Delete an item by id inside ram
+     */
+    async deleteById(id) {
+        let action = await this.deleteByIdWithError(id);
+        if (action.success) {
+            return action.result;
+        }
+        return undefined;
+    }
+    /**
+    * Delete an item by id inside ram
+    */
+    async deleteByIdWithError(id) {
+        let item = this.records.get(id);
+        if (item) {
+            return await this._delete(item, false);
+        }
+        let result = new Aventus.ResultRamWithError();
+        result.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "can't delete the item " + id + " because it wasn't found inside ram"));
+        return result;
+    }
+    async _delete(item, fromList) {
+        item = this.removeWatch(item);
+        return this.actionGuard.run(['_delete', item], async () => {
+            let action = new Aventus.ResultRamWithError();
+            let resultTemp = await this.getIdWithError(item);
+            if (resultTemp.success && resultTemp.result) {
+                let key = resultTemp.result;
+                let oldItem = this.records.get(key);
+                if (oldItem) {
+                    let deleteResult = new Aventus.VoidWithError();
+                    await this.beforeDeleteItem(oldItem, fromList, deleteResult);
+                    if (!deleteResult.success) {
+                        action.errors = deleteResult.errors;
+                        return action;
+                    }
+                    await this.queryDeleteItem(oldItem, fromList, deleteResult);
+                    this.beforeRecordDelete(oldItem);
+                    this.records.delete(key);
+                    this.afterRecordDelete(oldItem);
+                    action.result = oldItem;
+                    await this.afterDeleteItem(action, fromList);
+                    if (!action.success) {
+                        action.result = undefined;
+                    }
+                    else {
+                        this.publish('deleted', action.result);
+                    }
+                    this.recordsSubscribers.delete(key);
+                }
+                else {
+                    action.errors.push(new Aventus.RamError(Aventus.RamErrorCode.noItemInsideRam, "can't delete the item " + key + " because it wasn't found inside ram"));
+                }
+            }
+            else {
+                action.errors = resultTemp.errors;
+            }
+            return action;
+        });
+    }
+    async queryDeleteList(list, result) {
+        let response = await this.routes.destroyMany(list.map(t => t.id));
+        if (!response.success) {
+            result.errors = [...result.errors, ...response.errors];
+        }
+    }
+    /**
+     * Trigger before deleting a list of items
+     */
+    async beforeDeleteList(list, result) { }
+    async queryDeleteItem(item, fromList, result) {
         if (fromList) {
             return;
         }
@@ -7830,12 +8640,23 @@ let RamHttp=class RamHttp extends Aventus.Ram {
             result.errors = [...result.errors, ...response.errors];
         }
     }
-    async beforeDeleteList(list, result) {
-        let response = await this.routes.destroyMany(list.map(t => t.id));
-        if (!response.success) {
-            result.errors = [...result.errors, ...response.errors];
-        }
-    }
+    /**
+     * Trigger before deleting an item
+     */
+    async beforeDeleteItem(item, fromList, result) { }
+    /**
+     * Trigger after deleting an item
+     */
+    async afterDeleteItem(result, fromList) { }
+    /**
+     * Trigger after deleting a list of items
+     */
+    async afterDeleteList(result) { }
+}
+GenericRamHttp.Namespace=`AventusPhp`;
+__as1(_, 'GenericRamHttp', GenericRamHttp);
+
+let RamHttp=class RamHttp extends GenericRamHttp {
 }
 RamHttp.Namespace=`AventusPhp`;
 __as1(_, 'RamHttp', RamHttp);
@@ -11264,16 +12085,16 @@ App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","
 Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
 __as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
 
-App.Http.Resources.MaterielImageResource=class MaterielImageResource {
+App.Http.Resources.MaterielImageResource=class MaterielImageResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Resources.MaterielImageResource"; }
     uri;
 }
 App.Http.Resources.MaterielImageResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.MaterielImageResource.$schema={"uri":"number"};
+App.Http.Resources.MaterielImageResource.$schema={...(Aventus.Data?.$schema ?? {}), "uri":"number"};
 Aventus.Converter.register(App.Http.Resources.MaterielImageResource.Fullname, App.Http.Resources.MaterielImageResource);
 __as1(_.App.Http.Resources, 'MaterielImageResource', App.Http.Resources.MaterielImageResource);
 
-App.Http.Resources.UserResource=class UserResource {
+App.Http.Resources.UserResource=class UserResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Resources.UserResource"; }
     id;
     nom;
@@ -11281,7 +12102,7 @@ App.Http.Resources.UserResource=class UserResource {
     nom_utilisateur;
 }
 App.Http.Resources.UserResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.UserResource.$schema={"id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
+App.Http.Resources.UserResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
 Aventus.Converter.register(App.Http.Resources.UserResource.Fullname, App.Http.Resources.UserResource);
 __as1(_.App.Http.Resources, 'UserResource', App.Http.Resources.UserResource);
 
@@ -11327,44 +12148,15 @@ App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), }
 Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
 __as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
-App.Http.Resources.MaterielResource=class MaterielResource {
-    static get Fullname() { return "App.Http.Resources.MaterielResource"; }
-    variations;
-    id;
-    nom;
-    image = new _.App.Models.MaterielImage();
-}
-App.Http.Resources.MaterielResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.MaterielResource.$schema={"variations":"Inventaire.App.Models.Variation[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage"};
-Aventus.Converter.register(App.Http.Resources.MaterielResource.Fullname, App.Http.Resources.MaterielResource);
-__as1(_.App.Http.Resources, 'MaterielResource', App.Http.Resources.MaterielResource);
-
-App.Http.Resources.EquipeResource=class EquipeResource {
+App.Http.Resources.EquipeResource=class EquipeResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Resources.EquipeResource"; }
     id;
     nom;
 }
 App.Http.Resources.EquipeResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.EquipeResource.$schema={"id":"number","nom":"string"};
+App.Http.Resources.EquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
 Aventus.Converter.register(App.Http.Resources.EquipeResource.Fullname, App.Http.Resources.EquipeResource);
 __as1(_.App.Http.Resources, 'EquipeResource', App.Http.Resources.EquipeResource);
-
-App.Http.Requests.EquipeRequest=class EquipeRequest {
-    id = undefined;
-    nom;
-}
-App.Http.Requests.EquipeRequest.Namespace=`Inventaire.App.Http.Requests`;
-__as1(_.App.Http.Requests, 'EquipeRequest', App.Http.Requests.EquipeRequest);
-
-App.Models.Equipe=class Equipe extends Aventus.Data {
-    static get Fullname() { return "App.Models.Equipe"; }
-    id;
-    nom;
-}
-App.Models.Equipe.Namespace=`Inventaire.App.Models`;
-App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
-Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
-__as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
 const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -11387,7 +12179,12 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-link _id="equipeitem_0">    <div class="name" _id="equipeitem_1"></div>    <div class="actions">        <mi-icon icon="chevron_right"></mi-icon>    </div></av-link>` }
+        blocks: { 'default':`<av-link _id="equipeitem_0">
+    <div class="name" _id="equipeitem_1"></div>
+    <div class="actions">
+        <mi-icon icon="chevron_right"></mi-icon>
+    </div>
+</av-link>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -11420,6 +12217,163 @@ EquipeItem.Namespace=`Inventaire`;
 EquipeItem.Tag=`av-equipe-item`;
 __as1(_, 'EquipeItem', EquipeItem);
 if(!window.customElements.get('av-equipe-item')){window.customElements.define('av-equipe-item', EquipeItem);Aventus.WebComponentInstance.registerDefinition(EquipeItem);}
+
+App.Http.Resources.MaterielResource=class MaterielResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Resources.MaterielResource"; }
+    variations;
+    equipes;
+    id;
+    nom;
+    image = new _.App.Models.MaterielImage();
+    tout_monde;
+}
+App.Http.Resources.MaterielResource.Namespace=`Inventaire.App.Http.Resources`;
+App.Http.Resources.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.Variation[]","equipes":"Inventaire.App.Http.Resources.EquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+Aventus.Converter.register(App.Http.Resources.MaterielResource.Fullname, App.Http.Resources.MaterielResource);
+__as1(_.App.Http.Resources, 'MaterielResource', App.Http.Resources.MaterielResource);
+
+const MaterielCard = class MaterielCard extends Aventus.WebComponent {
+    get 'visible'() { return this.getBoolAttr('visible') }
+    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
+						return this.__watch["item"];
+					}
+					set 'item'(val) {
+						this.__watch["item"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("item");    super.__registerWatchesActions();
+}
+    static __style = `:host{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-width:400px;overflow:hidden;width:100%}:host .img{width:100%}:host .img av-img{aspect-ratio:1;width:100%}:host .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host .info .title{font-size:var(--font-size-md);margin-top:8px}:host .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host .visible{align-items:center;display:flex}:host .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
+    __getStatic() {
+        return MaterielCard;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(MaterielCard.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3" center>
+    <av-link to="/materiel/1">
+        <div class="img">
+            <av-img mode="cover" _id="materielcard_0"></av-img>
+        </div>
+        <div class="info">
+            <div class="title" _id="materielcard_1"></div>
+            <div class="variations">
+                <template _id="materielcard_2"></template>
+                <av-tag color="accent">S</av-tag>
+            </div>
+            <div class="visible">
+                <div>Visible pour :</div>
+                <template _id="materielcard_4"></template>
+            </div>
+        </div>
+    </av-link>
+</av-col>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "materielcard_0°src": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
+      "once": true
+    },
+    "materielcard_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
+      "once": true
+    }
+  }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+                    <av-tag color="accent" _id="materielcard_3"></av-tag>
+                `);templ0.setActions({
+  "content": {
+    "materielcard_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5(c.data.variation))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'materielcard_2',
+                    template: templ0,
+                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                    <div>Tout le monde</div>
+                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <div class="visible-for">
+                        <template _id="materielcard_5"></template>
+                    </div>
+                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(` 
+                            <av-tag color="accent" _id="materielcard_6"></av-tag>
+                        `);templ3.setActions({
+  "content": {
+    "materielcard_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.equipe))}`,
+      "once": true
+    }
+  }
+});templ2.addLoop({
+                    anchorId: 'materielcard_5',
+                    template: templ3,
+                simple:{data: "this.item.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
+                    anchorId: 'materielcard_4',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
+                    template: templ1
+                },{once: true,
+                    condition: (c) => true,
+                    template: templ2
+                }]
+            }); }
+    getClassName() {
+        return "MaterielCard";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
+    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    getSrc() {
+        if (this.item.image?.uri) {
+            return this.item.image?.uri;
+        }
+        return "/img/default_img.svg";
+    }
+    __98d262679bf6afafa524060227ae1154method3() {
+        return this.getSrc();
+    }
+    __98d262679bf6afafa524060227ae1154method4() {
+        return this.item.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method5(variation) {
+        return variation.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method6(equipe) {
+        return equipe.equipe.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method1() {
+        return this.item.tout_monde;
+    }
+}
+MaterielCard.Namespace=`Inventaire`;
+MaterielCard.Tag=`av-materiel-card`;
+__as1(_, 'MaterielCard', MaterielCard);
+if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
+
+App.Http.Requests.EquipeRequest=class EquipeRequest {
+    id = undefined;
+    nom;
+}
+App.Http.Requests.EquipeRequest.Namespace=`Inventaire.App.Http.Requests`;
+__as1(_.App.Http.Requests, 'EquipeRequest', App.Http.Requests.EquipeRequest);
+
+App.Models.Equipe=class Equipe extends Aventus.Data {
+    static get Fullname() { return "App.Models.Equipe"; }
+    id;
+    nom;
+}
+App.Models.Equipe.Namespace=`Inventaire.App.Models`;
+App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
+__as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
 App.Models.MaterielEquipe=class MaterielEquipe extends Aventus.Data {
     static get Fullname() { return "App.Models.MaterielEquipe"; }
@@ -11471,7 +12425,9 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
+        blocks: { 'default':`<div class="content">
+    <slot></slot>
+</div>` }
     });
 }
     getClassName() {
@@ -11500,7 +12456,11 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll">    <div class="content">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll">
+    <div class="content">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -11522,7 +12482,17 @@ const Header = class Header extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content">    <div class="logo">Inventaire FC Vétroz</div>    <div class="menu">        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>        <div class="item">            <mi-icon icon="power_settings_new"></mi-icon>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="content">
+    <div class="logo">Inventaire FC Vétroz</div>
+    <div class="menu">
+        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
+        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>
+        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
+        <div class="item">
+            <mi-icon icon="power_settings_new"></mi-icon>
+        </div>
+    </div>
+</div>` }
     });
 }
     getClassName() {
@@ -11627,7 +12597,10 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
+    <av-button _id="confirm_2"></av-button>
+    <av-button color="primary" _id="confirm_3"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -11715,7 +12688,10 @@ const EquipeTag = class EquipeTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="equipetag_0"></span>    <mi-icon icon="delete" _id="equipetag_1"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="equipetag_0"></span>
+    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -11892,7 +12868,15 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
+    <div class="preview" _id="inputimage_1">
+        <av-img _id="inputimage_2"></av-img>
+        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
+    </div>
+    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
+</div><div class="errors">
+    <template _id="inputimage_5"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -11937,10 +12921,14 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+        <template _id="inputimage_6"></template>
+    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+            <div _id="inputimage_7"></div>
+        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -12134,7 +13122,13 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
+    <slot name="before"></slot>
+    <input _id="input_1" />
+    <slot name="after"></slot>
+</div><div class="errors">
+    <template _id="input_2"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12195,7 +13189,9 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="input_3"></div>
+    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -12269,7 +13265,12 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
+    <av-input label="Nom de la variation" _id="modaltag_1"></av-input>
+</div><div class="footer">
+    <av-button _id="modaltag_2">Annuler</av-button>
+    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12359,7 +13360,11 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="variationtag_0"></span>
+    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
+    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12429,7 +13434,8 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0">
+</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12510,7 +13516,9 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">
+    <div class="loader"></div>
+</div>` }
     });
 }
     getClassName() {
@@ -12798,7 +13806,9 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
+    <slot _id="iconaction_1"></slot>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12875,7 +13885,11 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>
+    <div class="container">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -12985,8 +13999,22 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <div class="error-logo">!</div>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
+    <slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>
+    <input id="input" autocomplete="off" _id="genericselect_3" />
+    <slot name="append"></slot>
+    <div class="error-logo">!</div>
+    <av-img src="/img/angle-left.svg" class="caret"></av-img>
+</div><div class="errors">
+    <template _id="genericselect_4"></template>
+</div><div class="hidden">
+    <slot></slot>
+</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13041,7 +14069,9 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="genericselect_5"></div>
+    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -13180,164 +14210,6 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
 }
 GenericSelect.Namespace=`Inventaire`;
 __as1(_, 'GenericSelect', GenericSelect);
-
-const SelectData = class SelectData extends GenericSelect {
-    get 'loading'() { return this.getBoolAttr('loading') }
-    set 'loading'(val) { this.setBoolAttr('loading', val) }get 'txt_undefined'() { return this.getStringAttr('txt_undefined') }
-    set 'txt_undefined'(val) { this.setStringAttr('txt_undefined', val) }    data = [];
-    isInit = false;
-    static __style = ``;
-    constructor() {
-        super();
-        if (this.constructor == SelectData) {
-            throw "can't instanciate an abstract class";
-        }
-        this.subscribe = this.subscribe.bind(this);
-        this.unsubscribe = this.unsubscribe.bind(this);
-        this.onCreated = this.onCreated.bind(this);
-        this.onDeleted = this.onDeleted.bind(this);
-        this.onUpdated = this.onUpdated.bind(this);
-    }
-    __getStatic() {
-        return SelectData;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(SelectData.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "SelectData";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('loading')) { this.attributeChangedCallback('loading', false, false); }if(!this.hasAttribute('txt_undefined')){ this['txt_undefined'] = undefined; } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('loading');this.__upgradeProperty('txt_undefined'); }
-    __listBoolProps() { return ["loading"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    compare(item1, item2) {
-        if (item1 === undefined && item2 === undefined) {
-            return true;
-        }
-        if (item1 === undefined || item2 === undefined) {
-            return false;
-        }
-        if (typeof item1 == 'number' || typeof item2 == 'number') {
-            return item1 == item2;
-        }
-        const key1 = this.defineRam().getId(item1);
-        const key2 = this.defineRam().getId(item2);
-        return key1 == key2;
-    }
-    itemToText(option) {
-        return option.getText();
-    }
-    defineOption() {
-        return OptionData;
-    }
-    getOption() {
-        const cst = this.defineOption();
-        let option = new cst();
-        option.init(this);
-        return option;
-    }
-    async createOptions() {
-        this.loading = true;
-        this.data = await this.loadData();
-        for (let child of this.children) {
-            child.remove();
-        }
-        if (this.txt_undefined !== undefined) {
-            let option = this.getOption();
-            await option.setItem(undefined);
-            if (this.compare(option.value, this.value)) {
-                this.selectedOption = option;
-                this.displayValue = this.itemToText(option);
-                this.filter();
-            }
-            option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
-            this.appendChild(option);
-        }
-        for (let item of this.data) {
-            let option = this.getOption();
-            await option.setItem(item);
-            if (this.compare(option.value, this.value)) {
-                this.selectedOption = option;
-                this.displayValue = this.itemToText(option);
-                this.filter();
-            }
-            this.appendChild(option);
-        }
-        this.loading = false;
-        this.init();
-    }
-    async loadData() {
-        const result = await Aventus.Process.execute(this.defineRam().getListWithError()) ?? [];
-        return result;
-    }
-    subscribe() {
-        this.defineRam().onCreated(this.onCreated);
-        this.defineRam().onUpdated(this.onUpdated);
-        this.defineRam().onDeleted(this.onDeleted);
-    }
-    unsubscribe() {
-        this.defineRam().offCreated(this.onCreated);
-        this.defineRam().offUpdated(this.onUpdated);
-        this.defineRam().offDeleted(this.onDeleted);
-    }
-    async onCreated(item) {
-        this.data.push(item);
-        let option = this.getOption();
-        await option.setItem(item);
-        this.appendChild(option);
-        this.loadElementsFromSlot();
-    }
-    async onDeleted(item) {
-        for (let i = 0; i < this.options.length; i++) {
-            let option = this.options[i];
-            let value = await this.optionValue(item);
-            if (this.compare(option.value, value)) {
-                this.options.splice(i, 1);
-                option.remove();
-                if (this.compare(this.value, value)) {
-                    this.value = undefined;
-                }
-            }
-        }
-    }
-    async onUpdated(item) {
-        for (let i = 0; i < this.options.length; i++) {
-            let option = this.options[i];
-            if (this.compare(option.value, await this.optionValue(item))) {
-                option.innerHTML = await this.optionText(item);
-            }
-        }
-    }
-    async init() {
-        if (!this.isConnected)
-            return;
-        if (this.isInit)
-            return;
-        this.isInit = true;
-        await this.createOptions();
-        super.postCreation();
-        this.subscribe();
-    }
-    postDestruction() {
-        super.postDestruction();
-        this.unsubscribe();
-    }
-    postConnect() {
-    }
-    postCreation() {
-        this.init();
-    }
-}
-SelectData.Namespace=`Inventaire`;
-__as1(_, 'SelectData', SelectData);
 
 const GenericOption = class GenericOption extends Aventus.WebComponent {
     value;
@@ -13540,6 +14412,164 @@ Select.Tag=`av-select`;
 __as1(_, 'Select', Select);
 if(!window.customElements.get('av-select')){window.customElements.define('av-select', Select);Aventus.WebComponentInstance.registerDefinition(Select);}
 
+const SelectData = class SelectData extends GenericSelect {
+    get 'loading'() { return this.getBoolAttr('loading') }
+    set 'loading'(val) { this.setBoolAttr('loading', val) }get 'txt_undefined'() { return this.getStringAttr('txt_undefined') }
+    set 'txt_undefined'(val) { this.setStringAttr('txt_undefined', val) }    data = [];
+    isInit = false;
+    static __style = ``;
+    constructor() {
+        super();
+        if (this.constructor == SelectData) {
+            throw "can't instanciate an abstract class";
+        }
+        this.subscribe = this.subscribe.bind(this);
+        this.unsubscribe = this.unsubscribe.bind(this);
+        this.onCreated = this.onCreated.bind(this);
+        this.onDeleted = this.onDeleted.bind(this);
+        this.onUpdated = this.onUpdated.bind(this);
+    }
+    __getStatic() {
+        return SelectData;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(SelectData.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "SelectData";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('loading')) { this.attributeChangedCallback('loading', false, false); }if(!this.hasAttribute('txt_undefined')){ this['txt_undefined'] = undefined; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('loading');this.__upgradeProperty('txt_undefined'); }
+    __listBoolProps() { return ["loading"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    compare(item1, item2) {
+        if (item1 === undefined && item2 === undefined) {
+            return true;
+        }
+        if (item1 === undefined || item2 === undefined) {
+            return false;
+        }
+        if (typeof item1 == 'number' || typeof item2 == 'number') {
+            return item1 == item2;
+        }
+        const key1 = this.defineRam().getId(item1);
+        const key2 = this.defineRam().getId(item2);
+        return key1 == key2;
+    }
+    itemToText(option) {
+        return option.getText();
+    }
+    defineOption() {
+        return OptionData;
+    }
+    getOption() {
+        const cst = this.defineOption();
+        let option = new cst();
+        option.init(this);
+        return option;
+    }
+    async createOptions() {
+        this.loading = true;
+        this.data = await this.loadData();
+        for (let child of this.children) {
+            child.remove();
+        }
+        if (this.txt_undefined !== undefined) {
+            let option = this.getOption();
+            await option.setItem(undefined);
+            if (this.compare(option.value, this.value)) {
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+            }
+            option.innerHTML = this.txt_undefined === "" ? "&nbsp;" : this.txt_undefined;
+            this.appendChild(option);
+        }
+        for (let item of this.data) {
+            let option = this.getOption();
+            await option.setItem(item);
+            if (this.compare(option.value, this.value)) {
+                this.selectedOption = option;
+                this.displayValue = this.itemToText(option);
+                this.filter();
+            }
+            this.appendChild(option);
+        }
+        this.loading = false;
+        this.init();
+    }
+    async loadData() {
+        const result = await Aventus.Process.execute(this.defineRam().getListWithError()) ?? [];
+        return result;
+    }
+    subscribe() {
+        this.defineRam().onCreated(this.onCreated);
+        this.defineRam().onUpdated(this.onUpdated);
+        this.defineRam().onDeleted(this.onDeleted);
+    }
+    unsubscribe() {
+        this.defineRam().offCreated(this.onCreated);
+        this.defineRam().offUpdated(this.onUpdated);
+        this.defineRam().offDeleted(this.onDeleted);
+    }
+    async onCreated(item) {
+        this.data.push(item);
+        let option = this.getOption();
+        await option.setItem(item);
+        this.appendChild(option);
+        this.loadElementsFromSlot();
+    }
+    async onDeleted(item) {
+        for (let i = 0; i < this.options.length; i++) {
+            let option = this.options[i];
+            let value = await this.optionValue(item);
+            if (this.compare(option.value, value)) {
+                this.options.splice(i, 1);
+                option.remove();
+                if (this.compare(this.value, value)) {
+                    this.value = undefined;
+                }
+            }
+        }
+    }
+    async onUpdated(item) {
+        for (let i = 0; i < this.options.length; i++) {
+            let option = this.options[i];
+            if (this.compare(option.value, await this.optionValue(item))) {
+                option.innerHTML = await this.optionText(item);
+            }
+        }
+    }
+    async init() {
+        if (!this.isConnected)
+            return;
+        if (this.isInit)
+            return;
+        this.isInit = true;
+        await this.createOptions();
+        super.postCreation();
+        this.subscribe();
+    }
+    postDestruction() {
+        super.postDestruction();
+        this.unsubscribe();
+    }
+    postConnect() {
+    }
+    postCreation() {
+        this.init();
+    }
+}
+SelectData.Namespace=`Inventaire`;
+__as1(_, 'SelectData', SelectData);
+
 const OptionData = class OptionData extends GenericOption {
     static __style = ``;
     __getStatic() {
@@ -13591,7 +14621,9 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
+    <av-button _id="alert_1"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13669,7 +14701,17 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="img"></div>    <div class="content">        <div class="title">Inventaire FC Vétroz</div>        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>        <div class="right">            <av-button type="submit" color="neutral">Login</av-button>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="img"></div>
+    <div class="content">
+        <div class="title">Inventaire FC Vétroz</div>
+        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>
+        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>
+        <div class="right">
+            <av-button type="submit" color="neutral">Login</av-button>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13721,6 +14763,8 @@ __as1(_, 'LoginPage', LoginPage);
 if(!window.customElements.get('av-login-page')){window.customElements.define('av-login-page', LoginPage);Aventus.WebComponentInstance.registerDefinition(LoginPage);}
 
 App.Http.Controllers.EquipeController=class EquipeController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Requests.EquipeRequest; }
+    getResource() { return _.App.Http.Resources.EquipeResource; }
     getUri() { return "data/equipe"; }
 }
 App.Http.Controllers.EquipeController.Namespace=`Inventaire.App.Http.Controllers`;
@@ -13744,12 +14788,6 @@ let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
      */
     defineIndexKey() {
         return 'id';
-    }
-    /**
-     * @inheritdoc
-     */
-    getTypeForData(objJson) {
-        return App.Models.Equipe;
     }
 }
 EquipeRAM.Namespace=`Inventaire`;
@@ -13809,7 +14847,12 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
+    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
+</div><div class="footer">
+    <av-button _id="modalequipe_2">Annuler</av-button>
+    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13899,106 +14942,9 @@ App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","no
 Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
 __as1(_.App.Models, 'Materiel', App.Models.Materiel);
 
-const MaterielCard = class MaterielCard extends Aventus.WebComponent {
-    get 'visible'() { return this.getBoolAttr('visible') }
-    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
-						return this.__watch["item"];
-					}
-					set 'item'(val) {
-						this.__watch["item"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("item");    super.__registerWatchesActions();
-}
-    static __style = `:host{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-width:400px;overflow:hidden;width:100%}:host .img{width:100%}:host .img av-img{aspect-ratio:1;width:100%}:host .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host .info .title{font-size:var(--font-size-md);margin-top:8px}:host .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host .visible{align-items:center;display:flex}:host .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
-    __getStatic() {
-        return MaterielCard;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(MaterielCard.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3" center>    <av-link to="/materiel/1">        <div class="img">            <av-img mode="cover" _id="materielcard_0"></av-img>        </div>        <div class="info">            <div class="title" _id="materielcard_1"></div>            <div class="variations">                <template _id="materielcard_2"></template>                <av-tag color="accent">S</av-tag>            </div>            <div class="visible">                <div>Visible pour :</div>                <template _id="materielcard_4"></template>            </div>        </div>    </av-link></av-col>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "materielcard_0°src": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
-      "once": true
-    },
-    "materielcard_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
-      "once": true
-    }
-  }
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                     <av-tag color="accent" _id="materielcard_3"></av-tag>                `);templ0.setActions({
-  "content": {
-    "materielcard_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5(c.data.variation))}`,
-      "once": true
-    }
-  }
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'materielcard_2',
-                    template: templ0,
-                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`                    <div>Tout le monde</div>                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                    <div class="visible-for">                        <template _id="materielcard_5"></template>                    </div>                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(`                             <av-tag color="accent" _id="materielcard_6"></av-tag>                        `);templ3.setActions({
-  "content": {
-    "materielcard_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.equipe))}`,
-      "once": true
-    }
-  }
-});templ2.addLoop({
-                    anchorId: 'materielcard_5',
-                    template: templ3,
-                simple:{data: "this.item.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materielcard_4',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
-                    template: templ1
-                },{once: true,
-                    condition: (c) => true,
-                    template: templ2
-                }]
-            }); }
-    getClassName() {
-        return "MaterielCard";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
-    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    getSrc() {
-        if (this.item.image?.uri) {
-            return this.item.image?.uri;
-        }
-        return "/img/default_img.svg";
-    }
-    __98d262679bf6afafa524060227ae1154method3() {
-        return this.getSrc();
-    }
-    __98d262679bf6afafa524060227ae1154method4() {
-        return this.item.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method5(variation) {
-        return variation.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method6(equipe) {
-        return equipe.equipe.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method1() {
-        return this.item.tout_monde;
-    }
-}
-MaterielCard.Namespace=`Inventaire`;
-MaterielCard.Tag=`av-materiel-card`;
-__as1(_, 'MaterielCard', MaterielCard);
-if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
-
 App.Http.Controllers.MaterielController=class MaterielController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Requests.MaterielRequest; }
+    getResource() { return _.App.Http.Resources.MaterielResource; }
     getUri() { return "data/materiel"; }
 }
 App.Http.Controllers.MaterielController.Namespace=`Inventaire.App.Http.Controllers`;
@@ -14022,12 +14968,6 @@ let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
      */
     defineIndexKey() {
         return 'id';
-    }
-    /**
-     * @inheritdoc
-     */
-    getTypeForData(objJson) {
-        return App.Models.Materiel;
     }
 }
 MaterielRAM.Namespace=`Inventaire`;
@@ -14056,7 +14996,39 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="materieldetailspage_0"></div>        <div class="actions">            <av-icon-action color="success" icon="save" _id="materieldetailspage_1">Enregistrer</av-icon-action>        </div>    </div>    <div class="body">        <av-row>            <av-col size="6">                <av-input-image label="Image" _id="materieldetailspage_2"></av-input-image>            </av-col>            <av-col size="6" class="contenu">                <av-input label="Nom du materiel" _id="materieldetailspage_3"></av-input>                <div class="tags">                    <div class="label">Variations</div>                    <av-variation-tags _id="materieldetailspage_4"></av-variation-tags>                </div>                <div class="tags">                    <div class="label pour">                        <span class="main-label">Pour :</span>                        <div class="toggle">                            <span class="sub-label" _id="materieldetailspage_5">Equipe spécifique</span>                            <av-toggle _id="materieldetailspage_6"></av-toggle>                            <span class="sub-label" _id="materieldetailspage_7">Tout le monde</span>                        </div>                    </div>                    <template _id="materieldetailspage_8"></template>                </div>            </av-col>        </av-row>    </div></div><template _id="materieldetailspage_10"></template>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="materieldetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="success" icon="save" _id="materieldetailspage_1">Enregistrer</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <av-row>
+            <av-col size="6">
+                <av-input-image label="Image" _id="materieldetailspage_2"></av-input-image>
+            </av-col>
+            <av-col size="6" class="contenu">
+                <av-input label="Nom du materiel" _id="materieldetailspage_3"></av-input>
+                <div class="tags">
+                    <div class="label">Variations</div>
+                    <av-variation-tags _id="materieldetailspage_4"></av-variation-tags>
+                </div>
+                <div class="tags">
+                    <div class="label pour">
+                        <span class="main-label">Pour :</span>
+                        <div class="toggle">
+                            <span class="sub-label" _id="materieldetailspage_5">Equipe spécifique</span>
+                            <av-toggle _id="materieldetailspage_6"></av-toggle>
+                            <span class="sub-label" _id="materieldetailspage_7">Tout le monde</span>
+                        </div>
+                    </div>
+                    <template _id="materieldetailspage_8"></template>
+                </div>
+            </av-col>
+        </av-row>
+    </div>
+</div><template _id="materieldetailspage_10"></template>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14106,7 +15078,9 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
       "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                        <av-equipe-tags _id="materieldetailspage_9"></av-equipe-tags>                    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                        <av-equipe-tags _id="materieldetailspage_9"></av-equipe-tags>
+                    `);templ0.setActions({
   "injection": [
     {
       "id": "materieldetailspage_9",
@@ -14121,7 +15095,32 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                     condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`    <div class="card by-equipe">        <div class="header">            <div class="title">Liste dans les équipes</div>        </div>        <div class="body">            <div class="list">                <template _id="materieldetailspage_11"></template>            </div>        </div>    </div>    `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                     <div class="item">                        <div class="line">                            <div class="nom">U18</div>                            <div class="quantite">21</div>                            <div class="modification">                                <div class="actions">                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>                                </div>                                <span>Maxime, le 24.08.2025</span>                            </div>                        </div>                    </div>                `);templ1.addLoop({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+    <div class="card by-equipe">
+        <div class="header">
+            <div class="title">Liste dans les équipes</div>
+        </div>
+        <div class="body">
+            <div class="list">
+                <template _id="materieldetailspage_11"></template>
+            </div>
+        </div>
+    </div>
+    `);const templ2 = new Aventus.Template(this);templ2.setTemplate(` 
+                    <div class="item">
+                        <div class="line">
+                            <div class="nom">U18</div>
+                            <div class="quantite">21</div>
+                            <div class="modification">
+                                <div class="actions">
+                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
+                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                                </div>
+                                <span>Maxime, le 24.08.2025</span>
+                            </div>
+                        </div>
+                    </div>
+                `);templ1.addLoop({
                     anchorId: 'materieldetailspage_11',
                     template: templ2,
                 func: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3()});this.__getStatic().__template.addIf({
@@ -14141,7 +15140,9 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         }
         const id = slugs['id'];
         if (id == 0) {
-            let newItem = new App.Models.Materiel();
+            let newItem = new App.Http.Requests.MaterielRequest();
+            newItem.id = 0;
+            newItem.tout_monde = true;
             newItem.image = new App.Models.MaterielImage();
             newItem.variations = [];
             let v1 = new App.Models.Variation();
@@ -14154,20 +15155,21 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             this.form.item = newItem;
         }
         else {
-            const item = await MaterielRAM.getInstance().getById(id);
+            const ram = MaterielRAM.getInstance();
+            const item = await ram.getById(id);
             if (!item) {
                 return "/materiel";
             }
-            this.form.item = item;
+            this.form.item = ram.toRequest(item);
         }
         return true;
     }
     configure() {
         return {};
     }
-    save() {
+    async save() {
         console.log(this.form.item);
-        MaterielRAM.getInstance().saveWithError(this.form.item);
+        await this.form.execute(MaterielRAM.getInstance().saveWithError);
     }
     getTitle() {
         if (this.form.item?.id) {
@@ -14226,6 +15228,8 @@ __as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
 if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
 
 App.Http.Controllers.UserController=class UserController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Requests.UserRequest; }
+    getResource() { return _.App.Http.Resources.UserResource; }
     getUri() { return "data/user"; }
 }
 App.Http.Controllers.UserController.Namespace=`Inventaire.App.Http.Controllers`;
@@ -14250,12 +15254,6 @@ let UserRAM=class UserRAM extends AventusPhp.RamHttp {
     defineIndexKey() {
         return 'id';
     }
-    /**
-     * @inheritdoc
-     */
-    getTypeForData(objJson) {
-        return App.Models.User;
-    }
 }
 UserRAM.Namespace=`Inventaire`;
 __as1(_, 'UserRAM', UserRAM);
@@ -14279,7 +15277,10 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">    <av-button _id="equipeeditmodal_2">Annuler</av-button>    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">
+    <av-button _id="equipeeditmodal_2">Annuler</av-button>
+    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14329,11 +15330,11 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     static async open(item) {
         const modal = new EquipeEditModal();
         modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
-        item = item ? item.clone() : new App.Models.Equipe();
-        if (!item.id) {
-            item.id = 0;
+        const clone = item ? item.clone() : new App.Http.Resources.EquipeResource();
+        if (!clone.id) {
+            clone.id = 0;
         }
-        modal.form.item = item;
+        modal.form.item = EquipeRAM.getInstance().toRequest(clone);
         return await EquipeEditModal._show(modal);
     }
 }
@@ -14362,7 +15363,23 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="equipedetailspage_0"></div>        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>        </div>    </div>    <div class="body">        <div class="title">            <span>Liste de matériel</span>        </div>        <div class="list">            <template _id="equipedetailspage_3"></template>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="equipedetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
+            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <div class="title">
+            <span>Liste de matériel</span>
+        </div>
+        <div class="list">
+            <template _id="equipedetailspage_3"></template>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14382,7 +15399,22 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
       "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                 <div class="item">                    <div class="line">                        <div class="img"></div>                        <div class="nom">Nom de l'article</div>                        <div class="quantite">21</div>                        <div class="modification">                            <div class="actions">                                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_4">Modifier</av-icon-action>                                <av-icon-action color="info" icon="history" _id="equipedetailspage_5">Historique</av-icon-action>                            </div>                            <span>Maxime, le 24.08.2025</span>                        </div>                    </div>                </div>            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+                <div class="item">
+                    <div class="line">
+                        <div class="img"></div>
+                        <div class="nom">Nom de l'article</div>
+                        <div class="quantite">21</div>
+                        <div class="modification">
+                            <div class="actions">
+                                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_4">Modifier</av-icon-action>
+                                <av-icon-action color="info" icon="history" _id="equipedetailspage_5">Historique</av-icon-action>
+                            </div>
+                            <span>Maxime, le 24.08.2025</span>
+                        </div>
+                    </div>
+                </div>
+            `);templ0.setActions({
   "pressEvents": [
     {
       "id": "equipedetailspage_4",
@@ -14469,7 +15501,19 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des équipes</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
+            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="equipespage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14600,7 +15644,19 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste du matériel</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
+            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <av-row class="list" _id="materielpage_2">
+        </av-row>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14655,7 +15711,7 @@ const MaterielPage = class MaterielPage extends PageFull {
         Main.instance.navigate("/materiel/0");
     }
     async bindData() {
-        let list = await MaterielRAM.getInstance().getList();
+        let list = await Aventus.Process.execute(MaterielRAM.getInstance().getListWithError()) ?? [];
         list.sort((a, b) => a.nom.localeCompare(a.nom));
         for (let item of list) {
             let el = new MaterielCard();
@@ -14740,7 +15796,17 @@ const UserEditModal = class UserEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>    <av-col size="12" size_xs="6">        <av-input label="Nom" _id="usereditmodal_1"></av-input>    </av-col>    <av-col size="12" size_xs="6">        <av-input label="Prénom" _id="usereditmodal_2"></av-input>    </av-col></av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">    <av-button _id="usereditmodal_5">Annuler</av-button>    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>
+    <av-col size="12" size_xs="6">
+        <av-input label="Nom" _id="usereditmodal_1"></av-input>
+    </av-col>
+    <av-col size="12" size_xs="6">
+        <av-input label="Prénom" _id="usereditmodal_2"></av-input>
+    </av-col>
+</av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">
+    <av-button _id="usereditmodal_5">Annuler</av-button>
+    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14848,7 +15914,10 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
+    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14918,7 +15987,19 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des utilisateurs</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
+            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="userspage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15044,7 +16125,11 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`    <av-header></av-header>`,'after':`    <av-footer></av-footer>` }
+        blocks: { 'before':`
+    <av-header></av-header>
+`,'after':`
+    <av-footer></av-footer>
+` }
     });
 }
     getClassName() {
@@ -15067,6 +16152,55 @@ const Main = class Main extends Aventus.Navigation.Router {
         Main.instance = this;
         Aventus.Modal.ModalElement.configure({
             closeWithClick: false
+        });
+        Aventus.Form.Form.configure({
+            handleExecuteNoInputError: (errors) => {
+                if (errors.length > 0) {
+                    let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                    Alert.open({
+                        title: "Execution error",
+                        content: msg,
+                    });
+                }
+            },
+            handleValidateNoInputError: (errors) => {
+                const li = [];
+                for (let key in errors) {
+                    if (errors[key]) {
+                        for (let msg of errors[key]) {
+                            li.push(`<li>${key} : ${msg}</li>`);
+                        }
+                    }
+                }
+                Alert.open({
+                    title: "Form validation error",
+                    content: `<p>The form can't be validated because of :</p><ul>${li.join("")}</ul>`
+                });
+            }
+        });
+        Aventus.HttpRequest.configure({
+            beforeSend: (request) => {
+                const result = new Aventus.VoidWithError();
+                // request.setCredentials("include");
+                // if(this.indexResource.user) {
+                //     request.setHeader("Authorization", "Bearer " + this.bearer);
+                // }
+                return result;
+            },
+            responseMiddleware: (response, request) => {
+                if (response.containsCode(401)) {
+                    location.reload();
+                }
+                return response;
+            }
+        });
+        Aventus.Process.configure({
+            handleErrors: (msg) => {
+                Alert.open({
+                    title: "Execution error",
+                    content: msg,
+                });
+            }
         });
     }
 }
@@ -15092,7 +16226,8 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0">
+</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

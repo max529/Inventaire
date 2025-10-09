@@ -2,6 +2,7 @@
 
 return [
     "model" => [
-        "timestamps" => false
+        "timestamps" => false,
+        "only_fillable" => false
     ]
 ];

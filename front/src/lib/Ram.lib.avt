@@ -1,0 +1,3 @@
+import type { IRamData } from "Aventus@Main:Aventus.package.avt";
+
+export type Ram<T extends IRamData> = Aventus.Ram<T> | AventusPhp.RamHttp<AventusPhp.ModelController<any, any, T>>

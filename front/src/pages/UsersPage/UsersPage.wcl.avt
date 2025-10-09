@@ -6,6 +6,7 @@ import { UserRAM } from "../../ram/User.ram.avt";
 import { UserEditModal } from "./components/UserEditModal/UserEditModal.wcl.avt";
 import { UserItem } from "./components/UserItem/UserItem.wcl.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+import type { UserResource } from "../../generated/app/Http/Resources/UserResource.lib.avt";
 
 export class UsersPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -86,7 +87,7 @@ export class UsersPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onNewData(user: User) {
+    protected onNewData(user: UserResource) {
         let itemBefore: UserItem | undefined = undefined;
         for(let item of this.list) {
             if(itemBefore == null && user.nom.localeCompare(item.item.nom) < 0) {
@@ -116,7 +117,7 @@ export class UsersPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onRemoveData(user: User) {
+    protected onRemoveData(user: UserResource) {
         for(let item of this.list) {
             if(item.item.id == user.id) {
                 item.remove();

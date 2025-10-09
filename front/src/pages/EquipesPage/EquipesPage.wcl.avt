@@ -6,6 +6,7 @@ import { EquipeItem } from "./components/EquipeItem/EquipeItem.wcl.avt";
 import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
+import type { EquipeResource } from "../../generated/app/Http/Resources/EquipeResource.lib.avt";
 
 export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -86,7 +87,7 @@ export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onNewData(newData: Equipe) {
+    protected onNewData(newData: EquipeResource) {
         let itemBefore: EquipeItem | undefined = undefined;
         for(let item of this.list) {
             if(itemBefore == null && newData.nom.localeCompare(item.item.nom) < 0) {
@@ -116,7 +117,7 @@ export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onRemoveData(Equipe: Equipe) {
+    protected onRemoveData(Equipe: EquipeResource) {
         for(let item of this.list) {
             if(item.item.id == Equipe.id) {
                 item.remove();

@@ -11,7 +11,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "D:\\Aventus\\LarAventus\\Laraventus"
+            "url": "C:\\Projets\\av\\Laraventus\\Laraventus"
         }
     ],
     "require": {

@@ -1,8 +1,10 @@
 import { SelectData } from "../../../../components/form/select/SelectData/SelectData.wcl.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
 import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import type { Ram } from "../../../../lib/Ram.lib.avt";
 import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
 
-export class EquipeSelect extends SelectData<Equipe> implements Aventus.DefaultComponent {
+export class EquipeSelect extends SelectData<EquipeResource> implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -28,9 +30,11 @@ export class EquipeSelect extends SelectData<Equipe> implements Aventus.DefaultC
     /**
      * @inheritdoc
      */
-    protected override defineRam(): Aventus.Ram<Equipe, Equipe> {
-        return EquipeRAM.getInstance();
+    protected override defineRam(): Ram<EquipeResource> {
+       return EquipeRAM.getInstance();
     }
+
+   
     /**
      * @inheritdoc
      */

@@ -5,7 +5,12 @@ import { EquipeResource } from '../Resources/EquipeResource.lib.avt';
 namespace App.Http.Controllers {
 
 	export class EquipeController extends AventusPhp.ModelController<Equipe, EquipeRequest, EquipeResource> {
-public override getUri(): string { return "data/equipe"; }
+		/** @inheritdoc */
+		public override getRequest(): new () => EquipeRequest { return EquipeRequest; }
+		/** @inheritdoc */
+		public override getResource(): new () => EquipeResource { return EquipeResource; }
+		/** @inheritdoc */
+		public override getUri(): string { return "data/equipe"; }
 	}
 
 }

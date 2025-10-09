@@ -7,6 +7,8 @@ import { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";
 import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
+import type { MaterielResource } from "../../generated/app/Http/Resources/MaterielResource.lib.avt";
+import { Process } from "Aventus@UI:Aventus.package.avt";
 
 export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -69,7 +71,7 @@ export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     protected async bindData() {
-        let list = await MaterielRAM.getInstance().getList();
+        let list = await Process.execute(MaterielRAM.getInstance().getListWithError()) ?? [];
         list.sort((a, b) => a.nom.localeCompare(a.nom));
 
         for(let item of list) {
@@ -87,7 +89,7 @@ export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onNewData(materiel: Materiel) {
+    protected onNewData(materiel: MaterielResource) {
         let itemBefore: MaterielCard | undefined = undefined;
         for(let item of this.list) {
             if(itemBefore == null && materiel.nom.localeCompare(item.item.nom) < 0) {
@@ -117,7 +119,7 @@ export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
     }
 
     @BindThis()
-    protected onRemoveData(materiel: Materiel) {
+    protected onRemoveData(materiel: MaterielResource) {
         for(let item of this.list) {
             if(item.item.id == materiel.id) {
                 item.remove();

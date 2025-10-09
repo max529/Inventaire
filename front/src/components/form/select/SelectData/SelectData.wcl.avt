@@ -1,6 +1,8 @@
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { GenericSelect } from "../GenericSelect/GenericSelect.wcl.avt";
 import { OptionData } from "./OptionData/OptionData.wcl.avt";
+import type { ModelController } from "Aventus@Php:AventusPhp.package.avt";
+import type { Ram } from "../../../../lib/Ram.lib.avt";
 
 export abstract class SelectData<U extends Aventus.IData, T extends U | number = U, R extends OptionData<T, U> = OptionData<T, U>> extends GenericSelect<R, T> implements Aventus.DefaultComponent {
 
@@ -96,7 +98,7 @@ export abstract class SelectData<U extends Aventus.IData, T extends U | number =
         }
 
 
-        protected abstract defineRam(): Aventus.Ram<U>;
+        protected abstract defineRam(): Ram<U>;
         protected async loadData(): Promise<Aventus.RamItem<U>[]> {
             const result = await Process.execute(this.defineRam().getListWithError()) ?? [];
             return result;

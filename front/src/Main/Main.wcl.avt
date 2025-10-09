@@ -5,6 +5,10 @@ import { UsersPage } from "../pages/UsersPage/UsersPage.wcl.avt";
 import { ModalElement } from "Aventus@UI:Aventus.Modal.package.avt";
 import { MaterielPage } from "../pages/MaterielPage/MaterielPage.wcl.avt";
 import { MaterielDetailsPage } from "../pages/MaterielDetailsPage/MaterielDetailsPage.wcl.avt";
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { Alert } from "../components/interaction/Alert/Alert.wcl.avt";
+import { HttpRequest, VoidWithError } from "Aventus@Main:Aventus.package.avt";
+import { Form } from "Aventus@UI:Aventus.Form.package.avt";
 
 export class Main extends Router implements Aventus.DefaultComponent {
 
@@ -51,6 +55,55 @@ export class Main extends Router implements Aventus.DefaultComponent {
 
         ModalElement.configure({
             closeWithClick: false
+        });
+        Form.configure({
+            handleExecuteNoInputError: (errors) => {
+                if(errors.length > 0) {
+                    let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                    Alert.open({
+                        title: "Execution error",
+                        content: msg,
+                    });
+                }
+            },
+            handleValidateNoInputError: (errors) => {
+                const li: string[] = [];
+                for(let key in errors) {
+                    if(errors[key]) {
+                        for(let msg of errors[key]) {
+                            li.push(`<li>${key} : ${msg}</li>`);
+                        }
+                    }
+                }
+                Alert.open({
+                    title: "Form validation error",
+                    content: `<p>The form can't be validated because of :</p><ul>${li.join("")}</ul>`
+                });
+            }
+        });
+        HttpRequest.configure({
+            beforeSend: (request) => {
+                const result = new VoidWithError();
+                // request.setCredentials("include");
+                // if(this.indexResource.user) {
+                //     request.setHeader("Authorization", "Bearer " + this.bearer);
+                // }
+                return result;
+            },
+            responseMiddleware: (response, request) => {
+                if(response.containsCode(401)) {
+                    location.reload();
+                }
+                return response;
+            }
+        });
+        Process.configure({
+            handleErrors: (msg) => {
+                Alert.open({
+                    title: "Execution error",
+                    content: msg,
+                });
+            }
         });
     }
 

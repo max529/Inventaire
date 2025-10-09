@@ -4,12 +4,13 @@ import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
 import type { UserRequest } from "../../../../generated/app/Http/Requests/UserRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { UserRAM } from "../../../../ram/User.ram.avt";
+import type { UserResource } from "../../../../generated/app/Http/Resources/UserResource.lib.avt";
 
 
-export class UserEditModal extends Modal<User> implements Aventus.DefaultComponent {
+export class UserEditModal extends Modal<UserResource> implements Aventus.DefaultComponent {
 
     //#region static
-    public static async open(item?: User): Promise<User | null> {
+    public static async open(item?: UserResource): Promise<UserResource | null> {
         const modal = new UserEditModal();
         modal.options.title = item ? "Edition d'un utilisateur" : "Création d'un utilisateur";
         item = item ? item.clone() : new User();
