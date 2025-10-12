@@ -1,9 +1,10 @@
 import { PageFormRoute } from "Aventus@UI:Aventus.Navigation.package.avt";
-import { AuthController } from "../../generated/app/Http/Controllers/AuthController.lib.avt";
-import type { LoginRequest } from "../../generated/app/Http/Requests/LoginRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+import { AuthLoginController } from "../../generated/app/Http/Controllers/Auth/Login/Controller.lib.avt";
+import type { Response } from "../../generated/app/Http/Controllers/Auth/Login/Response.lib.avt";
+import type { Request } from "../../generated/app/Http/Controllers/Auth/Login/Request.lib.avt";
 
-export class LoginPage extends PageFormRoute<typeof AuthController, "login"> implements Aventus.DefaultComponent {
+export class LoginPage extends PageFormRoute<typeof AuthLoginController> implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -26,16 +27,18 @@ export class LoginPage extends PageFormRoute<typeof AuthController, "login"> imp
 
 
     //#region methods
+
+
     /**
      * @inheritdoc
      */
-    public override route(): [typeof AuthController, "login"] {
-        return [AuthController, "login"];
+    public override route(): typeof AuthLoginController {
+        return AuthLoginController;
     }
     /**
      * @inheritdoc
      */
-    public override onResult(result: Aventus.ResultWithError<boolean, Aventus.GenericError<any>> | null): Aventus.Asyncable<void> {
+    public override onResult(result: Aventus.ResultWithError<Response, Aventus.GenericError<any>> | null): Aventus.Asyncable<void> {
         if(result?.result) {
             window.location.href = "/";
         }
@@ -43,12 +46,13 @@ export class LoginPage extends PageFormRoute<typeof AuthController, "login"> imp
     /**
      * @inheritdoc
      */
-    protected override formSchema(): Aventus.Form.FormSchema<LoginRequest> {
+    protected override formSchema(): Aventus.Form.FormSchema<Request> {
         return {
             nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
             mot_passe: new Required("Le mot de passe est requis"),
         };
     }
+
     /**
      * @inheritdoc
      */

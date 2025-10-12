@@ -1,5 +1,5 @@
-<av-col size="12" size_sm="4" size_md="3" center>
-    <av-link to="/materiel/1">
+<av-col size="12" size_sm="4" size_md="3">
+    <av-link to="/materiel/{{ this.item.id }}">
         <div class="img">
             <av-img src="{{ this.getSrc() }}" mode="cover"></av-img>
         </div>
@@ -9,7 +9,6 @@
                 for(let variation of this.item.variations) { 
                     <av-tag color="accent">{{ variation.nom }}</av-tag>
                 }
-                <av-tag color="accent">S</av-tag>
             </div>
             <div class="visible">
                 <div>Visible pour :</div>

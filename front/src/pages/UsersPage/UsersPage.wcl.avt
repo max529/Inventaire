@@ -1,12 +1,11 @@
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
 import type { Input } from "../../components/form/Input/Input.wcl.avt";
-import type { User } from "../../generated/app/Models/User.lib.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
 import { UserRAM } from "../../ram/User.ram.avt";
 import { UserEditModal } from "./components/UserEditModal/UserEditModal.wcl.avt";
 import { UserItem } from "./components/UserItem/UserItem.wcl.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
-import type { UserResource } from "../../generated/app/Http/Resources/UserResource.lib.avt";
+import type { UserResource } from "../../generated/app/Http/Controllers/User/UserResource.lib.avt";
 
 export class UsersPage extends PageFull implements Aventus.DefaultComponent {
 

@@ -1,4 +1,4 @@
-import type { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 
 export class EquipeItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
 

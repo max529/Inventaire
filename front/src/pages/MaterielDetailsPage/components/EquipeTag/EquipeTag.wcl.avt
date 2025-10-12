@@ -1,6 +1,7 @@
 import { Callback } from "Aventus@Main:Aventus.package.avt";
 import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
 import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
+import type { MaterielEquipe } from "../../../../generated/app/Models/MaterielEquipe.lib.avt";
 
 export class EquipeTag extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -19,7 +20,7 @@ export class EquipeTag extends Aventus.WebComponent implements Aventus.DefaultCo
     @ViewElement()
     protected componentEl!: HTMLSpanElement;
     // @Watch()
-    public equipe!: Equipe;
+    public equipe!: MaterielEquipe;
 
     //#endregion
 
@@ -58,7 +59,7 @@ export class EquipeTag extends Aventus.WebComponent implements Aventus.DefaultCo
      */
     protected async triggerDelete() {
         const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
+            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.equipe.nom + "?"
         });
         if(result) {
             this.onDelete.trigger(this);
@@ -67,7 +68,7 @@ export class EquipeTag extends Aventus.WebComponent implements Aventus.DefaultCo
 
     protected override postCreation(): void {
         super.postCreation();
-        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.nom);
+        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.equipe.nom);
     }
 	//#endregion
 	

@@ -1,1 +1,21 @@
-<slot></slot>
+<div class="toast-content">
+    <div class="toast-flex">
+        <div class="toast-icon-wrapper">
+            <mi-icon icon="{{ this.getIcon() }}" class="toast-icon" aria-hidden="true"></mi-icon>
+        </div>
+        <div class="toast-message-wrapper">
+            if(this.toastTitle) {
+                <p class="toast-title">{{ this.toastTitle }}</p>
+            }
+            if(this.toastMessage) {
+                <p class="toast-message">{{ this.toastMessage }}</p>
+            }
+        </div>
+        <div class="toast-close-wrapper">
+            <button @click="close" class="toast-close-button">
+                <span class="sr-only">Close</span>
+                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
+            </button>
+        </div>
+    </div>
+</div>

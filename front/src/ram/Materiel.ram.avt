@@ -1,6 +1,6 @@
-import { MaterielController } from "../generated/app/Http/Controllers/MaterielController.lib.avt";
-import { MaterielResource } from "../generated/app/Http/Resources/MaterielResource.lib.avt";
-import { Materiel } from "../generated/app/Models/Materiel.lib.avt";
+import { MaterielController } from "../generated/app/Http/Controllers/Materiel/MaterielController.lib.avt";
+import type { MaterielResource } from "../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+
 
 export class MaterielRAM extends AventusPhp.RamHttp<MaterielController> implements Aventus.IRam {
     /**

@@ -130,6 +130,10 @@
 						flex-direction: column;
 						font-size: var(--font-size-sm);
 
+						.actions {
+							display: flex;
+						}
+
 						av-icon-action {
 							width: fit-content;
 							// transform: translateY(57px);

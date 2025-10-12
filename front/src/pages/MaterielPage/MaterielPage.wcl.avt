@@ -5,10 +5,9 @@ import { MaterielCard } from "./components/MaterielCard/MaterielCard.wcl.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
 import { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";
-import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
-import type { MaterielResource } from "../../generated/app/Http/Resources/MaterielResource.lib.avt";
 import { Process } from "Aventus@UI:Aventus.package.avt";
+import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 
 export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
 

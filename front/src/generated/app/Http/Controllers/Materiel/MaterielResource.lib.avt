@@ -1,0 +1,18 @@
+import { Variation } from '../../../Models/Variation.lib.avt';
+import { MaterielEquipeResource } from './MaterielEquipeResource.lib.avt';
+import { MaterielImage } from '../../../Models/MaterielImage.lib.avt';
+
+namespace App.Http.Controllers.Materiel {
+
+	@Convertible()
+	export class MaterielResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.MaterielResource"; }
+		public variations!: Variation[];
+		public equipes!: MaterielEquipeResource[];
+		public id!: number;
+		public nom!: string;
+		public image: MaterielImage = new MaterielImage();
+		public tout_monde!: boolean;
+	}
+
+}

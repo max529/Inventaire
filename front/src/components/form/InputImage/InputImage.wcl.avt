@@ -57,6 +57,7 @@ export class InputImage extends FormElement<AventusFile> implements Aventus.Defa
     protected setPreview() {
         if(!this.value?.uri) {
             this.previewUri = this.no_default_preview ? '' : this.default_preview;
+            this.show_delete = false;
         }
         else {
             this.previewUri = this.value.uri;
@@ -96,6 +97,10 @@ export class InputImage extends FormElement<AventusFile> implements Aventus.Defa
      */
     protected deleteFile() {
         this.inputFileEl.value = '';
+        if(this.value !== undefined) {
+            this.value.uri = "";
+            this.onChange.trigger(this.value);
+        }
         this.updateFile();
     }
 

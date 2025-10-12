@@ -1,0 +1,16 @@
+import { Variation } from '../../../Models/Variation.lib.avt';
+import { MaterielEquipe } from '../../../Models/MaterielEquipe.lib.avt';
+import { MaterielImage } from '../../../Models/MaterielImage.lib.avt';
+
+namespace App.Http.Controllers.Materiel {
+
+	export class MaterielRequest {
+		public variations!: Variation[];
+		public equipes!: MaterielEquipe[];
+		public id?: number = undefined;
+		public nom!: string;
+		public image?: MaterielImage = undefined;
+		public tout_monde!: boolean;
+	}
+
+}

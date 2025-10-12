@@ -1,98 +1,83 @@
-:host {
-	--_select-height: var(--select-height, 30px);
-	--_select-background-color: var(--select-background-color, var(--form-element-background, white));
-	--_select-icon-height: var(--select-icon-height, calc(var(--_select-height) / 2));
-	--_select-error-logo-size: var(--select-error-logo-size, calc(var(--_select-height) / 2));
-	--_select-font-size: var(--select-font-size, var(--form-element-font-size, 16px));
-	--_select-font-size-label: var(--select-font-size-label, var(--form-element-font-size-label, calc(var(--_select-font-size) * 0.95)));
-	--_select-select-border: var(--select-select-border, var(--form-element-border, 1px solid var(--lighter-active)));
-	--_generic-select-border-radius: var(--generic-select-border-radius, var(--form-element-border-radius, 0));
-	--_select-caret-height: var(--select-caret-height, calc(var(--_select-height) / 2));
-	--_select-caret-color: var(--select-caret-color, var(--form-element-color));
-}
+@import '@functions';
 
 :host {
+	--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);
+	color: var(--color-base-content);
 	min-width: 100px;
+	width: 100%;
 	width: 100%;
 
 	label {
 		cursor: pointer;
-		display: none;
-		font-size: var(--_select-font-size-label);
-		margin-bottom: 5px;
-		margin-left: 3px;
+		display: block;
+		font-size: calc(var(--font-size) * 0.85);
+		margin-bottom: 6px;
 	}
 
 	.input {
 		align-items: center;
-		background-color: var(--_select-background-color);
-		border: var(--_select-select-border);
-		border-radius: var(--_generic-select-border-radius);
+		background-color: var(--color-base-100);
+		border: 1px solid var(--input-color);
+		border-end-end-radius: var(--join-ee, var(--radius-field));
+		border-end-start-radius: var(--join-es, var(--radius-field));
+		border-start-end-radius: var(--join-se, var(--radius-field));
+		border-start-start-radius: var(--join-ss, var(--radius-field));
+		box-shadow: 0 1px color-mix(in oklab, var(--input-color)calc(var(--depth)*10%), #0000) inset, 0 -1px oklch(100% 0 0/calc(var(--depth)*.1)) inset;
 		cursor: pointer;
 		display: flex;
-		height: var(--_select-height);
-		padding: 0 10px;
+		padding: 0 8px;
 		width: 100%;
 
 		.icon {
 			display: none;
-			height: var(--_select-icon-height);
+			height: calc(var(--font-size) * 0.95);
 			margin-right: 10px;
 		}
 
 		av-img.caret {
-			--img-fill-color: var(--_select-caret-color);
+			--img-fill-color: var(--color-base-content);
 			--img-stroke-width: 0;
 			aspect-ratio: 1;
 			flex-grow: 0;
 			flex-shrink: 0;
-			height: var(--_select-caret-height);
+			height: calc(var(--font-size) * 0.95);
 			transform: rotate(-90deg);
 			transition: transform 0.5s ease-in-out;
 		}
 
 		input {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
 			background-color: transparent;
 			border: none;
-			color: var(--text-color);
-			display: block;
+			color: inherit;
 			flex-grow: 1;
-			font-size: var(--_select-font-size);
-			height: 100%;
-			margin: 0;
-			opacity: 1;
+			font-size: calc(var(--font-size) * 0.95);
 			outline: none;
-			padding: 5px 0;
-			padding-right: 10px;
-			-webkit-text-fill-color: var(--text-color);
-			width: 100%;
+			outline-style: none;
+			padding: 8px 0;
 		}
 
-		.error-logo {
-			align-items: center;
-			background-color: var(--red);
-			border-radius: var(--border-radius-round);
-			color: white;
-			display: none;
-			flex-shrink: 0;
-			font-size: calc(var(--_select-error-logo-size) - 5px);
-			height: var(--_select-error-logo-size);
-			justify-content: center;
-			width: var(--_select-error-logo-size);
+		input:-webkit-autofill,
+		input:-webkit-autofill:hover,
+		input:-webkit-autofill:focus,
+		input:-webkit-autofill:active {
+			-webkit-box-shadow: 0 0 0 30px var(--color-base-100) inset !important;
+			-webkit-text-fill-color: var(--color-base-content);
 		}
+
+		input::placeholder {
+			color: color-mix(in srgb, var(--color-base-content)20%, transparent);
+		}
+
+
 	}
 
 	.errors {
-		color: var(--red);
-		display: none;
-		font-size: var(--font-size-sm);
-		line-height: 1.1;
-		margin: 10px;
-		margin-bottom: 0px;
-
-		div {
-			margin: 5px 0;
-		}
+		color: var(--color-error);
+		font-size: calc(var(--font-size) * 0.8);
+		margin-top: 6px;
 	}
 
 	.hidden {
@@ -100,19 +85,31 @@
 	}
 }
 
-:host([has_errors]) {
-	.input {
-		border: 1px solid var(--red);
-
-		.error-logo {
-			display: flex;
-		}
-	}
-
-	.errors {
-		display: block;
+:host(:not([label])),
+:host([label=""]) {
+	.label {
+		display: none;
 	}
 }
+
+:host(:not([has_errors])) {
+	.errors {
+		display: none;
+	}
+}
+
+:host([disabled]) {
+	.input {
+		input {
+			background-color: var(--color-base-200);
+			border-color: var(--color-base-200);
+			box-shadow: none;
+			color: color-mix(in srgb, var(--color-base-content)40%, transparent);
+			cursor: not-allowed;
+		}
+	}
+}
+
 
 :host([icon]:not([icon=""])) {
 	.input {
@@ -122,16 +119,41 @@
 	}
 }
 
-:host([label]:not([label=""])) {
-	label {
-		display: flex;
-	}
-}
 
 :host([open]) {
 	.input {
 		.caret {
 			transform: rotate(-270deg);
 		}
+	}
+}
+
+
+@supports (color: color-mix(in lab, red, red)) {
+	:host {
+		--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000);
+
+		.input {
+			input::placeholder {
+				color: color-mix(in oklab, var(--color-base-content)20%, transparent);
+			}
+		}
+	}
+
+	:host([disabled]) {
+		.input {
+			input {
+				color: color-mix(in oklab, var(--color-base-content)40%, transparent);
+			}
+		}
+	}
+}
+
+@include eachColor using ($color) {
+
+	:host([color="#{$color}"]),
+	:host([color="#{$color}"]):focus,
+	:host([color="#{$color}"]):focus-within {
+		--input-color: var(--color-#{$color});
 	}
 }

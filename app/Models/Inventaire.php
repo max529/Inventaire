@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Aventus\Laraventus\Models\AventusModel;
+use DateTime;
 
 /**
  * @property int $id
@@ -10,6 +11,8 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property int $id_materiel
  * @property ?int $id_variation
  * @property float $quantite
+ * @property DateTime $lastUpdate
+ * @property string $lastUpdateBy
  */
 class Inventaire extends AventusModel {
 }

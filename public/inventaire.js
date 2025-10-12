@@ -434,33 +434,6 @@ let ElementExtension=class ElementExtension {
 ElementExtension.Namespace=`Aventus`;
 __as1(_, 'ElementExtension', ElementExtension);
 
-let Instance=class Instance {
-    static elements = new Map();
-    static get(type) {
-        let result = this.elements.get(type);
-        if (!result) {
-            let cst = type.prototype['constructor'];
-            result = new cst();
-            this.elements.set(type, result);
-        }
-        return result;
-    }
-    static set(el) {
-        let cst = el.constructor;
-        if (this.elements.get(cst)) {
-            return false;
-        }
-        this.elements.set(cst, el);
-        return true;
-    }
-    static destroy(el) {
-        let cst = el.constructor;
-        return this.elements.delete(cst);
-    }
-}
-Instance.Namespace=`Aventus`;
-__as1(_, 'Instance', Instance);
-
 let Style=class Style {
     static instance;
     static noAnimation;
@@ -3963,6 +3936,33 @@ let Template=class Template {
 Template.Namespace=`Aventus`;
 __as1(_, 'Template', Template);
 
+let Instance=class Instance {
+    static elements = new Map();
+    static get(type) {
+        let result = this.elements.get(type);
+        if (!result) {
+            let cst = type.prototype['constructor'];
+            result = new cst();
+            this.elements.set(type, result);
+        }
+        return result;
+    }
+    static set(el) {
+        let cst = el.constructor;
+        if (this.elements.get(cst)) {
+            return false;
+        }
+        this.elements.set(cst, el);
+        return true;
+    }
+    static destroy(el) {
+        let cst = el.constructor;
+        return this.elements.delete(cst);
+    }
+}
+Instance.Namespace=`Aventus`;
+__as1(_, 'Instance', Instance);
+
 let WebComponent=class WebComponent extends HTMLElement {
     /**
      * Add attributes informations
@@ -5562,6 +5562,9 @@ let DragAndDrop=class DragAndDrop {
         const result = this.options.onStart(e);
         if (result !== false) {
             document.body.style.userSelect = 'none';
+            if (window.getSelection) {
+                window.getSelection()?.removeAllRanges();
+            }
         }
         return result;
     }
@@ -7079,9 +7082,11 @@ let HttpRequest=class HttpRequest {
     }
     request;
     url;
-    constructor(url, method = HttpMethod.GET, body) {
+    methodSpoofing = false;
+    constructor(url, method = HttpMethod.GET, body, methodSpoofing = false) {
         this.url = url;
         this.request = {};
+        this.methodSpoofing = methodSpoofing;
         this.setMethod(method);
         this.prepareBody(body);
     }
@@ -7096,6 +7101,12 @@ let HttpRequest=class HttpRequest {
     }
     setMethod(method) {
         this.request.method = method;
+    }
+    /**
+     * Replace method Put/Delete by _method:"put" inside a form
+     */
+    enableMethodSpoofing() {
+        this.methodSpoofing = true;
     }
     objectToFormData(obj, formData, parentKey) {
         formData = formData || new FormData();
@@ -7176,6 +7187,20 @@ let HttpRequest=class HttpRequest {
             else {
                 this.request.body = JSON.stringify(data, this.jsonReplacer);
                 this.setHeader("Content-Type", "Application/json");
+            }
+        }
+        if (this.methodSpoofing) {
+            if (this.request.method?.toLowerCase() == Aventus.HttpMethod.PUT) {
+                if (this.request.body instanceof FormData) {
+                    this.request.body.append("_method", Aventus.HttpMethod.PUT);
+                    this.request.method = Aventus.HttpMethod.POST;
+                }
+            }
+            else if (this.request.method?.toLowerCase() == Aventus.HttpMethod.DELETE) {
+                if (this.request.body instanceof FormData) {
+                    this.request.body.append("_method", Aventus.HttpMethod.DELETE);
+                    this.request.method = Aventus.HttpMethod.POST;
+                }
             }
         }
     }
@@ -7561,6 +7586,9 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
         this.destroy = this.destroy.bind(this);
         this.destroyMany = this.destroyMany.bind(this);
     }
+    getResourceDetails() {
+        return undefined;
+    }
     async index() {
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}`, Aventus.HttpMethod.GET);
         return await request.queryJSON(this.router);
@@ -7589,6 +7617,7 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
     }
     async update(id, body) {
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/${id}`, Aventus.HttpMethod.PUT);
+        request.enableMethodSpoofing();
         request.setBody(body);
         return await request.queryJSON(this.router);
     }
@@ -7596,6 +7625,7 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
         const requestBody = new ItemsManyRequest();
         requestBody.items = body;
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/many`, Aventus.HttpMethod.PUT);
+        request.enableMethodSpoofing();
         request.setBody(requestBody);
         return await request.queryJSON(this.router);
     }
@@ -7607,6 +7637,7 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
         const requestBody = new IdsManyRequest();
         requestBody.ids = ids;
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/many`, Aventus.HttpMethod.DELETE);
+        request.enableMethodSpoofing();
         request.setBody(requestBody);
         return await request.queryJSON(this.router);
     }
@@ -7645,11 +7676,19 @@ let GenericRamHttp=class GenericRamHttp {
     actionGuard = new Aventus.ActionGuard();
     routes;
     getAllDone = false;
+    getByIdDone = [];
+    hasDetails;
     constructor() {
         if (this.constructor == Aventus.GenericRam) {
             throw "can't instanciate an abstract class";
         }
         this.routes = this.defineRoutes();
+        if (!this.routes.getResourceDetails()) {
+            this.hasDetails = false;
+        }
+        else {
+            this.hasDetails = this.routes.getResourceDetails() != this.routes.getResource();
+        }
         this.getIdWithError = this.getIdWithError.bind(this);
         this.getId = this.getId.bind(this);
         this.save = this.save.bind(this);
@@ -7711,7 +7750,14 @@ let GenericRamHttp=class GenericRamHttp {
     }
     isResource(item) {
         const ResourceType = this.routes.getResource();
-        return item instanceof ResourceType;
+        const ResourceDetailsType = this.routes.getResourceDetails();
+        if (item instanceof ResourceType) {
+            return true;
+        }
+        if (ResourceDetailsType) {
+            return item instanceof ResourceDetailsType;
+        }
+        return false;
     }
     toRequest(resource) {
         return this.routes.toRequest(resource);
@@ -7828,7 +7874,7 @@ let GenericRamHttp=class GenericRamHttp {
         };
     }
     getTypeForData(objJson) {
-        return this.routes.getResource();
+        return this.routes.getResourceDetails() ?? this.routes.getResource();
     }
     /**
      * Transform the object into the object stored inside Ram
@@ -7842,7 +7888,7 @@ let GenericRamHttp=class GenericRamHttp {
     /**
      * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
      */
-    async addOrUpdateData(item, result) {
+    async addOrUpdateData(item, result, options) {
         let resultTemp = null;
         try {
             let idWithError = this.getIdWithError(item);
@@ -7851,7 +7897,7 @@ let GenericRamHttp=class GenericRamHttp {
                 if (this.records.has(id)) {
                     let uniqueRecord = this.records.get(id);
                     await this.beforeRecordSet(uniqueRecord);
-                    this.mergeObject(uniqueRecord, item);
+                    this.mergeObject(uniqueRecord, item, options);
                     await this.afterRecordSet(uniqueRecord);
                     resultTemp = 'updated';
                 }
@@ -8027,7 +8073,10 @@ let GenericRamHttp=class GenericRamHttp {
         });
     }
     async queryGetById(id, result) {
-        if (this.records.has(id)) {
+        if (!this.hasDetails && this.records.has(id)) {
+            return;
+        }
+        if (this.hasDetails && this.getByIdDone.includes(id)) {
             return;
         }
         else {
@@ -8040,6 +8089,9 @@ let GenericRamHttp=class GenericRamHttp {
                 }
                 else {
                     result.result = resultTemp.result;
+                    if (this.hasDetails) {
+                        this.getByIdDone.push(id);
+                    }
                 }
             }
             else {
@@ -8096,9 +8148,18 @@ let GenericRamHttp=class GenericRamHttp {
     }
     async queryGetByIds(ids, result) {
         let missingIds = [];
-        for (let id of ids) {
-            if (!this.records.has(id)) {
-                missingIds.push(id);
+        if (this.hasDetails) {
+            for (let id of ids) {
+                if (!this.getByIdDone.includes(id)) {
+                    missingIds.push(id);
+                }
+            }
+        }
+        else {
+            for (let id of ids) {
+                if (!this.records.has(id)) {
+                    missingIds.push(id);
+                }
             }
         }
         if (missingIds.length > 0) {
@@ -8113,6 +8174,11 @@ let GenericRamHttp=class GenericRamHttp {
                     }
                     else if (!result.result.includes(resultTemp.result)) {
                         result.result.push(resultTemp.result);
+                    }
+                }
+                if (this.hasDetails) {
+                    for (let item of result.result) {
+                        this.getByIdDone.push(this.getId(item));
                     }
                 }
             }
@@ -8163,7 +8229,7 @@ let GenericRamHttp=class GenericRamHttp {
             if (response.success && response.result) {
                 for (let item of response.result) {
                     let resultTemp = new Aventus.ResultRamWithError();
-                    await this.addOrUpdateData(item, resultTemp);
+                    await this.addOrUpdateData(item, resultTemp, { replaceUndefined: false });
                     if (!resultTemp.success) {
                         result.errors = [...result.errors, ...resultTemp.errors];
                     }
@@ -8310,6 +8376,14 @@ let GenericRamHttp=class GenericRamHttp {
             for (let element of response.result) {
                 result.result.push(this.getObjectForRam(element));
             }
+            if (this.hasDetails) {
+                for (let element of result.result) {
+                    const id = this.getId(element);
+                    if (!this.getByIdDone.includes(id)) {
+                        this.getByIdDone.push(id);
+                    }
+                }
+            }
         }
         else {
             result.errors = [...result.errors, ...response.errors];
@@ -8330,6 +8404,12 @@ let GenericRamHttp=class GenericRamHttp {
         let response = await this.routes.store(item);
         if (response.success && response.result) {
             result.result = this.getObjectForRam(response.result);
+            if (this.hasDetails && result.result) {
+                const id = this.getId(result.result);
+                if (!this.getByIdDone.includes(id)) {
+                    this.getByIdDone.push(id);
+                }
+            }
         }
         else {
             result.errors = [...result.errors, ...response.errors];
@@ -8465,6 +8545,14 @@ let GenericRamHttp=class GenericRamHttp {
             for (let element of response.result) {
                 result.result.push(this.getObjectForRam(element));
             }
+            if (this.hasDetails) {
+                for (let element of result.result) {
+                    const id = this.getId(element);
+                    if (!this.getByIdDone.includes(id)) {
+                        this.getByIdDone.push(id);
+                    }
+                }
+            }
         }
         else {
             result.errors = [...result.errors, ...response.errors];
@@ -8485,6 +8573,12 @@ let GenericRamHttp=class GenericRamHttp {
         let response = await this.routes.update(item.id, item);
         if (response.success && response.result) {
             result.result = this.getObjectForRam(response.result);
+            if (this.hasDetails && result.result) {
+                const id = this.getId(result.result);
+                if (!this.getByIdDone.includes(id)) {
+                    this.getByIdDone.push(id);
+                }
+            }
         }
         else {
             result.errors = [...result.errors, ...response.errors];
@@ -8626,6 +8720,15 @@ let GenericRamHttp=class GenericRamHttp {
         if (!response.success) {
             result.errors = [...result.errors, ...response.errors];
         }
+        else if (this.hasDetails) {
+            for (let item of list) {
+                const id = this.getId(item);
+                const index = this.getByIdDone.indexOf(id);
+                if (index != -1) {
+                    this.getByIdDone.splice(index, 1);
+                }
+            }
+        }
     }
     /**
      * Trigger before deleting a list of items
@@ -8638,6 +8741,13 @@ let GenericRamHttp=class GenericRamHttp {
         let response = await this.routes.destroy(item.id);
         if (!response.success) {
             result.errors = [...result.errors, ...response.errors];
+        }
+        else if (this.hasDetails) {
+            const id = this.getId(item);
+            const index = this.getByIdDone.indexOf(id);
+            if (index != -1) {
+                this.getByIdDone.splice(index, 1);
+            }
         }
     }
     /**
@@ -8674,6 +8784,8 @@ const _ = {};
 
 let Layout = {};
 _.Layout = Aventus.Layout ?? {};
+let Toast = {};
+_.Toast = Aventus.Toast ?? {};
 let Lib = {};
 _.Lib = Aventus.Lib ?? {};
 let Navigation = {};
@@ -8682,8 +8794,6 @@ let Form = {};
 _.Form = Aventus.Form ?? {};
 Form.Validators = {};
 _.Form.Validators = Aventus.Form?.Validators ?? {};
-let Toast = {};
-_.Toast = Aventus.Toast ?? {};
 let Modal = {};
 _.Modal = Aventus.Modal ?? {};
 let _n;
@@ -8716,6 +8826,109 @@ Layout.Row.Namespace=`Aventus.Layout`;
 Layout.Row.Tag=`av-row`;
 __as1(_.Layout, 'Row', Layout.Row);
 if(!window.customElements.get('av-row')){window.customElements.define('av-row', Layout.Row);Aventus.WebComponentInstance.registerDefinition(Layout.Row);}
+
+Toast.ToastElement = class ToastElement extends Aventus.WebComponent {
+    get 'position'() { return this.getStringAttr('position') }
+    set 'position'(val) { this.setStringAttr('position', val) }get 'delay'() { return this.getNumberAttr('delay') }
+    set 'delay'(val) { this.setNumberAttr('delay', val) }get 'is_active'() { return this.getBoolAttr('is_active') }
+    set 'is_active'(val) { this.setBoolAttr('is_active', val) }    showAsked = false;
+    onHideCallback = () => { };
+    timeout = 0;
+    isTransition = false;
+    waitTransitionCbs = [];
+    static __style = `:host{position:absolute}:host(:not([is_active])){opacity:0;visibility:hidden}:host([position="bottom left"]){bottom:var(--_toast-space-bottom);left:0px}:host([position="top left"]){left:var(--_toast-space-left);top:var(--_toast-space-top)}:host([position="bottom right"]){bottom:var(--_toast-space-bottom);right:var(--_toast-space-right)}:host([position="top right"]){right:var(--_toast-space-right);top:var(--_toast-space-top)}:host([position=top]){left:50%;top:var(--_toast-space-top);transform:translateX(-50%)}:host([position=bottom]){bottom:var(--_toast-space-bottom);left:50%;transform:translateX(-50%)}`;
+    constructor() {
+        super();
+        if (this.constructor == ToastElement) {
+            throw "can't instanciate an abstract class";
+        }
+    }
+    __getStatic() {
+        return ToastElement;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ToastElement.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "ToastElement";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('position')){ this['position'] = _.Toast.ToastManager.defaultPosition; }if(!this.hasAttribute('delay')){ this['delay'] = _.Toast.ToastManager.defaultDelay; }if(!this.hasAttribute('is_active')) { this.attributeChangedCallback('is_active', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('position');this.__upgradeProperty('delay');this.__upgradeProperty('is_active'); }
+    __listBoolProps() { return ["is_active"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    _setOptions(options) {
+        if (options.position !== undefined)
+            this.position = options.position;
+        if (options.delay !== undefined)
+            this.delay = options.delay;
+        return this.setOptions(options);
+    }
+    show(onHideCallback) {
+        this.onHideCallback = onHideCallback;
+        if (this.isReady) {
+            this.is_active = true;
+            this.startDelay();
+        }
+        else {
+            this.showAsked = true;
+        }
+    }
+    startDelay() {
+        if (this.delay > 0) {
+            this.timeout = setTimeout(() => {
+                this.close();
+            }, this.delay);
+        }
+    }
+    async close() {
+        if (this.onHideCallback) {
+            this.is_active = false;
+            this.onHideCallback(false);
+            this.remove();
+        }
+    }
+    addTransition() {
+        this.addEventListener("transitionStart", (e) => {
+            this.isTransition = true;
+        });
+        this.addEventListener("transitionEnd", () => {
+            this.isTransition = false;
+            let cbs = [...this.waitTransitionCbs];
+            this.waitTransitionCbs = [];
+            for (let cb of cbs) {
+                cb();
+            }
+        });
+    }
+    waitTransition() {
+        if (this.isTransition) {
+            return new Promise((resolve) => {
+                this.waitTransitionCbs.push(resolve);
+            });
+        }
+        return new Promise((resolve) => {
+            resolve();
+        });
+    }
+    postCreation() {
+        if (this.showAsked) {
+            this.is_active = true;
+            this.startDelay();
+        }
+    }
+    static add(options) {
+        return _.Toast.ToastManager.add(options);
+    }
+}
+Toast.ToastElement.Namespace=`Aventus.Toast`;
+__as1(_.Toast, 'ToastElement', Toast.ToastElement);
 
 (function (SpecialTouch) {
     SpecialTouch[SpecialTouch["Backspace"] = 0] = "Backspace";
@@ -9147,6 +9360,241 @@ Navigation.Default404.Namespace=`Aventus.Navigation`;
 Navigation.Default404.Tag=`av-default-404`;
 __as1(_.Navigation, 'Default404', Navigation.Default404);
 if(!window.customElements.get('av-default-404')){window.customElements.define('av-default-404', Navigation.Default404);Aventus.WebComponentInstance.registerDefinition(Navigation.Default404);}
+
+Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
+    get 'gap'() { return this.getNumberAttr('gap') }
+    set 'gap'(val) { this.setNumberAttr('gap', val) }get 'not_main'() { return this.getBoolAttr('not_main') }
+    set 'not_main'(val) { this.setBoolAttr('not_main', val) }    static defaultToast;
+    static defaultToastManager;
+    static defaultPosition = 'top right';
+    static defaultDelay = 5000;
+    static heightLimitPercent = 100;
+    static instance;
+    activeToasts = {
+        top: [],
+        'top left': [],
+        'bottom left': [],
+        bottom: [],
+        'bottom right': [],
+        'top right': [],
+    };
+    waitingToasts = {
+        top: [],
+        'top left': [],
+        'bottom left': [],
+        bottom: [],
+        'bottom right': [],
+        'top right': [],
+    };
+    get containerHeight() {
+        return this.offsetHeight;
+    }
+    get heightLimit() {
+        return this.containerHeight * Toast.ToastManager.heightLimitPercent / 100;
+    }
+    mutex = new Aventus.Mutex();
+    static __style = `:host{--_toast-space-bottom: var(--toast-space-bottom, 20px);--_toast-space-top: var(--toast-space-top, 20px);--_toast-space-right: var(--toast-space-right, 10px);--_toast-space-left: var(--toast-space-left, 10px)}:host{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:50}:host ::slotted(*){pointer-events:auto}`;
+    __getStatic() {
+        return ToastManager;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ToastManager.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "ToastManager";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('gap')){ this['gap'] = 10; }if(!this.hasAttribute('not_main')) { this.attributeChangedCallback('not_main', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('containerHeight');this.__correctGetter('heightLimit');this.__upgradeProperty('gap');this.__upgradeProperty('not_main'); }
+    __listBoolProps() { return ["not_main"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    async add(toast) {
+        await this.mutex.waitOne();
+        console.log("inside");
+        let realToast;
+        if (toast instanceof _.Toast.ToastElement) {
+            realToast = toast;
+        }
+        else {
+            if (!Toast.ToastManager.defaultToast)
+                throw "No default toast. Try ToastManager.configure()";
+            realToast = new Toast.ToastManager.defaultToast();
+            await realToast._setOptions(toast);
+        }
+        this.appendChild(realToast);
+        if (realToast.position == "bottom") {
+            return this._notifyBottom(realToast, true);
+        }
+        else if (realToast.position == "bottom left") {
+            return this._notifyBottomLeft(realToast, true);
+        }
+        else if (realToast.position == "top left") {
+            return this._notifyTopLeft(realToast, true);
+        }
+        else if (realToast.position == "bottom right") {
+            return this._notifyBottomRight(realToast, true);
+        }
+        else if (realToast.position == "top right") {
+            return this._notifyTopRight(realToast, true);
+        }
+        else if (realToast.position == "top") {
+            return this._notifyTop(realToast, true);
+        }
+        return false;
+    }
+    _calculateBottom(toast, firstTime, position, from) {
+        return new Promise((resolve) => {
+            let height = toast.offsetHeight;
+            let containerHeight = this.containerHeight;
+            const _remove = (result) => {
+                let index = this.activeToasts[position].indexOf(toast);
+                if (index > -1) {
+                    this.activeToasts[position].splice(index, 1);
+                }
+                if (this.waitingToasts[position].length > 0) {
+                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
+                    this._calculateBottom(nextNotif, false, position, index);
+                }
+                else {
+                    let containerHeight = this.containerHeight;
+                    for (let i = 0; i < index; i++) {
+                        let notif = this.activeToasts[position][i];
+                        let bottom = containerHeight - (notif.offsetTop + notif.offsetHeight);
+                        notif.style.bottom = bottom - height - this.gap + 'px';
+                    }
+                }
+                resolve(result);
+            };
+            let length = this.activeToasts[position].length;
+            if (length == 0) {
+                this.activeToasts[position].push(toast);
+                toast.show(_remove);
+            }
+            else {
+                let totHeight = 0;
+                for (let t of this.activeToasts[position]) {
+                    totHeight += t.offsetHeight + this.gap;
+                }
+                if (totHeight + height < this.heightLimit) {
+                    for (let i = from; i < this.activeToasts[position].length; i++) {
+                        let t = this.activeToasts[position][i];
+                        let bottom = containerHeight - (t.offsetTop + t.offsetHeight);
+                        t.style.bottom = bottom + height + this.gap + 'px';
+                    }
+                    this.activeToasts[position].push(toast);
+                    toast.show(_remove);
+                }
+                else if (firstTime) {
+                    this.waitingToasts[position].push(toast);
+                }
+            }
+        });
+    }
+    _calculateTop(toast, firstTime, position, from) {
+        return new Promise(async (resolve) => {
+            let height = toast.offsetHeight;
+            const _remove = (result) => {
+                let index = this.activeToasts[position].indexOf(toast);
+                if (index > -1) {
+                    this.activeToasts[position].splice(index, 1);
+                }
+                if (this.waitingToasts[position].length > 0) {
+                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
+                    this._calculateTop(nextNotif, false, position, index);
+                }
+                else {
+                    for (let i = 0; i < index; i++) {
+                        let notif = this.activeToasts[position][i];
+                        let top = (notif.offsetTop - height - this.gap);
+                        notif.style.top = top + 'px';
+                    }
+                }
+                resolve(result);
+            };
+            let length = this.activeToasts[position].length;
+            if (length == 0) {
+                this.activeToasts[position].push(toast);
+                toast.show(_remove);
+            }
+            else {
+                let totHeight = 0;
+                for (let notif of this.activeToasts[position]) {
+                    await notif.waitTransition();
+                    console.log(notif.offsetHeight);
+                    totHeight += notif.offsetHeight + this.gap;
+                }
+                if (totHeight + height < this.heightLimit) {
+                    for (let i = from; i < this.activeToasts[position].length; i++) {
+                        let notif = this.activeToasts[position][i];
+                        await notif.waitTransition();
+                        let top = (notif.offsetTop + notif.offsetHeight);
+                        notif.style.top = top + this.gap + 'px';
+                    }
+                    this.activeToasts[position].push(toast);
+                    toast.show(_remove);
+                }
+                else if (firstTime) {
+                    this.waitingToasts[position].push(toast);
+                }
+            }
+            console.log("outside");
+            this.mutex.release();
+            return;
+        });
+    }
+    async _notifyBottomRight(toast, firstTime) {
+        return await this._calculateBottom(toast, firstTime, "bottom right", 0);
+    }
+    async _notifyTopRight(toast, firstTime) {
+        return await this._calculateTop(toast, firstTime, "top right", 0);
+    }
+    async _notifyBottomLeft(toast, firstTime) {
+        return await this._calculateBottom(toast, firstTime, "bottom left", 0);
+    }
+    async _notifyTopLeft(toast, firstTime) {
+        return await this._calculateTop(toast, firstTime, "top left", 0);
+    }
+    async _notifyTop(toast, firstTime, from = 0) {
+        return await this._calculateTop(toast, firstTime, "top", 0);
+    }
+    async _notifyBottom(toast, firstTime, from = 0) {
+        return await this._calculateBottom(toast, firstTime, "bottom", from);
+    }
+    postConnect() {
+        super.postConnect();
+        if (!Toast.ToastManager.instance && !this.not_main) {
+            Toast.ToastManager.instance = this;
+        }
+    }
+    postDisonnect() {
+        if (Toast.ToastManager.instance == this) {
+            Toast.ToastManager.instance = undefined;
+        }
+    }
+    static add(toast) {
+        if (!this.instance) {
+            this.instance = this.defaultToastManager ? new this.defaultToastManager() : new Toast.ToastManager();
+            document.body.appendChild(this.instance);
+        }
+        return this.instance.add(toast);
+    }
+    static configure(options) {
+        for (let key in options) {
+            if (options[key] !== undefined)
+                this[key] = options[key];
+        }
+    }
+}
+Toast.ToastManager.Namespace=`Aventus.Toast`;
+Toast.ToastManager.Tag=`av-toast-manager`;
+__as1(_.Toast, 'ToastManager', Toast.ToastManager);
+if(!window.customElements.get('av-toast-manager')){window.customElements.define('av-toast-manager', Toast.ToastManager);Aventus.WebComponentInstance.registerDefinition(Toast.ToastManager);}
 
 Form.FormElement = class FormElement extends Aventus.WebComponent {
     static get observedAttributes() {return ["disabled"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -11003,109 +11451,6 @@ let Process=class Process {
 Process.Namespace=`Aventus`;
 __as1(_, 'Process', Process);
 
-Toast.ToastElement = class ToastElement extends Aventus.WebComponent {
-    get 'position'() { return this.getStringAttr('position') }
-    set 'position'(val) { this.setStringAttr('position', val) }get 'delay'() { return this.getNumberAttr('delay') }
-    set 'delay'(val) { this.setNumberAttr('delay', val) }get 'is_active'() { return this.getBoolAttr('is_active') }
-    set 'is_active'(val) { this.setBoolAttr('is_active', val) }    showAsked = false;
-    onHideCallback = () => { };
-    timeout = 0;
-    isTransition = false;
-    waitTransitionCbs = [];
-    static __style = `:host{position:absolute}:host(:not([is_active])){opacity:0;visibility:hidden}:host([position="bottom left"]){bottom:var(--_toast-space-bottom);left:0px}:host([position="top left"]){left:var(--_toast-space-left);top:var(--_toast-space-top)}:host([position="bottom right"]){bottom:var(--_toast-space-bottom);right:var(--_toast-space-right)}:host([position="top right"]){right:var(--_toast-space-right);top:var(--_toast-space-top)}:host([position=top]){left:50%;top:var(--_toast-space-top);transform:translateX(-50%)}:host([position=bottom]){bottom:var(--_toast-space-bottom);left:50%;transform:translateX(-50%)}`;
-    constructor() {
-        super();
-        if (this.constructor == ToastElement) {
-            throw "can't instanciate an abstract class";
-        }
-    }
-    __getStatic() {
-        return ToastElement;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ToastElement.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "ToastElement";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('position')){ this['position'] = _.Toast.ToastManager.defaultPosition; }if(!this.hasAttribute('delay')){ this['delay'] = _.Toast.ToastManager.defaultDelay; }if(!this.hasAttribute('is_active')) { this.attributeChangedCallback('is_active', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('position');this.__upgradeProperty('delay');this.__upgradeProperty('is_active'); }
-    __listBoolProps() { return ["is_active"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    _setOptions(options) {
-        if (options.position !== undefined)
-            this.position = options.position;
-        if (options.delay !== undefined)
-            this.delay = options.delay;
-        return this.setOptions(options);
-    }
-    show(onHideCallback) {
-        this.onHideCallback = onHideCallback;
-        if (this.isReady) {
-            this.is_active = true;
-            this.startDelay();
-        }
-        else {
-            this.showAsked = true;
-        }
-    }
-    startDelay() {
-        if (this.delay > 0) {
-            this.timeout = setTimeout(() => {
-                this.close();
-            }, this.delay);
-        }
-    }
-    async close() {
-        if (this.onHideCallback) {
-            this.is_active = false;
-            this.onHideCallback(false);
-            this.remove();
-        }
-    }
-    addTransition() {
-        this.addEventListener("transitionStart", (e) => {
-            this.isTransition = true;
-        });
-        this.addEventListener("transitionEnd", () => {
-            this.isTransition = false;
-            let cbs = [...this.waitTransitionCbs];
-            this.waitTransitionCbs = [];
-            for (let cb of cbs) {
-                cb();
-            }
-        });
-    }
-    waitTransition() {
-        if (this.isTransition) {
-            return new Promise((resolve) => {
-                this.waitTransitionCbs.push(resolve);
-            });
-        }
-        return new Promise((resolve) => {
-            resolve();
-        });
-    }
-    postCreation() {
-        if (this.showAsked) {
-            this.is_active = true;
-            this.startDelay();
-        }
-    }
-    static add(options) {
-        return _.Toast.ToastManager.add(options);
-    }
-}
-Toast.ToastElement.Namespace=`Aventus.Toast`;
-__as1(_.Toast, 'ToastElement', Toast.ToastElement);
-
 Lib.ShortcutManager=class ShortcutManager {
     static memory = {};
     static autoPrevents = [];
@@ -11419,241 +11764,6 @@ Modal.ModalElement = class ModalElement extends Aventus.WebComponent {
 }
 Modal.ModalElement.Namespace=`Aventus.Modal`;
 __as1(_.Modal, 'ModalElement', Modal.ModalElement);
-
-Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
-    get 'gap'() { return this.getNumberAttr('gap') }
-    set 'gap'(val) { this.setNumberAttr('gap', val) }get 'not_main'() { return this.getBoolAttr('not_main') }
-    set 'not_main'(val) { this.setBoolAttr('not_main', val) }    static defaultToast;
-    static defaultToastManager;
-    static defaultPosition = 'top right';
-    static defaultDelay = 5000;
-    static heightLimitPercent = 100;
-    static instance;
-    activeToasts = {
-        top: [],
-        'top left': [],
-        'bottom left': [],
-        bottom: [],
-        'bottom right': [],
-        'top right': [],
-    };
-    waitingToasts = {
-        top: [],
-        'top left': [],
-        'bottom left': [],
-        bottom: [],
-        'bottom right': [],
-        'top right': [],
-    };
-    get containerHeight() {
-        return this.offsetHeight;
-    }
-    get heightLimit() {
-        return this.containerHeight * Toast.ToastManager.heightLimitPercent / 100;
-    }
-    mutex = new Aventus.Mutex();
-    static __style = `:host{--_toast-space-bottom: var(--toast-space-bottom, 20px);--_toast-space-top: var(--toast-space-top, 20px);--_toast-space-right: var(--toast-space-right, 10px);--_toast-space-left: var(--toast-space-left, 10px)}:host{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:50}:host ::slotted(*){pointer-events:auto}`;
-    __getStatic() {
-        return ToastManager;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ToastManager.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "ToastManager";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('gap')){ this['gap'] = 10; }if(!this.hasAttribute('not_main')) { this.attributeChangedCallback('not_main', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('containerHeight');this.__correctGetter('heightLimit');this.__upgradeProperty('gap');this.__upgradeProperty('not_main'); }
-    __listBoolProps() { return ["not_main"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    async add(toast) {
-        await this.mutex.waitOne();
-        console.log("inside");
-        let realToast;
-        if (toast instanceof _.Toast.ToastElement) {
-            realToast = toast;
-        }
-        else {
-            if (!Toast.ToastManager.defaultToast)
-                throw "No default toast. Try ToastManager.configure()";
-            realToast = new Toast.ToastManager.defaultToast();
-            await realToast._setOptions(toast);
-        }
-        this.appendChild(realToast);
-        if (realToast.position == "bottom") {
-            return this._notifyBottom(realToast, true);
-        }
-        else if (realToast.position == "bottom left") {
-            return this._notifyBottomLeft(realToast, true);
-        }
-        else if (realToast.position == "top left") {
-            return this._notifyTopLeft(realToast, true);
-        }
-        else if (realToast.position == "bottom right") {
-            return this._notifyBottomRight(realToast, true);
-        }
-        else if (realToast.position == "top right") {
-            return this._notifyTopRight(realToast, true);
-        }
-        else if (realToast.position == "top") {
-            return this._notifyTop(realToast, true);
-        }
-        return false;
-    }
-    _calculateBottom(toast, firstTime, position, from) {
-        return new Promise((resolve) => {
-            let height = toast.offsetHeight;
-            let containerHeight = this.containerHeight;
-            const _remove = (result) => {
-                let index = this.activeToasts[position].indexOf(toast);
-                if (index > -1) {
-                    this.activeToasts[position].splice(index, 1);
-                }
-                if (this.waitingToasts[position].length > 0) {
-                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
-                    this._calculateBottom(nextNotif, false, position, index);
-                }
-                else {
-                    let containerHeight = this.containerHeight;
-                    for (let i = 0; i < index; i++) {
-                        let notif = this.activeToasts[position][i];
-                        let bottom = containerHeight - (notif.offsetTop + notif.offsetHeight);
-                        notif.style.bottom = bottom - height - this.gap + 'px';
-                    }
-                }
-                resolve(result);
-            };
-            let length = this.activeToasts[position].length;
-            if (length == 0) {
-                this.activeToasts[position].push(toast);
-                toast.show(_remove);
-            }
-            else {
-                let totHeight = 0;
-                for (let t of this.activeToasts[position]) {
-                    totHeight += t.offsetHeight + this.gap;
-                }
-                if (totHeight + height < this.heightLimit) {
-                    for (let i = from; i < this.activeToasts[position].length; i++) {
-                        let t = this.activeToasts[position][i];
-                        let bottom = containerHeight - (t.offsetTop + t.offsetHeight);
-                        t.style.bottom = bottom + height + this.gap + 'px';
-                    }
-                    this.activeToasts[position].push(toast);
-                    toast.show(_remove);
-                }
-                else if (firstTime) {
-                    this.waitingToasts[position].push(toast);
-                }
-            }
-        });
-    }
-    _calculateTop(toast, firstTime, position, from) {
-        return new Promise(async (resolve) => {
-            let height = toast.offsetHeight;
-            const _remove = (result) => {
-                let index = this.activeToasts[position].indexOf(toast);
-                if (index > -1) {
-                    this.activeToasts[position].splice(index, 1);
-                }
-                if (this.waitingToasts[position].length > 0) {
-                    let nextNotif = this.waitingToasts[position].splice(0, 1)[0];
-                    this._calculateTop(nextNotif, false, position, index);
-                }
-                else {
-                    for (let i = 0; i < index; i++) {
-                        let notif = this.activeToasts[position][i];
-                        let top = (notif.offsetTop - height - this.gap);
-                        notif.style.top = top + 'px';
-                    }
-                }
-                resolve(result);
-            };
-            let length = this.activeToasts[position].length;
-            if (length == 0) {
-                this.activeToasts[position].push(toast);
-                toast.show(_remove);
-            }
-            else {
-                let totHeight = 0;
-                for (let notif of this.activeToasts[position]) {
-                    await notif.waitTransition();
-                    console.log(notif.offsetHeight);
-                    totHeight += notif.offsetHeight + this.gap;
-                }
-                if (totHeight + height < this.heightLimit) {
-                    for (let i = from; i < this.activeToasts[position].length; i++) {
-                        let notif = this.activeToasts[position][i];
-                        await notif.waitTransition();
-                        let top = (notif.offsetTop + notif.offsetHeight);
-                        notif.style.top = top + this.gap + 'px';
-                    }
-                    this.activeToasts[position].push(toast);
-                    toast.show(_remove);
-                }
-                else if (firstTime) {
-                    this.waitingToasts[position].push(toast);
-                }
-            }
-            console.log("outside");
-            this.mutex.release();
-            return;
-        });
-    }
-    async _notifyBottomRight(toast, firstTime) {
-        return await this._calculateBottom(toast, firstTime, "bottom right", 0);
-    }
-    async _notifyTopRight(toast, firstTime) {
-        return await this._calculateTop(toast, firstTime, "top right", 0);
-    }
-    async _notifyBottomLeft(toast, firstTime) {
-        return await this._calculateBottom(toast, firstTime, "bottom left", 0);
-    }
-    async _notifyTopLeft(toast, firstTime) {
-        return await this._calculateTop(toast, firstTime, "top left", 0);
-    }
-    async _notifyTop(toast, firstTime, from = 0) {
-        return await this._calculateTop(toast, firstTime, "top", 0);
-    }
-    async _notifyBottom(toast, firstTime, from = 0) {
-        return await this._calculateBottom(toast, firstTime, "bottom", from);
-    }
-    postConnect() {
-        super.postConnect();
-        if (!Toast.ToastManager.instance && !this.not_main) {
-            Toast.ToastManager.instance = this;
-        }
-    }
-    postDisonnect() {
-        if (Toast.ToastManager.instance == this) {
-            Toast.ToastManager.instance = undefined;
-        }
-    }
-    static add(toast) {
-        if (!this.instance) {
-            this.instance = this.defaultToastManager ? new this.defaultToastManager() : new Toast.ToastManager();
-            document.body.appendChild(this.instance);
-        }
-        return this.instance.add(toast);
-    }
-    static configure(options) {
-        for (let key in options) {
-            if (options[key] !== undefined)
-                this[key] = options[key];
-        }
-    }
-}
-Toast.ToastManager.Namespace=`Aventus.Toast`;
-Toast.ToastManager.Tag=`av-toast-manager`;
-__as1(_.Toast, 'ToastManager', Toast.ToastManager);
-if(!window.customElements.get('av-toast-manager')){window.customElements.define('av-toast-manager', Toast.ToastManager);Aventus.WebComponentInstance.registerDefinition(Toast.ToastManager);}
 
 Navigation.Router = class Router extends Aventus.WebComponent {
     static page404 = _.Navigation.Default404;
@@ -12020,19 +12130,25 @@ var Inventaire;
 const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Inventaire`;
 const _ = {};
-Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.neutral{background-color:var(--color-neutral)}.content-neutral{color:var(--color-neutral-content)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.accent{background-color:var(--color-accent)}.content-accent{color:var(--color-accent-content)}.info{background-color:var(--color-info)}.content-info{color:var(--color-info-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}`)
+Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.neutral{background-color:var(--color-neutral)}.content-neutral{color:var(--color-neutral-content)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.accent{background-color:var(--color-accent)}.content-accent{color:var(--color-accent-content)}.info{background-color:var(--color-info)}.content-info{color:var(--color-info-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}`)
 let App = {};
 _.App = Inventaire.App ?? {};
-App.Models = {};
-_.App.Models = Inventaire.App?.Models ?? {};
 App.Http = {};
 _.App.Http = Inventaire.App?.Http ?? {};
-App.Http.Resources = {};
-_.App.Http.Resources = Inventaire.App?.Http?.Resources ?? {};
-App.Http.Requests = {};
-_.App.Http.Requests = Inventaire.App?.Http?.Requests ?? {};
 App.Http.Controllers = {};
 _.App.Http.Controllers = Inventaire.App?.Http?.Controllers ?? {};
+App.Http.Controllers.User = {};
+_.App.Http.Controllers.User = Inventaire.App?.Http?.Controllers?.User ?? {};
+App.Models = {};
+_.App.Models = Inventaire.App?.Models ?? {};
+App.Http.Controllers.Materiel = {};
+_.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
+App.Http.Controllers.Equipe = {};
+_.App.Http.Controllers.Equipe = Inventaire.App?.Http?.Controllers?.Equipe ?? {};
+App.Http.Controllers.Auth = {};
+_.App.Http.Controllers.Auth = Inventaire.App?.Http?.Controllers?.Auth ?? {};
+App.Http.Controllers.Auth.Login = {};
+_.App.Http.Controllers.Auth.Login = Inventaire.App?.Http?.Controllers?.Auth?.Login ?? {};
 let _n;
 let StringTools=class StringTools {
     static removeAccents(value) {
@@ -12072,49 +12188,27 @@ let Colors= [
 ];
 __as1(_, 'Colors', Colors);
 
-App.Models.Inventaire=class Inventaire extends Aventus.Data {
-    static get Fullname() { return "App.Models.Inventaire"; }
-    id;
-    id_equipe;
-    id_materiel;
-    id_variation = undefined;
-    quantite;
-}
-App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
-App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number"};
-Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
-__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
-
-App.Http.Resources.MaterielImageResource=class MaterielImageResource extends Aventus.Data {
-    static get Fullname() { return "App.Http.Resources.MaterielImageResource"; }
-    uri;
-}
-App.Http.Resources.MaterielImageResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.MaterielImageResource.$schema={...(Aventus.Data?.$schema ?? {}), "uri":"number"};
-Aventus.Converter.register(App.Http.Resources.MaterielImageResource.Fullname, App.Http.Resources.MaterielImageResource);
-__as1(_.App.Http.Resources, 'MaterielImageResource', App.Http.Resources.MaterielImageResource);
-
-App.Http.Resources.UserResource=class UserResource extends Aventus.Data {
-    static get Fullname() { return "App.Http.Resources.UserResource"; }
+App.Http.Controllers.User.UserResource=class UserResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.User.UserResource"; }
     id;
     nom;
     prenom;
     nom_utilisateur;
 }
-App.Http.Resources.UserResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.UserResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
-Aventus.Converter.register(App.Http.Resources.UserResource.Fullname, App.Http.Resources.UserResource);
-__as1(_.App.Http.Resources, 'UserResource', App.Http.Resources.UserResource);
+App.Http.Controllers.User.UserResource.Namespace=`Inventaire.App.Http.Controllers.User`;
+App.Http.Controllers.User.UserResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
+Aventus.Converter.register(App.Http.Controllers.User.UserResource.Fullname, App.Http.Controllers.User.UserResource);
+__as1(_.App.Http.Controllers.User, 'UserResource', App.Http.Controllers.User.UserResource);
 
-App.Http.Requests.UserRequest=class UserRequest {
+App.Http.Controllers.User.UserRequest=class UserRequest {
     id = undefined;
     nom;
     prenom;
     nom_utilisateur;
     mot_passe = undefined;
 }
-App.Http.Requests.UserRequest.Namespace=`Inventaire.App.Http.Requests`;
-__as1(_.App.Http.Requests, 'UserRequest', App.Http.Requests.UserRequest);
+App.Http.Controllers.User.UserRequest.Namespace=`Inventaire.App.Http.Controllers.User`;
+__as1(_.App.Http.Controllers.User, 'UserRequest', App.Http.Controllers.User.UserRequest);
 
 App.Models.User=class User extends Aventus.Data {
     static get Fullname() { return "App.Models.User"; }
@@ -12128,6 +12222,30 @@ App.Models.User.Namespace=`Inventaire.App.Models`;
 App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string"};
 Aventus.Converter.register(App.Models.User.Fullname, App.Models.User);
 __as1(_.App.Models, 'User', App.Models.User);
+
+App.Http.Controllers.Materiel.MaterielImageResource=class MaterielImageResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielImageResource"; }
+    uri;
+}
+App.Http.Controllers.Materiel.MaterielImageResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielImageResource.$schema={...(Aventus.Data?.$schema ?? {}), "uri":"number"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielImageResource.Fullname, App.Http.Controllers.Materiel.MaterielImageResource);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielImageResource', App.Http.Controllers.Materiel.MaterielImageResource);
+
+App.Models.Inventaire=class Inventaire extends Aventus.Data {
+    static get Fullname() { return "App.Models.Inventaire"; }
+    id;
+    id_equipe;
+    id_materiel;
+    id_variation = undefined;
+    quantite;
+    lastUpdate;
+    lastUpdateBy;
+}
+App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
+App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","lastUpdate":"Date","lastUpdateBy":"string"};
+Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
+__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
 
 App.Models.Variation=class Variation extends Aventus.Data {
     static get Fullname() { return "App.Models.Variation"; }
@@ -12148,15 +12266,15 @@ App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), }
 Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
 __as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
-App.Http.Resources.EquipeResource=class EquipeResource extends Aventus.Data {
-    static get Fullname() { return "App.Http.Resources.EquipeResource"; }
+App.Http.Controllers.Equipe.EquipeResource=class EquipeResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.EquipeResource"; }
     id;
     nom;
 }
-App.Http.Resources.EquipeResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.EquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
-Aventus.Converter.register(App.Http.Resources.EquipeResource.Fullname, App.Http.Resources.EquipeResource);
-__as1(_.App.Http.Resources, 'EquipeResource', App.Http.Resources.EquipeResource);
+App.Http.Controllers.Equipe.EquipeResource.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
+App.Http.Controllers.Equipe.EquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.Equipe.EquipeResource.Fullname, App.Http.Controllers.Equipe.EquipeResource);
+__as1(_.App.Http.Controllers.Equipe, 'EquipeResource', App.Http.Controllers.Equipe.EquipeResource);
 
 const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -12179,12 +12297,7 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-link _id="equipeitem_0">
-    <div class="name" _id="equipeitem_1"></div>
-    <div class="actions">
-        <mi-icon icon="chevron_right"></mi-icon>
-    </div>
-</av-link>` }
+        blocks: { 'default':`<av-link _id="equipeitem_0">    <div class="name" _id="equipeitem_1"></div>    <div class="actions">        <mi-icon icon="chevron_right"></mi-icon>    </div></av-link>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12218,152 +12331,22 @@ EquipeItem.Tag=`av-equipe-item`;
 __as1(_, 'EquipeItem', EquipeItem);
 if(!window.customElements.get('av-equipe-item')){window.customElements.define('av-equipe-item', EquipeItem);Aventus.WebComponentInstance.registerDefinition(EquipeItem);}
 
-App.Http.Resources.MaterielResource=class MaterielResource extends Aventus.Data {
-    static get Fullname() { return "App.Http.Resources.MaterielResource"; }
-    variations;
-    equipes;
-    id;
-    nom;
-    image = new _.App.Models.MaterielImage();
-    tout_monde;
+App.Http.Controllers.Materiel.MaterielEquipeResource=class MaterielEquipeResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielEquipeResource"; }
+    id_equipe;
+    equipe;
 }
-App.Http.Resources.MaterielResource.Namespace=`Inventaire.App.Http.Resources`;
-App.Http.Resources.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.Variation[]","equipes":"Inventaire.App.Http.Resources.EquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
-Aventus.Converter.register(App.Http.Resources.MaterielResource.Fullname, App.Http.Resources.MaterielResource);
-__as1(_.App.Http.Resources, 'MaterielResource', App.Http.Resources.MaterielResource);
+App.Http.Controllers.Materiel.MaterielEquipeResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielEquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id_equipe":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielEquipeResource.Fullname, App.Http.Controllers.Materiel.MaterielEquipeResource);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielEquipeResource', App.Http.Controllers.Materiel.MaterielEquipeResource);
 
-const MaterielCard = class MaterielCard extends Aventus.WebComponent {
-    get 'visible'() { return this.getBoolAttr('visible') }
-    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
-						return this.__watch["item"];
-					}
-					set 'item'(val) {
-						this.__watch["item"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("item");    super.__registerWatchesActions();
-}
-    static __style = `:host{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-width:400px;overflow:hidden;width:100%}:host .img{width:100%}:host .img av-img{aspect-ratio:1;width:100%}:host .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host .info .title{font-size:var(--font-size-md);margin-top:8px}:host .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host .visible{align-items:center;display:flex}:host .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
-    __getStatic() {
-        return MaterielCard;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(MaterielCard.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3" center>
-    <av-link to="/materiel/1">
-        <div class="img">
-            <av-img mode="cover" _id="materielcard_0"></av-img>
-        </div>
-        <div class="info">
-            <div class="title" _id="materielcard_1"></div>
-            <div class="variations">
-                <template _id="materielcard_2"></template>
-                <av-tag color="accent">S</av-tag>
-            </div>
-            <div class="visible">
-                <div>Visible pour :</div>
-                <template _id="materielcard_4"></template>
-            </div>
-        </div>
-    </av-link>
-</av-col>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "materielcard_0°src": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
-      "once": true
-    },
-    "materielcard_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
-      "once": true
-    }
-  }
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-                    <av-tag color="accent" _id="materielcard_3"></av-tag>
-                `);templ0.setActions({
-  "content": {
-    "materielcard_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5(c.data.variation))}`,
-      "once": true
-    }
-  }
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'materielcard_2',
-                    template: templ0,
-                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-                    <div>Tout le monde</div>
-                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <div class="visible-for">
-                        <template _id="materielcard_5"></template>
-                    </div>
-                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(` 
-                            <av-tag color="accent" _id="materielcard_6"></av-tag>
-                        `);templ3.setActions({
-  "content": {
-    "materielcard_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.equipe))}`,
-      "once": true
-    }
-  }
-});templ2.addLoop({
-                    anchorId: 'materielcard_5',
-                    template: templ3,
-                simple:{data: "this.item.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materielcard_4',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
-                    template: templ1
-                },{once: true,
-                    condition: (c) => true,
-                    template: templ2
-                }]
-            }); }
-    getClassName() {
-        return "MaterielCard";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
-    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-    getSrc() {
-        if (this.item.image?.uri) {
-            return this.item.image?.uri;
-        }
-        return "/img/default_img.svg";
-    }
-    __98d262679bf6afafa524060227ae1154method3() {
-        return this.getSrc();
-    }
-    __98d262679bf6afafa524060227ae1154method4() {
-        return this.item.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method5(variation) {
-        return variation.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method6(equipe) {
-        return equipe.equipe.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method1() {
-        return this.item.tout_monde;
-    }
-}
-MaterielCard.Namespace=`Inventaire`;
-MaterielCard.Tag=`av-materiel-card`;
-__as1(_, 'MaterielCard', MaterielCard);
-if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
-
-App.Http.Requests.EquipeRequest=class EquipeRequest {
+App.Http.Controllers.Equipe.EquipeRequest=class EquipeRequest {
     id = undefined;
     nom;
 }
-App.Http.Requests.EquipeRequest.Namespace=`Inventaire.App.Http.Requests`;
-__as1(_.App.Http.Requests, 'EquipeRequest', App.Http.Requests.EquipeRequest);
+App.Http.Controllers.Equipe.EquipeRequest.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
+__as1(_.App.Http.Controllers.Equipe, 'EquipeRequest', App.Http.Controllers.Equipe.EquipeRequest);
 
 App.Models.Equipe=class Equipe extends Aventus.Data {
     static get Fullname() { return "App.Models.Equipe"; }
@@ -12388,7 +12371,7 @@ App.Models.MaterielEquipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"numbe
 Aventus.Converter.register(App.Models.MaterielEquipe.Fullname, App.Models.MaterielEquipe);
 __as1(_.App.Models, 'MaterielEquipe', App.Models.MaterielEquipe);
 
-App.Http.Requests.MaterielRequest=class MaterielRequest {
+App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
     variations;
     equipes;
     id = undefined;
@@ -12396,15 +12379,23 @@ App.Http.Requests.MaterielRequest=class MaterielRequest {
     image = undefined;
     tout_monde;
 }
-App.Http.Requests.MaterielRequest.Namespace=`Inventaire.App.Http.Requests`;
-__as1(_.App.Http.Requests, 'MaterielRequest', App.Http.Requests.MaterielRequest);
+App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+__as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
 
-App.Http.Requests.LoginRequest=class LoginRequest {
+App.Http.Controllers.Auth.Login.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Auth.Login.Response"; }
+}
+App.Http.Controllers.Auth.Login.Response.Namespace=`Inventaire.App.Http.Controllers.Auth.Login`;
+App.Http.Controllers.Auth.Login.Response.$schema={...(Aventus.Data?.$schema ?? {}), };
+Aventus.Converter.register(App.Http.Controllers.Auth.Login.Response.Fullname, App.Http.Controllers.Auth.Login.Response);
+__as1(_.App.Http.Controllers.Auth.Login, 'Response', App.Http.Controllers.Auth.Login.Response);
+
+App.Http.Controllers.Auth.Login.Request=class Request {
     nom_utilisateur;
     mot_passe;
 }
-App.Http.Requests.LoginRequest.Namespace=`Inventaire.App.Http.Requests`;
-__as1(_.App.Http.Requests, 'LoginRequest', App.Http.Requests.LoginRequest);
+App.Http.Controllers.Auth.Login.Request.Namespace=`Inventaire.App.Http.Controllers.Auth.Login`;
+__as1(_.App.Http.Controllers.Auth.Login, 'Request', App.Http.Controllers.Auth.Login.Request);
 
 const PageFull = class PageFull extends Aventus.Navigation.Page {
     static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}`;
@@ -12425,9 +12416,7 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">
-    <slot></slot>
-</div>` }
+        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
     });
 }
     getClassName() {
@@ -12456,11 +12445,7 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll">
-    <div class="content">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll">    <div class="content">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -12482,17 +12467,7 @@ const Header = class Header extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content">
-    <div class="logo">Inventaire FC Vétroz</div>
-    <div class="menu">
-        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
-        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>
-        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
-        <div class="item">
-            <mi-icon icon="power_settings_new"></mi-icon>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="content">    <div class="logo">Inventaire FC Vétroz</div>    <div class="menu">        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>        <div class="item">            <mi-icon icon="power_settings_new"></mi-icon>        </div>    </div></div>` }
     });
 }
     getClassName() {
@@ -12528,33 +12503,6 @@ Footer.Namespace=`Inventaire`;
 Footer.Tag=`av-footer`;
 __as1(_, 'Footer', Footer);
 if(!window.customElements.get('av-footer')){window.customElements.define('av-footer', Footer);Aventus.WebComponentInstance.registerDefinition(Footer);}
-
-const Toast = class Toast extends Aventus.Toast.ToastElement {
-    static __style = ``;
-    __getStatic() {
-        return Toast;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(Toast.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "Toast";
-    }
-    setOptions(options) {
-    }
-}
-Toast.Namespace=`Inventaire`;
-Toast.Tag=`av-toast`;
-__as1(_, 'Toast', Toast);
-if(!window.customElements.get('av-toast')){window.customElements.define('av-toast', Toast);Aventus.WebComponentInstance.registerDefinition(Toast);}
 
 const Modal = class Modal extends Aventus.Modal.ModalElement {
     static __style = `:host{align-items:center;background-color:rgba(30,30,30,.3);display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:.75rem;box-shadow:var(--elevation-3);margin:16px;max-width:32rem;padding:1.5rem;position:relative;text-align:left;transform:translateZ(0);transition:all .2s ease-in-out;width:100%}`;
@@ -12597,10 +12545,7 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
-    <av-button _id="confirm_2"></av-button>
-    <av-button color="primary" _id="confirm_3"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12688,10 +12633,7 @@ const EquipeTag = class EquipeTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="equipetag_0"></span>
-    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
-</av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">    <span _id="equipetag_0"></span>    <mi-icon icon="delete" _id="equipetag_1"></mi-icon></av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12733,7 +12675,7 @@ const EquipeTag = class EquipeTag extends Aventus.WebComponent {
     }
     async triggerDelete() {
         const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
+            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.equipe.nom + "?"
         });
         if (result) {
             this.onDelete.trigger(this);
@@ -12741,7 +12683,7 @@ const EquipeTag = class EquipeTag extends Aventus.WebComponent {
     }
     postCreation() {
         super.postCreation();
-        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.nom);
+        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.equipe.nom);
     }
 }
 EquipeTag.Namespace=`Inventaire`;
@@ -12868,15 +12810,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
-    <div class="preview" _id="inputimage_1">
-        <av-img _id="inputimage_2"></av-img>
-        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
-    </div>
-    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
-</div><div class="errors">
-    <template _id="inputimage_5"></template>
-</div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12921,14 +12855,10 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-        <template _id="inputimage_6"></template>
-    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-            <div _id="inputimage_7"></div>
-        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -12955,6 +12885,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     setPreview() {
         if (!this.value?.uri) {
             this.previewUri = this.no_default_preview ? '' : this.default_preview;
+            this.show_delete = false;
         }
         else {
             this.previewUri = this.value.uri;
@@ -12986,6 +12917,10 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     deleteFile() {
         this.inputFileEl.value = '';
+        if (this.value !== undefined) {
+            this.value.uri = "";
+            this.onChange.trigger(this.value);
+        }
         this.updateFile();
     }
     clickFile() {
@@ -13098,6 +13033,170 @@ InlineEdit.Tag=`av-inline-edit`;
 __as1(_, 'InlineEdit', InlineEdit);
 if(!window.customElements.get('av-inline-edit')){window.customElements.define('av-inline-edit', InlineEdit);Aventus.WebComponentInstance.registerDefinition(InlineEdit);}
 
+const Toast = class Toast extends Aventus.Toast.ToastElement {
+    get 'color'() { return this.getStringAttr('color') }
+    set 'color'(val) { this.setStringAttr('color', val) }get 'closing'() { return this.getBoolAttr('closing') }
+    set 'closing'(val) { this.setBoolAttr('closing', val) }get 'outline'() { return this.getBoolAttr('outline') }
+    set 'outline'(val) { this.setBoolAttr('outline', val) }get 'dash'() { return this.getBoolAttr('dash') }
+    set 'dash'(val) { this.setBoolAttr('dash', val) }get 'soft'() { return this.getBoolAttr('soft') }
+    set 'soft'(val) { this.setBoolAttr('soft', val) }get 'closable'() { return this.getBoolAttr('closable') }
+    set 'closable'(val) { this.setBoolAttr('closable', val) }get 'close_icon'() { return this.getBoolAttr('close_icon') }
+    set 'close_icon'(val) { this.setBoolAttr('close_icon', val) }    get 'toastTitle'() {
+						return this.__watch["toastTitle"];
+					}
+					set 'toastTitle'(val) {
+						this.__watch["toastTitle"] = val;
+					}get 'toastMessage'() {
+						return this.__watch["toastMessage"];
+					}
+					set 'toastMessage'(val) {
+						this.__watch["toastMessage"] = val;
+					}    icon;
+    __registerWatchesActions() {
+    this.__addWatchesActions("toastTitle");this.__addWatchesActions("toastMessage");    super.__registerWatchesActions();
+}
+    static __style = `:host{background-color:var(--alert-color, var(--color-base-200));background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px #000,0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08));color:var(--color-base-content);cursor:default;max-width:calc(100vw - 2rem);overflow:hidden;pointer-events:auto;transition:top .2s linear,opacity .2s linear,visibility .2s linear}:host .toast-content{display:grid;font-size:.875rem;gap:1rem;grid-auto-flow:column;grid-template-columns:auto;justify-content:start;line-height:1.25rem;padding-block:.75rem;padding-inline:1rem;place-items:center start;text-align:start}:host .toast-flex{align-items:flex-start;display:flex}:host .toast-icon-wrapper{flex-shrink:0}:host .toast-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host .toast-message-wrapper{flex:1;margin-left:1rem;padding-top:.125rem}:host .toast-title{font-size:.875rem;font-weight:500;margin:0}:host .toast-message{font-size:.875rem;margin-bottom:0;margin-top:0}:host .toast-message:nth-child(3){margin-top:.25rem}:host .toast-close-wrapper{flex-shrink:0;margin-left:1rem}:host .toast-close-wrapper .sr-only{border-width:0;clip:rect(0, 0, 0, 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}:host .toast-close-wrapper .toast-close-button{background-color:rgba(0,0,0,0);border:none;color:inherit;cursor:pointer;display:inline-flex;outline:none}:host .toast-close-wrapper .toast-close-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host([color=neutral]){--alert-color: var(--color-neutral);border-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){--alert-color: var(--color-primary);border-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){--alert-color: var(--color-secondary);border-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){--alert-color: var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){--alert-color: var(--color-info);border-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){--alert-color: var(--color-success);border-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){--alert-color: var(--color-warning);border-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){--alert-color: var(--color-error);border-color:var(--color-error);color:var(--color-error-content)}:host([closing]){opacity:0;visibility:hidden}:host(:not([close_icon])) .toast-close-wrapper{display:none}:host([closable]:not([close_icon])){cursor:pointer}:host([soft]){background:var(--alert-color, var(--color-base-content));background-image:none;border-color:var(--alert-color, var(--color-base-content));box-shadow:none;color:var(--alert-color, var(--color-base-content))}:host([outline]){background-color:rgba(0,0,0,0);background-image:none;box-shadow:none;color:var(--alert-color)}:host([dash]){background-color:rgba(0,0,0,0);background-image:none;border-style:dashed;box-shadow:none;color:var(--alert-color)}@supports(color: color-mix(in lab, red, red)){:host{box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200))) calc(var(--depth) * 20%), rgba(0, 0, 0, 0)),0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08))}:host([soft]){background:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));border-color:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100))}}`;
+    __getStatic() {
+        return Toast;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Toast.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "toast_0°icon": {
+      "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method2())}`,
+      "once": true
+    }
+  },
+  "events": [
+    {
+      "eventName": "click",
+      "id": "toast_5",
+      "fct": (e, c) => c.comp.close(e)
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
+  "content": {
+    "toast_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'toast_1',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
+  "content": {
+    "toast_4°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'toast_3',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method1(),
+                    template: templ1
+                }]
+            }); }
+    getClassName() {
+        return "Toast";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('color')){ this['color'] = undefined; }if(!this.hasAttribute('closing')) { this.attributeChangedCallback('closing', false, false); }if(!this.hasAttribute('outline')) { this.attributeChangedCallback('outline', false, false); }if(!this.hasAttribute('dash')) { this.attributeChangedCallback('dash', false, false); }if(!this.hasAttribute('soft')) { this.attributeChangedCallback('soft', false, false); }if(!this.hasAttribute('closable')) { this.attributeChangedCallback('closable', false, false); }if(!this.hasAttribute('close_icon')) { this.attributeChangedCallback('close_icon', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["toastTitle"] = "";w["toastMessage"] = ""; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('color');this.__upgradeProperty('closing');this.__upgradeProperty('outline');this.__upgradeProperty('dash');this.__upgradeProperty('soft');this.__upgradeProperty('closable');this.__upgradeProperty('close_icon');this.__correctGetter('toastTitle');this.__correctGetter('toastMessage'); }
+    __listBoolProps() { return ["closing","outline","dash","soft","closable","close_icon"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    close() {
+        if (this.onHideCallback) {
+            this.closing = true;
+            this.is_active = false;
+            this.onHideCallback(false);
+            Aventus.sleep(300).then(() => {
+                this.remove();
+            });
+        }
+    }
+    setOptions(options) {
+        if (options.color != undefined)
+            this.color = options.color;
+        if (options.icon != undefined)
+            this.icon = options.icon;
+        if (options.title != undefined)
+            this.toastTitle = options.title;
+        if (options.message != undefined)
+            this.toastMessage = options.message;
+        if (options.closable != undefined)
+            this.closable = options.closable;
+        if (options.close_icon != undefined)
+            this.close_icon = options.close_icon;
+        if (options.outline != undefined)
+            this.outline = options.outline;
+        if (options.dash != undefined)
+            this.dash = options.dash;
+        if (options.soft != undefined)
+            this.soft = options.soft;
+        if (options.message != undefined)
+            this.toastMessage = options.message;
+    }
+    getIcon() {
+        if (this.icon !== undefined)
+            return this.icon;
+        if (this.color == "error")
+            return 'error';
+        if (this.color == "info")
+            return 'info';
+        if (this.color == "success")
+            return 'check';
+        if (this.color == "warning")
+            return 'warning';
+        return 'error';
+    }
+    postCreation() {
+        super.postCreation();
+        if (this.closable && !this.close_icon) {
+            new Aventus.PressManager({
+                element: this,
+                onPress: () => {
+                    this.close();
+                }
+            });
+        }
+    }
+    __8b8b64fb001ad828fd9cd08e5018dbd9method2() {
+        return this.getIcon();
+    }
+    __8b8b64fb001ad828fd9cd08e5018dbd9method3() {
+        return this.toastTitle;
+    }
+    __8b8b64fb001ad828fd9cd08e5018dbd9method4() {
+        return this.toastMessage;
+    }
+    __8b8b64fb001ad828fd9cd08e5018dbd9method0() {
+        return this.toastTitle;
+    }
+    __8b8b64fb001ad828fd9cd08e5018dbd9method1() {
+        return this.toastMessage;
+    }
+    static add(options) {
+        return super.add(options);
+    }
+}
+Toast.Namespace=`Inventaire`;
+Toast.Tag=`av-toast`;
+__as1(_, 'Toast', Toast);
+if(!window.customElements.get('av-toast')){window.customElements.define('av-toast', Toast);Aventus.WebComponentInstance.registerDefinition(Toast);}
+
 const Input = class Input extends Aventus.Form.FormElement {
     static get observedAttributes() {return ["name", "label", "value"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
     get 'color'() { return this.getStringAttr('color') }
@@ -13122,13 +13221,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
-    <slot name="before"></slot>
-    <input _id="input_1" />
-    <slot name="after"></slot>
-</div><div class="errors">
-    <template _id="input_2"></template>
-</div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13189,9 +13282,7 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="input_3"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13265,12 +13356,7 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
-    <av-input label="Nom de la variation" _id="modaltag_1"></av-input>
-</div><div class="footer">
-    <av-button _id="modaltag_2">Annuler</av-button>
-    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13360,11 +13446,7 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="variationtag_0"></span>
-    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
-    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
-</av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13434,8 +13516,7 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0">
-</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13516,9 +13597,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">
-    <div class="loader"></div>
-</div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
     });
 }
     getClassName() {
@@ -13806,9 +13885,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
-    <slot _id="iconaction_1"></slot>
-</div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13873,7 +13950,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     onOpen = new Aventus.Callback();
     isAnimating = false;
     firstOpen = true;
-    static __style = `:host{--_options-container-background: var(--options-container-background, var(--form-element-background, white));--_options-container-border-radius: var(--options-container-border-radius, var(--form-element-border-radius, 0));--_options-container-box-shadow: var(--options-container-box-shadow, var(--elevation-2))}:host{background-color:var(--_options-container-background);border-radius:var(--_options-container-border-radius);box-shadow:var(--_options-container-box-shadow);display:grid;grid-template-rows:0fr;left:0;overflow:hidden;position:absolute;top:0;transition:.2s ease-in-out grid-template-rows;z-index:800}:host av-scrollable .container{display:flex;flex-direction:column}:host([open]){grid-template-rows:1fr}`;
+    static __style = `:host{--_options-container-background: var(--options-container-background, var(--form-element-background, white));--_options-container-border-radius: var(--options-container-border-radius, var(--form-element-border-radius, 0));--_options-container-box-shadow: var(--options-container-box-shadow, var(--elevation-2))}:host{background-color:var(--color-base-100);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 2px calc(var(--depth)*3px) -2px rgba(0,0,0,.2);box-shadow:0 20px 25px -5px rgb(0, 0, 0, calc(var(--depth) * 0.1)),0 8px 10px -6px rgb(0, 0, 0, calc(var(--depth) * 0.1));color:var(--color-base-content);display:grid;grid-template-rows:0fr;left:0;max-height:min(24rem,70dvh);overflow:hidden;padding:.5rem;position:absolute;top:0;transition:.2s ease-in-out grid-template-rows;z-index:800}:host av-scrollable .container{display:flex;flex-direction:column}:host([open]){grid-template-rows:1fr}`;
     __getStatic() {
         return OptionsContainer;
     }
@@ -13885,11 +13962,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>
-    <div class="container">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -13982,7 +14055,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         target.inputEl.setAttribute("disabled", "disabled");
     }
 })); }
-    static __style = `:host{--_select-height: var(--select-height, 30px);--_select-background-color: var(--select-background-color, var(--form-element-background, white));--_select-icon-height: var(--select-icon-height, calc(var(--_select-height) / 2));--_select-error-logo-size: var(--select-error-logo-size, calc(var(--_select-height) / 2));--_select-font-size: var(--select-font-size, var(--form-element-font-size, 16px));--_select-font-size-label: var(--select-font-size-label, var(--form-element-font-size-label, calc(var(--_select-font-size) * 0.95)));--_select-select-border: var(--select-select-border, var(--form-element-border, 1px solid var(--lighter-active)));--_generic-select-border-radius: var(--generic-select-border-radius, var(--form-element-border-radius, 0));--_select-caret-height: var(--select-caret-height, calc(var(--_select-height) / 2));--_select-caret-color: var(--select-caret-color, var(--form-element-color))}:host{min-width:100px;width:100%}:host label{cursor:pointer;display:none;font-size:var(--_select-font-size-label);margin-bottom:5px;margin-left:3px}:host .input{align-items:center;background-color:var(--_select-background-color);border:var(--_select-select-border);border-radius:var(--_generic-select-border-radius);cursor:pointer;display:flex;height:var(--_select-height);padding:0 10px;width:100%}:host .input .icon{display:none;height:var(--_select-icon-height);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--_select-caret-color);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:var(--_select-caret-height);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{background-color:rgba(0,0,0,0);border:none;color:var(--text-color);display:block;flex-grow:1;font-size:var(--_select-font-size);height:100%;margin:0;opacity:1;outline:none;padding:5px 0;padding-right:10px;-webkit-text-fill-color:var(--text-color);width:100%}:host .input .error-logo{align-items:center;background-color:var(--red);border-radius:var(--border-radius-round);color:#fff;display:none;flex-shrink:0;font-size:calc(var(--_select-error-logo-size) - 5px);height:var(--_select-error-logo-size);justify-content:center;width:var(--_select-error-logo-size)}:host .errors{color:var(--red);display:none;font-size:var(--font-size-sm);line-height:1.1;margin:10px;margin-bottom:0px}:host .errors div{margin:5px 0}:host .hidden{display:none}:host([has_errors]) .input{border:1px solid var(--red)}:host([has_errors]) .input .error-logo{display:flex}:host([has_errors]) .errors{display:block}:host([icon]:not([icon=""])) .input .icon{display:block}:host([label]:not([label=""])) label{display:flex}:host([open]) .input .caret{transform:rotate(-270deg)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
     constructor() {
         super();
         if (this.constructor == GenericSelect) {
@@ -13999,22 +14072,8 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
-    <slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>
-    <input id="input" autocomplete="off" _id="genericselect_3" />
-    <slot name="append"></slot>
-    <div class="error-logo">!</div>
-    <av-img src="/img/angle-left.svg" class="caret"></av-img>
-</div><div class="errors">
-    <template _id="genericselect_4"></template>
-</div><div class="hidden">
-    <slot></slot>
-</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14069,9 +14128,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="genericselect_5"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14178,6 +14235,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         });
         this.inputEl.addEventListener("focus", () => {
             clearTimeout(blurTimeout);
+            this.inputEl.select();
         });
         this.optionsContainer.addEventListener("focus", () => {
             clearTimeout(blurTimeout);
@@ -14214,7 +14272,7 @@ __as1(_, 'GenericSelect', GenericSelect);
 const GenericOption = class GenericOption extends Aventus.WebComponent {
     value;
     select;
-    static __style = `:host{--_option-font-size: var(--option-font-size, var(--form-element-font-size, 16px))}:host{padding:5px 10px;font-size:var(--_option-font-size);cursor:pointer;transition:background-color .2s linear}:host(:hover){background-color:var(--form-element-background-active)}`;
+    static __style = `:host{border-radius:var(--radius-field);color:inherit;font-size:.875rem;padding-block:.375rem;padding-inline:.75rem;transition-duration:.2s;transition-property:color,background-color;transition-timing-function:cubic-bezier(0, 0, 0.2, 1);white-space:normal;cursor:pointer}:host(:hover){background-color:var(--color-base-content)}@supports(color: color-mix(in lab, red, red)){:host(:hover){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}}`;
     __getStatic() {
         return GenericOption;
     }
@@ -14621,9 +14679,7 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
-    <av-button _id="alert_1"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14675,19 +14731,19 @@ Alert.Tag=`av-alert`;
 __as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
 
-App.Http.Controllers.AuthController=class AuthController extends Aventus.HttpRoute {
+App.Http.Controllers.Auth.Login.AuthLoginController=class AuthLoginController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
-        this.login = this.login.bind(this);
+        this.request = this.request.bind(this);
     }
-    async login(body) {
+    async request(body) {
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/login`, Aventus.HttpMethod.POST);
         request.setBody(body);
         return await request.queryJSON(this.router);
     }
 }
-App.Http.Controllers.AuthController.Namespace=`Inventaire.App.Http.Controllers`;
-__as1(_.App.Http.Controllers, 'AuthController', App.Http.Controllers.AuthController);
+App.Http.Controllers.Auth.Login.AuthLoginController.Namespace=`Inventaire.App.Http.Controllers.Auth.Login`;
+__as1(_.App.Http.Controllers.Auth.Login, 'AuthLoginController', App.Http.Controllers.Auth.Login.AuthLoginController);
 
 const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     static __style = `:host{align-items:center;display:flex;height:100%;justify-content:center;width:100%}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-3);display:flex;justify-content:stretch;max-width:700px;overflow:hidden;width:calc(100% - 40px)}:host .card .img{background-image:url("/img/background-foot.jpg");background-position:center center;background-size:cover;width:300px;flex-shrink:0}:host .card .content{padding:24px}:host .card .title{font-size:var(--font-size-lg);margin-bottom:24px}:host .card av-input{margin-bottom:12px}:host .card .right{display:flex;justify-content:flex-end;margin-top:8px}:host(:not([visible])){display:flex}@media screen and (max-width: 800px){:host .card{flex-direction:column;max-width:500px}:host .card .img{height:200px;width:100%}}`;
@@ -14701,17 +14757,7 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="img"></div>
-    <div class="content">
-        <div class="title">Inventaire FC Vétroz</div>
-        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>
-        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>
-        <div class="right">
-            <av-button type="submit" color="neutral">Login</av-button>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="img"></div>    <div class="content">        <div class="title">Inventaire FC Vétroz</div>        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>        <div class="right">            <av-button type="submit" color="neutral">Login</av-button>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14734,7 +14780,7 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
         return "LoginPage";
     }
     route() {
-        return [App.Http.Controllers.AuthController, "login"];
+        return App.Http.Controllers.Auth.Login.AuthLoginController;
     }
     onResult(result) {
         if (result?.result) {
@@ -14762,20 +14808,20 @@ LoginPage.Tag=`av-login-page`;
 __as1(_, 'LoginPage', LoginPage);
 if(!window.customElements.get('av-login-page')){window.customElements.define('av-login-page', LoginPage);Aventus.WebComponentInstance.registerDefinition(LoginPage);}
 
-App.Http.Controllers.EquipeController=class EquipeController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Requests.EquipeRequest; }
-    getResource() { return _.App.Http.Resources.EquipeResource; }
+App.Http.Controllers.Equipe.EquipeController=class EquipeController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.Equipe.EquipeRequest; }
+    getResource() { return _.App.Http.Controllers.Equipe.EquipeResource; }
     getUri() { return "data/equipe"; }
 }
-App.Http.Controllers.EquipeController.Namespace=`Inventaire.App.Http.Controllers`;
-__as1(_.App.Http.Controllers, 'EquipeController', App.Http.Controllers.EquipeController);
+App.Http.Controllers.Equipe.EquipeController.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
+__as1(_.App.Http.Controllers.Equipe, 'EquipeController', App.Http.Controllers.Equipe.EquipeController);
 
 let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
     /**
      * @inheritdoc
      */
     defineRoutes() {
-        return new App.Http.Controllers.EquipeController();
+        return new App.Http.Controllers.Equipe.EquipeController();
     }
     /**
      * Create a singleton to store data
@@ -14847,12 +14893,7 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
-    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
-</div><div class="footer">
-    <av-button _id="modalequipe_2">Annuler</av-button>
-    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14942,20 +14983,151 @@ App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","no
 Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
 __as1(_.App.Models, 'Materiel', App.Models.Materiel);
 
-App.Http.Controllers.MaterielController=class MaterielController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Requests.MaterielRequest; }
-    getResource() { return _.App.Http.Resources.MaterielResource; }
+App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResource"; }
+    variations;
+    equipes;
+    id;
+    nom;
+    image = new _.App.Models.MaterielImage();
+    tout_monde;
+}
+App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.Variation[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
+
+const MaterielCard = class MaterielCard extends Aventus.WebComponent {
+    get 'visible'() { return this.getBoolAttr('visible') }
+    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
+						return this.__watch["item"];
+					}
+					set 'item'(val) {
+						this.__watch["item"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("item");    super.__registerWatchesActions();
+}
+    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;overflow:hidden}:host av-col .img{width:100%;max-height:250px}:host av-col .img av-img{aspect-ratio:1;width:100%;max-height:250px}:host av-col .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host av-col .info .title{font-size:var(--font-size-md);margin-top:8px}:host av-col .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host av-col .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .visible{align-items:center;display:flex}:host av-col .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
+    __getStatic() {
+        return MaterielCard;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(MaterielCard.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3">    <av-link _id="materielcard_0">        <div class="img">            <av-img mode="cover" _id="materielcard_1"></av-img>        </div>        <div class="info">            <div class="title" _id="materielcard_2"></div>            <div class="variations">                <template _id="materielcard_3"></template>            </div>            <div class="visible">                <div>Visible pour :</div>                <template _id="materielcard_5"></template>            </div>        </div>    </av-link></av-col>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "materielcard_0°to": {
+      "fct": (c) => `/materiel/${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
+      "once": true
+    },
+    "materielcard_1°src": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
+      "once": true
+    },
+    "materielcard_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5())}`,
+      "once": true
+    }
+  }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                     <av-tag color="accent" _id="materielcard_4"></av-tag>                `);templ0.setActions({
+  "content": {
+    "materielcard_4°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.variation))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'materielcard_3',
+                    template: templ0,
+                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`                    <div>Tout le monde</div>                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                    <div class="visible-for">                        <template _id="materielcard_6"></template>                    </div>                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(`                             <av-tag color="accent" _id="materielcard_7"></av-tag>                        `);templ3.setActions({
+  "content": {
+    "materielcard_7°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method7(c.data.equipe))}`,
+      "once": true
+    }
+  }
+});templ2.addLoop({
+                    anchorId: 'materielcard_6',
+                    template: templ3,
+                simple:{data: "this.item.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
+                    anchorId: 'materielcard_5',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
+                    template: templ1
+                },{once: true,
+                    condition: (c) => true,
+                    template: templ2
+                }]
+            }); }
+    getClassName() {
+        return "MaterielCard";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
+    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    getSrc() {
+        if (this.item.image?.uri) {
+            return this.item.image?.uri;
+        }
+        return "/img/default_img.svg";
+    }
+    __98d262679bf6afafa524060227ae1154method3() {
+        return this.item.id;
+    }
+    __98d262679bf6afafa524060227ae1154method4() {
+        return this.getSrc();
+    }
+    __98d262679bf6afafa524060227ae1154method5() {
+        return this.item.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method6(variation) {
+        return variation.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method7(equipe) {
+        return equipe.equipe.nom;
+    }
+    __98d262679bf6afafa524060227ae1154method1() {
+        return this.item.tout_monde;
+    }
+}
+MaterielCard.Namespace=`Inventaire`;
+MaterielCard.Tag=`av-materiel-card`;
+__as1(_, 'MaterielCard', MaterielCard);
+if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
+
+App.Http.Controllers.Materiel.MaterielResourceDetails=class MaterielResourceDetails extends _.App.Http.Controllers.Materiel.MaterielResource {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResourceDetails"; }
+    inventaires;
+    test;
+}
+App.Http.Controllers.Materiel.MaterielResourceDetails.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielResourceDetails.$schema={...(App.Http.Controllers.Materiel.MaterielResource?.$schema ?? {}), "inventaires":"Inventaire.App.Models.Inventaire[]","test":"string"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResourceDetails.Fullname, App.Http.Controllers.Materiel.MaterielResourceDetails);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielResourceDetails', App.Http.Controllers.Materiel.MaterielResourceDetails);
+
+App.Http.Controllers.Materiel.MaterielController=class MaterielController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.Materiel.MaterielRequest; }
+    getResource() { return _.App.Http.Controllers.Materiel.MaterielResource; }
+    getResourceDetails() { return _.App.Http.Controllers.Materiel.MaterielResourceDetails; }
     getUri() { return "data/materiel"; }
 }
-App.Http.Controllers.MaterielController.Namespace=`Inventaire.App.Http.Controllers`;
-__as1(_.App.Http.Controllers, 'MaterielController', App.Http.Controllers.MaterielController);
+App.Http.Controllers.Materiel.MaterielController.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+__as1(_.App.Http.Controllers.Materiel, 'MaterielController', App.Http.Controllers.Materiel.MaterielController);
 
 let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
     /**
      * @inheritdoc
      */
     defineRoutes() {
-        return new App.Http.Controllers.MaterielController();
+        return new App.Http.Controllers.Materiel.MaterielController();
     }
     /**
      * Create a singleton to store data
@@ -14973,274 +15145,20 @@ let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
 MaterielRAM.Namespace=`Inventaire`;
 __as1(_, 'MaterielRAM', MaterielRAM);
 
-const MaterielDetailsPage = class MaterielDetailsPage extends Page {
-    form;
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}:host .by-equipe .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .by-equipe .list .item .line{align-items:center;display:flex;gap:20px}:host .by-equipe .list .item .line .nom{flex-grow:1;width:50%}:host .by-equipe .list .item .line .quantite{flex-grow:1;width:50%}:host .by-equipe .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .by-equipe .list .item .line .modification av-icon-action{width:fit-content}:host .by-equipe .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .by-equipe .list .item:first-child{border-top:none}`;
-    constructor() {
-        super();
-        this.form = Aventus.Form.Form.create({
-            nom: Aventus.Form.Validators.Required,
-            variations: {},
-            image: {},
-            tout_monde: {},
-            equipes: {}
-        });
-    }
-    __getStatic() {
-        return MaterielDetailsPage;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(MaterielDetailsPage.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title" _id="materieldetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="success" icon="save" _id="materieldetailspage_1">Enregistrer</av-icon-action>
-        </div>
-    </div>
-    <div class="body">
-        <av-row>
-            <av-col size="6">
-                <av-input-image label="Image" _id="materieldetailspage_2"></av-input-image>
-            </av-col>
-            <av-col size="6" class="contenu">
-                <av-input label="Nom du materiel" _id="materieldetailspage_3"></av-input>
-                <div class="tags">
-                    <div class="label">Variations</div>
-                    <av-variation-tags _id="materieldetailspage_4"></av-variation-tags>
-                </div>
-                <div class="tags">
-                    <div class="label pour">
-                        <span class="main-label">Pour :</span>
-                        <div class="toggle">
-                            <span class="sub-label" _id="materieldetailspage_5">Equipe spécifique</span>
-                            <av-toggle _id="materieldetailspage_6"></av-toggle>
-                            <span class="sub-label" _id="materieldetailspage_7">Tout le monde</span>
-                        </div>
-                    </div>
-                    <template _id="materieldetailspage_8"></template>
-                </div>
-            </av-col>
-        </av-row>
-    </div>
-</div><template _id="materieldetailspage_10"></template>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "materieldetailspage_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4())}`,
-      "once": true
-    }
-  },
-  "injection": [
-    {
-      "id": "materieldetailspage_2",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_3",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_4",
-      "injectionName": "variations",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_6",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
-      "once": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "materieldetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_5",
-      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_7",
-      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                        <av-equipe-tags _id="materieldetailspage_9"></av-equipe-tags>
-                    `);templ0.setActions({
-  "injection": [
-    {
-      "id": "materieldetailspage_9",
-      "injectionName": "equipes",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(),
-      "once": true
-    }
-  ]
-});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_8',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
-                    template: templ0
-                }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-    <div class="card by-equipe">
-        <div class="header">
-            <div class="title">Liste dans les équipes</div>
-        </div>
-        <div class="body">
-            <div class="list">
-                <template _id="materieldetailspage_11"></template>
-            </div>
-        </div>
-    </div>
-    `);const templ2 = new Aventus.Template(this);templ2.setTemplate(` 
-                    <div class="item">
-                        <div class="line">
-                            <div class="nom">U18</div>
-                            <div class="quantite">21</div>
-                            <div class="modification">
-                                <div class="actions">
-                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
-                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>
-                                </div>
-                                <span>Maxime, le 24.08.2025</span>
-                            </div>
-                        </div>
-                    </div>
-                `);templ1.addLoop({
-                    anchorId: 'materieldetailspage_11',
-                    template: templ2,
-                func: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3()});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_10',
-                    parts: [{
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
-                    template: templ1
-                }]
-            }); }
-    getClassName() {
-        return "MaterielDetailsPage";
-    }
-    async isAllowed(state, pattern, router) {
-        const slugs = router.getSlugs(pattern);
-        if (!slugs || typeof slugs['id'] != "number") {
-            return "/materiel";
-        }
-        const id = slugs['id'];
-        if (id == 0) {
-            let newItem = new App.Http.Requests.MaterielRequest();
-            newItem.id = 0;
-            newItem.tout_monde = true;
-            newItem.image = new App.Models.MaterielImage();
-            newItem.variations = [];
-            let v1 = new App.Models.Variation();
-            v1.nom = "XS";
-            newItem.variations.push(v1);
-            let v2 = new App.Models.Variation();
-            v2.nom = "S";
-            newItem.variations.push(v2);
-            newItem.equipes = [];
-            this.form.item = newItem;
-        }
-        else {
-            const ram = MaterielRAM.getInstance();
-            const item = await ram.getById(id);
-            if (!item) {
-                return "/materiel";
-            }
-            this.form.item = ram.toRequest(item);
-        }
-        return true;
-    }
-    configure() {
-        return {};
-    }
-    async save() {
-        console.log(this.form.item);
-        await this.form.execute(MaterielRAM.getInstance().saveWithError);
-    }
-    getTitle() {
-        if (this.form.item?.id) {
-            return this.form.item.nom;
-        }
-        return "Création de matériel";
-    }
-    setToutMonde() {
-        this.form.item.tout_monde = true;
-    }
-    unsetToutMonde() {
-        this.form.item.tout_monde = false;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
-        let i = 0;
-        return {
-            transform: () => {
-                i++;
-            },
-            condition: () => {
-                return (i < 50);
-            },
-            apply: () => {
-                return ({ i });
-            }
-        };
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
-        return this.getTitle();
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
-        return !this.form.item.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
-        return this.form.item?.id;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
-        return this.form.parts.image;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
-        return this.form.parts.nom;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
-        return this.form.item.variations;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
-        return this.form.parts.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
-        return this.form.item.equipes;
-    }
-}
-MaterielDetailsPage.Namespace=`Inventaire`;
-MaterielDetailsPage.Tag=`av-materiel-details-page`;
-__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
-if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
-
-App.Http.Controllers.UserController=class UserController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Requests.UserRequest; }
-    getResource() { return _.App.Http.Resources.UserResource; }
+App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.User.UserRequest; }
+    getResource() { return _.App.Http.Controllers.User.UserResource; }
     getUri() { return "data/user"; }
 }
-App.Http.Controllers.UserController.Namespace=`Inventaire.App.Http.Controllers`;
-__as1(_.App.Http.Controllers, 'UserController', App.Http.Controllers.UserController);
+App.Http.Controllers.User.UserController.Namespace=`Inventaire.App.Http.Controllers.User`;
+__as1(_.App.Http.Controllers.User, 'UserController', App.Http.Controllers.User.UserController);
 
 let UserRAM=class UserRAM extends AventusPhp.RamHttp {
     /**
      * @inheritdoc
      */
     defineRoutes() {
-        return new App.Http.Controllers.UserController();
+        return new App.Http.Controllers.User.UserController();
     }
     /**
      * Create a singleton to store data
@@ -15277,10 +15195,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">
-    <av-button _id="equipeeditmodal_2">Annuler</av-button>
-    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">    <av-button _id="equipeeditmodal_2">Annuler</av-button>    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15330,7 +15245,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     static async open(item) {
         const modal = new EquipeEditModal();
         modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
-        const clone = item ? item.clone() : new App.Http.Resources.EquipeResource();
+        const clone = item ? item.clone() : new App.Http.Controllers.Equipe.EquipeResource();
         if (!clone.id) {
             clone.id = 0;
         }
@@ -15363,23 +15278,7 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title" _id="equipedetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
-            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
-        </div>
-    </div>
-    <div class="body">
-        <div class="title">
-            <span>Liste de matériel</span>
-        </div>
-        <div class="list">
-            <template _id="equipedetailspage_3"></template>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="equipedetailspage_0"></div>        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>        </div>    </div>    <div class="body">        <div class="title">            <span>Liste de matériel</span>        </div>        <div class="list">            <template _id="equipedetailspage_3"></template>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15399,22 +15298,7 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
       "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-                <div class="item">
-                    <div class="line">
-                        <div class="img"></div>
-                        <div class="nom">Nom de l'article</div>
-                        <div class="quantite">21</div>
-                        <div class="modification">
-                            <div class="actions">
-                                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_4">Modifier</av-icon-action>
-                                <av-icon-action color="info" icon="history" _id="equipedetailspage_5">Historique</av-icon-action>
-                            </div>
-                            <span>Maxime, le 24.08.2025</span>
-                        </div>
-                    </div>
-                </div>
-            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                 <div class="item">                    <div class="line">                        <div class="img"></div>                        <div class="nom">Nom de l'article</div>                        <div class="quantite">21</div>                        <div class="modification">                            <div class="actions">                                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_4">Modifier</av-icon-action>                                <av-icon-action color="info" icon="history" _id="equipedetailspage_5">Historique</av-icon-action>                            </div>                            <span>Maxime, le 24.08.2025</span>                        </div>                    </div>                </div>            `);templ0.setActions({
   "pressEvents": [
     {
       "id": "equipedetailspage_4",
@@ -15501,19 +15385,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des équipes</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
-            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="equipespage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15644,19 +15516,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste du matériel</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
-            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <av-row class="list" _id="materielpage_2">
-        </av-row>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15769,6 +15629,290 @@ MaterielPage.Tag=`av-materiel-page`;
 __as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
 
+const MaterielDetailsPage = class MaterielDetailsPage extends Page {
+    get 'inventaires'() {
+						return this.__watch["inventaires"];
+					}
+					set 'inventaires'(val) {
+						this.__watch["inventaires"] = val;
+					}get 'objName'() {
+						return this.__watch["objName"];
+					}
+					set 'objName'(val) {
+						this.__watch["objName"] = val;
+					}    form;
+    item;
+    slugId = 0;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
+}
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}:host .by-equipe .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .by-equipe .list .item .line{align-items:center;display:flex;gap:20px}:host .by-equipe .list .item .line .nom{flex-grow:1;width:50%}:host .by-equipe .list .item .line .quantite{flex-grow:1;width:50%}:host .by-equipe .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .by-equipe .list .item .line .modification .actions{display:flex}:host .by-equipe .list .item .line .modification av-icon-action{width:fit-content}:host .by-equipe .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .by-equipe .list .item:first-child{border-top:none}`;
+    constructor() {
+        super();
+        this.form = Aventus.Form.Form.create({
+            nom: Aventus.Form.Validators.Required,
+            variations: {},
+            image: {},
+            tout_monde: {},
+            equipes: {}
+        });
+    }
+    __getStatic() {
+        return MaterielDetailsPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(MaterielDetailsPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="materieldetailspage_0"></div>        <div class="actions">            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>        </div>    </div>    <div class="body">        <av-row>            <av-col size="6">                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>            </av-col>            <av-col size="6" class="contenu">                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>                <div class="tags">                    <div class="label">Variations</div>                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>                </div>                <div class="tags">                    <div class="label pour">                        <span class="main-label">Pour :</span>                        <div class="toggle">                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>                            <av-toggle _id="materieldetailspage_7"></av-toggle>                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>                        </div>                    </div>                    <template _id="materieldetailspage_9"></template>                </div>            </av-col>        </av-row>    </div></div><template _id="materieldetailspage_11"></template>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "materieldetailspage_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4())}`,
+      "once": true
+    }
+  },
+  "injection": [
+    {
+      "id": "materieldetailspage_3",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_4",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_5",
+      "injectionName": "variations",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_7",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "materieldetailspage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_6",
+      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_8",
+      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>                    `);templ0.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_10",
+      "injectionName": "equipes",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(),
+      "once": true
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_9',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`    <div class="card by-equipe">        <div class="header">            <div class="title">Liste dans les équipes</div>        </div>        <div class="body">            <div class="list">                <template _id="materieldetailspage_12"></template>            </div>        </div>    </div>`);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                    <div class="item">                        <div class="line">                            <div class="nom" _id="materieldetailspage_13"></div>                            <div class="quantite" _id="materieldetailspage_14"></div>                            <div class="modification">                                <div class="actions">                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>                                    <template _id="materieldetailspage_15"></template>                                </div>                                <span _id="materieldetailspage_16"></span>                            </div>                        </div>                    </div>                `);templ2.setActions({
+  "content": {
+    "materieldetailspage_13°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(c.data.inventaire))}`,
+      "once": true
+    },
+    "materieldetailspage_14°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11(c.data.inventaire))}`
+    },
+    "materieldetailspage_16°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12(c.data.inventaire))}`,
+      "once": true
+    }
+  }
+});templ1.addLoop({
+                    anchorId: 'materieldetailspage_12',
+                    template: templ2,
+                simple:{data: "this.inventaires",item:"inventaire"}});const templ3 = new Aventus.Template(this);templ3.setTemplate(`                                        <av-icon-action color="info" icon="history">Historique</av-icon-action>                                    `);templ2.addIf({
+                    anchorId: 'materieldetailspage_15',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3(c.data.inventaire),
+                    template: templ3
+                }]
+            });this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_11',
+                    parts: [{
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
+                    template: templ1
+                }]
+            }); }
+    getClassName() {
+        return "MaterielDetailsPage";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    async isAllowed(state, pattern, router) {
+        const slugs = router.getSlugs(pattern);
+        if (!slugs || typeof slugs['id'] != "number") {
+            return "/materiel";
+        }
+        const id = slugs['id'];
+        this.slugId = id;
+        if (id == 0) {
+            let newItem = new App.Http.Controllers.Materiel.MaterielRequest();
+            newItem.id = 0;
+            newItem.tout_monde = true;
+            newItem.image = new App.Models.MaterielImage();
+            newItem.variations = [];
+            let v1 = new App.Models.Variation();
+            v1.nom = "XS";
+            newItem.variations.push(v1);
+            let v2 = new App.Models.Variation();
+            v2.nom = "S";
+            newItem.variations.push(v2);
+            newItem.equipes = [];
+            this.form.item = newItem;
+            this.objName = "Création de matériel";
+        }
+        else {
+            const ram = MaterielRAM.getInstance();
+            const item = await ram.getById(id);
+            if (!item) {
+                return "/materiel";
+            }
+            this.item = item;
+            this.form.item = ram.toRequest(item);
+            this.objName = this.form.item.nom;
+            const inventaires = [];
+            let equipes = [];
+            if (item.tout_monde) {
+                equipes = (await EquipeRAM.getInstance().getList());
+            }
+            else {
+                equipes = item.equipes.map(p => p.equipe);
+            }
+            equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+            for (let equipe of equipes) {
+                const el = (item.inventaires.find(p => p.id_equipe == equipe.id) ?? new App.Models.Inventaire());
+                el.equipe = equipe;
+                inventaires.push(el);
+            }
+            this.inventaires = inventaires;
+        }
+        return true;
+    }
+    configure() {
+        return {};
+    }
+    getLastUpdate(inventaire) {
+        if (inventaire.lastUpdate) {
+            return inventaire.lastUpdateBy + ", le " + inventaire.lastUpdate.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "2-digit"
+            });
+        }
+        return "";
+    }
+    async save() {
+        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
+        if (result.result) {
+            Toast.add({
+                message: "Matériel enregistré",
+                color: "success",
+                closable: true
+            });
+            if (this.form.item.id == 0) {
+                this.router?.navigate('/materiel/' + result.result.id);
+            }
+            else {
+                const ram = MaterielRAM.getInstance();
+                this.form.item = ram.toRequest(result.result);
+                this.objName = this.form.item.nom;
+            }
+        }
+    }
+    async destroy() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
+        });
+        if (result) {
+            const ram = MaterielRAM.getInstance();
+            const result = await Aventus.Process.execute(ram.deleteByIdWithError(this.slugId));
+            if (result) {
+                this.router?.navigate("/materiel");
+            }
+        }
+    }
+    setToutMonde() {
+        this.form.item.tout_monde = true;
+    }
+    unsetToutMonde() {
+        this.form.item.tout_monde = false;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
+        return this.objName;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10(inventaire) {
+        return inventaire.equipe.nom;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11(inventaire) {
+        return inventaire.quantite ?? '-';
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod12(inventaire) {
+        return this.getLastUpdate(inventaire);
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
+        return !this.form.item.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
+        return this.form.item?.id;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3(inventaire) {
+        return inventaire.id;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
+        return this.form.parts.image;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
+        return this.form.parts.nom;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+        return this.form.item.variations;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
+        return this.form.parts.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
+        return this.form.item.equipes;
+    }
+}
+MaterielDetailsPage.Namespace=`Inventaire`;
+MaterielDetailsPage.Tag=`av-materiel-details-page`;
+__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
+if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
+
 const UserEditModal = class UserEditModal extends Modal {
     form;
     static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}`;
@@ -15796,17 +15940,7 @@ const UserEditModal = class UserEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>
-    <av-col size="12" size_xs="6">
-        <av-input label="Nom" _id="usereditmodal_1"></av-input>
-    </av-col>
-    <av-col size="12" size_xs="6">
-        <av-input label="Prénom" _id="usereditmodal_2"></av-input>
-    </av-col>
-</av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">
-    <av-button _id="usereditmodal_5">Annuler</av-button>
-    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>    <av-col size="12" size_xs="6">        <av-input label="Nom" _id="usereditmodal_1"></av-input>    </av-col>    <av-col size="12" size_xs="6">        <av-input label="Prénom" _id="usereditmodal_2"></av-input>    </av-col></av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">    <av-button _id="usereditmodal_5">Annuler</av-button>    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15914,10 +16048,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15987,19 +16118,7 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des utilisateurs</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
-            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="userspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16125,11 +16244,7 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`
-    <av-header></av-header>
-`,'after':`
-    <av-footer></av-footer>
-` }
+        blocks: { 'before':`    <av-header></av-header>`,'after':`    <av-footer></av-footer>` }
     });
 }
     getClassName() {
@@ -16150,6 +16265,12 @@ const Main = class Main extends Aventus.Navigation.Router {
     postCreation() {
         super.postCreation();
         Main.instance = this;
+        Aventus.Toast.ToastManager.configure({
+            defaultDelay: 5000,
+            defaultPosition: "top right",
+            defaultToast: Toast,
+            heightLimitPercent: 100,
+        });
         Aventus.Modal.ModalElement.configure({
             closeWithClick: false
         });
@@ -16226,8 +16347,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0">
-</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16268,9 +16388,12 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
         const p = new ModalEquipe();
         const equipe = await p.show();
         if (equipe !== null) {
-            this.equipes.push(equipe);
+            let materielEquipe = new App.Models.MaterielEquipe();
+            materielEquipe.id_equipe = equipe.id;
+            materielEquipe.equipe = equipe;
+            this.equipes.push(materielEquipe);
             let el = new EquipeTag();
-            el.equipe = equipe;
+            el.equipe = materielEquipe;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }

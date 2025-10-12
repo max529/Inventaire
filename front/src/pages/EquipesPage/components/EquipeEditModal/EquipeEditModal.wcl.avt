@@ -2,9 +2,9 @@ import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
 import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
 import { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
 import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
-import type { EquipeRequest } from "../../../../generated/app/Http/Requests/EquipeRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
-import { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
+import type { EquipeRequest } from "../../../../generated/app/Http/Controllers/Equipe/EquipeRequest.lib.avt";
+import { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 
 export class EquipeEditModal extends Modal<EquipeResource> implements Aventus.DefaultComponent {
 

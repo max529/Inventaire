@@ -1,8 +1,0 @@
-namespace App.Http.Requests {
-
-	export class EquipeRequest {
-		public id?: number = undefined;
-		public nom!: string;
-	}
-
-}

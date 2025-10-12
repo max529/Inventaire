@@ -1,12 +1,21 @@
 import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
 import { Page } from "../../components/layout/Page/Page.wcl.avt";
-import { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
 import { MaterielImage } from "../../generated/app/Models/MaterielImage.lib.avt";
 import type { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";
-import { MaterielRequest } from "../../generated/app/Http/Requests/MaterielRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { Variation } from "../../generated/app/Models/Variation.lib.avt";
+import { Toast } from "../../components/interaction/Toast/Toast.wcl.avt";
+import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { MaterielRequest } from "../../generated/app/Http/Controllers/Materiel/MaterielRequest.lib.avt";
+import type { MaterielResourceDetails } from "../../generated/app/Http/Controllers/Materiel/MaterielResourceDetails.lib.avt";
+import { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
+import { EquipeRAM } from "../../ram/Equipe.ram.avt";
+import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
+import { DateConverter } from "Aventus@Main:Aventus.package.avt";
+
+export type InventaireWithEquipe = Inventaire & { equipe: Equipe; };
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -22,6 +31,14 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
     //#region variables
     public form: FormHandler<MaterielRequest>;
+    public item!: MaterielResourceDetails;
+
+    @Watch()
+    public inventaires: InventaireWithEquipe[] = [];
+    @Watch()
+    public objName: string = "";
+
+    private slugId: number = 0;
     //#endregion
 
 
@@ -48,6 +65,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         }
 
         const id = slugs['id'];
+        this.slugId = id;
         if(id == 0) {
             let newItem = new MaterielRequest();
             newItem.id = 0;
@@ -62,6 +80,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             newItem.variations.push(v2);
             newItem.equipes = [];
             this.form.item = newItem;
+            this.objName = "Création de matériel";
         }
         else {
             const ram = MaterielRAM.getInstance();
@@ -70,7 +89,27 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             if(!item) {
                 return "/materiel";
             }
+            this.item = item;
             this.form.item = ram.toRequest(item);
+            this.objName = this.form.item.nom;
+
+            const inventaires: InventaireWithEquipe[] = [];
+
+            let equipes: Equipe[] = [];
+            if(item.tout_monde) {
+                equipes = (await EquipeRAM.getInstance().getList());
+            }
+            else {
+                equipes = item.equipes.map(p => p.equipe);
+            }
+            equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+
+            for(let equipe of equipes) {
+                const el = (item.inventaires.find(p => p.id_equipe == equipe.id) ?? new Inventaire()) as InventaireWithEquipe;
+                el.equipe = equipe;
+                inventaires.push(el);
+            }
+            this.inventaires = inventaires;
         }
         return true;
     }
@@ -82,19 +121,55 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     }
 
 
+    protected getLastUpdate(inventaire: InventaireWithEquipe) {
+        if(inventaire.lastUpdate) {
+            return inventaire.lastUpdateBy + ", le " + inventaire.lastUpdate.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "2-digit"
+            });
+        }
+        return "";
+    }
     /**
      * 
      */
     protected async save() {
-        console.log(this.form.item);
-        await this.form.execute(MaterielRAM.getInstance().saveWithError)
+        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
+
+        if(result.result) {
+            Toast.add({
+                message: "Matériel enregistré",
+                color: "success",
+                closable: true
+            });
+            if(this.form.item.id == 0) {
+                this.router?.navigate('/materiel/' + result.result.id);
+            }
+            else {
+                const ram = MaterielRAM.getInstance();
+                this.form.item = ram.toRequest(result.result);
+                this.objName = this.form.item.nom;
+            }
+        }
     }
 
-    protected getTitle() {
-        if(this.form.item?.id) {
-            return this.form.item.nom;
+
+    /**
+     * 
+     */
+    protected async destroy() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
+        });
+        if(result) {
+            const ram = MaterielRAM.getInstance();
+            const result = await Process.execute(ram.deleteByIdWithError(this.slugId));
+            if(result) {
+                this.router?.navigate("/materiel");
+            }
         }
-        return "Création de matériel";
     }
 
 

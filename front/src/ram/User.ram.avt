@@ -1,5 +1,5 @@
-import { UserController } from "../generated/app/Http/Controllers/UserController.lib.avt";
-import type { UserResource } from "../generated/app/Http/Resources/UserResource.lib.avt";
+import { UserController } from "../generated/app/Http/Controllers/User/UserController.lib.avt";
+import type { UserResource } from "../generated/app/Http/Controllers/User/UserResource.lib.avt";
 
 export class UserRAM extends AventusPhp.RamHttp<UserController> implements Aventus.IRam {
     /**

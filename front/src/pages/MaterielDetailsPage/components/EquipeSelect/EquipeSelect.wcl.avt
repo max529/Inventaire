@@ -1,5 +1,5 @@
 import { SelectData } from "../../../../components/form/select/SelectData/SelectData.wcl.avt";
-import type { EquipeResource } from "../../../../generated/app/Http/Resources/EquipeResource.lib.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
 import type { Ram } from "../../../../lib/Ram.lib.avt";
 import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";

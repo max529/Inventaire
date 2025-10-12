@@ -175,6 +175,7 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
         });
         this.inputEl.addEventListener("focus", () => {
             clearTimeout(blurTimeout);
+            this.inputEl.select();
         });
         this.optionsContainer.addEventListener("focus", () => {
             clearTimeout(blurTimeout);

@@ -1,7 +1,8 @@
 <div class="card">
     <div class="header">
-        <div class="title">{{ this.getTitle() }}</div>
+        <div class="title">{{ this.objName }}</div>
         <div class="actions">
+            <av-icon-action color="error" @press="destroy" icon="delete">Supprimer</av-icon-action>
             <av-icon-action color="success" @press="save" icon="save">Enregistrer</av-icon-action>
         </div>
     </div>
@@ -41,17 +42,19 @@ if(this.form.item?.id) {
         </div>
         <div class="body">
             <div class="list">
-                for(let i = 0; i < 50; i++) { 
+                for(let inventaire of this.inventaires) {
                     <div class="item">
                         <div class="line">
-                            <div class="nom">U18</div>
-                            <div class="quantite">21</div>
+                            <div class="nom">{{ inventaire.equipe.nom }}</div>
+                            <div class="quantite">{{ inventaire.quantite ?? '-' }}</div>
                             <div class="modification">
                                 <div class="actions">
                                     <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
-                                    <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                                    if (inventaire.id) {
+                                        <av-icon-action color="info" icon="history">Historique</av-icon-action>
+                                    }
                                 </div>
-                                <span>Maxime, le 24.08.2025</span>
+                                <span>{{ this.getLastUpdate(inventaire) }}</span>
                             </div>
                         </div>
                     </div>
@@ -59,4 +62,4 @@ if(this.form.item?.id) {
             </div>
         </div>
     </div>
-    <
+}

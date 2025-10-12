@@ -1,5 +1,6 @@
-import { EquipeController } from "../generated/app/Http/Controllers/EquipeController.lib.avt";
-import type { EquipeResource } from "../generated/app/Http/Resources/EquipeResource.lib.avt";
+import { EquipeController } from "../generated/app/Http/Controllers/Equipe/EquipeController.lib.avt";
+import type { EquipeResource } from "../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+
 
 export class EquipeRAM extends AventusPhp.RamHttp<EquipeController> implements Aventus.IRam {
     /**

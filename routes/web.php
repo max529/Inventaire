@@ -1,10 +1,8 @@
 <?php
 
-use App\Http\Controllers\ArticleController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EquipeController;
-use App\Http\Controllers\MaterielController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Equipe\EquipeController;
+use App\Http\Controllers\Materiel\MaterielController;
+use App\Http\Controllers\User\UserController;
 use App\Http\Middlewares\IsConnected;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +16,7 @@ Route::get('/logout', function () {
     return redirect('/login');
 });
 
-Route::post('/login', [AuthController::class, "login"]);
+Route::post('/login', [\App\Http\Controllers\Auth\Login\Controller::class, "request"]);
 
 
 Route::middleware(IsConnected::class)->group(function () {

@@ -1,3 +1,168 @@
+@import '@functions';
+
 :host {
-	
+	background-color: var(--alert-color, var(--color-base-200));
+	background-image: none, var(--fx-noise);
+	background-size: auto, calc(var(--noise) * 100%);
+	border: var(--border) solid var(--color-base-200);
+	border-radius: var(--radius-box);
+	box-shadow: 0 3px 0 -2px oklch(100% 0 0 / calc(var(--depth) * .08)) inset, 0 1px #000, 0 4px 3px -2px oklch(0% 0 0 / calc(var(--depth) * .08));
+	color: var(--color-base-content);
+	cursor: default;
+	max-width: calc(100vw - 2rem);
+	overflow: hidden;
+	pointer-events: auto;
+	transition: top 0.2s linear, opacity 0.2s linear, visibility 0.2s linear;
+
+	.toast-content {
+		display: grid;
+		font-size: .875rem;
+		gap: 1rem;
+		grid-auto-flow: column;
+		grid-template-columns: auto;
+		justify-content: start;
+		line-height: 1.25rem;
+		padding-block: .75rem;
+		padding-inline: 1rem;
+		place-items: center start;
+		text-align: start;
+	}
+
+	.toast-flex {
+		align-items: flex-start;
+		display: flex;
+	}
+
+	.toast-icon-wrapper {
+		flex-shrink: 0;
+	}
+
+	.toast-icon {
+		align-items: center;
+		display: flex;
+		font-size: calc(var(--spacing)*6);
+		height: calc(var(--spacing)*6);
+		justify-content: center;
+		width: calc(var(--spacing)*6);
+	}
+
+	.toast-message-wrapper {
+		flex: 1;
+		margin-left: 1rem;
+		padding-top: 0.125rem;
+	}
+
+
+	.toast-title {
+		font-size: 0.875rem;
+		font-weight: 500;
+		margin: 0;
+	}
+
+	.toast-message {
+		font-size: 0.875rem;
+		margin-bottom: 0;
+		margin-top: 0;
+	}
+
+	.toast-message:nth-child(3) {
+		margin-top: 0.25rem;
+	}
+
+	.toast-close-wrapper {
+		flex-shrink: 0;
+		margin-left: 1rem;
+
+		.sr-only {
+			border-width: 0;
+			clip: rect(0, 0, 0, 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			white-space: nowrap;
+			width: 1px;
+		}
+
+		.toast-close-button {
+			background-color: transparent;
+			border: none;
+			color: inherit;
+			cursor: pointer;
+			display: inline-flex;
+			outline: none;
+		}
+
+		.toast-close-icon {
+			align-items: center;
+			display: flex;
+			font-size: calc(var(--spacing)*6);
+			height: calc(var(--spacing)*6);
+			justify-content: center;
+			width: calc(var(--spacing)*6);
+		}
+	}
+}
+
+
+
+
+@include eachColor using ($color) {
+	:host([color="#{$color}"]) {
+		--alert-color: var(--color-#{$color});
+		border-color: var(--color-#{$color});
+		color: var(--color-#{$color}-content);
+	}
+}
+
+:host([closing]) {
+	opacity: 0;
+	visibility: hidden;
+}
+
+:host(:not([close_icon])) {
+	.toast-close-wrapper {
+		display: none;
+	}
+}
+
+:host([closable]:not([close_icon])) {
+	cursor: pointer;
+}
+
+
+:host([soft]) {
+	background: var(--alert-color, var(--color-base-content));
+	background-image: none;
+	border-color: var(--alert-color, var(--color-base-content));
+	box-shadow: none;
+	color: var(--alert-color, var(--color-base-content));
+}
+
+:host([outline]) {
+	background-color: #0000;
+	background-image: none;
+	box-shadow: none;
+	color: var(--alert-color);
+}
+
+:host([dash]) {
+	background-color: #0000;
+	background-image: none;
+	border-style: dashed;
+	box-shadow: none;
+	color: var(--alert-color);
+}
+
+
+@supports (color: color-mix(in lab, red, red)) {
+	:host {
+		box-shadow: 0 3px 0 -2px oklch(100% 0 0/calc(var(--depth)*.08)) inset, 0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200)))calc(var(--depth)*20%), #0000), 0 4px 3px -2px oklch(0% 0 0/calc(var(--depth)*.08));
+	}
+
+	:host([soft]) {
+		background: color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));
+		border-color: color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100));
+	}
 }

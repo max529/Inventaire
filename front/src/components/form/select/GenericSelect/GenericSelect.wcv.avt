@@ -5,7 +5,6 @@
     </slot>
     <input id="input" @element="inputEl" placeholder="{{ this.placeholder }}" @input="filter" autocomplete="off" />
     <slot name="append"></slot>
-    <div class="error-logo">!</div>
     <av-img src="/img/angle-left.svg" class="caret"></av-img>
 </div>
 <div class="errors">

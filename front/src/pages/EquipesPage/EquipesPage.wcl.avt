@@ -6,7 +6,7 @@ import { EquipeItem } from "./components/EquipeItem/EquipeItem.wcl.avt";
 import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
-import type { EquipeResource } from "../../generated/app/Http/Resources/EquipeResource.lib.avt";
+import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 
 export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
 

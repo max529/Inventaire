@@ -8,6 +8,8 @@ namespace App.Models {
 		public id_materiel!: number;
 		public id_variation?: number = undefined;
 		public quantite!: number;
+		public lastUpdate!: Date;
+		public lastUpdateBy!: string;
 	}
 
 }

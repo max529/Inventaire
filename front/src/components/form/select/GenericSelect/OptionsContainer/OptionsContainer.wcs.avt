@@ -5,13 +5,18 @@
 }
 
 :host {
-	background-color: var(--_options-container-background);
-	border-radius: var(--_options-container-border-radius);
-	box-shadow: var(--_options-container-box-shadow);
+	background-color: var(--color-base-100);
+	border: var(--border)solid var(--color-base-200);
+	border-radius: var(--radius-box);
+	box-shadow: 0 2px calc(var(--depth)*3px) -2px #0003;
+	box-shadow: 0 20px 25px -5px rgb(0 0 0/calc(var(--depth)*.1)), 0 8px 10px -6px rgb(0 0 0/calc(var(--depth)*.1));
+	color: var(--color-base-content);
 	display: grid;
 	grid-template-rows: 0fr;
 	left: 0;
+	max-height: min(24rem, 70dvh);
 	overflow: hidden;
+	padding: .5rem;
 	position: absolute;
 	top: 0;
 	transition: 0.2s ease-in-out grid-template-rows;

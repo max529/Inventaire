@@ -1,0 +1,12 @@
+namespace App.Http.Controllers.User {
+
+	@Convertible()
+	export class UserResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.User.UserResource"; }
+		public id!: number;
+		public nom!: string;
+		public prenom!: string;
+		public nom_utilisateur!: string;
+	}
+
+}

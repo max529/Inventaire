@@ -1,14 +1,22 @@
 :host {
-	--_option-font-size: var(--option-font-size, var(--form-element-font-size, 16px));
-}
-
-:host {
-	padding: 5px 10px;
-    font-size: var(--_option-font-size);
+	border-radius: var(--radius-field);
+	color: inherit;
+	font-size: 0.875rem;
+	padding-block: .375rem;
+	padding-inline: .75rem;
+	transition-duration: .2s;
+	transition-property: color, background-color;
+	transition-timing-function: cubic-bezier(0, 0, .2, 1);
+	white-space: normal;
     cursor: pointer;
-    transition: background-color 0.2s linear;
 }
 
 :host(:hover) {
-    background-color: var(--form-element-background-active);
+	background-color: var(--color-base-content);
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+	:host(:hover) {
+		background-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+	}
 }

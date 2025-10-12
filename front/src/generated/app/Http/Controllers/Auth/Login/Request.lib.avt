@@ -1,0 +1,8 @@
+namespace App.Http.Controllers.Auth.Login {
+
+	export class Request {
+		public nom_utilisateur!: string;
+		public mot_passe!: string;
+	}
+
+}

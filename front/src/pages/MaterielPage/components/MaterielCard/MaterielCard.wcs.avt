@@ -1,63 +1,44 @@
 :host {
-	background-color: var(--color-base-100);
-	border: 1px solid var(--color-base-300);
-	border-radius: var(--radius-box);
-	box-shadow: var(--elevation-2);
-	display: flex;
-	flex-direction: column;
-	max-width: 400px;
-	overflow: hidden;
-	width: 100%;
+	display: contents;
 
-	.img {
-		width: 100%;
+	av-col {
+		background-color: var(--color-base-100);
+		border: 1px solid var(--color-base-300);
+		border-radius: var(--radius-box);
+		box-shadow: var(--elevation-2);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 
-		av-img {
-			aspect-ratio: 1;
+		.img {
 			width: 100%;
+			max-height: 250px;
+
+			av-img {
+				aspect-ratio: 1;
+				width: 100%;
+				max-height: 250px;
+			}
 		}
-	}
 
-	.info {
-		background-color: transparent;
-		padding: 16px;
-		padding-top: 0;
+		.info {
+			background-color: transparent;
+			padding: 16px;
+			padding-top: 0;
 
-		.title {
-			font-size: var(--font-size-md);
-			margin-top: 8px;
+			.title {
+				font-size: var(--font-size-md);
+				margin-top: 8px;
+			}
 		}
-	}
 
-	.variations {
-		display: flex;
-		gap: 6px;
-		margin-bottom: 12px;
-		margin-top: 12px;
-
-		.tag {
-			align-items: center;
-			background-color: var(--color-tag);
-			border-radius: 50px;
+		.variations {
 			display: flex;
-			font-size: var(--font-size-sm);
-			justify-content: center;
-			padding: 4px 8px;
-		}
-	}
-
-	.visible {
-		align-items: center;
-		display: flex;
-
-		.visible-for {
-			display: flex;
-			font-size: var(--font-size-sm);
 			gap: 6px;
-			margin-left: 6px;
-			margin-top: 6px;
+			margin-bottom: 12px;
+			margin-top: 12px;
 
-			div {
+			.tag {
 				align-items: center;
 				background-color: var(--color-tag);
 				border-radius: 50px;
@@ -67,7 +48,31 @@
 				padding: 4px 8px;
 			}
 		}
+
+		.visible {
+			align-items: center;
+			display: flex;
+
+			.visible-for {
+				display: flex;
+				font-size: var(--font-size-sm);
+				gap: 6px;
+				margin-left: 6px;
+				margin-top: 6px;
+
+				div {
+					align-items: center;
+					background-color: var(--color-tag);
+					border-radius: 50px;
+					display: flex;
+					font-size: var(--font-size-sm);
+					justify-content: center;
+					padding: 4px 8px;
+				}
+			}
+		}
 	}
+
 }
 
 :host(:hover) {

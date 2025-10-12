@@ -1,11 +1,9 @@
-import { Ram } from "Aventus@Main:Aventus.package.avt";
 import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
 import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
-import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
 import { Main } from "../../Main/Main.wcl.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
 import { EquipeEditModal } from "../EquipesPage/components/EquipeEditModal/EquipeEditModal.wcl.avt";
-import type { EquipeResource } from "../../generated/app/Http/Resources/EquipeResource.lib.avt";
+import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 
 export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
 

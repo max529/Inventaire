@@ -1,8 +1,0 @@
-namespace App.Http.Requests {
-
-	export class LoginRequest {
-		public nom_utilisateur!: string;
-		public mot_passe!: string;
-	}
-
-}

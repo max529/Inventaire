@@ -1,4 +1,5 @@
 import type { Equipe } from "../../../../generated/app/Models/Equipe.lib.avt";
+import { MaterielEquipe } from "../../../../generated/app/Models/MaterielEquipe.lib.avt";
 import { EquipeTag } from "../EquipeTag/EquipeTag.wcl.avt";
 import { ModalEquipe } from "../ModalEquipe/ModalEquipe.wcl.avt";
 
@@ -20,7 +21,7 @@ export class EquipeTags extends Aventus.WebComponent implements Aventus.DefaultC
     @ViewElement()
     protected listEl!: HTMLDivElement;
 
-    public equipes: Equipe[] = [];
+    public equipes: MaterielEquipe[] = [];
     //#endregion
 
 
@@ -50,9 +51,12 @@ export class EquipeTags extends Aventus.WebComponent implements Aventus.DefaultC
         const p = new ModalEquipe();
         const equipe = await p.show();
         if(equipe !== null) {
-            this.equipes.push(equipe);
+            let materielEquipe = new MaterielEquipe();
+            materielEquipe.id_equipe = equipe.id;
+            materielEquipe.equipe = equipe;
+            this.equipes.push(materielEquipe);
             let el = new EquipeTag();
-            el.equipe = equipe;
+            el.equipe = materielEquipe;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }

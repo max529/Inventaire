@@ -1,5 +1,4 @@
-import type { MaterielResource } from "../../../../generated/app/Http/Resources/MaterielResource.lib.avt";
-import type { Materiel } from "../../../../generated/app/Models/Materiel.lib.avt";
+import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 
 export class MaterielCard extends Aventus.WebComponent implements Aventus.DefaultComponent {
 

@@ -1,10 +1,10 @@
 import { User } from "../../../../generated/app/Models/User.lib.avt";
 import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
 import { Form, FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
-import type { UserRequest } from "../../../../generated/app/Http/Requests/UserRequest.lib.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { UserRAM } from "../../../../ram/User.ram.avt";
-import type { UserResource } from "../../../../generated/app/Http/Resources/UserResource.lib.avt";
+import type { UserResource } from "../../../../generated/app/Http/Controllers/User/UserResource.lib.avt";
+import type { UserRequest } from "../../../../generated/app/Http/Controllers/User/UserRequest.lib.avt";
 
 
 export class UserEditModal extends Modal<UserResource> implements Aventus.DefaultComponent {

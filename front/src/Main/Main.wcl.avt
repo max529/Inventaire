@@ -9,6 +9,8 @@ import { Process } from "Aventus@UI:Aventus.package.avt";
 import { Alert } from "../components/interaction/Alert/Alert.wcl.avt";
 import { HttpRequest, VoidWithError } from "Aventus@Main:Aventus.package.avt";
 import { Form } from "Aventus@UI:Aventus.Form.package.avt";
+import { ToastManager } from "Aventus@UI:Aventus.Toast.package.avt";
+import { Toast } from "../components/interaction/Toast/Toast.wcl.avt";
 
 export class Main extends Router implements Aventus.DefaultComponent {
 
@@ -52,7 +54,12 @@ export class Main extends Router implements Aventus.DefaultComponent {
     protected override postCreation(): void {
         super.postCreation();
         Main.instance = this;
-
+        ToastManager.configure({
+            defaultDelay: 5000,
+            defaultPosition: "top right",
+            defaultToast: Toast,
+            heightLimitPercent: 100,
+        });
         ModalElement.configure({
             closeWithClick: false
         });
@@ -82,6 +89,7 @@ export class Main extends Router implements Aventus.DefaultComponent {
             }
         });
         HttpRequest.configure({
+            
             beforeSend: (request) => {
                 const result = new VoidWithError();
                 // request.setCredentials("include");

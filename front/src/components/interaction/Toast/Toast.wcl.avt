@@ -1,35 +1,110 @@
 import { ToastElement } from "Aventus@UI:Aventus.Toast.package.avt";
+import { PressManager, sleep } from "Aventus@Main:Aventus.package.avt";
+import type { IconType } from "MaterialIcon:MaterialIcon.package.avt";
+import type { ColorsType } from "../../../lib/Colors.lib.avt";
 
+export type ToastOptions = Aventus.Toast.ToastOptions & {
+    color?: ColorsType,
+    icon?: IconType;
+    title?: string,
+    message?: string,
+
+    closable?: boolean,
+    close_icon?: boolean,
+    outline?: boolean,
+    dash?: boolean,
+    soft?: boolean
+};
 export class Toast extends ToastElement implements Aventus.DefaultComponent {
 
-	//#region static
-	
-	//#endregion
-	
-	
-	//#region props
-	
-	//#endregion
-	
-	
-	//#region variables
-	
-	//#endregion
-	
-	
-	//#region constructor
-	
-	//#endregion
-	
-	
-	//#region methods
+    ///#region static
+    public static override add(options: ToastOptions): Promise<boolean> {
+        return super.add(options);
+    }
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public color?: ColorsType;
+    @Attribute()
+    private closing!: boolean;
+    @Attribute()
+    public outline!: boolean;
+    @Attribute()
+    public dash!: boolean;
+    @Attribute()
+    public soft!: boolean;
+    @Attribute()
+    public closable!: boolean;
+    @Attribute()
+    public close_icon!: boolean;
+    //#endregion
+
+
+    //#region variables
+    private icon?: IconType;
+
+    @Watch()
+    public toastTitle: string = "";
+    @Watch()
+    public toastMessage: string = "";
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected override close() {
+        if(this.onHideCallback) {
+            this.closing = true;
+            this.is_active = false;
+            this.onHideCallback(false);
+            sleep(300).then(() => {
+                this.remove();
+            });
+        }
+    }
     /**
      * @inheritdoc
      */
-    public override setOptions(options: Aventus.Toast.ToastOptions): Aventus.Asyncable<void> {
-        
+    public override setOptions(options: ToastOptions): Aventus.Asyncable<void> {
+        if(options.color != undefined) this.color = options.color;
+        if(options.icon != undefined) this.icon = options.icon;
+        if(options.title != undefined) this.toastTitle = options.title;
+        if(options.message != undefined) this.toastMessage = options.message;
+
+        if(options.closable != undefined) this.closable = options.closable;
+        if(options.close_icon != undefined) this.close_icon = options.close_icon;
+        if(options.outline != undefined) this.outline = options.outline;
+        if(options.dash != undefined) this.dash = options.dash;
+        if(options.soft != undefined) this.soft = options.soft;
+        if(options.message != undefined) this.toastMessage = options.message;
     }
-	
-	//#endregion
-	
+    protected getIcon(): IconType {
+        if(this.icon !== undefined) return this.icon;
+        if(this.color == "error") return 'error';
+        if(this.color == "info") return 'info';
+        if(this.color == "success") return 'check';
+        if(this.color == "warning") return 'warning';
+        return 'error';
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        if(this.closable && !this.close_icon) {
+            new PressManager({
+                element: this,
+                onPress: () => {
+                    this.close();
+                }
+            });
+        }
+    }
+
+    //#endregion
+
 }

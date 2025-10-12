@@ -28,7 +28,7 @@ return new class extends Migration
 
         Schema::create("variations", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_materiel')->constrained('materiels');
+            $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
             $table->string('nom');
         });
 
@@ -39,16 +39,16 @@ return new class extends Migration
 
         Schema::create("inventaires", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_equipe')->constrained('equipes');
-            $table->foreignId('id_materiel')->constrained('materiels');
-            $table->foreignId('id_variation')->nullable()->constrained('variations');
+            $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
+            $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
+            $table->foreignId('id_variation')->nullable()->constrained('variations')->cascadeOnDelete();
             $table->float('quantite');
         });
 
         Schema::create("materiel_equipes", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_equipe')->constrained('equipes');
-            $table->foreignId('id_materiel')->constrained('materiels');
+            $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
+            $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
         });
     }
 
