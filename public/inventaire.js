@@ -15906,8 +15906,9 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
                 quantite: result
             }));
             if (save) {
-                this.inventaire.last_update = save.last_update;
+                this.inventaire.id = save.id;
                 this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.last_update = save.last_update;
                 this.inventaire.quantite = save.quantite;
                 Toast.add({
                     message: "Inventaire enregistré",
@@ -17421,8 +17422,9 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
                 quantite: result
             }));
             if (save) {
-                this.inventaire.last_update = save.last_update;
+                this.inventaire.id = save.id;
                 this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.last_update = save.last_update;
                 this.inventaire.quantite = save.quantite;
                 Toast.add({
                     message: "Inventaire enregistré",
