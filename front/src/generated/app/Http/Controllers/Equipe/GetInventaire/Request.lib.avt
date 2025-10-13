@@ -1,0 +1,7 @@
+namespace App.Http.Controllers.Equipe.GetInventaire {
+
+	export class Request {
+		public id_equipe!: number;
+	}
+
+}

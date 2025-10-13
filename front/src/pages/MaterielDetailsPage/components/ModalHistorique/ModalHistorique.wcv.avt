@@ -1,0 +1,19 @@
+<div class="title">Historique pour {{ this.materiel.nom }} {{ this.variation?.nom }} pour {{ this.equipe.nom }}</div>
+
+<div class="content">
+    <av-flex-scroll @scrollChange="loadData" @element="scrollEl">
+        for(let historique of this.historiques) {
+            <div class="line">
+                <div class="quantite">{{ historique.quantite }}</div>
+                <div class="par">{{ historique.last_update_by }}</div>
+                <div class="modification">
+                    <span>{{ this.getLastUpdate(historique) }}</span>
+                </div>
+            </div>
+        }
+    </av-flex-scroll>
+</div>
+
+<div class="footer">
+    <av-button @press="reject">Fermer</av-button>
+</div>

@@ -11,5 +11,5 @@
 <av-input label="Mot de passe" :form="this.form.parts.mot_passe"></av-input>
 <div class="actions">
     <av-button @press="reject">Annuler</av-button>
-    <av-button color="primary"  @press="submit">Enregistrer</av-button>
+    <av-button color="primary" @press="submit">Enregistrer</av-button>
 </div>

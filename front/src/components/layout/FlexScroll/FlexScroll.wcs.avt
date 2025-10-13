@@ -1,0 +1,14 @@
+:host {
+	display: flex;
+	flex-direction: column;
+
+	.scroll-main-container {
+		display: flex;
+		flex-direction: column;
+
+		.content-zoom {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+}

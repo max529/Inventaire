@@ -51,6 +51,13 @@ export class Input extends FormElement<string> implements Aventus.DefaultCompone
     /**
      * 
      */
+    public select() {
+        this.inputEl.select();
+    }
+
+    /**
+     * 
+     */
     protected onFocus() {
         this.clearErrors();
         this.focusValue = this.inputEl.value;
@@ -68,9 +75,6 @@ export class Input extends FormElement<string> implements Aventus.DefaultCompone
     */
     protected onInput() {
         this.triggerChange(this.inputEl.value);
-    }
-
-    protected override postCreation(): void {
     }
 
     //#endregion

@@ -113,6 +113,7 @@ export class InputImage extends FormElement<AventusFile> implements Aventus.Defa
     }
 
     protected override postCreation(): void {
+        super.postCreation();
         this.setPreview();
     }
     //#endregion

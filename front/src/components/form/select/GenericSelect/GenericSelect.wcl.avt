@@ -189,6 +189,7 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
     }
 
     protected override postCreation(): void {
+        super.postCreation();
         this.manageFocus();
         this.optionsContainer.init(this);
         this.loadElementsFromSlot();

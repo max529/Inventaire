@@ -1,3 +1,7 @@
+import { Equipe } from './Equipe.lib.avt';
+import { Materiel } from './Materiel.lib.avt';
+import { Variation } from './Variation.lib.avt';
+
 namespace App.Models {
 
 	@Convertible()
@@ -8,8 +12,11 @@ namespace App.Models {
 		public id_materiel!: number;
 		public id_variation?: number = undefined;
 		public quantite!: number;
-		public lastUpdate!: Date;
-		public lastUpdateBy!: string;
+		public last_update!: Date;
+		public last_update_by!: string;
+		public equipe!: Equipe;
+		public materiel!: Materiel;
+		public variation?: Variation = undefined;
 	}
 
 }

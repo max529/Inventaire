@@ -1,0 +1,94 @@
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { InventaireUpdateController } from "../../../../generated/app/Http/Controllers/Inventaire/Update/Controller.lib.avt";
+import { ModalInventaireUpdate } from "../ModalInventaireUpdate/ModalInventaireUpdate.wcl.avt";
+import { Toast } from "../../../../components/interaction/Toast/Toast.wcl.avt";
+import { ModalHistorique } from "../ModalHistorique/ModalHistorique.wcl.avt";
+import { Response as Inventaire } from "../../../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
+import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+
+export class InventaireListItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Injectable()
+    @Watch()
+    public inventaire!: Inventaire;
+
+    @Injectable()
+    public materiel!: MaterielResource;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected getLastUpdate() {
+        if(this.inventaire.last_update) {
+            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+
+    /**
+     * 
+     */
+    protected async edit() {
+        const modal = new ModalInventaireUpdate();
+        modal.variation = this.inventaire.variation;
+        modal.equipe = this.inventaire.equipe;
+        modal.materiel = this.materiel;
+        modal.nb = this.inventaire.quantite;
+        const result = await modal.show();
+        if(result) {
+            const save = await Process.execute(new InventaireUpdateController().request({ 
+                id: this.inventaire.id,
+                id_equipe: this.inventaire.equipe.id,
+                id_materiel: this.materiel.id,
+                id_variation: this.inventaire.variation?.id,
+                quantite: result
+            }));
+            if(save) {
+                this.inventaire.last_update = save.last_update;
+                this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.quantite = save.quantite;
+                Toast.add({
+                    message: "Inventaire enregistré",
+                    color: "success",
+                    closable: true
+                });
+            }
+        }
+    }
+    /**
+    * 
+    */
+    protected async historique() {
+        const modal = new ModalHistorique();
+        modal.materiel = this.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.variation = this.inventaire.variation;
+        await modal.show();
+
+    }
+
+    //#endregion
+
+}

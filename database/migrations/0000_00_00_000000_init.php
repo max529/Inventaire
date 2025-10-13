@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -43,6 +44,18 @@ return new class extends Migration
             $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
             $table->foreignId('id_variation')->nullable()->constrained('variations')->cascadeOnDelete();
             $table->float('quantite');
+            $table->dateTime('last_update');
+            $table->string('last_update_by');
+        });
+
+        Schema::create("inventaire_historiques", function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
+            $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
+            $table->foreignId('id_variation')->nullable()->constrained('variations')->cascadeOnDelete();
+            $table->float('quantite');
+            $table->dateTime('last_update');
+            $table->string('last_update_by');
         });
 
         Schema::create("materiel_equipes", function (Blueprint $table) {
@@ -50,6 +63,13 @@ return new class extends Migration
             $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
             $table->foreignId('id_materiel')->constrained('materiels')->cascadeOnDelete();
         });
+
+        $user = new User();
+        $user->nom = "Bonnaz";
+        $user->prenom = "Jonathan";
+        $user->nom_utilisateur = "jonathan";
+        $user->mot_passe = "Pass$1234";
+        $user->save();
     }
 
     /**

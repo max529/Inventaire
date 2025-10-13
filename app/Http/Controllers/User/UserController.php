@@ -23,5 +23,17 @@ class UserController extends ModelController
     {
         return UserResource::class;
     }
+
+
+    protected function updateAction($item): void
+    {
+        if($item->mot_passe) {
+            $item->update();
+        }
+        else {
+            unset($item->mot_passe);
+            $item->update();
+        }
+    }
 }
 

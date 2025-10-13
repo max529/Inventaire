@@ -1,6 +1,7 @@
 <?php
 
 use Aventus\Laraventus\Exceptions\AventusExceptionCatcher;
+use Aventus\Laraventus\Middlewares\AventusAttributesMiddleware;
 use Aventus\Laraventus\Middlewares\AventusMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             except: ["*"]
         );
         $middleware->append(AventusMiddleware::class);
+        $middleware->appendToGroup("web", AventusAttributesMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         AventusExceptionCatcher::use($exceptions);

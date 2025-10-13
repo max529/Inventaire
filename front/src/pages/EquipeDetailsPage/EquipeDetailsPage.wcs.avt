@@ -43,57 +43,7 @@
 				width: 100%;
 				margin-top: 8px;
 
-				.item {
-					border-top: 1px solid var(--color-base-300);
-					padding: 8px 16px;
-
-					.line {
-						align-items: center;
-						display: flex;
-						gap: 20px;
-
-						.img {
-							background-image: url('https://placeholderimage.eu/api/800/600');
-							background-position: center;
-							background-size: cover;
-							flex-shrink: 0;
-							height: 34px;
-							width: 34px;
-						}
-
-						.nom {
-							flex-grow: 1;
-							width: 50%;
-						}
-
-						.quantite {
-							flex-grow: 1;
-							width: 50%;
-						}
-
-						.modification {
-							align-items: flex-end;
-							display: flex;
-							flex-direction: column;
-							font-size: var(--font-size-sm);
-
-							av-icon-action {
-								width: fit-content;
-								// transform: translateY(57px);
-							}
-
-							span {
-								transform: translateY(5px);
-								white-space: nowrap;
-							}
-						}
-					}
-
-				}
-
-				.item:first-child {
-					border-top: none;
-				}
+				
 			}
 		}
 

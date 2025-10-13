@@ -9,4 +9,9 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $nom
  */
 class Equipe extends AventusModel {
+
+    protected $fillable = [
+        "id",
+        "nom"
+    ];
 }

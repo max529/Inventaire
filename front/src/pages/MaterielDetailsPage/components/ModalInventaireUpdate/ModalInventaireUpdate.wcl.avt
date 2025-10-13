@@ -1,0 +1,92 @@
+import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+import { Response as Inventaire } from "../../../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
+import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+
+
+export class ModalInventaireUpdate extends Modal<number> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Signal()
+    public materiel!: MaterielResource;
+    @Signal()
+    public variation?: Variation;
+    @Signal()
+    public equipe!: EquipeResource;
+    @Signal()
+    public nb: number = 0;
+
+    @ViewElement()
+    protected inputEl!: Input;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<number> {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+
+    /**
+     * 
+     */
+    protected save() {
+        if(typeof this.nb == 'number') {
+            this.resolve(this.nb);
+        }
+        else {
+            const nbTxt = this.nb as string;
+            if(nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+
+            const nb2 = Number(nbTxt);
+            if(isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            this.resolve(nb2);
+        }
+    }
+
+    /**
+     * 
+     */
+    protected select() {
+        this.inputEl.select();
+    }
+
+    protected getTitle() {
+        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+    }
+
+
+    //#endregion
+
+}

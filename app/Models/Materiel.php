@@ -19,6 +19,12 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class Materiel extends AventusModel
 {
+    protected $fillable = [
+        "id",
+        "nom",
+        "image",
+        "tout_monde"
+    ];
     protected $casts = [
         "image" => MaterielImage::class,
         "tout_monde" => ToBoolCast::class

@@ -105,52 +105,7 @@
 			flex-direction: column;
 			width: 100%;
 
-			.item {
-				border-top: 1px solid var(--color-base-300);
-				padding: 8px 16px;
-
-				.line {
-					align-items: center;
-					display: flex;
-					gap: 20px;
-
-					.nom {
-						flex-grow: 1;
-						width: 50%;
-					}
-
-					.quantite {
-						flex-grow: 1;
-						width: 50%;
-					}
-
-					.modification {
-						align-items: flex-end;
-						display: flex;
-						flex-direction: column;
-						font-size: var(--font-size-sm);
-
-						.actions {
-							display: flex;
-						}
-
-						av-icon-action {
-							width: fit-content;
-							// transform: translateY(57px);
-						}
-
-						span {
-							transform: translateY(5px);
-							white-space: nowrap;
-						}
-					}
-				}
-
-			}
-
-			.item:first-child {
-				border-top: none;
-			}
+			
 		}
 	}
 }

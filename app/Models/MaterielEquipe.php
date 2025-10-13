@@ -12,7 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Equipe $equipe
  * @property Materiel $materiel
  */
-class MaterielEquipe extends AventusModel {
+class MaterielEquipe extends AventusModel
+{
+
+    protected $fillable = [
+        "id",
+        "id_materiel",
+        "id_equipe",
+    ];
 
     public function equipe(): BelongsTo
     {
@@ -23,6 +30,4 @@ class MaterielEquipe extends AventusModel {
     {
         return $this->belongsTo(Materiel::class, "id_materiel");
     }
-
-
 }

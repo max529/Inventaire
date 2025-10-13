@@ -9,13 +9,13 @@ import { Toast } from "../../components/interaction/Toast/Toast.wcl.avt";
 import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { MaterielRequest } from "../../generated/app/Http/Controllers/Materiel/MaterielRequest.lib.avt";
-import type { MaterielResourceDetails } from "../../generated/app/Http/Controllers/Materiel/MaterielResourceDetails.lib.avt";
-import { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
 import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
 import { DateConverter } from "Aventus@Main:Aventus.package.avt";
+import { MaterielGetInventaireController } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Controller.lib.avt";
+import { Response as Inventaire } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
+import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 
-export type InventaireWithEquipe = Inventaire & { equipe: Equipe; };
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -31,10 +31,10 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
     //#region variables
     public form: FormHandler<MaterielRequest>;
-    public item!: MaterielResourceDetails;
+    public item!: MaterielResource;
 
     @Watch()
-    public inventaires: InventaireWithEquipe[] = [];
+    public inventaires: Inventaire[] = [];
     @Watch()
     public objName: string = "";
 
@@ -81,6 +81,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             newItem.equipes = [];
             this.form.item = newItem;
             this.objName = "Création de matériel";
+            this.inventaires = [];
         }
         else {
             const ram = MaterielRAM.getInstance();
@@ -93,25 +94,57 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             this.form.item = ram.toRequest(item);
             this.objName = this.form.item.nom;
 
-            const inventaires: InventaireWithEquipe[] = [];
-
-            let equipes: Equipe[] = [];
-            if(item.tout_monde) {
-                equipes = (await EquipeRAM.getInstance().getList());
-            }
-            else {
-                equipes = item.equipes.map(p => p.equipe);
-            }
-            equipes.sort((a, b) => a.nom.localeCompare(b.nom));
-
-            for(let equipe of equipes) {
-                const el = (item.inventaires.find(p => p.id_equipe == equipe.id) ?? new Inventaire()) as InventaireWithEquipe;
-                el.equipe = equipe;
-                inventaires.push(el);
-            }
-            this.inventaires = inventaires;
+            await this.loadInventaire(id);
         }
         return true;
+    }
+
+    protected async loadInventaire(id: number) {
+        const item = this.item;
+        const inventaires: Inventaire[] = [];
+        const connu = await Process.execute(new MaterielGetInventaireController().request({ id_materiel: id }));
+        if(!connu) return;
+
+        let equipes: Equipe[] = [];
+        if(item.tout_monde) {
+            equipes = (await EquipeRAM.getInstance().getList());
+        }
+        else {
+            equipes = item.equipes.map(p => p.equipe);
+        }
+        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+
+        const addInventaire = (equipe: Equipe, variation?: Variation) => {
+            let el: Inventaire | undefined;
+            if(variation) {
+                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.equipe.id == equipe.id);
+            }
+            if(el == undefined) {
+                el = new Inventaire();
+                el.equipe = equipe;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            el.equipe = equipe;
+            el.variation = variation;
+            inventaires.push(el);
+        };
+
+        for(let equipe of equipes) {
+            if(item.variations.length > 0) {
+                for(let variation of item.variations) {
+                    addInventaire(equipe, variation);
+                }
+            }
+            else {
+                addInventaire(equipe);
+            }
+
+        }
+        this.inventaires = inventaires;
     }
     /**
      * @inheritdoc
@@ -121,16 +154,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     }
 
 
-    protected getLastUpdate(inventaire: InventaireWithEquipe) {
-        if(inventaire.lastUpdate) {
-            return inventaire.lastUpdateBy + ", le " + inventaire.lastUpdate.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "2-digit"
-            });
-        }
-        return "";
-    }
+
     /**
      * 
      */
@@ -148,8 +172,10 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             }
             else {
                 const ram = MaterielRAM.getInstance();
+                this.item = result.result;
                 this.form.item = ram.toRequest(result.result);
                 this.objName = this.form.item.nom;
+                await this.loadInventaire(this.item.id);
             }
         }
     }

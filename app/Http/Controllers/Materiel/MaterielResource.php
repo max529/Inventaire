@@ -31,6 +31,5 @@ class MaterielResource extends AventusModelResource
         $this->variations = $item->variations->toArray();
         $this->tout_monde = $item->tout_monde;
         $this->equipes = MaterielEquipeResource::collection($item->equipes);
-        // $this->inventaires = InventaireResource::collection($item->);
     }
 }

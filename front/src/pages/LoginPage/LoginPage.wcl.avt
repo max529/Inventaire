@@ -3,6 +3,7 @@ import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { AuthLoginController } from "../../generated/app/Http/Controllers/Auth/Login/Controller.lib.avt";
 import type { Response } from "../../generated/app/Http/Controllers/Auth/Login/Response.lib.avt";
 import type { Request } from "../../generated/app/Http/Controllers/Auth/Login/Request.lib.avt";
+import { Alert } from "../../components/interaction/Alert/Alert.wcl.avt";
 
 export class LoginPage extends PageFormRoute<typeof AuthLoginController> implements Aventus.DefaultComponent {
 
@@ -17,7 +18,8 @@ export class LoginPage extends PageFormRoute<typeof AuthLoginController> impleme
 
 
     //#region variables
-
+    @Watch()
+    public error?: string;
     //#endregion
 
 
@@ -58,10 +60,30 @@ export class LoginPage extends PageFormRoute<typeof AuthLoginController> impleme
      */
     public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
         return {
-
+            
         };
     }
 
+    protected override formConfig(): Aventus.Form.FormHandlerConfig<Request> {
+        return {
+            handleExecuteNoInputError: (errors) => {
+                if(errors.some(p => p.code == 422)) {
+                    this.error = "Informations non valides";
+                }
+                else {
+                    let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                    Alert.open({
+                        title: "Erreur",
+                        content: msg,
+                    });
+                }
+            }
+        };
+    }
+
+    protected clearError() {
+        this.error = undefined;
+    }
     //#endregion
 
 }

@@ -1,0 +1,10 @@
+namespace App.Http.Controllers.Inventaire.Historique {
+
+	export class Request {
+		public id_materiel!: number;
+		public id_equipe!: number;
+		public id_variation?: number = undefined;
+		public page!: number;
+	}
+
+}

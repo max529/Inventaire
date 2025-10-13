@@ -1,0 +1,110 @@
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import { InventaireHistoriqueController } from "../../../../generated/app/Http/Controllers/Inventaire/Historique/Controller.lib.avt";
+import { InventaireHistorique } from "../../../../generated/app/Models/InventaireHistorique.lib.avt";
+import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+
+export class ModalHistorique extends Modal<void> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Signal()
+    public materiel!: MaterielResource;
+    @Signal()
+    public equipe!: EquipeResource;
+    @Signal()
+    public variation?: Variation;
+
+
+    private isLoading: boolean = false;
+    private page: number = 0;
+    private canLoadMore: boolean = true;
+
+    @Watch()
+    private historiques: InventaireHistorique[] = [];
+
+    @ViewElement()
+    protected scrollEl!: Aventus.Layout.Scrollable;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<void> {
+        return {
+            title: ""
+        };
+    }
+
+    protected async loadMoreData() {
+        if(this.scrollEl.y + 200 > this.scrollEl.yMax) {
+            this.loadData(this.page + 1);
+        }
+    }
+    protected async loadData(page: number) {
+        if(!this.canLoadMore) return;
+        if(this.isLoading) {
+            return;
+        }
+        this.isLoading = true;
+        const data = await Process.execute(new InventaireHistoriqueController().request({
+            id_equipe: this.equipe.id,
+            id_materiel: this.materiel.id,
+            id_variation: this.variation?.id,
+            page: page
+        }));
+
+        if(data) {
+            this.page = page;
+            if(this.page == 0) {
+                this.historiques = data.historique;
+            }
+            else {
+                this.historiques.splice(this.historiques.length - 1, 0, ...data.historique);
+            }
+
+            if(data.historique.length < 20) {
+                this.canLoadMore = false;
+            }
+        }
+        else {
+            this.reject();
+        }
+        this.isLoading = false;
+    }
+
+    protected getLastUpdate(inventaire: InventaireHistorique) {
+        return inventaire.last_update.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.loadData(0);
+    }
+    //#endregion
+
+}

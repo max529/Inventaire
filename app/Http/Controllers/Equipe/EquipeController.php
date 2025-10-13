@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Equipe;
 
 use App\Models\Equipe;
+use App\Models\Inventaire;
+use Aventus\Laraventus\Attributes\NoExport;
 use Aventus\Laraventus\Controllers\ModelController;
 
 /**
@@ -23,5 +25,6 @@ class EquipeController extends ModelController
     {
         return EquipeResource::class;
     }
+   
 }
 

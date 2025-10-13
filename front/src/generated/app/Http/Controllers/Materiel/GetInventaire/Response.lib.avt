@@ -1,0 +1,17 @@
+import { EquipeResource } from '../../Equipe/EquipeResource.lib.avt';
+import { Variation } from '../../../../Models/Variation.lib.avt';
+
+namespace App.Http.Controllers.Materiel.GetInventaire {
+
+	@Convertible()
+	export class Response extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
+		public id!: number;
+		public equipe!: EquipeResource;
+		public variation?: Variation = undefined;
+		public quantite!: number;
+		public last_update!: Date;
+		public last_update_by!: string;
+	}
+
+}

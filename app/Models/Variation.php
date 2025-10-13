@@ -10,4 +10,9 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $nom
  */
 class Variation extends AventusModel {
+    protected $fillable = [
+        "id",
+        "id_materiel",
+        "nom"
+    ];
 }

@@ -12143,12 +12143,24 @@ App.Models = {};
 _.App.Models = Inventaire.App?.Models ?? {};
 App.Http.Controllers.Materiel = {};
 _.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
+App.Http.Controllers.Materiel.GetInventaire = {};
+_.App.Http.Controllers.Materiel.GetInventaire = Inventaire.App?.Http?.Controllers?.Materiel?.GetInventaire ?? {};
+App.Http.Controllers.Inventaire = {};
+_.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
+App.Http.Controllers.Inventaire.Update = {};
+_.App.Http.Controllers.Inventaire.Update = Inventaire.App?.Http?.Controllers?.Inventaire?.Update ?? {};
+App.Http.Controllers.Inventaire.Historique = {};
+_.App.Http.Controllers.Inventaire.Historique = Inventaire.App?.Http?.Controllers?.Inventaire?.Historique ?? {};
 App.Http.Controllers.Equipe = {};
 _.App.Http.Controllers.Equipe = Inventaire.App?.Http?.Controllers?.Equipe ?? {};
+App.Http.Controllers.Equipe.GetInventaire = {};
+_.App.Http.Controllers.Equipe.GetInventaire = Inventaire.App?.Http?.Controllers?.Equipe?.GetInventaire ?? {};
 App.Http.Controllers.Auth = {};
 _.App.Http.Controllers.Auth = Inventaire.App?.Http?.Controllers?.Auth ?? {};
 App.Http.Controllers.Auth.Login = {};
 _.App.Http.Controllers.Auth.Login = Inventaire.App?.Http?.Controllers?.Auth?.Login ?? {};
+App.Http.Controllers.Auth.Logout = {};
+_.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
 let StringTools=class StringTools {
     static removeAccents(value) {
@@ -12232,20 +12244,53 @@ App.Http.Controllers.Materiel.MaterielImageResource.$schema={...(Aventus.Data?.$
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielImageResource.Fullname, App.Http.Controllers.Materiel.MaterielImageResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielImageResource', App.Http.Controllers.Materiel.MaterielImageResource);
 
-App.Models.Inventaire=class Inventaire extends Aventus.Data {
-    static get Fullname() { return "App.Models.Inventaire"; }
+App.Http.Controllers.Materiel.GetInventaire.Request=class Request {
+    id_materiel;
+}
+App.Http.Controllers.Materiel.GetInventaire.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Controllers.Materiel.GetInventaire.Request);
+
+App.Http.Controllers.Inventaire.Update.Request=class Request {
+    id = undefined;
+    quantite;
+    id_materiel;
+    id_equipe;
+    id_variation = undefined;
+}
+App.Http.Controllers.Inventaire.Update.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
+__as1(_.App.Http.Controllers.Inventaire.Update, 'Request', App.Http.Controllers.Inventaire.Update.Request);
+
+App.Models.InventaireHistorique=class InventaireHistorique extends Aventus.Data {
+    static get Fullname() { return "App.Models.InventaireHistorique"; }
     id;
     id_equipe;
     id_materiel;
     id_variation = undefined;
     quantite;
-    lastUpdate;
-    lastUpdateBy;
+    last_update;
+    last_update_by;
 }
-App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
-App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","lastUpdate":"Date","lastUpdateBy":"string"};
-Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
-__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
+App.Models.InventaireHistorique.Namespace=`Inventaire.App.Models`;
+App.Models.InventaireHistorique.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string"};
+Aventus.Converter.register(App.Models.InventaireHistorique.Fullname, App.Models.InventaireHistorique);
+__as1(_.App.Models, 'InventaireHistorique', App.Models.InventaireHistorique);
+
+App.Http.Controllers.Inventaire.Historique.Request=class Request {
+    id_materiel;
+    id_equipe;
+    id_variation = undefined;
+    page;
+}
+App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
+__as1(_.App.Http.Controllers.Inventaire.Historique, 'Request', App.Http.Controllers.Inventaire.Historique.Request);
+
+App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
+    static get Fullname() { return "App.Models.MaterielImage"; }
+}
+App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
+Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
+__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
 App.Models.Variation=class Variation extends Aventus.Data {
     static get Fullname() { return "App.Models.Variation"; }
@@ -12258,13 +12303,11 @@ App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","i
 Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
 __as1(_.App.Models, 'Variation', App.Models.Variation);
 
-App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
-    static get Fullname() { return "App.Models.MaterielImage"; }
+App.Http.Controllers.Equipe.GetInventaire.Request=class Request {
+    id_equipe;
 }
-App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
-Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
-__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
+App.Http.Controllers.Equipe.GetInventaire.Request.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
+__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'Request', App.Http.Controllers.Equipe.GetInventaire.Request);
 
 App.Http.Controllers.Equipe.EquipeResource=class EquipeResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Equipe.EquipeResource"; }
@@ -12297,7 +12340,12 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-link _id="equipeitem_0">    <div class="name" _id="equipeitem_1"></div>    <div class="actions">        <mi-icon icon="chevron_right"></mi-icon>    </div></av-link>` }
+        blocks: { 'default':`<av-link _id="equipeitem_0">
+    <div class="name" _id="equipeitem_1"></div>
+    <div class="actions">
+        <mi-icon icon="chevron_right"></mi-icon>
+    </div>
+</av-link>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12330,6 +12378,20 @@ EquipeItem.Namespace=`Inventaire`;
 EquipeItem.Tag=`av-equipe-item`;
 __as1(_, 'EquipeItem', EquipeItem);
 if(!window.customElements.get('av-equipe-item')){window.customElements.define('av-equipe-item', EquipeItem);Aventus.WebComponentInstance.registerDefinition(EquipeItem);}
+
+App.Http.Controllers.Materiel.GetInventaire.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
+    id;
+    equipe;
+    variation = undefined;
+    quantite;
+    last_update;
+    last_update_by;
+}
+App.Http.Controllers.Materiel.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+App.Http.Controllers.Materiel.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource","variation":"Inventaire.App.Models.Variation","quantite":"number","last_update":"Date","last_update_by":"string"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.GetInventaire.Response.Fullname, App.Http.Controllers.Materiel.GetInventaire.Response);
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Response', App.Http.Controllers.Materiel.GetInventaire.Response);
 
 App.Http.Controllers.Materiel.MaterielEquipeResource=class MaterielEquipeResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielEquipeResource"; }
@@ -12416,7 +12478,9 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
+        blocks: { 'default':`<div class="content">
+    <slot></slot>
+</div>` }
     });
 }
     getClassName() {
@@ -12445,7 +12509,11 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll">    <div class="content">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll">
+    <div class="content">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -12455,29 +12523,18 @@ const Page = class Page extends Aventus.Navigation.Page {
 Page.Namespace=`Inventaire`;
 __as1(_, 'Page', Page);
 
-const Header = class Header extends Aventus.WebComponent {
-    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo{font-size:var(--font-size-md)}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}`;
-    __getStatic() {
-        return Header;
+App.Http.Controllers.Auth.Logout.AuthLogoutController=class AuthLogoutController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
     }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(Header.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content">    <div class="logo">Inventaire FC Vétroz</div>    <div class="menu">        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>        <div class="item">            <mi-icon icon="power_settings_new"></mi-icon>        </div>    </div></div>` }
-    });
-}
-    getClassName() {
-        return "Header";
+    async request() {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/logout`, Aventus.HttpMethod.POST);
+        return await request.queryVoid(this.router);
     }
 }
-Header.Namespace=`Inventaire`;
-Header.Tag=`av-header`;
-__as1(_, 'Header', Header);
-if(!window.customElements.get('av-header')){window.customElements.define('av-header', Header);Aventus.WebComponentInstance.registerDefinition(Header);}
+App.Http.Controllers.Auth.Logout.AuthLogoutController.Namespace=`Inventaire.App.Http.Controllers.Auth.Logout`;
+__as1(_.App.Http.Controllers.Auth.Logout, 'AuthLogoutController', App.Http.Controllers.Auth.Logout.AuthLogoutController);
 
 const Footer = class Footer extends Aventus.WebComponent {
     static __style = `:host{align-items:center;background-color:var(--color-base-100);display:flex;flex-shrink:0;height:30px;justify-content:center;width:100%;box-shadow:var(--elevation-2);z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}`;
@@ -12503,6 +12560,31 @@ Footer.Namespace=`Inventaire`;
 Footer.Tag=`av-footer`;
 __as1(_, 'Footer', Footer);
 if(!window.customElements.get('av-footer')){window.customElements.define('av-footer', Footer);Aventus.WebComponentInstance.registerDefinition(Footer);}
+
+const FlexScroll = class FlexScroll extends Aventus.Layout.Scrollable {
+    static __style = `:host{display:flex;flex-direction:column}:host .scroll-main-container{display:flex;flex-direction:column}:host .scroll-main-container .content-zoom{display:flex;flex-direction:column}`;
+    __getStatic() {
+        return FlexScroll;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(FlexScroll.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "FlexScroll";
+    }
+}
+FlexScroll.Namespace=`Inventaire`;
+FlexScroll.Tag=`av-flex-scroll`;
+__as1(_, 'FlexScroll', FlexScroll);
+if(!window.customElements.get('av-flex-scroll')){window.customElements.define('av-flex-scroll', FlexScroll);Aventus.WebComponentInstance.registerDefinition(FlexScroll);}
 
 const Modal = class Modal extends Aventus.Modal.ModalElement {
     static __style = `:host{align-items:center;background-color:rgba(30,30,30,.3);display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:.75rem;box-shadow:var(--elevation-3);margin:16px;max-width:32rem;padding:1.5rem;position:relative;text-align:left;transform:translateZ(0);transition:all .2s ease-in-out;width:100%}`;
@@ -12545,7 +12627,10 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
+    <av-button _id="confirm_2"></av-button>
+    <av-button color="primary" _id="confirm_3"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12633,7 +12718,10 @@ const EquipeTag = class EquipeTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="equipetag_0"></span>    <mi-icon icon="delete" _id="equipetag_1"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="equipetag_0"></span>
+    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12810,7 +12898,15 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
+    <div class="preview" _id="inputimage_1">
+        <av-img _id="inputimage_2"></av-img>
+        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
+    </div>
+    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
+</div><div class="errors">
+    <template _id="inputimage_5"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12855,10 +12951,14 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+        <template _id="inputimage_6"></template>
+    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+            <div _id="inputimage_7"></div>
+        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -12928,6 +13028,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
         this.inputFileEl.click();
     }
     postCreation() {
+        super.postCreation();
         this.setPreview();
     }
     __20fb5d8b19c82e031f4b31c5973774bemethod1() {
@@ -13066,7 +13167,23 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="toast-content">
+    <div class="toast-flex">
+        <div class="toast-icon-wrapper">
+            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
+        </div>
+        <div class="toast-message-wrapper">
+            <template _id="toast_1"></template>
+            <template _id="toast_3"></template>
+        </div>
+        <div class="toast-close-wrapper">
+            <button class="toast-close-button" _id="toast_5">
+                <span class="sr-only">Close</span>
+                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
+            </button>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13083,7 +13200,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <p class="toast-title" _id="toast_2"></p>
+            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13096,7 +13215,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                <p class="toast-message" _id="toast_4"></p>
+            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13221,7 +13342,13 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
+    <slot name="before"></slot>
+    <input _id="input_1" />
+    <slot name="after"></slot>
+</div><div class="errors">
+    <template _id="input_2"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13282,7 +13409,9 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="input_3"></div>
+    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13301,6 +13430,9 @@ const Input = class Input extends Aventus.Form.FormElement {
     focusInput() {
         this.inputEl.focus();
     }
+    select() {
+        this.inputEl.select();
+    }
     onFocus() {
         this.clearErrors();
         this.focusValue = this.inputEl.value;
@@ -13312,8 +13444,6 @@ const Input = class Input extends Aventus.Form.FormElement {
     }
     onInput() {
         this.triggerChange(this.inputEl.value);
-    }
-    postCreation() {
     }
     __7d3ca2aeff9f73a58c356d3051050ae6method1() {
         return this.name;
@@ -13356,7 +13486,12 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
+    <av-input label="Nom de la variation" _id="modaltag_1"></av-input>
+</div><div class="footer">
+    <av-button _id="modaltag_2">Annuler</av-button>
+    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13446,7 +13581,11 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="variationtag_0"></span>
+    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
+    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13516,7 +13655,8 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0">
+</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13597,7 +13737,9 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">
+    <div class="loader"></div>
+</div>` }
     });
 }
     getClassName() {
@@ -13885,7 +14027,9 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
+    <slot _id="iconaction_1"></slot>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13962,7 +14106,11 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>
+    <div class="container">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -14072,8 +14220,21 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
+    <slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>
+    <input id="input" autocomplete="off" _id="genericselect_3" />
+    <slot name="append"></slot>
+    <av-img src="/img/angle-left.svg" class="caret"></av-img>
+</div><div class="errors">
+    <template _id="genericselect_4"></template>
+</div><div class="hidden">
+    <slot></slot>
+</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14128,7 +14289,9 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="genericselect_5"></div>
+    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14246,6 +14409,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         this.optionsContainer.remove();
     }
     postCreation() {
+        super.postCreation();
         this.manageFocus();
         this.optionsContainer.init(this);
         this.loadElementsFromSlot();
@@ -14679,7 +14843,9 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
+    <av-button _id="alert_1"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14731,6 +14897,52 @@ Alert.Tag=`av-alert`;
 __as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
 
+const Header = class Header extends Aventus.WebComponent {
+    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo{font-size:var(--font-size-md)}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}`;
+    __getStatic() {
+        return Header;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Header.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="content">
+    <div class="logo">Inventaire FC Vétroz</div>
+    <div class="menu">
+        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
+        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>
+        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
+        <div class="item">
+            <mi-icon icon="power_settings_new" _id="header_0"></mi-icon>
+        </div>
+    </div>
+</div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "pressEvents": [
+    {
+      "id": "header_0",
+      "onPress": (e, pressInstance, c) => { c.comp.logout(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "Header";
+    }
+    async logout() {
+        await Aventus.Process.execute(new App.Http.Controllers.Auth.Logout.AuthLogoutController().request());
+        location.reload();
+    }
+}
+Header.Namespace=`Inventaire`;
+Header.Tag=`av-header`;
+__as1(_, 'Header', Header);
+if(!window.customElements.get('av-header')){window.customElements.define('av-header', Header);Aventus.WebComponentInstance.registerDefinition(Header);}
+
 App.Http.Controllers.Auth.Login.AuthLoginController=class AuthLoginController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -14746,7 +14958,15 @@ App.Http.Controllers.Auth.Login.AuthLoginController.Namespace=`Inventaire.App.Ht
 __as1(_.App.Http.Controllers.Auth.Login, 'AuthLoginController', App.Http.Controllers.Auth.Login.AuthLoginController);
 
 const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
-    static __style = `:host{align-items:center;display:flex;height:100%;justify-content:center;width:100%}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-3);display:flex;justify-content:stretch;max-width:700px;overflow:hidden;width:calc(100% - 40px)}:host .card .img{background-image:url("/img/background-foot.jpg");background-position:center center;background-size:cover;width:300px;flex-shrink:0}:host .card .content{padding:24px}:host .card .title{font-size:var(--font-size-lg);margin-bottom:24px}:host .card av-input{margin-bottom:12px}:host .card .right{display:flex;justify-content:flex-end;margin-top:8px}:host(:not([visible])){display:flex}@media screen and (max-width: 800px){:host .card{flex-direction:column;max-width:500px}:host .card .img{height:200px;width:100%}}`;
+    get 'error'() {
+						return this.__watch["error"];
+					}
+					set 'error'(val) {
+						this.__watch["error"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("error");    super.__registerWatchesActions();
+}
+    static __style = `:host{align-items:center;display:flex;height:100%;justify-content:center;width:100%}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-3);display:flex;justify-content:stretch;max-width:700px;overflow:hidden;width:calc(100% - 40px)}:host .card .img{background-image:url("/img/background-foot.jpg");background-position:center center;background-size:cover;flex-shrink:0;width:300px}:host .card .content{padding:24px}:host .card .title{font-size:var(--font-size-lg);margin-bottom:24px}:host .card av-input{margin-bottom:12px}:host .card .right{display:flex;justify-content:flex-end;margin-top:8px}:host .card .form-error{color:var(--color-danger);font-size:.875rem;color:var(--color-error)}:host(:not([visible])){display:flex}@media screen and (max-width: 800px){:host .card{flex-direction:column;max-width:500px}:host .card .img{height:200px;width:100%}}`;
     __getStatic() {
         return LoginPage;
     }
@@ -14757,7 +14977,18 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="img"></div>    <div class="content">        <div class="title">Inventaire FC Vétroz</div>        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>        <div class="right">            <av-button type="submit" color="neutral">Login</av-button>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="img"></div>
+    <div class="content">
+        <div class="title">Inventaire FC Vétroz</div>
+        <av-input label="Nom d'utilisateur" name="username" _id="loginpage_0"></av-input>
+        <av-input label="Mot de passe" name="password" type="password" _id="loginpage_1"></av-input>
+        <template _id="loginpage_2"></template>
+        <div class="right">
+            <av-button type="submit" color="neutral">Login</av-button>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14765,20 +14996,51 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     {
       "id": "loginpage_0",
       "injectionName": "form",
-      "inject": (c) => c.comp.__32893ce09ff9e4944d5fa5903c489fc0method0(),
+      "inject": (c) => c.comp.__32893ce09ff9e4944d5fa5903c489fc0method1(),
       "once": true
     },
     {
       "id": "loginpage_1",
       "injectionName": "form",
-      "inject": (c) => c.comp.__32893ce09ff9e4944d5fa5903c489fc0method1(),
+      "inject": (c) => c.comp.__32893ce09ff9e4944d5fa5903c489fc0method2(),
       "once": true
     }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "loginpage_0",
+      "fct": (e, c) => c.comp.clearError(e)
+    },
+    {
+      "eventName": "focus",
+      "id": "loginpage_1",
+      "fct": (e, c) => c.comp.clearError(e)
+    }
   ]
-}); }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+            <div class="form-error">
+                <div _id="loginpage_3"></div>
+            </div>
+        `);templ0.setActions({
+  "content": {
+    "loginpage_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__32893ce09ff9e4944d5fa5903c489fc0method3())}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'loginpage_2',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__32893ce09ff9e4944d5fa5903c489fc0method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "LoginPage";
     }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["error"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('error'); }
     route() {
         return App.Http.Controllers.Auth.Login.AuthLoginController;
     }
@@ -14796,10 +15058,35 @@ const LoginPage = class LoginPage extends Aventus.Navigation.PageFormRoute {
     configure() {
         return {};
     }
+    formConfig() {
+        return {
+            handleExecuteNoInputError: (errors) => {
+                if (errors.some(p => p.code == 422)) {
+                    this.error = "Informations non valides";
+                }
+                else {
+                    let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                    Alert.open({
+                        title: "Erreur",
+                        content: msg,
+                    });
+                }
+            }
+        };
+    }
+    clearError() {
+        this.error = undefined;
+    }
+    __32893ce09ff9e4944d5fa5903c489fc0method3() {
+        return this.error;
+    }
     __32893ce09ff9e4944d5fa5903c489fc0method0() {
-        return this.form.parts.nom_utilisateur;
+        return this.error;
     }
     __32893ce09ff9e4944d5fa5903c489fc0method1() {
+        return this.form.parts.nom_utilisateur;
+    }
+    __32893ce09ff9e4944d5fa5903c489fc0method2() {
         return this.form.parts.mot_passe;
     }
 }
@@ -14893,7 +15180,12 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
+    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
+</div><div class="footer">
+    <av-button _id="modalequipe_2">Annuler</av-button>
+    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14969,20 +15261,6 @@ ModalEquipe.Tag=`av-modal-equipe`;
 __as1(_, 'ModalEquipe', ModalEquipe);
 if(!window.customElements.get('av-modal-equipe')){window.customElements.define('av-modal-equipe', ModalEquipe);Aventus.WebComponentInstance.registerDefinition(ModalEquipe);}
 
-App.Models.Materiel=class Materiel extends Aventus.Data {
-    static get Fullname() { return "App.Models.Materiel"; }
-    id;
-    nom;
-    image = undefined;
-    variations;
-    tout_monde;
-    equipes;
-}
-App.Models.Materiel.Namespace=`Inventaire.App.Models`;
-App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.Variation[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
-Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
-__as1(_.App.Models, 'Materiel', App.Models.Materiel);
-
 App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResource"; }
     variations;
@@ -14996,6 +15274,142 @@ App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Co
 App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.Variation[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
+
+const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
+    get 'materiel'() {
+						return this.__signals["materiel"].value;
+					}
+					set 'materiel'(val) {
+						this.__signals["materiel"].value = val;
+					}get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalInventaireUpdate;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventaireUpdate.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventaireupdate_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventaireupdate_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventaireupdate_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
+      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventaireupdate_1",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventaireupdate_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventaireupdate_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventaireUpdate";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    save() {
+        if (typeof this.nb == 'number') {
+            this.resolve(this.nb);
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            this.resolve(nb2);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
+    }
+    postCreation() {
+        super.postCreation();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method0() {
+        return this.getTitle();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method1() {
+        return this.nb;
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventaireUpdate.Namespace=`Inventaire`;
+ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
+__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
+if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
 
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -15018,7 +15432,23 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3">    <av-link _id="materielcard_0">        <div class="img">            <av-img mode="cover" _id="materielcard_1"></av-img>        </div>        <div class="info">            <div class="title" _id="materielcard_2"></div>            <div class="variations">                <template _id="materielcard_3"></template>            </div>            <div class="visible">                <div>Visible pour :</div>                <template _id="materielcard_5"></template>            </div>        </div>    </av-link></av-col>` }
+        blocks: { 'default':`<av-col size="12" size_sm="4" size_md="3">
+    <av-link _id="materielcard_0">
+        <div class="img">
+            <av-img mode="cover" _id="materielcard_1"></av-img>
+        </div>
+        <div class="info">
+            <div class="title" _id="materielcard_2"></div>
+            <div class="variations">
+                <template _id="materielcard_3"></template>
+            </div>
+            <div class="visible">
+                <div>Visible pour :</div>
+                <template _id="materielcard_5"></template>
+            </div>
+        </div>
+    </av-link>
+</av-col>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15036,7 +15466,9 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
       "once": true
     }
   }
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                     <av-tag color="accent" _id="materielcard_4"></av-tag>                `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+                    <av-tag color="accent" _id="materielcard_4"></av-tag>
+                `);templ0.setActions({
   "content": {
     "materielcard_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.variation))}`,
@@ -15046,7 +15478,15 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
 });this.__getStatic().__template.addLoop({
                     anchorId: 'materielcard_3',
                     template: templ0,
-                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`                    <div>Tout le monde</div>                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                    <div class="visible-for">                        <template _id="materielcard_6"></template>                    </div>                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(`                             <av-tag color="accent" _id="materielcard_7"></av-tag>                        `);templ3.setActions({
+                simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                    <div>Tout le monde</div>
+                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <div class="visible-for">
+                        <template _id="materielcard_6"></template>
+                    </div>
+                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(` 
+                            <av-tag color="accent" _id="materielcard_7"></av-tag>
+                        `);templ3.setActions({
   "content": {
     "materielcard_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method7(c.data.equipe))}`,
@@ -15103,20 +15543,425 @@ MaterielCard.Tag=`av-materiel-card`;
 __as1(_, 'MaterielCard', MaterielCard);
 if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
 
-App.Http.Controllers.Materiel.MaterielResourceDetails=class MaterielResourceDetails extends _.App.Http.Controllers.Materiel.MaterielResource {
-    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResourceDetails"; }
-    inventaires;
-    test;
+App.Http.Controllers.Equipe.GetInventaire.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
+    id;
+    materiel;
+    variation = undefined;
+    quantite;
+    last_update;
+    last_update_by;
 }
-App.Http.Controllers.Materiel.MaterielResourceDetails.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielResourceDetails.$schema={...(App.Http.Controllers.Materiel.MaterielResource?.$schema ?? {}), "inventaires":"Inventaire.App.Models.Inventaire[]","test":"string"};
-Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResourceDetails.Fullname, App.Http.Controllers.Materiel.MaterielResourceDetails);
-__as1(_.App.Http.Controllers.Materiel, 'MaterielResourceDetails', App.Http.Controllers.Materiel.MaterielResourceDetails);
+App.Http.Controllers.Equipe.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
+App.Http.Controllers.Equipe.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielResource","variation":"Inventaire.App.Models.Variation","quantite":"number","last_update":"Date","last_update_by":"string"};
+Aventus.Converter.register(App.Http.Controllers.Equipe.GetInventaire.Response.Fullname, App.Http.Controllers.Equipe.GetInventaire.Response);
+__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'Response', App.Http.Controllers.Equipe.GetInventaire.Response);
+
+App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController=class EquipeGetInventaireController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/equipe/inventaire`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
+__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'EquipeGetInventaireController', App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController);
+
+App.Http.Controllers.Inventaire.Historique.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Inventaire.Historique.Response"; }
+    historique;
+}
+App.Http.Controllers.Inventaire.Historique.Response.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
+App.Http.Controllers.Inventaire.Historique.Response.$schema={...(Aventus.Data?.$schema ?? {}), "historique":"Inventaire.App.Models.InventaireHistorique[]"};
+Aventus.Converter.register(App.Http.Controllers.Inventaire.Historique.Response.Fullname, App.Http.Controllers.Inventaire.Historique.Response);
+__as1(_.App.Http.Controllers.Inventaire.Historique, 'Response', App.Http.Controllers.Inventaire.Historique.Response);
+
+App.Http.Controllers.Inventaire.Historique.InventaireHistoriqueController=class InventaireHistoriqueController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/historique`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Inventaire.Historique.InventaireHistoriqueController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
+__as1(_.App.Http.Controllers.Inventaire.Historique, 'InventaireHistoriqueController', App.Http.Controllers.Inventaire.Historique.InventaireHistoriqueController);
+
+const ModalHistorique = class ModalHistorique extends Modal {
+    get 'historiques'() {
+						return this.__watch["historiques"];
+					}
+					set 'historiques'(val) {
+						this.__watch["historiques"] = val;
+					}    get 'materiel'() {
+						return this.__signals["materiel"].value;
+					}
+					set 'materiel'(val) {
+						this.__signals["materiel"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}    isLoading = false;
+    page = 0;
+    canLoadMore = true;
+    __registerWatchesActions() {
+    this.__addWatchesActions("historiques");    super.__registerWatchesActions();
+}
+    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["equipe"] = null;this.__signals["variation"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);flex-grow:1;min-height:0;width:100%;display:flex;flex-direction:column}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;gap:20px;padding:8px 16px}:host .content .line .quantite{flex-shrink:0;width:75px}:host .content .line .par{flex-grow:1}:host .content .line .modification{flex-shrink:0;width:200px}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}`;
+    __getStatic() {
+        return ModalHistorique;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalHistorique.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "scrollEl",
+      "ids": [
+        "modalhistorique_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalhistorique_0°@HTML": {
+      "fct": (c) => `Historique pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method1())} ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method2())} pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method3())}`
+    }
+  },
+  "events": [
+    {
+      "eventName": "onScrollChange",
+      "id": "modalhistorique_1",
+      "fct": (c, ...args) => c.comp.loadData.apply(c.comp, ...args),
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalhistorique_6",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite" _id="modalhistorique_3"></div>                <div class="par" _id="modalhistorique_4"></div>                <div class="modification">                    <span _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
+  "content": {
+    "modalhistorique_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
+      "once": true
+    },
+    "modalhistorique_4°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method5(c.data.historique))}`,
+      "once": true
+    },
+    "modalhistorique_5°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method6(c.data.historique))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'modalhistorique_2',
+                    template: templ0,
+                simple:{data: "this.historiques",item:"historique"}}); }
+    getClassName() {
+        return "ModalHistorique";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["historiques"] = []; }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["equipe"] = undefined;s["variation"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('equipe');this.__correctGetter('variation');this.__correctGetter('historiques'); }
+    configure() {
+        return {
+            title: ""
+        };
+    }
+    async loadMoreData() {
+        if (this.scrollEl.y + 200 > this.scrollEl.yMax) {
+            this.loadData(this.page + 1);
+        }
+    }
+    async loadData(page) {
+        if (!this.canLoadMore)
+            return;
+        if (this.isLoading) {
+            return;
+        }
+        this.isLoading = true;
+        const data = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Historique.InventaireHistoriqueController().request({
+            id_equipe: this.equipe.id,
+            id_materiel: this.materiel.id,
+            id_variation: this.variation?.id,
+            page: page
+        }));
+        if (data) {
+            this.page = page;
+            if (this.page == 0) {
+                this.historiques = data.historique;
+            }
+            else {
+                this.historiques.splice(this.historiques.length - 1, 0, ...data.historique);
+            }
+            if (data.historique.length < 20) {
+                this.canLoadMore = false;
+            }
+        }
+        else {
+            this.reject();
+        }
+        this.isLoading = false;
+    }
+    getLastUpdate(inventaire) {
+        return inventaire.last_update.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+    postCreation() {
+        super.postCreation();
+        this.loadData(0);
+    }
+    __96088c3823f02341204bbb7914b84118method1() {
+        return this.materiel.nom;
+    }
+    __96088c3823f02341204bbb7914b84118method2() {
+        return this.variation?.nom;
+    }
+    __96088c3823f02341204bbb7914b84118method3() {
+        return this.equipe.nom;
+    }
+    __96088c3823f02341204bbb7914b84118method4(historique) {
+        return historique.quantite;
+    }
+    __96088c3823f02341204bbb7914b84118method5(historique) {
+        return historique.last_update_by;
+    }
+    __96088c3823f02341204bbb7914b84118method6(historique) {
+        return this.getLastUpdate(historique);
+    }
+}
+ModalHistorique.Namespace=`Inventaire`;
+ModalHistorique.Tag=`av-modal-historique`;
+__as1(_, 'ModalHistorique', ModalHistorique);
+if(!window.customElements.get('av-modal-historique')){window.customElements.define('av-modal-historique', ModalHistorique);Aventus.WebComponentInstance.registerDefinition(ModalHistorique);}
+
+App.Models.Materiel=class Materiel extends Aventus.Data {
+    static get Fullname() { return "App.Models.Materiel"; }
+    id;
+    nom;
+    image = undefined;
+    variations;
+    tout_monde;
+    equipes;
+}
+App.Models.Materiel.Namespace=`Inventaire.App.Models`;
+App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.Variation[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
+Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
+__as1(_.App.Models, 'Materiel', App.Models.Materiel);
+
+App.Models.Inventaire=class Inventaire extends Aventus.Data {
+    static get Fullname() { return "App.Models.Inventaire"; }
+    id;
+    id_equipe;
+    id_materiel;
+    id_variation = undefined;
+    quantite;
+    last_update;
+    last_update_by;
+    equipe;
+    materiel;
+    variation = undefined;
+}
+App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
+App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.Materiel","variation":"Inventaire.App.Models.Variation"};
+Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
+__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
+
+App.Http.Controllers.Inventaire.Update.InventaireUpdateController=class InventaireUpdateController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/update`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Inventaire.Update.InventaireUpdateController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
+__as1(_.App.Http.Controllers.Inventaire.Update, 'InventaireUpdateController', App.Http.Controllers.Inventaire.Update.InventaireUpdateController);
+
+const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
+    get 'inventaire'() {
+						return this.__watch["inventaire"];
+					}
+					set 'inventaire'(val) {
+						this.__watch["inventaire"] = val;
+					}    materiel;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
+}
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .nom{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
+    __getStatic() {
+        return InventaireListItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(InventaireListItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="line">    <div class="nom" _id="inventairelistitem_0"></div>    <div class="variation" _id="inventairelistitem_1"></div>    <div class="quantite" _id="inventairelistitem_2"></div>    <div class="modification">        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_3">Modifier</av-icon-action>            <template _id="inventairelistitem_4"></template>        </div>        <span _id="inventairelistitem_6"></span>    </div></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "inventairelistitem_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
+      "once": true
+    },
+    "inventairelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`
+    },
+    "inventairelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}`
+    },
+    "inventairelistitem_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_3",
+      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <av-icon-action color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            `);templ0.setActions({
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_5",
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventairelistitem_4',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod0(),
+                    template: templ0
+                }]
+            }); }
+    getClassName() {
+        return "InventaireListItem";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    getLastUpdate() {
+        if (this.inventaire.last_update) {
+            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+    async edit() {
+        const modal = new ModalInventaireUpdate();
+        modal.variation = this.inventaire.variation;
+        modal.equipe = this.inventaire.equipe;
+        modal.materiel = this.materiel;
+        modal.nb = this.inventaire.quantite;
+        const result = await modal.show();
+        if (result) {
+            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+                id: this.inventaire.id,
+                id_equipe: this.inventaire.equipe.id,
+                id_materiel: this.materiel.id,
+                id_variation: this.inventaire.variation?.id,
+                quantite: result
+            }));
+            if (save) {
+                this.inventaire.last_update = save.last_update;
+                this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.quantite = save.quantite;
+                Toast.add({
+                    message: "Inventaire enregistré",
+                    color: "success",
+                    closable: true
+                });
+            }
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.materiel = this.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.variation = this.inventaire.variation;
+        await modal.show();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod1() {
+        return this.inventaire.equipe.nom;
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod2() {
+        return this.inventaire.variation?.nom;
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod3() {
+        return this.inventaire.quantite ?? '-';
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod4() {
+        return this.getLastUpdate();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod0() {
+        return this.inventaire.id;
+    }
+}
+InventaireListItem.Namespace=`Inventaire`;
+InventaireListItem.Tag=`av-inventaire-list-item`;
+__as1(_, 'InventaireListItem', InventaireListItem);
+if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+
+App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/inventaire`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'MaterielGetInventaireController', App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController);
 
 App.Http.Controllers.Materiel.MaterielController=class MaterielController extends AventusPhp.ModelController {
     getRequest() { return _.App.Http.Controllers.Materiel.MaterielRequest; }
     getResource() { return _.App.Http.Controllers.Materiel.MaterielResource; }
-    getResourceDetails() { return _.App.Http.Controllers.Materiel.MaterielResourceDetails; }
     getUri() { return "data/materiel"; }
 }
 App.Http.Controllers.Materiel.MaterielController.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
@@ -15144,6 +15989,350 @@ let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
 }
 MaterielRAM.Namespace=`Inventaire`;
 __as1(_, 'MaterielRAM', MaterielRAM);
+
+const MaterielDetailsPage = class MaterielDetailsPage extends Page {
+    get 'inventaires'() {
+						return this.__watch["inventaires"];
+					}
+					set 'inventaires'(val) {
+						this.__watch["inventaires"] = val;
+					}get 'objName'() {
+						return this.__watch["objName"];
+					}
+					set 'objName'(val) {
+						this.__watch["objName"] = val;
+					}    form;
+    item;
+    slugId = 0;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
+}
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}`;
+    constructor() {
+        super();
+        this.form = Aventus.Form.Form.create({
+            nom: Aventus.Form.Validators.Required,
+            variations: {},
+            image: {},
+            tout_monde: {},
+            equipes: {}
+        });
+    }
+    __getStatic() {
+        return MaterielDetailsPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(MaterielDetailsPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="materieldetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>
+            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <av-row>
+            <av-col size="6">
+                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>
+            </av-col>
+            <av-col size="6" class="contenu">
+                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>
+                <div class="tags">
+                    <div class="label">Variations</div>
+                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>
+                </div>
+                <div class="tags">
+                    <div class="label pour">
+                        <span class="main-label">Pour :</span>
+                        <div class="toggle">
+                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>
+                            <av-toggle _id="materieldetailspage_7"></av-toggle>
+                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>
+                        </div>
+                    </div>
+                    <template _id="materieldetailspage_9"></template>
+                </div>
+            </av-col>
+        </av-row>
+    </div>
+</div><template _id="materieldetailspage_11"></template>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "materieldetailspage_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
+      "once": true
+    }
+  },
+  "injection": [
+    {
+      "id": "materieldetailspage_3",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_4",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_5",
+      "injectionName": "variations",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_7",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "materieldetailspage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_6",
+      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_8",
+      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>
+                    `);templ0.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_10",
+      "injectionName": "equipes",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
+      "once": true
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_9',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+    <div class="card by-equipe">
+        <div class="header">
+            <div class="title">Liste dans les équipes</div>
+        </div>
+        <div class="body">
+            <div class="list">
+                <template _id="materieldetailspage_12"></template>
+            </div>
+        </div>
+    </div>
+`);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <av-inventaire-list-item _id="materieldetailspage_13"></av-inventaire-list-item>
+                `);templ2.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_13",
+      "injectionName": "inventaire",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(c.data.inventaire),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_13",
+      "injectionName": "materiel",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(),
+      "once": true
+    }
+  ]
+});templ1.addLoop({
+                    anchorId: 'materieldetailspage_12',
+                    template: templ2,
+                simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_11',
+                    parts: [{
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
+                    template: templ1
+                }]
+            }); }
+    getClassName() {
+        return "MaterielDetailsPage";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    async isAllowed(state, pattern, router) {
+        const slugs = router.getSlugs(pattern);
+        if (!slugs || typeof slugs['id'] != "number") {
+            return "/materiel";
+        }
+        const id = slugs['id'];
+        this.slugId = id;
+        if (id == 0) {
+            let newItem = new App.Http.Controllers.Materiel.MaterielRequest();
+            newItem.id = 0;
+            newItem.tout_monde = true;
+            newItem.image = new App.Models.MaterielImage();
+            newItem.variations = [];
+            let v1 = new App.Models.Variation();
+            v1.nom = "XS";
+            newItem.variations.push(v1);
+            let v2 = new App.Models.Variation();
+            v2.nom = "S";
+            newItem.variations.push(v2);
+            newItem.equipes = [];
+            this.form.item = newItem;
+            this.objName = "Création de matériel";
+            this.inventaires = [];
+        }
+        else {
+            const ram = MaterielRAM.getInstance();
+            const item = await ram.getById(id);
+            if (!item) {
+                return "/materiel";
+            }
+            this.item = item;
+            this.form.item = ram.toRequest(item);
+            this.objName = this.form.item.nom;
+            await this.loadInventaire(id);
+        }
+        return true;
+    }
+    async loadInventaire(id) {
+        const item = this.item;
+        const inventaires = [];
+        const connu = await Aventus.Process.execute(new App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController().request({ id_materiel: id }));
+        if (!connu)
+            return;
+        let equipes = [];
+        if (item.tout_monde) {
+            equipes = (await EquipeRAM.getInstance().getList());
+        }
+        else {
+            equipes = item.equipes.map(p => p.equipe);
+        }
+        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+        const addInventaire = (equipe, variation) => {
+            let el;
+            if (variation) {
+                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.equipe.id == equipe.id);
+            }
+            if (el == undefined) {
+                el = new App.Http.Controllers.Materiel.GetInventaire.Response();
+                el.equipe = equipe;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            el.equipe = equipe;
+            el.variation = variation;
+            inventaires.push(el);
+        };
+        for (let equipe of equipes) {
+            if (item.variations.length > 0) {
+                for (let variation of item.variations) {
+                    addInventaire(equipe, variation);
+                }
+            }
+            else {
+                addInventaire(equipe);
+            }
+        }
+        this.inventaires = inventaires;
+    }
+    configure() {
+        return {};
+    }
+    async save() {
+        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
+        if (result.result) {
+            Toast.add({
+                message: "Matériel enregistré",
+                color: "success",
+                closable: true
+            });
+            if (this.form.item.id == 0) {
+                this.router?.navigate('/materiel/' + result.result.id);
+            }
+            else {
+                const ram = MaterielRAM.getInstance();
+                this.item = result.result;
+                this.form.item = ram.toRequest(result.result);
+                this.objName = this.form.item.nom;
+                await this.loadInventaire(this.item.id);
+            }
+        }
+    }
+    async destroy() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
+        });
+        if (result) {
+            const ram = MaterielRAM.getInstance();
+            const result = await Aventus.Process.execute(ram.deleteByIdWithError(this.slugId));
+            if (result) {
+                this.router?.navigate("/materiel");
+            }
+        }
+    }
+    setToutMonde() {
+        this.form.item.tout_monde = true;
+    }
+    unsetToutMonde() {
+        this.form.item.tout_monde = false;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
+        return this.objName;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
+        return !this.form.item.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
+        return this.form.item?.id;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
+        return this.form.parts.image;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
+        return this.form.parts.nom;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
+        return this.form.item.variations;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+        return this.form.parts.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
+        return this.form.item.equipes;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9(inventaire) {
+        return inventaire;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
+        return this.item;
+    }
+}
+MaterielDetailsPage.Namespace=`Inventaire`;
+MaterielDetailsPage.Tag=`av-materiel-details-page`;
+__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
+if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
 
 App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
     getRequest() { return _.App.Http.Controllers.User.UserRequest; }
@@ -15195,7 +16384,10 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">    <av-button _id="equipeeditmodal_2">Annuler</av-button>    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">
+    <av-button _id="equipeeditmodal_2">Annuler</av-button>
+    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15264,10 +16456,15 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
 					}
 					set 'item'(val) {
 						this.__watch["item"] = val;
+					}get 'inventaires'() {
+						return this.__watch["inventaires"];
+					}
+					set 'inventaires'(val) {
+						this.__watch["inventaires"] = val;
 					}    __registerWatchesActions() {
-    this.__addWatchesActions("item");    super.__registerWatchesActions();
+    this.__addWatchesActions("item");this.__addWatchesActions("inventaires");    super.__registerWatchesActions();
 }
-    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%;margin-top:8px}:host .card .body .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .card .body .list .item .line{align-items:center;display:flex;gap:20px}:host .card .body .list .item .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .card .body .list .item .line .nom{flex-grow:1;width:50%}:host .card .body .list .item .line .quantite{flex-grow:1;width:50%}:host .card .body .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .card .body .list .item .line .modification av-icon-action{width:fit-content}:host .card .body .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .card .body .list .item:first-child{border-top:none}`;
+    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%;margin-top:8px}`;
     __getStatic() {
         return EquipeDetailsPage;
     }
@@ -15278,13 +16475,29 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="equipedetailspage_0"></div>        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>        </div>    </div>    <div class="body">        <div class="title">            <span>Liste de matériel</span>        </div>        <div class="list">            <template _id="equipedetailspage_3"></template>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="equipedetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
+            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <div class="title">
+            <span>Liste de matériel</span>
+        </div>
+        <div class="list">
+            <template _id="equipedetailspage_3"></template>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "equipedetailspage_0°@HTML": {
-      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2())}`,
+      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1())}`,
       "once": true
     }
   },
@@ -15298,26 +16511,32 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
       "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                 <div class="item">                    <div class="line">                        <div class="img"></div>                        <div class="nom">Nom de l'article</div>                        <div class="quantite">21</div>                        <div class="modification">                            <div class="actions">                                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_4">Modifier</av-icon-action>                                <av-icon-action color="info" icon="history" _id="equipedetailspage_5">Historique</av-icon-action>                            </div>                            <span>Maxime, le 24.08.2025</span>                        </div>                    </div>                </div>            `);templ0.setActions({
-  "pressEvents": [
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <av-inventaire-equipe-list-item _id="equipedetailspage_4"></av-inventaire-equipe-list-item>
+            `);templ0.setActions({
+  "injection": [
     {
       "id": "equipedetailspage_4",
-      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
+      "injectionName": "inventaire",
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2(c.data.inventaire),
+      "once": true
     },
     {
-      "id": "equipedetailspage_5",
-      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
+      "id": "equipedetailspage_4",
+      "injectionName": "equipe",
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3(),
+      "once": true
     }
   ]
 });this.__getStatic().__template.addLoop({
                     anchorId: 'equipedetailspage_3',
                     template: templ0,
-                func: (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1()}); }
+                simple:{data: "this.inventaires",item:"inventaire"}}); }
     getClassName() {
         return "EquipeDetailsPage";
     }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('item'); }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined;w["inventaires"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('item');this.__correctGetter('inventaires'); }
     async isAllowed(state, pattern) {
         let slugs = Main.instance.getSlugs(pattern);
         if (!slugs || typeof slugs['id'] != "number")
@@ -15325,6 +16544,11 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
         const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
         if (!equipe)
             return "/";
+        const inventaires = await Aventus.Process.execute(new App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController().request({ id_equipe: equipe.id }));
+        if (!inventaires) {
+            return "/";
+        }
+        this.inventaires = inventaires;
         this.item = equipe;
         return true;
     }
@@ -15345,21 +16569,13 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
         }
     }
     __1235ef0c4a20ffaa552fd37f83cb4912method1() {
-        let i = 0;
-        return {
-            transform: () => {
-                i++;
-            },
-            condition: () => {
-                return (i < 3);
-            },
-            apply: () => {
-                return ({ i });
-            }
-        };
-    }
-    __1235ef0c4a20ffaa552fd37f83cb4912method2() {
         return this.item.nom;
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method2(inventaire) {
+        return inventaire;
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method3() {
+        return this.item;
     }
 }
 EquipeDetailsPage.Namespace=`Inventaire`;
@@ -15385,7 +16601,19 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des équipes</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
+            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="equipespage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15516,7 +16744,19 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste du matériel</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
+            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <av-row class="list" _id="materielpage_2">
+        </av-row>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15629,296 +16869,13 @@ MaterielPage.Tag=`av-materiel-page`;
 __as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
 
-const MaterielDetailsPage = class MaterielDetailsPage extends Page {
-    get 'inventaires'() {
-						return this.__watch["inventaires"];
-					}
-					set 'inventaires'(val) {
-						this.__watch["inventaires"] = val;
-					}get 'objName'() {
-						return this.__watch["objName"];
-					}
-					set 'objName'(val) {
-						this.__watch["objName"] = val;
-					}    form;
-    item;
-    slugId = 0;
-    __registerWatchesActions() {
-    this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
-}
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}:host .by-equipe .list .item{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .by-equipe .list .item .line{align-items:center;display:flex;gap:20px}:host .by-equipe .list .item .line .nom{flex-grow:1;width:50%}:host .by-equipe .list .item .line .quantite{flex-grow:1;width:50%}:host .by-equipe .list .item .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .by-equipe .list .item .line .modification .actions{display:flex}:host .by-equipe .list .item .line .modification av-icon-action{width:fit-content}:host .by-equipe .list .item .line .modification span{transform:translateY(5px);white-space:nowrap}:host .by-equipe .list .item:first-child{border-top:none}`;
-    constructor() {
-        super();
-        this.form = Aventus.Form.Form.create({
-            nom: Aventus.Form.Validators.Required,
-            variations: {},
-            image: {},
-            tout_monde: {},
-            equipes: {}
-        });
-    }
-    __getStatic() {
-        return MaterielDetailsPage;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(MaterielDetailsPage.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title" _id="materieldetailspage_0"></div>        <div class="actions">            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>        </div>    </div>    <div class="body">        <av-row>            <av-col size="6">                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>            </av-col>            <av-col size="6" class="contenu">                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>                <div class="tags">                    <div class="label">Variations</div>                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>                </div>                <div class="tags">                    <div class="label pour">                        <span class="main-label">Pour :</span>                        <div class="toggle">                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>                            <av-toggle _id="materieldetailspage_7"></av-toggle>                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>                        </div>                    </div>                    <template _id="materieldetailspage_9"></template>                </div>            </av-col>        </av-row>    </div></div><template _id="materieldetailspage_11"></template>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "materieldetailspage_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4())}`,
-      "once": true
-    }
-  },
-  "injection": [
-    {
-      "id": "materieldetailspage_3",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_4",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_5",
-      "injectionName": "variations",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_7",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
-      "once": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "materieldetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_2",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_6",
-      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_8",
-      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>                    `);templ0.setActions({
-  "injection": [
-    {
-      "id": "materieldetailspage_10",
-      "injectionName": "equipes",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(),
-      "once": true
-    }
-  ]
-});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_9',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
-                    template: templ0
-                }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`    <div class="card by-equipe">        <div class="header">            <div class="title">Liste dans les équipes</div>        </div>        <div class="body">            <div class="list">                <template _id="materieldetailspage_12"></template>            </div>        </div>    </div>`);const templ2 = new Aventus.Template(this);templ2.setTemplate(`                    <div class="item">                        <div class="line">                            <div class="nom" _id="materieldetailspage_13"></div>                            <div class="quantite" _id="materieldetailspage_14"></div>                            <div class="modification">                                <div class="actions">                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>                                    <template _id="materieldetailspage_15"></template>                                </div>                                <span _id="materieldetailspage_16"></span>                            </div>                        </div>                    </div>                `);templ2.setActions({
-  "content": {
-    "materieldetailspage_13°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(c.data.inventaire))}`,
-      "once": true
-    },
-    "materieldetailspage_14°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11(c.data.inventaire))}`
-    },
-    "materieldetailspage_16°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12(c.data.inventaire))}`,
-      "once": true
-    }
-  }
-});templ1.addLoop({
-                    anchorId: 'materieldetailspage_12',
-                    template: templ2,
-                simple:{data: "this.inventaires",item:"inventaire"}});const templ3 = new Aventus.Template(this);templ3.setTemplate(`                                        <av-icon-action color="info" icon="history">Historique</av-icon-action>                                    `);templ2.addIf({
-                    anchorId: 'materieldetailspage_15',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3(c.data.inventaire),
-                    template: templ3
-                }]
-            });this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_11',
-                    parts: [{
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
-                    template: templ1
-                }]
-            }); }
-    getClassName() {
-        return "MaterielDetailsPage";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
-    async isAllowed(state, pattern, router) {
-        const slugs = router.getSlugs(pattern);
-        if (!slugs || typeof slugs['id'] != "number") {
-            return "/materiel";
-        }
-        const id = slugs['id'];
-        this.slugId = id;
-        if (id == 0) {
-            let newItem = new App.Http.Controllers.Materiel.MaterielRequest();
-            newItem.id = 0;
-            newItem.tout_monde = true;
-            newItem.image = new App.Models.MaterielImage();
-            newItem.variations = [];
-            let v1 = new App.Models.Variation();
-            v1.nom = "XS";
-            newItem.variations.push(v1);
-            let v2 = new App.Models.Variation();
-            v2.nom = "S";
-            newItem.variations.push(v2);
-            newItem.equipes = [];
-            this.form.item = newItem;
-            this.objName = "Création de matériel";
-        }
-        else {
-            const ram = MaterielRAM.getInstance();
-            const item = await ram.getById(id);
-            if (!item) {
-                return "/materiel";
-            }
-            this.item = item;
-            this.form.item = ram.toRequest(item);
-            this.objName = this.form.item.nom;
-            const inventaires = [];
-            let equipes = [];
-            if (item.tout_monde) {
-                equipes = (await EquipeRAM.getInstance().getList());
-            }
-            else {
-                equipes = item.equipes.map(p => p.equipe);
-            }
-            equipes.sort((a, b) => a.nom.localeCompare(b.nom));
-            for (let equipe of equipes) {
-                const el = (item.inventaires.find(p => p.id_equipe == equipe.id) ?? new App.Models.Inventaire());
-                el.equipe = equipe;
-                inventaires.push(el);
-            }
-            this.inventaires = inventaires;
-        }
-        return true;
-    }
-    configure() {
-        return {};
-    }
-    getLastUpdate(inventaire) {
-        if (inventaire.lastUpdate) {
-            return inventaire.lastUpdateBy + ", le " + inventaire.lastUpdate.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "2-digit"
-            });
-        }
-        return "";
-    }
-    async save() {
-        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
-        if (result.result) {
-            Toast.add({
-                message: "Matériel enregistré",
-                color: "success",
-                closable: true
-            });
-            if (this.form.item.id == 0) {
-                this.router?.navigate('/materiel/' + result.result.id);
-            }
-            else {
-                const ram = MaterielRAM.getInstance();
-                this.form.item = ram.toRequest(result.result);
-                this.objName = this.form.item.nom;
-            }
-        }
-    }
-    async destroy() {
-        const result = await Confirm.open({
-            title: "Confirmation de suppression",
-            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
-        });
-        if (result) {
-            const ram = MaterielRAM.getInstance();
-            const result = await Aventus.Process.execute(ram.deleteByIdWithError(this.slugId));
-            if (result) {
-                this.router?.navigate("/materiel");
-            }
-        }
-    }
-    setToutMonde() {
-        this.form.item.tout_monde = true;
-    }
-    unsetToutMonde() {
-        this.form.item.tout_monde = false;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
-        return this.objName;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10(inventaire) {
-        return inventaire.equipe.nom;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11(inventaire) {
-        return inventaire.quantite ?? '-';
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod12(inventaire) {
-        return this.getLastUpdate(inventaire);
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
-        return !this.form.item.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
-        return this.form.item?.id;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3(inventaire) {
-        return inventaire.id;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
-        return this.form.parts.image;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
-        return this.form.parts.nom;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
-        return this.form.item.variations;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
-        return this.form.parts.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
-        return this.form.item.equipes;
-    }
-}
-MaterielDetailsPage.Namespace=`Inventaire`;
-MaterielDetailsPage.Tag=`av-materiel-details-page`;
-__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
-if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
-
 const UserEditModal = class UserEditModal extends Modal {
     form;
     static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
+            id: {},
             nom: new Aventus.Form.Validators.Required("Le nom est requis"),
             prenom: new Aventus.Form.Validators.Required("Le prénom est requis"),
             nom_utilisateur: new Aventus.Form.Validators.Required("Le nom d'utilisateur est requis"),
@@ -15940,7 +16897,17 @@ const UserEditModal = class UserEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>    <av-col size="12" size_xs="6">        <av-input label="Nom" _id="usereditmodal_1"></av-input>    </av-col>    <av-col size="12" size_xs="6">        <av-input label="Prénom" _id="usereditmodal_2"></av-input>    </av-col></av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">    <av-button _id="usereditmodal_5">Annuler</av-button>    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>
+    <av-col size="12" size_xs="6">
+        <av-input label="Nom" _id="usereditmodal_1"></av-input>
+    </av-col>
+    <av-col size="12" size_xs="6">
+        <av-input label="Prénom" _id="usereditmodal_2"></av-input>
+    </av-col>
+</av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">
+    <av-button _id="usereditmodal_5">Annuler</av-button>
+    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15994,6 +16961,7 @@ const UserEditModal = class UserEditModal extends Modal {
         return { title: "" };
     }
     async submit() {
+        debugger;
         const result = await this.form.submit(UserRAM.getInstance().saveWithError);
         if (result?.result) {
             this.resolve(result.result);
@@ -16016,9 +16984,17 @@ const UserEditModal = class UserEditModal extends Modal {
     }
     static async open(item) {
         const modal = new UserEditModal();
-        modal.options.title = item ? "Edition d'un utilisateur" : "Création d'un utilisateur";
-        item = item ? item.clone() : new App.Models.User();
-        modal.form.item = item;
+        const ram = UserRAM.getInstance();
+        if (item) {
+            modal.options.title = "Edition d'un utilisateur";
+            modal.form.item = ram.toRequest(item);
+        }
+        else {
+            modal.options.title = "Création d'un utilisateur";
+            item = new App.Models.User();
+            item.id = 0;
+            modal.form.item = ram.toRequest(item);
+        }
         return await UserEditModal._show(modal);
     }
 }
@@ -16048,7 +17024,10 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
+    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16118,7 +17097,19 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des utilisateurs</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
+            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="userspage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16244,7 +17235,11 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`    <av-header></av-header>`,'after':`    <av-footer></av-footer>` }
+        blocks: { 'before':`
+    <av-header></av-header>
+`,'after':`
+    <av-footer></av-footer>
+` }
     });
 }
     getClassName() {
@@ -16330,6 +17325,141 @@ Main.Tag=`av-main`;
 __as1(_, 'Main', Main);
 if(!window.customElements.get('av-main')){window.customElements.define('av-main', Main);Aventus.WebComponentInstance.registerDefinition(Main);}
 
+const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
+    get 'inventaire'() {
+						return this.__watch["inventaire"];
+					}
+					set 'inventaire'(val) {
+						this.__watch["inventaire"] = val;
+					}    equipe;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
+}
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
+    __getStatic() {
+        return InventaireEquipeListItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(InventaireEquipeListItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="line">    <div class="img" _id="inventaireequipelistitem_0"></div>    <div class="nom" _id="inventaireequipelistitem_1"></div>    <div class="variation" _id="inventaireequipelistitem_2"></div>    <div class="quantite" _id="inventaireequipelistitem_3"></div>    <div class="modification">        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>            <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_5">Historique</av-icon-action>        </div>        <span _id="inventaireequipelistitem_6"></span>    </div></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "inventaireequipelistitem_0°style": {
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0())});`,
+      "once": true
+    },
+    "inventaireequipelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())}`,
+      "once": true
+    },
+    "inventaireequipelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`
+    },
+    "inventaireequipelistitem_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`,
+      "once": true
+    },
+    "inventaireequipelistitem_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "inventaireequipelistitem_4",
+      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
+    },
+    {
+      "id": "inventaireequipelistitem_5",
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "InventaireEquipeListItem";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    getLastUpdate() {
+        if (this.inventaire.last_update) {
+            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+    getPicture() {
+        if (this.inventaire.materiel.image.uri) {
+            return this.inventaire.materiel.image.uri;
+        }
+        return "/img/default_img.svg";
+    }
+    async edit() {
+        const modal = new ModalInventaireUpdate();
+        modal.variation = this.inventaire.variation;
+        modal.equipe = this.equipe;
+        modal.materiel = this.inventaire.materiel;
+        modal.nb = this.inventaire.quantite;
+        const result = await modal.show();
+        if (result) {
+            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+                id: this.inventaire.id,
+                id_equipe: this.equipe.id,
+                id_materiel: this.inventaire.materiel.id,
+                id_variation: this.inventaire.variation?.id,
+                quantite: result
+            }));
+            if (save) {
+                this.inventaire.last_update = save.last_update;
+                this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.quantite = save.quantite;
+                Toast.add({
+                    message: "Inventaire enregistré",
+                    color: "success",
+                    closable: true
+                });
+            }
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.materiel = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.variation = this.inventaire.variation;
+        await modal.show();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method0() {
+        return this.getPicture();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+        return this.inventaire.materiel.nom;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+        return this.inventaire.variation?.nom;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method3() {
+        return this.inventaire.quantite;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method4() {
+        return this.getLastUpdate();
+    }
+}
+InventaireEquipeListItem.Namespace=`Inventaire`;
+InventaireEquipeListItem.Tag=`av-inventaire-equipe-list-item`;
+__as1(_, 'InventaireEquipeListItem', InventaireEquipeListItem);
+if(!window.customElements.get('av-inventaire-equipe-list-item')){window.customElements.define('av-inventaire-equipe-list-item', InventaireEquipeListItem);Aventus.WebComponentInstance.registerDefinition(InventaireEquipeListItem);}
+
 const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     equipes = [];
     static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
@@ -16347,7 +17477,8 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0">
+</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

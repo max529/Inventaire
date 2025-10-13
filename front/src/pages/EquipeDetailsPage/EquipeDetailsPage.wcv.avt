@@ -14,21 +14,8 @@
             <input type="checkbox" name="" id=""> -->
         </div>
         <div class="list">
-            for(let i = 0;   i  <  3; i++) { 
-                <div class="item">
-                    <div class="line">
-                        <div class="img"></div>
-                        <div class="nom">Nom de l'article</div>
-                        <div class="quantite">21</div>
-                        <div class="modification">
-                            <div class="actions">
-                                <av-icon-action color="neutral" icon="edit" @press="editItem">Modifier</av-icon-action>
-                                <av-icon-action color="info" icon="history" @press="editItem">Historique</av-icon-action>
-                            </div>
-                            <span>Maxime, le 24.08.2025</span>
-                        </div>
-                    </div>
-                </div>
+            for(let inventaire of this.inventaires) {
+                <av-inventaire-equipe-list-item :inventaire="inventaire" :equipe="this.item"></av-inventaire-equipe-list-item>
             }
         </div>
     </div>

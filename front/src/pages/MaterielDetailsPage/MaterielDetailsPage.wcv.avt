@@ -43,21 +43,7 @@ if(this.form.item?.id) {
         <div class="body">
             <div class="list">
                 for(let inventaire of this.inventaires) {
-                    <div class="item">
-                        <div class="line">
-                            <div class="nom">{{ inventaire.equipe.nom }}</div>
-                            <div class="quantite">{{ inventaire.quantite ?? '-' }}</div>
-                            <div class="modification">
-                                <div class="actions">
-                                    <av-icon-action color="neutral" icon="edit">Modifier</av-icon-action>
-                                    if (inventaire.id) {
-                                        <av-icon-action color="info" icon="history">Historique</av-icon-action>
-                                    }
-                                </div>
-                                <span>{{ this.getLastUpdate(inventaire) }}</span>
-                            </div>
-                        </div>
-                    </div>
+                    <av-inventaire-list-item :inventaire="inventaire" :materiel="this.item"></av-inventaire-list-item>
                 }
             </div>
         </div>

@@ -1,0 +1,11 @@
+namespace App.Http.Controllers.Inventaire.Update {
+
+	export class Request {
+		public id?: number = undefined;
+		public quantite!: number;
+		public id_materiel!: number;
+		public id_equipe!: number;
+		public id_variation?: number = undefined;
+	}
+
+}

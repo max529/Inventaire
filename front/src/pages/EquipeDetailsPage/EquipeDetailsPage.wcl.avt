@@ -4,6 +4,11 @@ import { Main } from "../../Main/Main.wcl.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
 import { EquipeEditModal } from "../EquipesPage/components/EquipeEditModal/EquipeEditModal.wcl.avt";
 import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { EquipeGetInventaireController } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Controller.lib.avt";
+import { Response as Inventaire } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
+import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
+import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
 
 export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -20,6 +25,9 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
     //#region variables
     @Watch()
     public item!: EquipeResource;
+
+    @Watch()
+    public inventaires: Inventaire[] = [];
     //#endregion
 
 
@@ -40,7 +48,16 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
             return "/";
 
 
+        const inventaires = await Process.execute(new EquipeGetInventaireController().request({ id_equipe: equipe.id }));
+        if(!inventaires) {
+            return "/";
+        }
+
+        this.inventaires = inventaires;
         this.item = equipe;
+
+
+
         return true;
     }
 

@@ -17,6 +17,7 @@ Route::get('/logout', function () {
 });
 
 Route::post('/login', [\App\Http\Controllers\Auth\Login\Controller::class, "request"]);
+Route::post('/logout', [\App\Http\Controllers\Auth\Logout\Controller::class, "request"]);
 
 
 Route::middleware(IsConnected::class)->group(function () {
@@ -24,7 +25,12 @@ Route::middleware(IsConnected::class)->group(function () {
     Route::prefix("data")->group(function () {
         Route::resource('user', UserController::class);
         Route::resource('equipe', EquipeController::class);
+        Route::post('/equipe/inventaire', [\App\Http\Controllers\Equipe\GetInventaire\Controller::class, "request"]);
         Route::resource('materiel', MaterielController::class);
+        Route::post('/materiel/inventaire', [\App\Http\Controllers\Materiel\GetInventaire\Controller::class, "request"]);
+        
+        Route::post('/inventaire/update', [\App\Http\Controllers\Inventaire\Update\Controller::class, "request"]);
+        Route::post('/inventaire/historique', [\App\Http\Controllers\Inventaire\Historique\Controller::class, "request"]);
     });
 
 

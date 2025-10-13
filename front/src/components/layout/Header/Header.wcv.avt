@@ -5,7 +5,7 @@
         <av-link class="item" to="/materiel"  active_pattern="/materiel*">Matériel</av-link>
         <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
         <div class="item">
-            <mi-icon icon="power_settings_new"></mi-icon>
+            <mi-icon icon="power_settings_new" @press="logout"></mi-icon>
         </div>
     </div>
 </div>

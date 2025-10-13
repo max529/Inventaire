@@ -2,8 +2,13 @@
     <div class="img"></div>
     <div class="content">
         <div class="title">Inventaire FC Vétroz</div>
-        <av-input label="Nom d'utilisateur" name="username" :form="this.form.parts.nom_utilisateur"></av-input>
-        <av-input label="Mot de passe" name="password" type="password" :form="this.form.parts.mot_passe"></av-input>
+        <av-input label="Nom d'utilisateur" name="username" :form="this.form.parts.nom_utilisateur" @focus="clearError"></av-input>
+        <av-input label="Mot de passe" name="password" type="password" :form="this.form.parts.mot_passe" @focus="clearError"></av-input>
+        if(this.error) {
+            <div class="form-error">
+                <div>{{ this.error }}</div>
+            </div>
+        }
         <div class="right">
             <av-button type="submit" color="neutral">Login</av-button>
         </div>

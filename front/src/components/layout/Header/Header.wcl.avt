@@ -1,27 +1,37 @@
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import { AuthLogoutController } from "../../../generated/app/Http/Controllers/Auth/Logout/Controller.lib.avt";
+
 export class Header extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
-	//#region static
-	
-	//#endregion
-	
-	
-	//#region props
-	
-	//#endregion
-	
-	
-	//#region variables
-	
-	//#endregion
-	
-	
-	//#region constructor
-	
-	//#endregion
-	
-	
-	//#region methods
-	
-	//#endregion
-	
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    /**
+     * 
+     */
+    protected async logout() {
+        await Process.execute(new AuthLogoutController().request());
+        location.reload();
+    }
+    //#endregion
+
 }

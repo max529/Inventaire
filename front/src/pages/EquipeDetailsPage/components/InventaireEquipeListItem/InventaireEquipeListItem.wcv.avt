@@ -1,0 +1,13 @@
+<div class="line">
+    <div class="img" style="background-image: url({{this.getPicture()}});"></div>
+    <div class="nom">{{ this.inventaire.materiel.nom }}</div>
+    <div class="variation">{{ this.inventaire.variation?.nom }}</div>
+    <div class="quantite">{{ this.inventaire.quantite }}</div>
+    <div class="modification">
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" @press="edit">Modifier</av-icon-action>
+            <av-icon-action color="info" icon="history" @press="historique">Historique</av-icon-action>
+        </div>
+        <span>{{ this.getLastUpdate() }}</span>
+    </div>
+</div>

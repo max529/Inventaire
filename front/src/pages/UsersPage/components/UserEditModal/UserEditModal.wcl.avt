@@ -12,9 +12,17 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
     //#region static
     public static async open(item?: UserResource): Promise<UserResource | null> {
         const modal = new UserEditModal();
-        modal.options.title = item ? "Edition d'un utilisateur" : "Création d'un utilisateur";
-        item = item ? item.clone() : new User();
-        modal.form.item = item;
+        const ram = UserRAM.getInstance();
+        if(item) {
+            modal.options.title = "Edition d'un utilisateur";
+            modal.form.item = ram.toRequest(item);
+        }
+        else {
+            modal.options.title = "Création d'un utilisateur";
+            item = new User();
+            item.id = 0;
+            modal.form.item = ram.toRequest(item);
+        }
         return await UserEditModal._show(modal);
     }
     //#endregion
@@ -34,6 +42,7 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
     public constructor() {
         super();
         this.form = Form.create<UserRequest>({
+            id: {},
             nom: new Required("Le nom est requis"),
             prenom: new Required("Le prénom est requis"),
             nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
@@ -61,6 +70,7 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
      * 
      */
     protected async submit() {
+        debugger
         const result = await this.form.submit(UserRAM.getInstance().saveWithError);
         if(result?.result) {
             this.resolve(result.result);

@@ -3,6 +3,6 @@
 return [
     "model" => [
         "timestamps" => false,
-        "only_fillable" => false
+        "only_fillable" => true
     ]
 ];

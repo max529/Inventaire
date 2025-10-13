@@ -16,16 +16,16 @@ class IsConnected
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // if (session("user") == null) {
-        //     return redirect('/login');
-        // }
-        // $id = intval(session("user"));
-        // $user = User::find($id);
-        // if ($user == null) {
-        //     session("user", null);
-        //     return redirect('/login');
-        // }
-        // User::$current = $user;
+        if (session("user") == null) {
+            return redirect('/login');
+        }
+        $id = intval(session("user"));
+        $user = User::find($id);
+        if ($user == null) {
+            session("user", null);
+            return redirect('/login');
+        }
+        User::$current = $user;
         return $next($request);
     }
 }

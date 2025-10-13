@@ -7,6 +7,7 @@ use App\Models\User;
 use Aventus\Laraventus\Exceptions\LaraventusErrorEnum;
 use Illuminate\Support\Facades\Hash;
 use Aventus\Laraventus\Helpers\AventusError;
+use Aventus\Laraventus\Tools\Console;
 
 #[Rename("AuthLoginController")]
 class Controller
@@ -16,8 +17,8 @@ class Controller
         /** @var User $user */
         $user = User::where("nom_utilisateur", $request->nom_utilisateur)->first();
         if ($user) {
-            if ($user->mot_passe == Hash::make($request->mot_passe)) {
-                session("user", $user->id);
+            if (Hash::check($request->mot_passe, $user->mot_passe)) {
+                session(['user' => $user->id]);
                 return new Response();
             }
         }
