@@ -1,0 +1,7 @@
+namespace App.Http.Controllers.Equipe.Materiel {
+
+	export class Request {
+		public id_equipe!: number;
+	}
+
+}

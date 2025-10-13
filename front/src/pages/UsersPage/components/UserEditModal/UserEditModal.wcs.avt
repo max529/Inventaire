@@ -16,3 +16,10 @@
 		justify-content: center;
 	}
 }
+
+
+@media screen and (max-width:539px) {
+	:host {
+		--col-gap: 0px;
+	}
+}

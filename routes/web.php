@@ -24,6 +24,7 @@ Route::middleware(IsConnected::class)->group(function () {
         Route::resourceWithMany('user', UserController::class);
         Route::resourceWithMany('equipe', EquipeController::class);
         Route::post('/equipe/inventaire', [\App\Http\Controllers\Equipe\GetInventaire\Controller::class, "request"]);
+        Route::post('/equipe/materiel', [\App\Http\Controllers\Equipe\Materiel\Controller::class, "request"]);
         Route::resourceWithMany('materiel', MaterielController::class);
         Route::post('/materiel/inventaire', [\App\Http\Controllers\Materiel\GetInventaire\Controller::class, "request"]);
         

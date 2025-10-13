@@ -173,7 +173,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             else {
                 const ram = MaterielRAM.getInstance();
                 this.item = result.result;
-                this.form.item = ram.toRequest(result.result);
+                const request = ram.toRequest(result.result);
+                this.form.item = request;
                 this.objName = this.form.item.nom;
                 await this.loadInventaire(this.item.id);
             }

@@ -8,10 +8,10 @@
     </div>
     <div class="body">
         <av-row>
-            <av-col size="6">
+            <av-col size="12" size_sm="6">
                 <av-input-image label="Image" :form="this.form.parts.image"></av-input-image>
             </av-col>
-            <av-col size="6" class="contenu">
+            <av-col size="12"  size_sm="6" class="contenu">
                 <av-input label="Nom du materiel" :form="this.form.parts.nom"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>

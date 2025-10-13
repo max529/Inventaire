@@ -105,7 +105,22 @@
 			flex-direction: column;
 			width: 100%;
 
-			
+
 		}
 	}
+}
+
+
+@media screen and (max-width:500px) {
+	:host {
+		.label {
+			flex-wrap: wrap;
+		}
+
+		.main-label {
+			margin-bottom: 6px;
+			width: 100%;
+		}
+	}
+
 }

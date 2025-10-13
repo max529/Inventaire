@@ -9,7 +9,8 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
 
 
     //#region props
-
+    @Attribute()
+    public open_menu!: boolean;
     //#endregion
 
 
@@ -24,6 +25,21 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
 
 
     //#region methods
+
+
+    /**
+     * 
+     */
+    protected openMenu() {
+        this.open_menu = true;
+    }
+
+    /**
+     * 
+     */
+    protected closeMenu() {
+        this.open_menu = false;
+    }
 
     /**
      * 

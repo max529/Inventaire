@@ -11,9 +11,9 @@
                 }
             </div>
             <div class="visible">
-                <div>Visible pour :</div>
+                <div class="visible-label">Visible pour :</div>
                 if(this.item.tout_monde) {
-                    <div>Tout le monde</div>
+                    <div class="everybody">Tout le monde</div>
                 }
                 else {
                     <div class="visible-for">

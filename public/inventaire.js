@@ -43,24 +43,6 @@ var HttpErrorCode;
 })(HttpErrorCode || (HttpErrorCode = {}));
 __as1(_, 'HttpErrorCode', HttpErrorCode);
 
-var HttpMethod;
-(function (HttpMethod) {
-    HttpMethod["GET"] = "GET";
-    HttpMethod["POST"] = "POST";
-    HttpMethod["DELETE"] = "DELETE";
-    HttpMethod["PUT"] = "PUT";
-    HttpMethod["OPTION"] = "OPTION";
-})(HttpMethod || (HttpMethod = {}));
-__as1(_, 'HttpMethod', HttpMethod);
-
-var RamErrorCode;
-(function (RamErrorCode) {
-    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
-    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
-    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
-})(RamErrorCode || (RamErrorCode = {}));
-__as1(_, 'RamErrorCode', RamErrorCode);
-
 let DateConverter=class DateConverter {
     static __converter = new DateConverter();
     static get converter() {
@@ -84,6 +66,24 @@ let DateConverter=class DateConverter {
 }
 DateConverter.Namespace=`Aventus`;
 __as1(_, 'DateConverter', DateConverter);
+
+var HttpMethod;
+(function (HttpMethod) {
+    HttpMethod["GET"] = "GET";
+    HttpMethod["POST"] = "POST";
+    HttpMethod["DELETE"] = "DELETE";
+    HttpMethod["PUT"] = "PUT";
+    HttpMethod["OPTION"] = "OPTION";
+})(HttpMethod || (HttpMethod = {}));
+__as1(_, 'HttpMethod', HttpMethod);
+
+var RamErrorCode;
+(function (RamErrorCode) {
+    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
+    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
+    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
+})(RamErrorCode || (RamErrorCode = {}));
+__as1(_, 'RamErrorCode', RamErrorCode);
 
 let ActionGuard=class ActionGuard {
     /**
@@ -1165,6 +1165,9 @@ let Watcher=class Watcher {
             if (data instanceof Object && !data.__isProxy) {
                 for (let key in reservedName) {
                     delete data[key];
+                }
+                for (let key in data) {
+                    clearReservedNames(data[key]);
                 }
             }
         };
@@ -5975,209 +5978,6 @@ let DragAndDrop=class DragAndDrop {
 DragAndDrop.Namespace=`Aventus`;
 __as1(_, 'DragAndDrop', DragAndDrop);
 
-let ConverterTransform=class ConverterTransform {
-    transform(data) {
-        return this.transformLoop(data);
-    }
-    createInstance(data) {
-        if (data.$type) {
-            let cst = Converter.info.get(data.$type);
-            if (cst) {
-                return new cst();
-            }
-        }
-        return undefined;
-    }
-    beforeTransformObject(obj) {
-    }
-    afterTransformObject(obj) {
-    }
-    transformLoop(data) {
-        if (data === null) {
-            return data;
-        }
-        if (Array.isArray(data)) {
-            let result = [];
-            for (let element of data) {
-                result.push(this.transformLoop(element));
-            }
-            return result;
-        }
-        if (data instanceof Date) {
-            return data;
-        }
-        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
-            let objTemp = this.createInstance(data);
-            if (objTemp) {
-                if (objTemp instanceof Map) {
-                    if (data.values) {
-                        for (const keyValue of data.values) {
-                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                        }
-                    }
-                    return objTemp;
-                }
-                let obj = objTemp;
-                this.beforeTransformObject(obj);
-                if (obj.fromJSON) {
-                    obj = obj.fromJSON(data);
-                }
-                else {
-                    obj = Json.classFromJson(obj, data, {
-                        transformValue: (key, value) => {
-                            if (obj[key] instanceof Date) {
-                                return value ? new Date(value) : null;
-                            }
-                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
-                                return value ? DateConverter.converter.fromString(value) : null;
-                            }
-                            else if (obj[key] instanceof Map) {
-                                let map = new Map();
-                                if ("$type" in value && value['$type'] == "Aventus.Map") {
-                                    value = value.values;
-                                }
-                                for (const keyValue of value) {
-                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                                }
-                                return map;
-                            }
-                            else if (obj instanceof Data) {
-                                let cst = obj.constructor;
-                                if (cst.$schema[key] == 'boolean') {
-                                    return value ? true : false;
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'Date') {
-                                    return value ? new Date(value) : null;
-                                }
-                            }
-                            return this.transformLoop(value);
-                        }
-                    });
-                }
-                this.afterTransformObject(obj);
-                return obj;
-            }
-            let result = {};
-            for (let key in data) {
-                result[key] = this.transformLoop(data[key]);
-            }
-            return result;
-        }
-        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
-            return new Date(data);
-        }
-        return data;
-    }
-    copyValuesClass(target, src, options) {
-        const realOptions = {
-            isValidKey: options?.isValidKey ?? (() => true),
-            replaceKey: options?.replaceKey ?? ((key) => key),
-            transformValue: options?.transformValue ?? ((key, value) => value),
-        };
-        this.__classCopyValues(target, src, realOptions);
-    }
-    __classCopyValues(target, src, options) {
-        let props = Object.getOwnPropertyNames(target);
-        for (let prop of props) {
-            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
-            if (propInfo?.writable) {
-                if (options.isValidKey(prop))
-                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-            }
-        }
-        let cstTemp = target.constructor;
-        while (cstTemp.prototype && cstTemp != Object.prototype) {
-            props = Object.getOwnPropertyNames(cstTemp.prototype);
-            for (let prop of props) {
-                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
-                if (propInfo?.set && propInfo.get) {
-                    if (options.isValidKey(prop))
-                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-                }
-            }
-            cstTemp = Object.getPrototypeOf(cstTemp);
-        }
-    }
-}
-ConverterTransform.Namespace=`Aventus`;
-__as1(_, 'ConverterTransform', ConverterTransform);
-
-let Converter=class Converter {
-    /**
-    * Map storing information about registered types.
-    */
-    static info = new Map([["Aventus.Map", Map]]);
-    /**
-    * Map storing schemas for registered types.
-    */
-    static schema = new Map();
-    /**
-     * Internal converter instance.
-     */
-    static __converter = new ConverterTransform();
-    /**
-     * Getter for the internal converter instance.
-     */
-    static get converterTransform() {
-        return this.__converter;
-    }
-    /**
-    * Sets the converter instance.
-    * @param converter The converter instance to set.
-    */
-    static setConverter(converter) {
-        this.__converter = converter;
-    }
-    /**
-    * Registers a unique string type for any class.
-    * @param $type The unique string type identifier.
-    * @param cst The constructor function for the class.
-    * @param schema Optional schema for the registered type.
-    */
-    static register($type, cst, schema) {
-        this.info.set($type, cst);
-        if (schema) {
-            this.schema.set($type, schema);
-        }
-    }
-    /**
-     * Transforms the provided data using the current converter instance.
-     * @template T
-     * @param {*} data The data to transform.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
-     * @returns {T} Returns the transformed data.
-     */
-    static transform(data, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.transform(data);
-    }
-    /**
-     * Copies values from one class instance to another using the current converter instance.
-     * @template T
-     * @param {T} to The destination class instance to copy values into.
-     * @param {T} from The source class instance to copy values from.
-     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
-     * @returns {T} Returns the destination class instance with copied values.
-     */
-    static copyValuesClass(to, from, options, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.copyValuesClass(to, from, options);
-    }
-}
-Converter.Namespace=`Aventus`;
-__as1(_, 'Converter', Converter);
-
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
@@ -6194,7 +5994,6 @@ ResultRamWithError.Namespace=`Aventus`;
 __as1(_, 'ResultRamWithError', ResultRamWithError);
 
 let GenericRam=class GenericRam {
-    static info = new Map([]);
     /**
      * The current namespace
      */
@@ -6215,12 +6014,10 @@ let GenericRam=class GenericRam {
      */
     records = new Map();
     actionGuard = new ActionGuard();
-    ramMapping = {};
     constructor() {
         if (this.constructor == GenericRam) {
             throw "can't instanciate an abstract class";
         }
-        RamManager.check();
         this.getIdWithError = this.getIdWithError.bind(this);
         this.getId = this.getId.bind(this);
         this.save = this.save.bind(this);
@@ -6394,12 +6191,6 @@ let GenericRam=class GenericRam {
         };
     }
     /**
-     * Define all the types you ram is capable of
-     */
-    ramForTypes() {
-        return [this.getTypeForData({})];
-    }
-    /**
      * Transform the object into the object stored inside Ram
      */
     getObjectForRam(objJson) {
@@ -6407,47 +6198,6 @@ let GenericRam=class GenericRam {
         let item = new T();
         this.mergeObject(item, objJson);
         return item;
-    }
-    linkFct = new Map();
-    linkInfo = {};
-    linkRamItem(item) {
-        for (let key in this.ramMapping) {
-            this.linkRamItemByKey(item, key);
-        }
-    }
-    linkRamItemByKey(item, key) {
-        const mapping = this.ramMapping[key];
-        if (key in item) {
-            if (mapping.asArray) {
-                if (Array.isArray(item[key])) {
-                }
-                else {
-                    console.error(key + " in type " + item + " must be an array");
-                }
-            }
-            else {
-                const id = mapping.ram.getId(item[key]);
-                if (!this.linkFct.has(mapping.ram)) {
-                    const fcts = {
-                        onCreated: (item) => {
-                        },
-                        onUpdated: (item) => {
-                        },
-                        onDeleted: (item) => {
-                        },
-                    };
-                    this.linkFct.set(mapping.ram, fcts);
-                    mapping.ram.onCreated(fcts.onCreated);
-                    mapping.ram.onUpdated(fcts.onUpdated);
-                    mapping.ram.onDeleted(fcts.onDeleted);
-                }
-                if (!this.linkInfo[key])
-                    this.linkInfo[key] = {};
-                if (!this.linkInfo[key][id])
-                    this.linkInfo[key][id] = [];
-                this.linkInfo[key][id].push(item);
-            }
-        }
     }
     /**
      * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
@@ -6461,10 +6211,8 @@ let GenericRam=class GenericRam {
                 if (this.records.has(id)) {
                     let uniqueRecord = this.records.get(id);
                     await this.beforeRecordSet(uniqueRecord);
-                    // this.unlinkRamItem(uniqueRecord);
                     this.mergeObject(uniqueRecord, item);
                     await this.afterRecordSet(uniqueRecord);
-                    // this.linkRamItem(uniqueRecord);
                     resultTemp = 'updated';
                 }
                 else {
@@ -6472,7 +6220,6 @@ let GenericRam=class GenericRam {
                     await this.beforeRecordSet(realObject);
                     this.records.set(id, realObject);
                     await this.afterRecordSet(realObject);
-                    // this.linkRamItem(uniqueRecord);
                     resultTemp = 'created';
                 }
                 result.result = this.records.get(id);
@@ -7118,63 +6865,6 @@ let GenericRam=class GenericRam {
 GenericRam.Namespace=`Aventus`;
 __as1(_, 'GenericRam', GenericRam);
 
-let RamManager=class RamManager {
-    static _allInit = true;
-    static get allInit() { return this._allInit; }
-    ;
-    static info = new Map([]);
-    static rams = [];
-    static registerRAM(ram) {
-        this._allInit = false;
-        if (!this.rams.includes(ram)) {
-            this.rams.push(ram);
-        }
-    }
-    static check() {
-        if (this._allInit) {
-            this._allInit = true;
-            for (let ramCst of this.rams) {
-                const ram = Instance.get(ramCst);
-                for (let type of ram.ramForTypes()) {
-                    this.info.set(type, ram);
-                }
-            }
-            for (let ramCst of this.rams) {
-                const ram = Instance.get(ramCst);
-                const mapping = {};
-                for (let type of ram.ramForTypes()) {
-                    if ('$schema' in type) {
-                        const schema = type.$schema;
-                        for (let key in schema) {
-                            if (mapping[key])
-                                continue;
-                            let schemaType = schema[key];
-                            let asArray = false;
-                            if (schemaType.endsWith("[]")) {
-                                asArray = true;
-                                schemaType = schemaType.slice(0, -2);
-                            }
-                            const schemaInfo = Converter.info.get(schemaType);
-                            if (schemaInfo) {
-                                const ramLink = this.info.get(schemaInfo);
-                                if (ramLink) {
-                                    mapping[key] = {
-                                        ram: ramLink,
-                                        asArray
-                                    };
-                                }
-                            }
-                        }
-                    }
-                }
-                ram.ramMapping = mapping;
-            }
-        }
-    }
-}
-RamManager.Namespace=`Aventus`;
-__as1(_, 'RamManager', RamManager);
-
 let Ram=class Ram extends GenericRam {
 }
 Ram.Namespace=`Aventus`;
@@ -7184,6 +6874,214 @@ let HttpError=class HttpError extends GenericError {
 }
 HttpError.Namespace=`Aventus`;
 __as1(_, 'HttpError', HttpError);
+
+let ConverterTransform=class ConverterTransform {
+    transform(data) {
+        return this.transformLoop(data);
+    }
+    createInstance(data) {
+        if (data.$type) {
+            let cst = Converter.info.get(data.$type);
+            if (cst) {
+                return new cst();
+            }
+        }
+        return undefined;
+    }
+    beforeTransformObject(obj) {
+    }
+    afterTransformObject(obj) {
+    }
+    transformLoop(data) {
+        if (data === null) {
+            return data;
+        }
+        if (Array.isArray(data)) {
+            let result = [];
+            for (let element of data) {
+                result.push(this.transformLoop(element));
+            }
+            return result;
+        }
+        if (data instanceof Date) {
+            return data;
+        }
+        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
+            let objTemp = this.createInstance(data);
+            if (objTemp) {
+                if (objTemp instanceof Map) {
+                    if (data.values) {
+                        for (const keyValue of data.values) {
+                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                        }
+                    }
+                    return objTemp;
+                }
+                let obj = objTemp;
+                this.beforeTransformObject(obj);
+                if (obj.fromJSON) {
+                    obj = obj.fromJSON(data);
+                }
+                else {
+                    obj = Json.classFromJson(obj, data, {
+                        transformValue: (key, value) => {
+                            if (obj[key] instanceof Date) {
+                                return value ? new Date(value) : null;
+                            }
+                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
+                                return value ? DateConverter.converter.fromString(value) : null;
+                            }
+                            else if (obj[key] instanceof Map) {
+                                let map = new Map();
+                                if ("$type" in value && value['$type'] == "Aventus.Map") {
+                                    value = value.values;
+                                }
+                                for (const keyValue of value) {
+                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                                }
+                                return map;
+                            }
+                            else if (obj instanceof Data) {
+                                let cst = obj.constructor;
+                                if (cst.$schema[key] == 'boolean') {
+                                    return value ? true : false;
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'Date') {
+                                    return value ? new Date(value) : null;
+                                }
+                            }
+                            return this.transformLoop(value);
+                        }
+                    });
+                }
+                this.afterTransformObject(obj);
+                return obj;
+            }
+            let result = {};
+            for (let key in data) {
+                result[key] = this.transformLoop(data[key]);
+            }
+            return result;
+        }
+        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
+            return new Date(data);
+        }
+        return data;
+    }
+    copyValuesClass(target, src, options) {
+        const realOptions = {
+            isValidKey: options?.isValidKey ?? (() => true),
+            replaceKey: options?.replaceKey ?? ((key) => key),
+            transformValue: options?.transformValue ?? ((key, value) => value),
+        };
+        this.__classCopyValues(target, src, realOptions);
+    }
+    __classCopyValues(target, src, options) {
+        let props = Object.getOwnPropertyNames(target);
+        for (let prop of props) {
+            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
+            if (propInfo?.writable) {
+                if (options.isValidKey(prop))
+                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+            }
+        }
+        let cstTemp = target.constructor;
+        while (cstTemp.prototype && cstTemp != Object.prototype) {
+            props = Object.getOwnPropertyNames(cstTemp.prototype);
+            for (let prop of props) {
+                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
+                if (propInfo?.set && propInfo.get) {
+                    if (options.isValidKey(prop))
+                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+                }
+            }
+            cstTemp = Object.getPrototypeOf(cstTemp);
+        }
+    }
+}
+ConverterTransform.Namespace=`Aventus`;
+__as1(_, 'ConverterTransform', ConverterTransform);
+
+let Converter=class Converter {
+    /**
+    * Map storing information about registered types.
+    */
+    static info = new Map([["Aventus.Map", Map]]);
+    /**
+    * Map storing schemas for registered types.
+    */
+    static schema = new Map();
+    /**
+     * Internal converter instance.
+     */
+    static __converter = new ConverterTransform();
+    /**
+     * Getter for the internal converter instance.
+     */
+    static get converterTransform() {
+        return this.__converter;
+    }
+    /**
+    * Sets the converter instance.
+    * @param converter The converter instance to set.
+    */
+    static setConverter(converter) {
+        this.__converter = converter;
+    }
+    /**
+    * Registers a unique string type for any class.
+    * @param $type The unique string type identifier.
+    * @param cst The constructor function for the class.
+    * @param schema Optional schema for the registered type.
+    */
+    static register($type, cst, schema) {
+        this.info.set($type, cst);
+        if (schema) {
+            this.schema.set($type, schema);
+        }
+    }
+    /**
+     * Transforms the provided data using the current converter instance.
+     * @template T
+     * @param {*} data The data to transform.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
+     * @returns {T} Returns the transformed data.
+     */
+    static transform(data, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.transform(data);
+    }
+    /**
+     * Copies values from one class instance to another using the current converter instance.
+     * @template T
+     * @param {T} to The destination class instance to copy values into.
+     * @param {T} from The source class instance to copy values from.
+     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
+     * @returns {T} Returns the destination class instance with copied values.
+     */
+    static copyValuesClass(to, from, options, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.copyValuesClass(to, from, options);
+    }
+}
+Converter.Namespace=`Aventus`;
+__as1(_, 'Converter', Converter);
+
+let clone=function clone(item) {
+    return Converter.transform(JSON.parse(JSON.stringify(item)));
+}
+__as1(_, 'clone', clone);
 
 let HttpRequest=class HttpRequest {
     static options;
@@ -7300,13 +7198,13 @@ let HttpRequest=class HttpRequest {
             }
         }
         if (this.methodSpoofing) {
-            if (this.request.method?.toLowerCase() == Aventus.HttpMethod.PUT) {
+            if (this.request.method?.toUpperCase() == Aventus.HttpMethod.PUT) {
                 if (this.request.body instanceof FormData) {
                     this.request.body.append("_method", Aventus.HttpMethod.PUT);
                     this.request.method = Aventus.HttpMethod.POST;
                 }
             }
-            else if (this.request.method?.toLowerCase() == Aventus.HttpMethod.DELETE) {
+            else if (this.request.method?.toUpperCase() == Aventus.HttpMethod.DELETE) {
                 if (this.request.body instanceof FormData) {
                     this.request.body.append("_method", Aventus.HttpMethod.DELETE);
                     this.request.method = Aventus.HttpMethod.POST;
@@ -7755,7 +7653,8 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
     toRequest(resource) {
         const Request = this.getRequest();
         const result = new Request();
-        Aventus.Json.classFromJson(result, resource, {
+        const resourceClone = Aventus.clone(resource);
+        Aventus.Json.classFromJson(result, resourceClone, {
             replaceUndefined: true
         });
         return result;
@@ -9527,7 +9426,6 @@ Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
     __listBoolProps() { return ["not_main"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     async add(toast) {
         await this.mutex.waitOne();
-        console.log("inside");
         let realToast;
         if (toast instanceof _.Toast.ToastElement) {
             realToast = toast;
@@ -9637,7 +9535,6 @@ Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
                 let totHeight = 0;
                 for (let notif of this.activeToasts[position]) {
                     await notif.waitTransition();
-                    console.log(notif.offsetHeight);
                     totHeight += notif.offsetHeight + this.gap;
                 }
                 if (totHeight + height < this.heightLimit) {
@@ -9654,7 +9551,6 @@ Toast.ToastManager = class ToastManager extends Aventus.WebComponent {
                     this.waitingToasts[position].push(toast);
                 }
             }
-            console.log("outside");
             this.mutex.release();
             return;
         });
@@ -12264,6 +12160,8 @@ App.Http.Controllers.Inventaire.Historique = {};
 _.App.Http.Controllers.Inventaire.Historique = Inventaire.App?.Http?.Controllers?.Inventaire?.Historique ?? {};
 App.Http.Controllers.Equipe = {};
 _.App.Http.Controllers.Equipe = Inventaire.App?.Http?.Controllers?.Equipe ?? {};
+App.Http.Controllers.Equipe.Materiel = {};
+_.App.Http.Controllers.Equipe.Materiel = Inventaire.App?.Http?.Controllers?.Equipe?.Materiel ?? {};
 App.Http.Controllers.Equipe.GetInventaire = {};
 _.App.Http.Controllers.Equipe.GetInventaire = Inventaire.App?.Http?.Controllers?.Equipe?.GetInventaire ?? {};
 App.Http.Controllers.Auth = {};
@@ -12395,6 +12293,20 @@ App.Http.Controllers.Inventaire.Historique.Request=class Request {
 App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Request', App.Http.Controllers.Inventaire.Historique.Request);
 
+App.Http.Controllers.Equipe.Materiel.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.Materiel.Response"; }
+}
+App.Http.Controllers.Equipe.Materiel.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+App.Http.Controllers.Equipe.Materiel.Response.$schema={...(Aventus.Data?.$schema ?? {}), };
+Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.Response.Fullname, App.Http.Controllers.Equipe.Materiel.Response);
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'Response', App.Http.Controllers.Equipe.Materiel.Response);
+
+App.Http.Controllers.Equipe.Materiel.Request=class Request {
+    id_equipe;
+}
+App.Http.Controllers.Equipe.Materiel.Request.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'Request', App.Http.Controllers.Equipe.Materiel.Request);
+
 App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
     static get Fullname() { return "App.Models.MaterielImage"; }
 }
@@ -12451,12 +12363,7 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-link _id="equipeitem_0">
-    <div class="name" _id="equipeitem_1"></div>
-    <div class="actions">
-        <mi-icon icon="chevron_right"></mi-icon>
-    </div>
-</av-link>` }
+        blocks: { 'default':`<av-link _id="equipeitem_0">    <div class="name" _id="equipeitem_1"></div>    <div class="actions">        <mi-icon icon="chevron_right"></mi-icon>    </div></av-link>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12589,9 +12496,7 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">
-    <slot></slot>
-</div>` }
+        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
     });
 }
     getClassName() {
@@ -12620,11 +12525,7 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll">
-    <div class="content">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll">    <div class="content">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -12738,10 +12639,7 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
-    <av-button _id="confirm_2"></av-button>
-    <av-button color="primary" _id="confirm_3"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12934,15 +12832,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
-    <div class="preview" _id="inputimage_1">
-        <av-img _id="inputimage_2"></av-img>
-        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
-    </div>
-    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
-</div><div class="errors">
-    <template _id="inputimage_5"></template>
-</div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12987,14 +12877,10 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-        <template _id="inputimage_6"></template>
-    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-            <div _id="inputimage_7"></div>
-        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -13203,23 +13089,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">
-    <div class="toast-flex">
-        <div class="toast-icon-wrapper">
-            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
-        </div>
-        <div class="toast-message-wrapper">
-            <template _id="toast_1"></template>
-            <template _id="toast_3"></template>
-        </div>
-        <div class="toast-close-wrapper">
-            <button class="toast-close-button" _id="toast_5">
-                <span class="sr-only">Close</span>
-                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
-            </button>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13236,9 +13106,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <p class="toast-title" _id="toast_2"></p>
-            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13251,9 +13119,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-                <p class="toast-message" _id="toast_4"></p>
-            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13378,13 +13244,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
-    <slot name="before"></slot>
-    <input _id="input_1" />
-    <slot name="after"></slot>
-</div><div class="errors">
-    <template _id="input_2"></template>
-</div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13445,9 +13305,7 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="input_3"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13522,12 +13380,7 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
-    <av-input label="Nom de la variation" _id="modaltag_1"></av-input>
-</div><div class="footer">
-    <av-button _id="modaltag_2">Annuler</av-button>
-    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13617,11 +13470,7 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="variationtag_0"></span>
-    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
-    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
-</av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13691,8 +13540,7 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0">
-</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13773,9 +13621,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">
-    <div class="loader"></div>
-</div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
     });
 }
     getClassName() {
@@ -14063,9 +13909,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
-    <slot _id="iconaction_1"></slot>
-</div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14142,11 +13986,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>
-    <div class="container">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -14256,21 +14096,8 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
-    <slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>
-    <input id="input" autocomplete="off" _id="genericselect_3" />
-    <slot name="append"></slot>
-    <av-img src="/img/angle-left.svg" class="caret"></av-img>
-</div><div class="errors">
-    <template _id="genericselect_4"></template>
-</div><div class="hidden">
-    <slot></slot>
-</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14325,9 +14152,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="genericselect_5"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14879,9 +14704,7 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
-    <av-button _id="alert_1"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14934,7 +14757,8 @@ __as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
 
 const Header = class Header extends Aventus.WebComponent {
-    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo{font-size:var(--font-size-md)}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}`;
+    get 'open_menu'() { return this.getBoolAttr('open_menu') }
+    set 'open_menu'(val) { this.setBoolAttr('open_menu', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}}@media screen and (max-width: 500px){:host .content .logo{display:none}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}`;
     __getStatic() {
         return Header;
     }
@@ -14947,27 +14771,69 @@ const Header = class Header extends Aventus.WebComponent {
     this.__getStatic().__template.setHTML({
         blocks: { 'default':`<div class="content">
     <div class="logo">Inventaire FC Vétroz</div>
+    <div class="logo-icon">
+        <img src="/img/logo.png" alt="" />
+    </div>
+    <div class="menu-icon">
+        <mi-icon icon="menu" _id="header_0"></mi-icon>
+    </div>
+    <div class="menu-hidden" _id="header_1"></div>
     <div class="menu">
-        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
-        <av-link class="item" to="/materiel" active_pattern="/materiel*">Matériel</av-link>
-        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
+        <div class="logo-menu">Inventaire FC Vétroz</div>
+        <av-link class="item" to="/" active_pattern="/equipes/*|/" _id="header_2">Equipe</av-link>
+        <av-link class="item" to="/materiel" active_pattern="/materiel*" _id="header_3">Matériel</av-link>
+        <av-link class="item" to="/utilisateurs" _id="header_4">Utilisateur</av-link>
         <div class="item">
-            <mi-icon icon="power_settings_new" _id="header_0"></mi-icon>
+            <mi-icon icon="power_settings_new" _id="header_5"></mi-icon>
         </div>
     </div>
 </div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "events": [
+    {
+      "eventName": "click",
+      "id": "header_2",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_3",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_4",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    }
+  ],
   "pressEvents": [
     {
       "id": "header_0",
+      "onPress": (e, pressInstance, c) => { c.comp.openMenu(e, pressInstance); }
+    },
+    {
+      "id": "header_1",
+      "onPress": (e, pressInstance, c) => { c.comp.closeMenu(e, pressInstance); }
+    },
+    {
+      "id": "header_5",
       "onPress": (e, pressInstance, c) => { c.comp.logout(e, pressInstance); }
     }
   ]
 }); }
     getClassName() {
         return "Header";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('open_menu')) { this.attributeChangedCallback('open_menu', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('open_menu'); }
+    __listBoolProps() { return ["open_menu"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    openMenu() {
+        this.open_menu = true;
+    }
+    closeMenu() {
+        this.open_menu = false;
     }
     async logout() {
         await Aventus.Process.execute(new App.Http.Controllers.Auth.Logout.AuthLogoutController().request());
@@ -15295,12 +15161,7 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
-    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
-</div><div class="footer">
-    <av-button _id="modalequipe_2">Annuler</av-button>
-    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15423,7 +15284,10 @@ const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">
+    <av-button _id="modalinventaireupdate_2">Annuler</av-button>
+    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15544,7 +15408,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __registerSignalsActions() { this.__signals["item"] = null; super.__registerSignalsActions(); this.__addSignalActions("item", ((target) => {
     target.loadEquipes();
 })); }
-    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;overflow:hidden}:host av-col .img{width:100%;max-height:250px}:host av-col .img av-img{aspect-ratio:1;width:100%;max-height:250px}:host av-col .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host av-col .info .title{font-size:var(--font-size-md);margin-top:8px}:host av-col .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host av-col .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .visible{align-items:center;display:flex}:host av-col .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
+    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;justify-content:stretch;overflow:hidden}:host av-col .img{max-height:250px;width:100%;flex-shrink:0}:host av-col .img av-img{aspect-ratio:1;max-height:250px;width:100%}:host av-col .info{background-color:rgba(0,0,0,0);display:flex;flex-direction:column;flex-grow:1;padding:16px;padding-top:0}:host av-col .info .title{flex-shrink:0;font-size:var(--font-size-md);margin-top:8px}:host av-col .info .variations{display:flex;flex-grow:1;gap:6px;margin-bottom:12px;margin-top:12px}:host av-col .info .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .info .visible{align-items:center;display:flex;flex-shrink:0;min-height:30px;flex-wrap:wrap}:host av-col .info .visible .visible-label{width:100%}:host av-col .info .visible .everybody{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:3px}:host av-col .info .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .info .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
     __getStatic() {
         return MaterielCard;
     }
@@ -15566,7 +15430,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
                 <template _id="materielcard_3"></template>
             </div>
             <div class="visible">
-                <div>Visible pour :</div>
+                <div class="visible-label">Visible pour :</div>
                 <template _id="materielcard_5"></template>
             </div>
         </div>
@@ -15602,7 +15466,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
                     anchorId: 'materielcard_3',
                     template: templ0,
                 simple:{data: "this.item.variations",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-                    <div>Tout le monde</div>
+                    <div class="everybody">Tout le monde</div>
                 `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
                     <div class="visible-for">
                         <template _id="materielcard_6"></template>
@@ -15699,6 +15563,20 @@ App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController=class Eq
 App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
 __as1(_.App.Http.Controllers.Equipe.GetInventaire, 'EquipeGetInventaireController', App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController);
 
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielController=class EquipeMaterielController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/equipe/materiel`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielController.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielController', App.Http.Controllers.Equipe.Materiel.EquipeMaterielController);
+
 App.Http.Controllers.Inventaire.Historique.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Inventaire.Historique.Response"; }
     historique;
@@ -15761,7 +15639,13 @@ const ModalHistorique = class ModalHistorique extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">
+    <av-flex-scroll _id="modalhistorique_1">
+        <template _id="modalhistorique_2"></template>
+    </av-flex-scroll>
+</div><div class="footer">
+    <av-button _id="modalhistorique_6">Fermer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15792,7 +15676,15 @@ const ModalHistorique = class ModalHistorique extends Modal {
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite" _id="modalhistorique_3"></div>                <div class="par" _id="modalhistorique_4"></div>                <div class="modification">                    <span _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+            <div class="line">
+                <div class="quantite" _id="modalhistorique_3"></div>
+                <div class="par" _id="modalhistorique_4"></div>
+                <div class="modification">
+                    <span _id="modalhistorique_5"></span>
+                </div>
+            </div>
+        `);templ0.setActions({
   "content": {
     "modalhistorique_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
@@ -15961,7 +15853,18 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="line">    <div class="nom" _id="inventairelistitem_0"></div>    <div class="variation" _id="inventairelistitem_1"></div>    <div class="quantite" _id="inventairelistitem_2"></div>    <div class="modification">        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_3">Modifier</av-icon-action>            <template _id="inventairelistitem_4"></template>        </div>        <span _id="inventairelistitem_6"></span>    </div></div>` }
+        blocks: { 'default':`<div class="line">
+    <div class="nom" _id="inventairelistitem_0"></div>
+    <div class="variation" _id="inventairelistitem_1"></div>
+    <div class="quantite" _id="inventairelistitem_2"></div>
+    <div class="modification">
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_3">Modifier</av-icon-action>
+            <template _id="inventairelistitem_4"></template>
+        </div>
+        <span _id="inventairelistitem_6"></span>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15987,7 +15890,9 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
       "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <av-icon-action color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <av-icon-action color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>
+            `);templ0.setActions({
   "pressEvents": [
     {
       "id": "inventairelistitem_5",
@@ -16136,7 +16041,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     __registerWatchesActions() {
     this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
 }
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}`;
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
@@ -16167,10 +16072,10 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     </div>
     <div class="body">
         <av-row>
-            <av-col size="6">
+            <av-col size="12" size_sm="6">
                 <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>
             </av-col>
-            <av-col size="6" class="contenu">
+            <av-col size="12" size_sm="6" class="contenu">
                 <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>
@@ -16403,7 +16308,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             else {
                 const ram = MaterielRAM.getInstance();
                 this.item = result.result;
-                this.form.item = ram.toRequest(result.result);
+                const request = ram.toRequest(result.result);
+                this.form.item = request;
                 this.objName = this.form.item.nom;
                 await this.loadInventaire(this.item.id);
             }
@@ -16514,10 +16420,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">
-    <av-button _id="equipeeditmodal_2">Annuler</av-button>
-    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">    <av-button _id="equipeeditmodal_2">Annuler</av-button>    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16674,12 +16577,51 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
         const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
         if (!equipe)
             return "/";
-        const inventaires = await Aventus.Process.execute(new App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController().request({ id_equipe: equipe.id }));
-        if (!inventaires) {
+        this.item = equipe;
+        const result = await this.loadInventaire(equipe.id);
+        if (!result) {
             return "/";
         }
+        return true;
+    }
+    async loadInventaire(id) {
+        const materiels = await Aventus.Process.execute(new App.Http.Controllers.Equipe.Materiel.EquipeMaterielController().request({ id_equipe: id }));
+        if (!materiels) {
+            return false;
+        }
+        const connu = await Aventus.Process.execute(new App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController().request({ id_equipe: id }));
+        if (!connu) {
+            return false;
+        }
+        materiels.sort((a, b) => a.nom.localeCompare(b.nom));
+        const inventaires = [];
+        const addInventaire = (materiel, variation) => {
+            let el;
+            if (variation) {
+                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.materiel.id == materiel.id);
+            }
+            if (el == undefined) {
+                el = new App.Http.Controllers.Equipe.GetInventaire.Response();
+                el.materiel = materiel;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            inventaires.push(el);
+        };
+        for (let materiel of materiels) {
+            if (materiel.variations.length > 0) {
+                for (let variation of materiel.variations) {
+                    addInventaire(materiel, variation);
+                }
+            }
+            else {
+                addInventaire(materiel);
+            }
+        }
         this.inventaires = inventaires;
-        this.item = equipe;
         return true;
     }
     configure() {
@@ -16718,7 +16660,7 @@ if(!window.customElements.get('av-equipe-details-page')){window.customElements.d
 
 const EquipesPage = class EquipesPage extends PageFull {
     list = [];
-    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px;flex-shrink:0}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{width:100%;flex-grow:1;min-height:0}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}`;
+    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 600px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
     constructor() {
         super();
         this.onNewData = this.onNewData.bind(this);
@@ -16734,19 +16676,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des équipes</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
-            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="equipespage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16861,7 +16791,7 @@ if(!window.customElements.get('av-equipes-page')){window.customElements.define('
 
 const MaterielPage = class MaterielPage extends PageFull {
     list = [];
-    static __style = `:host{--col-gap: 16px}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{margin:16px;margin-top:0;width:calc(100% - 32px)}`;
+    static __style = `:host{--col-gap: 16px}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{margin:16px;margin-top:0;width:calc(100% - 32px)}@media screen and (max-width: 620px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
     constructor() {
         super();
         this.onNewData = this.onNewData.bind(this);
@@ -16877,19 +16807,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste du matériel</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
-            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <av-row class="list" _id="materielpage_2">
-        </av-row>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16945,7 +16863,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     async bindData() {
         let list = await Aventus.Process.execute(MaterielRAM.getInstance().getListWithError()) ?? [];
-        list.sort((a, b) => a.nom.localeCompare(a.nom));
+        list.sort((a, b) => a.nom.localeCompare(b.nom));
         for (let item of list) {
             let el = new MaterielCard();
             el.item = item;
@@ -17004,7 +16922,7 @@ if(!window.customElements.get('av-materiel-page')){window.customElements.define(
 
 const UserEditModal = class UserEditModal extends Modal {
     form;
-    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}`;
+    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}@media screen and (max-width: 539px){:host{--col-gap: 0px}}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
@@ -17031,10 +16949,10 @@ const UserEditModal = class UserEditModal extends Modal {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         blocks: { 'default':`<div class="title" _id="usereditmodal_0"></div><av-row>
-    <av-col size="12" size_xs="6">
+    <av-col size="12" size_sm="6" use_container="false">
         <av-input label="Nom" _id="usereditmodal_1"></av-input>
     </av-col>
-    <av-col size="12" size_xs="6">
+    <av-col size="12" size_sm="6" use_container="false">
         <av-input label="Prénom" _id="usereditmodal_2"></av-input>
     </av-col>
 </av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">
@@ -17094,7 +17012,6 @@ const UserEditModal = class UserEditModal extends Modal {
         return { title: "" };
     }
     async submit() {
-        debugger;
         const result = await this.form.submit(UserRAM.getInstance().saveWithError);
         if (result?.result) {
             this.resolve(result.result);
@@ -17146,7 +17063,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
 					}    __registerWatchesActions() {
     this.__addWatchesActions("item");    super.__registerWatchesActions();
 }
-    static __style = `:host{align-items:center;border-top:1px solid var(--color-base-300);display:flex;height:50px;padding:0 16px}:host .name{flex-grow:1}:host .actions{display:flex;flex-shrink:0;gap:5px}:host(:first-child){border-top:none}:host(:not([visible])){display:none}`;
+    static __style = `:host{align-items:center;border-top:1px solid var(--color-base-300);display:flex;height:50px;padding:0 16px}:host .name{flex-grow:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}:host .actions{display:flex;flex-shrink:0;gap:5px}:host(:first-child){border-top:none}:host(:not([visible])){display:none}`;
     __getStatic() {
         return UserItem;
     }
@@ -17157,10 +17074,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17214,7 +17128,7 @@ if(!window.customElements.get('av-user-item')){window.customElements.define('av-
 
 const UsersPage = class UsersPage extends PageFull {
     list = [];
-    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px;flex-shrink:0}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{width:100%;flex-grow:1;min-height:0}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}`;
+    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 650px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
     constructor() {
         super();
         this.onNewData = this.onNewData.bind(this);
@@ -17230,19 +17144,7 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des utilisateurs</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
-            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="userspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17368,11 +17270,7 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`
-    <av-header></av-header>
-`,'after':`
-    <av-footer></av-footer>
-` }
+        blocks: { 'before':`    <av-header></av-header>` }
     });
 }
     getClassName() {
@@ -17471,7 +17369,7 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     __registerWatchesActions() {
     this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
 }
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
     __getStatic() {
         return InventaireEquipeListItem;
     }
@@ -17482,28 +17380,40 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="line">    <div class="img" _id="inventaireequipelistitem_0"></div>    <div class="nom" _id="inventaireequipelistitem_1"></div>    <div class="variation" _id="inventaireequipelistitem_2"></div>    <div class="quantite" _id="inventaireequipelistitem_3"></div>    <div class="modification">        <div class="actions">            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>            <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_5">Historique</av-icon-action>        </div>        <span _id="inventaireequipelistitem_6"></span>    </div></div>` }
+        blocks: { 'default':`<div class="line">
+    <div class="img" _id="inventaireequipelistitem_0"></div>
+    <div class="nom" _id="inventaireequipelistitem_1"></div>
+    <div class="variation" _id="inventaireequipelistitem_2"></div>
+    <div class="quantite" _id="inventaireequipelistitem_3"></div>
+    <div class="modification">
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>
+            <template _id="inventaireequipelistitem_5"></template>
+        </div>
+        <span _id="inventaireequipelistitem_7"></span>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "inventaireequipelistitem_0°style": {
-      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0())});`,
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
       "once": true
     },
     "inventaireequipelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())}`,
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
       "once": true
     },
     "inventaireequipelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
     },
     "inventaireequipelistitem_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`,
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
       "once": true
     },
-    "inventaireequipelistitem_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
+    "inventaireequipelistitem_7°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
       "once": true
     }
   },
@@ -17511,13 +17421,24 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     {
       "id": "inventaireequipelistitem_4",
       "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    },
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_6">Historique</av-icon-action>
+            `);templ0.setActions({
+  "pressEvents": [
     {
-      "id": "inventaireequipelistitem_5",
+      "id": "inventaireequipelistitem_6",
       "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
     }
   ]
-}); }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventaireequipelistitem_5',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "InventaireEquipeListItem";
     }
@@ -17576,20 +17497,23 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         modal.variation = this.inventaire.variation;
         await modal.show();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method0() {
+    __a2ec46d163f7617d318fc452e85fb3c8method1() {
         return this.getPicture();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+    __a2ec46d163f7617d318fc452e85fb3c8method2() {
         return this.inventaire.materiel.nom;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+    __a2ec46d163f7617d318fc452e85fb3c8method3() {
         return this.inventaire.variation?.nom;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method3() {
+    __a2ec46d163f7617d318fc452e85fb3c8method4() {
         return this.inventaire.quantite;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method4() {
+    __a2ec46d163f7617d318fc452e85fb3c8method5() {
         return this.getLastUpdate();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method0() {
+        return this.inventaire.id;
     }
 }
 InventaireEquipeListItem.Namespace=`Inventaire`;
@@ -17614,8 +17538,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0">
-</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

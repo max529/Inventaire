@@ -1,9 +1,9 @@
 <div class="title">{{ this.options.title }}</div>
 <av-row>
-    <av-col size="12" size_xs="6">
+    <av-col size="12" size_sm="6" use_container="false">
         <av-input label="Nom" :form="this.form.parts.nom"></av-input>
     </av-col>
-    <av-col size="12" size_xs="6">
+    <av-col size="12" size_sm="6" use_container="false">
         <av-input label="Prénom" :form="this.form.parts.prenom"></av-input>
     </av-col>
 </av-row>

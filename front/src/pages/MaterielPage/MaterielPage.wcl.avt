@@ -71,7 +71,7 @@ export class MaterielPage extends PageFull implements Aventus.DefaultComponent {
 
     protected async bindData() {
         let list = await Process.execute(MaterielRAM.getInstance().getListWithError()) ?? [];
-        list.sort((a, b) => a.nom.localeCompare(a.nom));
+        list.sort((a, b) => a.nom.localeCompare(b.nom));
 
         for(let item of list) {
             let el = new MaterielCard();

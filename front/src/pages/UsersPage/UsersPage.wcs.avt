@@ -12,11 +12,11 @@
 		.header {
 			align-items: center;
 			display: flex;
+			flex-shrink: 0;
 			gap: 24px;
 			height: 50px;
 			justify-content: space-between;
 			margin-bottom: 24px;
-			flex-shrink: 0;
 
 			.title {
 				font-size: var(--font-size-md);
@@ -36,15 +36,49 @@
 		}
 
 		.body {
-			width: 100%;
 			flex-grow: 1;
 			min-height: 0;
+			width: 100%;
 
 			.list {
 				border: 1px solid var(--color-base-300);
 				border-radius: var(--radius-field);
 				width: 100%;
+				
 			}
+		}
+	}
+}
+
+@media screen and (max-width:650px) {
+	:host {
+		.card {
+			position: relative;
+
+			.header {
+				flex-wrap: wrap;
+				height: auto;
+
+				.title {
+					width: 100%;
+				}
+
+				.actions {
+					width: 100%;
+
+					av-input {
+						max-width: none;
+						width: 100%;
+					}
+
+					av-button {
+						position: absolute;
+						right: 16px;
+						top: 16px;
+					}
+				}
+			}
+
 		}
 	}
 }

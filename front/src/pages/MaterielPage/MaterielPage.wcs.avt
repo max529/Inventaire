@@ -41,11 +41,46 @@
 			flex-grow: 1;
 			min-height: 0;
 			width: 100%;
+
 			.list {
 				margin: 16px;
 				margin-top: 0;
 				width: calc(100% - 32px);
 			}
+		}
+	}
+}
+
+@media screen and (max-width:620px) {
+	:host {
+		.card {
+			position: relative;
+
+			.header {
+				flex-wrap: wrap;
+				height: auto;
+
+				.title {
+					width: 100%;
+				}
+
+				.actions {
+					width: 100%;
+
+					av-input {
+						max-width: none;
+						width: 100%;
+					}
+
+					av-button {
+						position: absolute;
+						right: 16px;
+						top: 16px;
+					}
+				}
+			}
+
+
 		}
 	}
 }

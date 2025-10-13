@@ -70,7 +70,6 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
      * 
      */
     protected async submit() {
-        debugger
         const result = await this.form.submit(UserRAM.getInstance().saveWithError);
         if(result?.result) {
             this.resolve(result.result);

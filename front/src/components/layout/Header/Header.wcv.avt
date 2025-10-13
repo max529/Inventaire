@@ -1,9 +1,17 @@
 <div class="content">
     <div class="logo">Inventaire FC Vétroz</div>
+    <div class="logo-icon">
+        <img src="/img/logo.png" alt="">
+    </div>
+    <div class="menu-icon">
+        <mi-icon icon="menu" @press="openMenu"></mi-icon>
+    </div>
+    <div class="menu-hidden" @press="closeMenu"></div>
     <div class="menu">
-        <av-link class="item" to="/" active_pattern="/equipes/*|/">Equipe</av-link>
-        <av-link class="item" to="/materiel"  active_pattern="/materiel*">Matériel</av-link>
-        <av-link class="item" to="/utilisateurs">Utilisateur</av-link>
+        <div class="logo-menu">Inventaire FC Vétroz</div>
+        <av-link class="item" to="/" active_pattern="/equipes/*|/" @click="closeMenu">Equipe</av-link>
+        <av-link class="item" to="/materiel" active_pattern="/materiel*" @click="closeMenu">Matériel</av-link>
+        <av-link class="item" to="/utilisateurs" @click="closeMenu">Utilisateur</av-link>
         <div class="item">
             <mi-icon icon="power_settings_new" @press="logout"></mi-icon>
         </div>

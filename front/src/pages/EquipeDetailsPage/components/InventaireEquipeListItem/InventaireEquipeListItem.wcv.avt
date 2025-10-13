@@ -6,7 +6,9 @@
     <div class="modification">
         <div class="actions">
             <av-icon-action color="neutral" icon="edit" @press="edit">Modifier</av-icon-action>
-            <av-icon-action color="info" icon="history" @press="historique">Historique</av-icon-action>
+            if(this.inventaire.id) {
+                <av-icon-action color="info" icon="history" @press="historique">Historique</av-icon-action>
+            }
         </div>
         <span>{{ this.getLastUpdate() }}</span>
     </div>

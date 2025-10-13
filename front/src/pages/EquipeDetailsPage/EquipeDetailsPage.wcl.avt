@@ -7,9 +7,10 @@ import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { EquipeGetInventaireController } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Controller.lib.avt";
 import { Response as Inventaire } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
-import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
-import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
+import { EquipeMaterielController } from "../../generated/app/Http/Controllers/Equipe/Materiel/Controller.lib.avt";
+import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
 
 export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -48,17 +49,62 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
         if(!equipe)
             return "/";
 
-
-        const inventaires = await Process.execute(new EquipeGetInventaireController().request({ id_equipe: equipe.id }));
-        if(!inventaires) {
-            return "/";
-        }
-
-        this.inventaires = inventaires;
         this.item = equipe;
 
 
 
+        const result = await this.loadInventaire(equipe.id);
+        if(!result) {
+            return "/";
+        }
+
+
+        return true;
+    }
+
+    protected async loadInventaire(id: number) {
+        const materiels = await Process.execute(new EquipeMaterielController().request({ id_equipe: id }));
+        if(!materiels) {
+            return false;
+        }
+        const connu = await Process.execute(new EquipeGetInventaireController().request({ id_equipe: id }));
+        if(!connu) {
+            return false;
+        }
+        materiels.sort((a, b) => a.nom.localeCompare(b.nom));
+
+        const inventaires: Inventaire[] = [];
+
+
+        const addInventaire = (materiel: MaterielResource, variation?: Variation) => {
+            let el: Inventaire | undefined;
+            if(variation) {
+                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.materiel.id == materiel.id);
+            }
+            if(el == undefined) {
+                el = new Inventaire();
+                el.materiel = materiel;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            inventaires.push(el);
+        };
+
+        for(let materiel of materiels) {
+            if(materiel.variations.length > 0) {
+                for(let variation of materiel.variations) {
+                    addInventaire(materiel, variation);
+                }
+            }
+            else {
+                addInventaire(materiel);
+            }
+
+        }
+        this.inventaires = inventaires;
         return true;
     }
 
