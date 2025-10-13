@@ -4,9 +4,7 @@ use App\Http\Controllers\Equipe\EquipeController;
 use App\Http\Controllers\Materiel\MaterielController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Middlewares\IsConnected;
-use Illuminate\Support\Facades\Route;
-
-
+use Aventus\Laraventus\Routes\Route;
 
 Route::get('/login', function () {
     return view('login');
@@ -23,10 +21,10 @@ Route::post('/logout', [\App\Http\Controllers\Auth\Logout\Controller::class, "re
 Route::middleware(IsConnected::class)->group(function () {
 
     Route::prefix("data")->group(function () {
-        Route::resource('user', UserController::class);
-        Route::resource('equipe', EquipeController::class);
+        Route::resourceWithMany('user', UserController::class);
+        Route::resourceWithMany('equipe', EquipeController::class);
         Route::post('/equipe/inventaire', [\App\Http\Controllers\Equipe\GetInventaire\Controller::class, "request"]);
-        Route::resource('materiel', MaterielController::class);
+        Route::resourceWithMany('materiel', MaterielController::class);
         Route::post('/materiel/inventaire', [\App\Http\Controllers\Materiel\GetInventaire\Controller::class, "request"]);
         
         Route::post('/inventaire/update', [\App\Http\Controllers\Inventaire\Update\Controller::class, "request"]);

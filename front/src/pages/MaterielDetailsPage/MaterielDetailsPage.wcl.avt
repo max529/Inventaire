@@ -31,7 +31,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
     //#region variables
     public form: FormHandler<MaterielRequest>;
-    public item!: MaterielResource;
+    public item?: MaterielResource;
 
     @Watch()
     public inventaires: Inventaire[] = [];
@@ -101,6 +101,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
     protected async loadInventaire(id: number) {
         const item = this.item;
+        if(!item) return;
         const inventaires: Inventaire[] = [];
         const connu = await Process.execute(new MaterielGetInventaireController().request({ id_materiel: id }));
         if(!connu) return;
@@ -110,7 +111,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             equipes = (await EquipeRAM.getInstance().getList());
         }
         else {
-            equipes = item.equipes.map(p => p.equipe);
+            const equipeIds = item.equipes.map(p => p.id_equipe);
+            equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
         }
         equipes.sort((a, b) => a.nom.localeCompare(b.nom));
 
@@ -128,8 +130,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 el.variation = variation;
                 el.quantite = 0;
             }
-            el.equipe = equipe;
-            el.variation = variation;
             inventaires.push(el);
         };
 

@@ -113,6 +113,9 @@ export class Main extends Router implements Aventus.DefaultComponent {
                 });
             }
         });
+        Router.configure({
+            destroyPage: true,
+        })
     }
 
     //#endregion

@@ -1,4 +1,4 @@
 <av-tag color="accent">
-    <span @element="componentEl"></span>
+    <span>{{ this.equipe.nom }}</span>
     <mi-icon icon="delete" @press="triggerDelete"></mi-icon>
 </av-tag>

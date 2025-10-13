@@ -9,6 +9,7 @@ import { EquipeGetInventaireController } from "../../generated/app/Http/Controll
 import { Response as Inventaire } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
 import type { Materiel } from "../../generated/app/Models/Materiel.lib.avt";
 import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
+import { Watcher } from "Aventus@Main:Aventus.package.avt";
 
 export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
 
@@ -72,8 +73,11 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
     /**
      * 
      */
-    protected editItem() {
-        EquipeEditModal.open(this.item);
+    protected async editItem() {
+        const result = await EquipeEditModal.open(this.item);
+        if(result) {
+            Watcher.trigger("UPDATED", this.item);
+        }
     }
     /**
     * 

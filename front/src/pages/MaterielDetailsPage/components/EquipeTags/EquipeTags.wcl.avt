@@ -42,7 +42,7 @@ export class EquipeTags extends Aventus.WebComponent implements Aventus.DefaultC
         this.listEl.innerHTML = "";
         for(let equipe of this.equipes) {
             let el = new EquipeTag();
-            el.equipe = equipe;
+            el.equipe_id = equipe.id_equipe
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }
@@ -56,7 +56,7 @@ export class EquipeTags extends Aventus.WebComponent implements Aventus.DefaultC
             materielEquipe.equipe = equipe;
             this.equipes.push(materielEquipe);
             let el = new EquipeTag();
-            el.equipe = materielEquipe;
+            el.equipe_id = materielEquipe.id_equipe;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }

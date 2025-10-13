@@ -1,4 +1,6 @@
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
 
 export class MaterielCard extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -14,8 +16,12 @@ export class MaterielCard extends Aventus.WebComponent implements Aventus.Defaul
 
 
     //#region variables
-    @Watch()
+    @Signal((target: MaterielCard) => {
+        target.loadEquipes();
+    })
     public item!: MaterielResource;
+    @Watch()
+    protected equipes: EquipeResource[] = [];
     //#endregion
 
 
@@ -25,6 +31,11 @@ export class MaterielCard extends Aventus.WebComponent implements Aventus.Defaul
 
 
     //#region methods
+    protected async loadEquipes() {
+        const equipeIds = this.item.equipes.map(p => p.id_equipe);
+        this.equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
+
+    }
     protected getSrc() {
         if(this.item.image?.uri) {
             return this.item.image?.uri;

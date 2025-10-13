@@ -17,8 +17,8 @@
                 }
                 else {
                     <div class="visible-for">
-                        for(let equipe of this.item.equipes) { 
-                            <av-tag color="accent">{{ equipe.equipe.nom }}</av-tag>
+                        for(let equipe of this.equipes) { 
+                            <av-tag color="accent">{{ equipe.nom }}</av-tag>
                         }
                     </div>
                 }

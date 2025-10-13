@@ -43,6 +43,24 @@ var HttpErrorCode;
 })(HttpErrorCode || (HttpErrorCode = {}));
 __as1(_, 'HttpErrorCode', HttpErrorCode);
 
+var HttpMethod;
+(function (HttpMethod) {
+    HttpMethod["GET"] = "GET";
+    HttpMethod["POST"] = "POST";
+    HttpMethod["DELETE"] = "DELETE";
+    HttpMethod["PUT"] = "PUT";
+    HttpMethod["OPTION"] = "OPTION";
+})(HttpMethod || (HttpMethod = {}));
+__as1(_, 'HttpMethod', HttpMethod);
+
+var RamErrorCode;
+(function (RamErrorCode) {
+    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
+    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
+    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
+})(RamErrorCode || (RamErrorCode = {}));
+__as1(_, 'RamErrorCode', RamErrorCode);
+
 let DateConverter=class DateConverter {
     static __converter = new DateConverter();
     static get converter() {
@@ -66,24 +84,6 @@ let DateConverter=class DateConverter {
 }
 DateConverter.Namespace=`Aventus`;
 __as1(_, 'DateConverter', DateConverter);
-
-var HttpMethod;
-(function (HttpMethod) {
-    HttpMethod["GET"] = "GET";
-    HttpMethod["POST"] = "POST";
-    HttpMethod["DELETE"] = "DELETE";
-    HttpMethod["PUT"] = "PUT";
-    HttpMethod["OPTION"] = "OPTION";
-})(HttpMethod || (HttpMethod = {}));
-__as1(_, 'HttpMethod', HttpMethod);
-
-var RamErrorCode;
-(function (RamErrorCode) {
-    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
-    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
-    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
-})(RamErrorCode || (RamErrorCode = {}));
-__as1(_, 'RamErrorCode', RamErrorCode);
 
 let ActionGuard=class ActionGuard {
     /**
@@ -5975,6 +5975,209 @@ let DragAndDrop=class DragAndDrop {
 DragAndDrop.Namespace=`Aventus`;
 __as1(_, 'DragAndDrop', DragAndDrop);
 
+let ConverterTransform=class ConverterTransform {
+    transform(data) {
+        return this.transformLoop(data);
+    }
+    createInstance(data) {
+        if (data.$type) {
+            let cst = Converter.info.get(data.$type);
+            if (cst) {
+                return new cst();
+            }
+        }
+        return undefined;
+    }
+    beforeTransformObject(obj) {
+    }
+    afterTransformObject(obj) {
+    }
+    transformLoop(data) {
+        if (data === null) {
+            return data;
+        }
+        if (Array.isArray(data)) {
+            let result = [];
+            for (let element of data) {
+                result.push(this.transformLoop(element));
+            }
+            return result;
+        }
+        if (data instanceof Date) {
+            return data;
+        }
+        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
+            let objTemp = this.createInstance(data);
+            if (objTemp) {
+                if (objTemp instanceof Map) {
+                    if (data.values) {
+                        for (const keyValue of data.values) {
+                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                        }
+                    }
+                    return objTemp;
+                }
+                let obj = objTemp;
+                this.beforeTransformObject(obj);
+                if (obj.fromJSON) {
+                    obj = obj.fromJSON(data);
+                }
+                else {
+                    obj = Json.classFromJson(obj, data, {
+                        transformValue: (key, value) => {
+                            if (obj[key] instanceof Date) {
+                                return value ? new Date(value) : null;
+                            }
+                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
+                                return value ? DateConverter.converter.fromString(value) : null;
+                            }
+                            else if (obj[key] instanceof Map) {
+                                let map = new Map();
+                                if ("$type" in value && value['$type'] == "Aventus.Map") {
+                                    value = value.values;
+                                }
+                                for (const keyValue of value) {
+                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                                }
+                                return map;
+                            }
+                            else if (obj instanceof Data) {
+                                let cst = obj.constructor;
+                                if (cst.$schema[key] == 'boolean') {
+                                    return value ? true : false;
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'Date') {
+                                    return value ? new Date(value) : null;
+                                }
+                            }
+                            return this.transformLoop(value);
+                        }
+                    });
+                }
+                this.afterTransformObject(obj);
+                return obj;
+            }
+            let result = {};
+            for (let key in data) {
+                result[key] = this.transformLoop(data[key]);
+            }
+            return result;
+        }
+        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
+            return new Date(data);
+        }
+        return data;
+    }
+    copyValuesClass(target, src, options) {
+        const realOptions = {
+            isValidKey: options?.isValidKey ?? (() => true),
+            replaceKey: options?.replaceKey ?? ((key) => key),
+            transformValue: options?.transformValue ?? ((key, value) => value),
+        };
+        this.__classCopyValues(target, src, realOptions);
+    }
+    __classCopyValues(target, src, options) {
+        let props = Object.getOwnPropertyNames(target);
+        for (let prop of props) {
+            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
+            if (propInfo?.writable) {
+                if (options.isValidKey(prop))
+                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+            }
+        }
+        let cstTemp = target.constructor;
+        while (cstTemp.prototype && cstTemp != Object.prototype) {
+            props = Object.getOwnPropertyNames(cstTemp.prototype);
+            for (let prop of props) {
+                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
+                if (propInfo?.set && propInfo.get) {
+                    if (options.isValidKey(prop))
+                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+                }
+            }
+            cstTemp = Object.getPrototypeOf(cstTemp);
+        }
+    }
+}
+ConverterTransform.Namespace=`Aventus`;
+__as1(_, 'ConverterTransform', ConverterTransform);
+
+let Converter=class Converter {
+    /**
+    * Map storing information about registered types.
+    */
+    static info = new Map([["Aventus.Map", Map]]);
+    /**
+    * Map storing schemas for registered types.
+    */
+    static schema = new Map();
+    /**
+     * Internal converter instance.
+     */
+    static __converter = new ConverterTransform();
+    /**
+     * Getter for the internal converter instance.
+     */
+    static get converterTransform() {
+        return this.__converter;
+    }
+    /**
+    * Sets the converter instance.
+    * @param converter The converter instance to set.
+    */
+    static setConverter(converter) {
+        this.__converter = converter;
+    }
+    /**
+    * Registers a unique string type for any class.
+    * @param $type The unique string type identifier.
+    * @param cst The constructor function for the class.
+    * @param schema Optional schema for the registered type.
+    */
+    static register($type, cst, schema) {
+        this.info.set($type, cst);
+        if (schema) {
+            this.schema.set($type, schema);
+        }
+    }
+    /**
+     * Transforms the provided data using the current converter instance.
+     * @template T
+     * @param {*} data The data to transform.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
+     * @returns {T} Returns the transformed data.
+     */
+    static transform(data, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.transform(data);
+    }
+    /**
+     * Copies values from one class instance to another using the current converter instance.
+     * @template T
+     * @param {T} to The destination class instance to copy values into.
+     * @param {T} from The source class instance to copy values from.
+     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
+     * @returns {T} Returns the destination class instance with copied values.
+     */
+    static copyValuesClass(to, from, options, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.copyValuesClass(to, from, options);
+    }
+}
+Converter.Namespace=`Aventus`;
+__as1(_, 'Converter', Converter);
+
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
@@ -5991,6 +6194,7 @@ ResultRamWithError.Namespace=`Aventus`;
 __as1(_, 'ResultRamWithError', ResultRamWithError);
 
 let GenericRam=class GenericRam {
+    static info = new Map([]);
     /**
      * The current namespace
      */
@@ -6011,10 +6215,12 @@ let GenericRam=class GenericRam {
      */
     records = new Map();
     actionGuard = new ActionGuard();
+    ramMapping = {};
     constructor() {
         if (this.constructor == GenericRam) {
             throw "can't instanciate an abstract class";
         }
+        RamManager.check();
         this.getIdWithError = this.getIdWithError.bind(this);
         this.getId = this.getId.bind(this);
         this.save = this.save.bind(this);
@@ -6188,6 +6394,12 @@ let GenericRam=class GenericRam {
         };
     }
     /**
+     * Define all the types you ram is capable of
+     */
+    ramForTypes() {
+        return [this.getTypeForData({})];
+    }
+    /**
      * Transform the object into the object stored inside Ram
      */
     getObjectForRam(objJson) {
@@ -6195,6 +6407,47 @@ let GenericRam=class GenericRam {
         let item = new T();
         this.mergeObject(item, objJson);
         return item;
+    }
+    linkFct = new Map();
+    linkInfo = {};
+    linkRamItem(item) {
+        for (let key in this.ramMapping) {
+            this.linkRamItemByKey(item, key);
+        }
+    }
+    linkRamItemByKey(item, key) {
+        const mapping = this.ramMapping[key];
+        if (key in item) {
+            if (mapping.asArray) {
+                if (Array.isArray(item[key])) {
+                }
+                else {
+                    console.error(key + " in type " + item + " must be an array");
+                }
+            }
+            else {
+                const id = mapping.ram.getId(item[key]);
+                if (!this.linkFct.has(mapping.ram)) {
+                    const fcts = {
+                        onCreated: (item) => {
+                        },
+                        onUpdated: (item) => {
+                        },
+                        onDeleted: (item) => {
+                        },
+                    };
+                    this.linkFct.set(mapping.ram, fcts);
+                    mapping.ram.onCreated(fcts.onCreated);
+                    mapping.ram.onUpdated(fcts.onUpdated);
+                    mapping.ram.onDeleted(fcts.onDeleted);
+                }
+                if (!this.linkInfo[key])
+                    this.linkInfo[key] = {};
+                if (!this.linkInfo[key][id])
+                    this.linkInfo[key][id] = [];
+                this.linkInfo[key][id].push(item);
+            }
+        }
     }
     /**
      * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
@@ -6208,8 +6461,10 @@ let GenericRam=class GenericRam {
                 if (this.records.has(id)) {
                     let uniqueRecord = this.records.get(id);
                     await this.beforeRecordSet(uniqueRecord);
+                    // this.unlinkRamItem(uniqueRecord);
                     this.mergeObject(uniqueRecord, item);
                     await this.afterRecordSet(uniqueRecord);
+                    // this.linkRamItem(uniqueRecord);
                     resultTemp = 'updated';
                 }
                 else {
@@ -6217,6 +6472,7 @@ let GenericRam=class GenericRam {
                     await this.beforeRecordSet(realObject);
                     this.records.set(id, realObject);
                     await this.afterRecordSet(realObject);
+                    // this.linkRamItem(uniqueRecord);
                     resultTemp = 'created';
                 }
                 result.result = this.records.get(id);
@@ -6862,6 +7118,63 @@ let GenericRam=class GenericRam {
 GenericRam.Namespace=`Aventus`;
 __as1(_, 'GenericRam', GenericRam);
 
+let RamManager=class RamManager {
+    static _allInit = true;
+    static get allInit() { return this._allInit; }
+    ;
+    static info = new Map([]);
+    static rams = [];
+    static registerRAM(ram) {
+        this._allInit = false;
+        if (!this.rams.includes(ram)) {
+            this.rams.push(ram);
+        }
+    }
+    static check() {
+        if (this._allInit) {
+            this._allInit = true;
+            for (let ramCst of this.rams) {
+                const ram = Instance.get(ramCst);
+                for (let type of ram.ramForTypes()) {
+                    this.info.set(type, ram);
+                }
+            }
+            for (let ramCst of this.rams) {
+                const ram = Instance.get(ramCst);
+                const mapping = {};
+                for (let type of ram.ramForTypes()) {
+                    if ('$schema' in type) {
+                        const schema = type.$schema;
+                        for (let key in schema) {
+                            if (mapping[key])
+                                continue;
+                            let schemaType = schema[key];
+                            let asArray = false;
+                            if (schemaType.endsWith("[]")) {
+                                asArray = true;
+                                schemaType = schemaType.slice(0, -2);
+                            }
+                            const schemaInfo = Converter.info.get(schemaType);
+                            if (schemaInfo) {
+                                const ramLink = this.info.get(schemaInfo);
+                                if (ramLink) {
+                                    mapping[key] = {
+                                        ram: ramLink,
+                                        asArray
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                ram.ramMapping = mapping;
+            }
+        }
+    }
+}
+RamManager.Namespace=`Aventus`;
+__as1(_, 'RamManager', RamManager);
+
 let Ram=class Ram extends GenericRam {
 }
 Ram.Namespace=`Aventus`;
@@ -6871,209 +7184,6 @@ let HttpError=class HttpError extends GenericError {
 }
 HttpError.Namespace=`Aventus`;
 __as1(_, 'HttpError', HttpError);
-
-let ConverterTransform=class ConverterTransform {
-    transform(data) {
-        return this.transformLoop(data);
-    }
-    createInstance(data) {
-        if (data.$type) {
-            let cst = Converter.info.get(data.$type);
-            if (cst) {
-                return new cst();
-            }
-        }
-        return undefined;
-    }
-    beforeTransformObject(obj) {
-    }
-    afterTransformObject(obj) {
-    }
-    transformLoop(data) {
-        if (data === null) {
-            return data;
-        }
-        if (Array.isArray(data)) {
-            let result = [];
-            for (let element of data) {
-                result.push(this.transformLoop(element));
-            }
-            return result;
-        }
-        if (data instanceof Date) {
-            return data;
-        }
-        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
-            let objTemp = this.createInstance(data);
-            if (objTemp) {
-                if (objTemp instanceof Map) {
-                    if (data.values) {
-                        for (const keyValue of data.values) {
-                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                        }
-                    }
-                    return objTemp;
-                }
-                let obj = objTemp;
-                this.beforeTransformObject(obj);
-                if (obj.fromJSON) {
-                    obj = obj.fromJSON(data);
-                }
-                else {
-                    obj = Json.classFromJson(obj, data, {
-                        transformValue: (key, value) => {
-                            if (obj[key] instanceof Date) {
-                                return value ? new Date(value) : null;
-                            }
-                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
-                                return value ? DateConverter.converter.fromString(value) : null;
-                            }
-                            else if (obj[key] instanceof Map) {
-                                let map = new Map();
-                                if ("$type" in value && value['$type'] == "Aventus.Map") {
-                                    value = value.values;
-                                }
-                                for (const keyValue of value) {
-                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                                }
-                                return map;
-                            }
-                            else if (obj instanceof Data) {
-                                let cst = obj.constructor;
-                                if (cst.$schema[key] == 'boolean') {
-                                    return value ? true : false;
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'Date') {
-                                    return value ? new Date(value) : null;
-                                }
-                            }
-                            return this.transformLoop(value);
-                        }
-                    });
-                }
-                this.afterTransformObject(obj);
-                return obj;
-            }
-            let result = {};
-            for (let key in data) {
-                result[key] = this.transformLoop(data[key]);
-            }
-            return result;
-        }
-        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
-            return new Date(data);
-        }
-        return data;
-    }
-    copyValuesClass(target, src, options) {
-        const realOptions = {
-            isValidKey: options?.isValidKey ?? (() => true),
-            replaceKey: options?.replaceKey ?? ((key) => key),
-            transformValue: options?.transformValue ?? ((key, value) => value),
-        };
-        this.__classCopyValues(target, src, realOptions);
-    }
-    __classCopyValues(target, src, options) {
-        let props = Object.getOwnPropertyNames(target);
-        for (let prop of props) {
-            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
-            if (propInfo?.writable) {
-                if (options.isValidKey(prop))
-                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-            }
-        }
-        let cstTemp = target.constructor;
-        while (cstTemp.prototype && cstTemp != Object.prototype) {
-            props = Object.getOwnPropertyNames(cstTemp.prototype);
-            for (let prop of props) {
-                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
-                if (propInfo?.set && propInfo.get) {
-                    if (options.isValidKey(prop))
-                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-                }
-            }
-            cstTemp = Object.getPrototypeOf(cstTemp);
-        }
-    }
-}
-ConverterTransform.Namespace=`Aventus`;
-__as1(_, 'ConverterTransform', ConverterTransform);
-
-let Converter=class Converter {
-    /**
-    * Map storing information about registered types.
-    */
-    static info = new Map([["Aventus.Map", Map]]);
-    /**
-    * Map storing schemas for registered types.
-    */
-    static schema = new Map();
-    /**
-     * Internal converter instance.
-     */
-    static __converter = new ConverterTransform();
-    /**
-     * Getter for the internal converter instance.
-     */
-    static get converterTransform() {
-        return this.__converter;
-    }
-    /**
-    * Sets the converter instance.
-    * @param converter The converter instance to set.
-    */
-    static setConverter(converter) {
-        this.__converter = converter;
-    }
-    /**
-    * Registers a unique string type for any class.
-    * @param $type The unique string type identifier.
-    * @param cst The constructor function for the class.
-    * @param schema Optional schema for the registered type.
-    */
-    static register($type, cst, schema) {
-        this.info.set($type, cst);
-        if (schema) {
-            this.schema.set($type, schema);
-        }
-    }
-    /**
-     * Transforms the provided data using the current converter instance.
-     * @template T
-     * @param {*} data The data to transform.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
-     * @returns {T} Returns the transformed data.
-     */
-    static transform(data, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.transform(data);
-    }
-    /**
-     * Copies values from one class instance to another using the current converter instance.
-     * @template T
-     * @param {T} to The destination class instance to copy values into.
-     * @param {T} from The source class instance to copy values from.
-     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
-     * @returns {T} Returns the destination class instance with copied values.
-     */
-    static copyValuesClass(to, from, options, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.copyValuesClass(to, from, options);
-    }
-}
-Converter.Namespace=`Aventus`;
-__as1(_, 'Converter', Converter);
 
 let HttpRequest=class HttpRequest {
     static options;
@@ -7613,6 +7723,7 @@ let ModelController=class ModelController extends Aventus.HttpRoute {
         const requestBody = new IdsManyRequest();
         requestBody.ids = ids;
         const request = new Aventus.HttpRequest(`${this.getPrefix()}/${this.getUri()}/show_many`, Aventus.HttpMethod.POST);
+        request.setBody(requestBody);
         return await request.queryJSON(this.router);
     }
     async update(id, body) {
@@ -12704,81 +12815,6 @@ Confirm.Tag=`av-confirm`;
 __as1(_, 'Confirm', Confirm);
 if(!window.customElements.get('av-confirm')){window.customElements.define('av-confirm', Confirm);Aventus.WebComponentInstance.registerDefinition(Confirm);}
 
-const EquipeTag = class EquipeTag extends Aventus.WebComponent {
-    equipe;
-    onDelete = new Aventus.Callback();
-    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
-    __getStatic() {
-        return EquipeTag;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipeTag.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="equipetag_0"></span>
-    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
-</av-tag>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "componentEl",
-      "ids": [
-        "equipetag_0"
-      ]
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "equipetag_1",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "EquipeTag";
-    }
-    decodeHtmlSpecialChars(text) {
-        const map = {
-            '&nbsp;': ' ',
-            '&amp;': '&',
-            '&#038;': '&',
-            '&lt;': '<',
-            '&gt;': '>',
-            '&quot;': '"',
-            '&#039;': "'",
-            '&#8217;': '’',
-            '&#8216;': '‘',
-            '&#8211;': '–',
-            '&#8212;': '—',
-            '&#8230;': '…',
-            '&#8221;': '”',
-        };
-        return text.replace(/\&[\w\d\#]{2,5}\;/g, (m) => map[m]);
-    }
-    async triggerDelete() {
-        const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.equipe.nom + "?"
-        });
-        if (result) {
-            this.onDelete.trigger(this);
-        }
-    }
-    postCreation() {
-        super.postCreation();
-        this.componentEl.innerText = this.decodeHtmlSpecialChars(this.equipe.equipe.nom);
-    }
-}
-EquipeTag.Namespace=`Inventaire`;
-EquipeTag.Tag=`av-equipe-tag`;
-__as1(_, 'EquipeTag', EquipeTag);
-if(!window.customElements.get('av-equipe-tag')){window.customElements.define('av-equipe-tag', EquipeTag);Aventus.WebComponentInstance.registerDefinition(EquipeTag);}
-
 const Toggle = class Toggle extends Aventus.Form.FormElement {
     static get observedAttributes() {return ["checked"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
     get 'checked'() { return this.getBoolProp('checked') }
@@ -15126,6 +15162,85 @@ let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
 EquipeRAM.Namespace=`Inventaire`;
 __as1(_, 'EquipeRAM', EquipeRAM);
 
+const EquipeTag = class EquipeTag extends Aventus.WebComponent {
+    get 'equipe_id'() {
+						return this.__watch["equipe_id"];
+					}
+					set 'equipe_id'(val) {
+						this.__watch["equipe_id"] = val;
+					}get 'equipe'() {
+						return this.__watch["equipe"];
+					}
+					set 'equipe'(val) {
+						this.__watch["equipe"] = val;
+					}    onDelete = new Aventus.Callback();
+    __registerWatchesActions() {
+    this.__addWatchesActions("equipe_id", ((target) => {
+    target.loadData();
+}));this.__addWatchesActions("equipe");    super.__registerWatchesActions();
+}
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
+    __getStatic() {
+        return EquipeTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="equipetag_0"></span>
+    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
+</av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "equipetag_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__6e6550e7a452d01b39466da4997f8b4dmethod0())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "equipetag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipeTag";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe_id"] = undefined;w["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe_id');this.__correctGetter('equipe'); }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    async loadData() {
+        const r = await EquipeRAM.getInstance().getById(this.equipe_id);
+        if (r) {
+            this.equipe = r;
+        }
+    }
+    postCreation() {
+        super.postCreation();
+    }
+    __6e6550e7a452d01b39466da4997f8b4dmethod0() {
+        return this.equipe.nom;
+    }
+}
+EquipeTag.Namespace=`Inventaire`;
+EquipeTag.Tag=`av-equipe-tag`;
+__as1(_, 'EquipeTag', EquipeTag);
+if(!window.customElements.get('av-equipe-tag')){window.customElements.define('av-equipe-tag', EquipeTag);Aventus.WebComponentInstance.registerDefinition(EquipeTag);}
+
 const EquipeSelect = class EquipeSelect extends SelectData {
     static __style = ``;
     __getStatic() {
@@ -15413,14 +15528,22 @@ if(!window.customElements.get('av-modal-inventaire-update')){window.customElemen
 
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
-    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
-						return this.__watch["item"];
+    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'equipes'() {
+						return this.__watch["equipes"];
+					}
+					set 'equipes'(val) {
+						this.__watch["equipes"] = val;
+					}    get 'item'() {
+						return this.__signals["item"].value;
 					}
 					set 'item'(val) {
-						this.__watch["item"] = val;
+						this.__signals["item"].value = val;
 					}    __registerWatchesActions() {
-    this.__addWatchesActions("item");    super.__registerWatchesActions();
+    this.__addWatchesActions("equipes");    super.__registerWatchesActions();
 }
+    __registerSignalsActions() { this.__signals["item"] = null; super.__registerSignalsActions(); this.__addSignalActions("item", ((target) => {
+    target.loadEquipes();
+})); }
     static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;overflow:hidden}:host av-col .img{width:100%;max-height:250px}:host av-col .img av-img{aspect-ratio:1;width:100%;max-height:250px}:host av-col .info{background-color:rgba(0,0,0,0);padding:16px;padding-top:0}:host av-col .info .title{font-size:var(--font-size-md);margin-top:8px}:host av-col .variations{display:flex;gap:6px;margin-bottom:12px;margin-top:12px}:host av-col .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .visible{align-items:center;display:flex}:host av-col .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
     __getStatic() {
         return MaterielCard;
@@ -15496,7 +15619,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
 });templ2.addLoop({
                     anchorId: 'materielcard_6',
                     template: templ3,
-                simple:{data: "this.item.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
+                simple:{data: "this.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
                     anchorId: 'materielcard_5',
                     parts: [{once: true,
                     condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
@@ -15510,9 +15633,14 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         return "MaterielCard";
     }
     __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipes"] = []; }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["item"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item');this.__correctGetter('equipes'); }
     __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    async loadEquipes() {
+        const equipeIds = this.item.equipes.map(p => p.id_equipe);
+        this.equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
+    }
     getSrc() {
         if (this.item.image?.uri) {
             return this.item.image?.uri;
@@ -15532,7 +15660,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         return variation.nom;
     }
     __98d262679bf6afafa524060227ae1154method7(equipe) {
-        return equipe.equipe.nom;
+        return equipe.nom;
     }
     __98d262679bf6afafa524060227ae1154method1() {
         return this.item.tout_monde;
@@ -16215,6 +16343,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     async loadInventaire(id) {
         const item = this.item;
+        if (!item)
+            return;
         const inventaires = [];
         const connu = await Aventus.Process.execute(new App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController().request({ id_materiel: id }));
         if (!connu)
@@ -16224,7 +16354,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             equipes = (await EquipeRAM.getInstance().getList());
         }
         else {
-            equipes = item.equipes.map(p => p.equipe);
+            const equipeIds = item.equipes.map(p => p.id_equipe);
+            equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
         }
         equipes.sort((a, b) => a.nom.localeCompare(b.nom));
         const addInventaire = (equipe, variation) => {
@@ -16241,8 +16372,6 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 el.variation = variation;
                 el.quantite = 0;
             }
-            el.equipe = equipe;
-            el.variation = variation;
             inventaires.push(el);
         };
         for (let equipe of equipes) {
@@ -16556,8 +16685,11 @@ const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
     configure() {
         return {};
     }
-    editItem() {
-        EquipeEditModal.open(this.item);
+    async editItem() {
+        const result = await EquipeEditModal.open(this.item);
+        if (result) {
+            Aventus.Watcher.trigger("UPDATED", this.item);
+        }
     }
     async deleteItem() {
         const result = await Confirm.open({
@@ -17319,6 +17451,9 @@ const Main = class Main extends Aventus.Navigation.Router {
                 });
             }
         });
+        Aventus.Navigation.Router.configure({
+            destroyPage: true,
+        });
     }
 }
 Main.Namespace=`Inventaire`;
@@ -17512,7 +17647,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
         this.listEl.innerHTML = "";
         for (let equipe of this.equipes) {
             let el = new EquipeTag();
-            el.equipe = equipe;
+            el.equipe_id = equipe.id_equipe;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }
@@ -17526,7 +17661,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
             materielEquipe.equipe = equipe;
             this.equipes.push(materielEquipe);
             let el = new EquipeTag();
-            el.equipe = materielEquipe;
+            el.equipe_id = materielEquipe.id_equipe;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }
