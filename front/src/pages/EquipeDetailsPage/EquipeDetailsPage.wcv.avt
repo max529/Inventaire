@@ -10,12 +10,11 @@
     <div class="body">
         <div class="title">
             <span>Liste de matériel</span>
-            <!-- <label for="">Article vide</label>
-            <input type="checkbox" name="" id=""> -->
+            <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
         </div>
         <div class="list">
             for(let inventaire of this.inventaires) {
-                <av-inventaire-equipe-list-item :inventaire="inventaire" :equipe="this.item"></av-inventaire-equipe-list-item>
+                <av-inventaire-equipe-list-item :inventaire="inventaire" :equipe="this.item"  @element="listItems"></av-inventaire-equipe-list-item>
             }
         </div>
     </div>

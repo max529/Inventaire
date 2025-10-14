@@ -1,5 +1,4 @@
 import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
-import { PageFull } from "../../components/layout/PageFull/PageFull.wcl.avt";
 import { Main } from "../../Main/Main.wcl.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
 import { EquipeEditModal } from "../EquipesPage/components/EquipeEditModal/EquipeEditModal.wcl.avt";
@@ -11,8 +10,12 @@ import { Watcher } from "Aventus@Main:Aventus.package.avt";
 import { EquipeMaterielController } from "../../generated/app/Http/Controllers/Equipe/Materiel/Controller.lib.avt";
 import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
+import type { Input } from "../../components/form/Input/Input.wcl.avt";
+import type { InventaireEquipeListItem } from "./components/InventaireEquipeListItem/InventaireEquipeListItem.wcl.avt";
+import { StringTools } from "../../lib/StringTools.lib.avt";
+import { Page } from "../../components/layout/Page/Page.wcl.avt";
 
-export class EquipeDetailsPage extends PageFull implements Aventus.DefaultComponent {
+export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -30,6 +33,11 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
 
     @Watch()
     public inventaires: Inventaire[] = [];
+
+    @ViewElement()
+    protected searchEl!: Input;
+    @ViewElement()
+    protected listItems!: InventaireEquipeListItem[];
     //#endregion
 
 
@@ -137,6 +145,24 @@ export class EquipeDetailsPage extends PageFull implements Aventus.DefaultCompon
         if(result) {
             await EquipeRAM.getInstance().delete(this.item);
             Main.instance.navigate("/", { replace: true });
+        }
+    }
+
+    /**
+     * 
+     */
+    protected search() {
+        const txt = this.searchEl.value;
+        for(let item of this.listItems) {
+            if(StringTools.contains(item.inventaire.materiel.nom, txt)) {
+                item.style.display = "";
+            }
+            else if(StringTools.contains(item.inventaire.variation?.nom, txt)) {
+                item.style.display = "";
+            }
+            else {
+                item.style.display = "none";
+            }
         }
     }
 

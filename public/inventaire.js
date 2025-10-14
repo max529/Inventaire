@@ -15775,142 +15775,6 @@ App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schem
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
-const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
-    get 'materiel'() {
-						return this.__signals["materiel"].value;
-					}
-					set 'materiel'(val) {
-						this.__signals["materiel"].value = val;
-					}get 'variation'() {
-						return this.__signals["variation"].value;
-					}
-					set 'variation'(val) {
-						this.__signals["variation"].value = val;
-					}get 'equipe'() {
-						return this.__signals["equipe"].value;
-					}
-					set 'equipe'(val) {
-						this.__signals["equipe"].value = val;
-					}get 'nb'() {
-						return this.__signals["nb"].value;
-					}
-					set 'nb'(val) {
-						this.__signals["nb"].value = val;
-					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
-    __getStatic() {
-        return ModalInventaireUpdate;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalInventaireUpdate.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "inputEl",
-      "ids": [
-        "modalinventaireupdate_1"
-      ]
-    }
-  ],
-  "content": {
-    "modalinventaireupdate_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
-      "once": true
-    }
-  },
-  "bindings": [
-    {
-      "id": "modalinventaireupdate_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
-      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
-      "once": true,
-      "isCallback": true
-    }
-  ],
-  "events": [
-    {
-      "eventName": "focus",
-      "id": "modalinventaireupdate_1",
-      "fct": (e, c) => c.comp.select(e)
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "modalinventaireupdate_2",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "modalinventaireupdate_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalInventaireUpdate";
-    }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
-    configure() {
-        return {
-            title: "Mise à jour de l'inventaire"
-        };
-    }
-    save() {
-        if (typeof this.nb == 'number') {
-            this.resolve(this.nb);
-        }
-        else {
-            const nbTxt = this.nb;
-            if (nbTxt.trim() == '') {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            const nb2 = Number(nbTxt);
-            if (isNaN(nb2)) {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            this.resolve(nb2);
-        }
-    }
-    select() {
-        this.inputEl.select();
-    }
-    getTitle() {
-        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
-    }
-    postCreation() {
-        super.postCreation();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method0() {
-        return this.getTitle();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method1() {
-        return this.nb;
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
-        if (this) {
-            this.nb = v;
-        }
-    }
-}
-ModalInventaireUpdate.Namespace=`Inventaire`;
-ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
-__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
-if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
-
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
     set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'equipes'() {
@@ -16056,6 +15920,142 @@ MaterielCard.Tag=`av-materiel-card`;
 __as1(_, 'MaterielCard', MaterielCard);
 if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
 
+const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
+    get 'materiel'() {
+						return this.__signals["materiel"].value;
+					}
+					set 'materiel'(val) {
+						this.__signals["materiel"].value = val;
+					}get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalInventaireUpdate;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventaireUpdate.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventaireupdate_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventaireupdate_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventaireupdate_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
+      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventaireupdate_1",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventaireupdate_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventaireupdate_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventaireUpdate";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    save() {
+        if (typeof this.nb == 'number') {
+            this.resolve(this.nb);
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            this.resolve(nb2);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
+    }
+    postCreation() {
+        super.postCreation();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method0() {
+        return this.getTitle();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method1() {
+        return this.nb;
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventaireUpdate.Namespace=`Inventaire`;
+ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
+__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
+if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
+
 App.Http.Controllers.Equipe.GetInventaire.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
     id;
@@ -16149,7 +16149,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
     this.__addWatchesActions("historiques");    super.__registerWatchesActions();
 }
     __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["equipe"] = null;this.__signals["variation"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);flex-grow:1;min-height:0;width:100%;display:flex;flex-direction:column}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;gap:20px;padding:8px 16px}:host .content .line .quantite{flex-shrink:0;width:75px}:host .content .line .par{flex-grow:1}:host .content .line .modification{flex-shrink:0;width:200px}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}`;
+    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;flex-grow:1;min-height:0;width:100%}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;gap:20px;padding:8px 16px}:host .content .line .quantite{flex-shrink:0;width:75px}:host .content .line .par{flex-grow:1}:host .content .line .modification{flex-shrink:0;width:200px}:host .content .key{display:none;width:120px}:host .content .value{display:inline-block}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}@media screen and (max-width: 600px){:host .content .line{flex-direction:column;gap:10px}:host .content .line .quantite,:host .content .line .par,:host .content .line .modification{width:100%;display:flex}:host .content .line .quantite .key,:host .content .line .par .key,:host .content .line .modification .key{display:inline-block;flex-shrink:0}}`;
     __getStatic() {
         return ModalHistorique;
     }
@@ -16160,7 +16160,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll floating_scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16191,7 +16191,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite" _id="modalhistorique_3"></div>                <div class="par" _id="modalhistorique_4"></div>                <div class="modification">                    <span _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite">                    <span class="key">Quantité : </span>                    <span class="value" _id="modalhistorique_3"></span>                </div>                <div class="par">                    <span class="key">Modifié par : </span>                    <span class="value" _id="modalhistorique_4"></span>                </div>                <div class="modification">                    <span class="key">Modifié le : </span>                    <span class="value" _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
   "content": {
     "modalhistorique_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
@@ -16339,88 +16339,63 @@ App.Http.Controllers.Inventaire.Update.InventaireUpdateController=class Inventai
 App.Http.Controllers.Inventaire.Update.InventaireUpdateController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
 __as1(_.App.Http.Controllers.Inventaire.Update, 'InventaireUpdateController', App.Http.Controllers.Inventaire.Update.InventaireUpdateController);
 
-const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
+const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
     get 'inventaire'() {
 						return this.__watch["inventaire"];
 					}
 					set 'inventaire'(val) {
 						this.__watch["inventaire"] = val;
-					}    equipe;
+					}    materiel;
     __registerWatchesActions() {
     this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
 }
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
     __getStatic() {
-        return InventaireEquipeListItem;
+        return InventaireListItem;
     }
     __getStyle() {
         let arrStyle = super.__getStyle();
-        arrStyle.push(InventaireEquipeListItem.__style);
+        arrStyle.push(InventaireListItem.__style);
         return arrStyle;
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="line">
-    <div class="img" _id="inventaireequipelistitem_0"></div>
-    <div class="nom" _id="inventaireequipelistitem_1"></div>
-    <div class="variation" _id="inventaireequipelistitem_2"></div>
-    <div class="quantite" _id="inventaireequipelistitem_3"></div>
-    <div class="modification">
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>
-            <template _id="inventaireequipelistitem_5"></template>
-        </div>
-        <span _id="inventaireequipelistitem_7"></span>
-    </div>
-</div>` }
+        blocks: { 'default':`<div _id="inventairelistitem_0">    <div class="main">        <div class="nom">            <span class="key">Nom :</span>            <span class="value" _id="inventairelistitem_1"></span>        </div>        <div class="variation">            <span class="key">Variation : </span>            <span class="value" _id="inventairelistitem_2"></span>        </div>        <div class="quantite">            <span class="key">Quantité : </span>            <span class="value" _id="inventairelistitem_3"></span>        </div>        <div class="modification">            <div class="actions">                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            </div>        </div>    </div>    <div class="last-update" _id="inventairelistitem_6"></div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
-    "inventaireequipelistitem_0°style": {
-      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
+    "inventairelistitem_0°class": {
+      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod0())}`
+    },
+    "inventairelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
       "once": true
     },
-    "inventaireequipelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
-      "once": true
+    "inventairelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`
     },
-    "inventaireequipelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
+    "inventairelistitem_3°@HTML": {
+      "fct": (c) => `\r\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\r\n            `
     },
-    "inventaireequipelistitem_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
-      "once": true
-    },
-    "inventaireequipelistitem_7°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
+    "inventairelistitem_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
       "once": true
     }
   },
   "pressEvents": [
     {
-      "id": "inventaireequipelistitem_4",
+      "id": "inventairelistitem_4",
       "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_6">Historique</av-icon-action>
-            `);templ0.setActions({
-  "pressEvents": [
+    },
     {
-      "id": "inventaireequipelistitem_6",
+      "id": "inventairelistitem_5",
       "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
     }
   ]
-});this.__getStatic().__template.addIf({
-                    anchorId: 'inventaireequipelistitem_5',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
-                    template: templ0
-                }]
-            }); }
+}); }
     getClassName() {
-        return "InventaireEquipeListItem";
+        return "InventaireListItem";
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
@@ -16436,24 +16411,18 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         }
         return "";
     }
-    getPicture() {
-        if (this.inventaire.materiel.image.uri) {
-            return this.inventaire.materiel.image.uri;
-        }
-        return "/img/default_img.svg";
-    }
     async edit() {
         const modal = new ModalInventaireUpdate();
         modal.variation = this.inventaire.variation;
-        modal.equipe = this.equipe;
-        modal.materiel = this.inventaire.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.materiel = this.materiel;
         modal.nb = this.inventaire.quantite;
         const result = await modal.show();
         if (result) {
             const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
                 id: this.inventaire.id,
-                id_equipe: this.equipe.id,
-                id_materiel: this.inventaire.materiel.id,
+                id_equipe: this.inventaire.equipe.id,
+                id_materiel: this.materiel.id,
                 id_variation: this.inventaire.variation?.id,
                 quantite: result
             }));
@@ -16472,34 +16441,31 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     }
     async historique() {
         const modal = new ModalHistorique();
-        modal.materiel = this.inventaire.materiel;
-        modal.equipe = this.equipe;
+        modal.materiel = this.materiel;
+        modal.equipe = this.inventaire.equipe;
         modal.variation = this.inventaire.variation;
         await modal.show();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method1() {
-        return this.getPicture();
+    __a95c8f763743275e162a27eb63a3f98emethod0() {
+        return this.inventaire.id > 0 ? 'exist' : '';
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method2() {
-        return this.inventaire.materiel.nom;
+    __a95c8f763743275e162a27eb63a3f98emethod1() {
+        return this.inventaire.equipe.nom;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method3() {
+    __a95c8f763743275e162a27eb63a3f98emethod2() {
         return this.inventaire.variation?.nom;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method4() {
-        return this.inventaire.quantite;
+    __a95c8f763743275e162a27eb63a3f98emethod3() {
+        return this.inventaire.quantite ?? '-';
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method5() {
+    __a95c8f763743275e162a27eb63a3f98emethod4() {
         return this.getLastUpdate();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method0() {
-        return this.inventaire.id;
-    }
 }
-InventaireEquipeListItem.Namespace=`Inventaire`;
-InventaireEquipeListItem.Tag=`av-inventaire-equipe-list-item`;
-__as1(_, 'InventaireEquipeListItem', InventaireEquipeListItem);
-if(!window.customElements.get('av-inventaire-equipe-list-item')){window.customElements.define('av-inventaire-equipe-list-item', InventaireEquipeListItem);Aventus.WebComponentInstance.registerDefinition(InventaireEquipeListItem);}
+InventaireListItem.Namespace=`Inventaire`;
+InventaireListItem.Tag=`av-inventaire-list-item`;
+__as1(_, 'InventaireListItem', InventaireListItem);
+if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
 
 App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
     constructor(router) {
@@ -16662,181 +16628,6 @@ EquipeEditModal.Tag=`av-equipe-edit-modal`;
 __as1(_, 'EquipeEditModal', EquipeEditModal);
 if(!window.customElements.get('av-equipe-edit-modal')){window.customElements.define('av-equipe-edit-modal', EquipeEditModal);Aventus.WebComponentInstance.registerDefinition(EquipeEditModal);}
 
-const EquipeDetailsPage = class EquipeDetailsPage extends PageFull {
-    get 'item'() {
-						return this.__watch["item"];
-					}
-					set 'item'(val) {
-						this.__watch["item"] = val;
-					}get 'inventaires'() {
-						return this.__watch["inventaires"];
-					}
-					set 'inventaires'(val) {
-						this.__watch["inventaires"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("item");this.__addWatchesActions("inventaires");    super.__registerWatchesActions();
-}
-    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%;margin-top:8px}`;
-    __getStatic() {
-        return EquipeDetailsPage;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipeDetailsPage.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title" _id="equipedetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
-            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
-        </div>
-    </div>
-    <div class="body">
-        <div class="title">
-            <span>Liste de matériel</span>
-        </div>
-        <div class="list">
-            <template _id="equipedetailspage_3"></template>
-        </div>
-    </div>
-</div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "equipedetailspage_0°@HTML": {
-      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1())}`,
-      "once": true
-    }
-  },
-  "pressEvents": [
-    {
-      "id": "equipedetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
-    },
-    {
-      "id": "equipedetailspage_2",
-      "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-inventaire-equipe-list-item _id="equipedetailspage_4"></av-inventaire-equipe-list-item>
-            `);templ0.setActions({
-  "injection": [
-    {
-      "id": "equipedetailspage_4",
-      "injectionName": "inventaire",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2(c.data.inventaire),
-      "once": true
-    },
-    {
-      "id": "equipedetailspage_4",
-      "injectionName": "equipe",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3(),
-      "once": true
-    }
-  ]
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'equipedetailspage_3',
-                    template: templ0,
-                simple:{data: "this.inventaires",item:"inventaire"}}); }
-    getClassName() {
-        return "EquipeDetailsPage";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined;w["inventaires"] = []; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('item');this.__correctGetter('inventaires'); }
-    async isAllowed(state, pattern) {
-        let slugs = Main.instance.getSlugs(pattern);
-        if (!slugs || typeof slugs['id'] != "number")
-            return "/";
-        const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
-        if (!equipe)
-            return "/";
-        this.item = equipe;
-        const result = await this.loadInventaire(equipe.id);
-        if (!result) {
-            return "/";
-        }
-        return true;
-    }
-    async loadInventaire(id) {
-        const materiels = await Aventus.Process.execute(new App.Http.Controllers.Equipe.Materiel.EquipeMaterielController().request({ id_equipe: id }));
-        if (!materiels) {
-            return false;
-        }
-        const connu = await Aventus.Process.execute(new App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController().request({ id_equipe: id }));
-        if (!connu) {
-            return false;
-        }
-        materiels.sort((a, b) => a.nom.localeCompare(b.nom));
-        const inventaires = [];
-        const addInventaire = (materiel, variation) => {
-            let el;
-            if (variation) {
-                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
-            }
-            else {
-                el = connu.find(p => p.materiel.id == materiel.id);
-            }
-            if (el == undefined) {
-                el = new App.Http.Controllers.Equipe.GetInventaire.Response();
-                el.materiel = materiel;
-                el.variation = variation;
-                el.quantite = 0;
-            }
-            inventaires.push(el);
-        };
-        for (let materiel of materiels) {
-            if (materiel.variations.length > 0) {
-                for (let variation of materiel.variations) {
-                    addInventaire(materiel, variation);
-                }
-            }
-            else {
-                addInventaire(materiel);
-            }
-        }
-        this.inventaires = inventaires;
-        return true;
-    }
-    configure() {
-        return {};
-    }
-    async editItem() {
-        const result = await EquipeEditModal.open(this.item);
-        if (result) {
-            Aventus.Watcher.trigger("UPDATED", this.item);
-        }
-    }
-    async deleteItem() {
-        const result = await Confirm.open({
-            title: "Confirmation de suppression",
-            content: "Êtes-vous sûr de vouloir supprimer cette équipe?"
-        });
-        if (result) {
-            await EquipeRAM.getInstance().delete(this.item);
-            Main.instance.navigate("/", { replace: true });
-        }
-    }
-    __1235ef0c4a20ffaa552fd37f83cb4912method1() {
-        return this.item.nom;
-    }
-    __1235ef0c4a20ffaa552fd37f83cb4912method2(inventaire) {
-        return inventaire;
-    }
-    __1235ef0c4a20ffaa552fd37f83cb4912method3() {
-        return this.item;
-    }
-}
-EquipeDetailsPage.Namespace=`Inventaire`;
-EquipeDetailsPage.Tag=`av-equipe-details-page`;
-__as1(_, 'EquipeDetailsPage', EquipeDetailsPage);
-if(!window.customElements.get('av-equipe-details-page')){window.customElements.define('av-equipe-details-page', EquipeDetailsPage);Aventus.WebComponentInstance.registerDefinition(EquipeDetailsPage);}
-
 const EquipesPage = class EquipesPage extends PageFull {
     list = [];
     static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 600px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
@@ -16980,6 +16771,376 @@ EquipesPage.Tag=`av-equipes-page`;
 __as1(_, 'EquipesPage', EquipesPage);
 if(!window.customElements.get('av-equipes-page')){window.customElements.define('av-equipes-page', EquipesPage);Aventus.WebComponentInstance.registerDefinition(EquipesPage);}
 
+const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
+    get 'inventaire'() {
+						return this.__watch["inventaire"];
+					}
+					set 'inventaire'(val) {
+						this.__watch["inventaire"] = val;
+					}    equipe;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
+}
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;transform:translateY(7px);width:34px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom,:host .line:not(.exist) .main .variation,:host .line:not(.exist) .main .quantite,:host .line:not(.exist) .main .img{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite,:host .line .main .img{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .img{height:100px;width:100px;margin-top:0}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
+    __getStatic() {
+        return InventaireEquipeListItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(InventaireEquipeListItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div _id="inventaireequipelistitem_0">
+    <div class="main">
+        <div class="img" _id="inventaireequipelistitem_1"></div>
+         <div class="nom">
+            <span class="key">Nom :</span>
+            <span class="value" _id="inventaireequipelistitem_2"></span>
+        </div>
+        <div class="variation">
+            <span class="key">Variation : </span>
+            <span class="value" _id="inventaireequipelistitem_3"></span>
+        </div>
+        <div class="quantite">
+            <span class="key">Quantité : </span>
+            <span class="value" _id="inventaireequipelistitem_4"></span>
+        </div>
+        <div class="modification">
+            <div class="actions">
+                <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_5">Modifier</av-icon-action>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_6">Historique</av-icon-action>
+            </div>
+        </div>
+    </div>
+    <div class="last-update" _id="inventaireequipelistitem_7"></div>
+</div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "inventaireequipelistitem_0°class": {
+      "fct": (c) => `line ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0())}`
+    },
+    "inventaireequipelistitem_1°style": {
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
+      "once": true
+    },
+    "inventaireequipelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
+      "once": true
+    },
+    "inventaireequipelistitem_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
+    },
+    "inventaireequipelistitem_4°@HTML": {
+      "fct": (c) => `\n                ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}\n            `
+    },
+    "inventaireequipelistitem_7°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "inventaireequipelistitem_5",
+      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
+    },
+    {
+      "id": "inventaireequipelistitem_6",
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "InventaireEquipeListItem";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    getLastUpdate() {
+        if (this.inventaire.last_update) {
+            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+    getPicture() {
+        if (this.inventaire.materiel.image.uri) {
+            return this.inventaire.materiel.image.uri;
+        }
+        return "/img/default_img.svg";
+    }
+    async edit() {
+        const modal = new ModalInventaireUpdate();
+        modal.variation = this.inventaire.variation;
+        modal.equipe = this.equipe;
+        modal.materiel = this.inventaire.materiel;
+        modal.nb = this.inventaire.quantite;
+        const result = await modal.show();
+        if (result) {
+            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+                id: this.inventaire.id,
+                id_equipe: this.equipe.id,
+                id_materiel: this.inventaire.materiel.id,
+                id_variation: this.inventaire.variation?.id,
+                quantite: result
+            }));
+            if (save) {
+                this.inventaire.id = save.id;
+                this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.last_update = save.last_update;
+                this.inventaire.quantite = save.quantite;
+                Toast.add({
+                    message: "Inventaire enregistré",
+                    color: "success",
+                    closable: true
+                });
+            }
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.materiel = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.variation = this.inventaire.variation;
+        await modal.show();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method0() {
+        return this.inventaire.id > 0 ? 'exist' : '';
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+        return this.getPicture();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+        return this.inventaire.materiel.nom;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method3() {
+        return this.inventaire.variation?.nom;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method4() {
+        return this.inventaire.quantite ?? '-';
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method5() {
+        return this.getLastUpdate();
+    }
+}
+InventaireEquipeListItem.Namespace=`Inventaire`;
+InventaireEquipeListItem.Tag=`av-inventaire-equipe-list-item`;
+__as1(_, 'InventaireEquipeListItem', InventaireEquipeListItem);
+if(!window.customElements.get('av-inventaire-equipe-list-item')){window.customElements.define('av-inventaire-equipe-list-item', InventaireEquipeListItem);Aventus.WebComponentInstance.registerDefinition(InventaireEquipeListItem);}
+
+const EquipeDetailsPage = class EquipeDetailsPage extends Page {
+    get 'item'() {
+						return this.__watch["item"];
+					}
+					set 'item'(val) {
+						this.__watch["item"] = val;
+					}get 'inventaires'() {
+						return this.__watch["inventaires"];
+					}
+					set 'inventaires'(val) {
+						this.__watch["inventaires"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("item");this.__addWatchesActions("inventaires");    super.__registerWatchesActions();
+}
+    static __style = `:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .title{align-items:center;display:flex;flex-shrink:0;gap:16px;justify-content:space-between;margin-bottom:16px}:host .card .body .title av-input{max-width:300px}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;margin-top:8px;width:100%}@media screen and (max-width: 660px){:host .card .body .title{flex-wrap:wrap;width:100%}:host .card .body .title av-input{max-width:none;width:100%}}`;
+    __getStatic() {
+        return EquipeDetailsPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeDetailsPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="equipedetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
+            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <div class="title">
+            <span>Liste de matériel</span>
+            <av-input placeholder="Recherche" _id="equipedetailspage_3"></av-input>
+        </div>
+        <div class="list">
+            <template _id="equipedetailspage_4"></template>
+        </div>
+    </div>
+</div>` }
+    });
+}
+    get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="equipedetailspage_5"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "searchEl",
+      "ids": [
+        "equipedetailspage_3"
+      ]
+    }
+  ],
+  "content": {
+    "equipedetailspage_0°@HTML": {
+      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1())}`,
+      "once": true
+    }
+  },
+  "events": [
+    {
+      "eventName": "onChange",
+      "id": "equipedetailspage_3",
+      "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "equipedetailspage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
+    },
+    {
+      "id": "equipedetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <av-inventaire-equipe-list-item _id="equipedetailspage_5"></av-inventaire-equipe-list-item>
+            `);templ0.setActions({
+  "injection": [
+    {
+      "id": "equipedetailspage_5",
+      "injectionName": "inventaire",
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2(c.data.inventaire),
+      "once": true
+    },
+    {
+      "id": "equipedetailspage_5",
+      "injectionName": "equipe",
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3(),
+      "once": true
+    }
+  ]
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'equipedetailspage_4',
+                    template: templ0,
+                simple:{data: "this.inventaires",item:"inventaire"}}); }
+    getClassName() {
+        return "EquipeDetailsPage";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined;w["inventaires"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('item');this.__correctGetter('inventaires'); }
+    async isAllowed(state, pattern) {
+        let slugs = Main.instance.getSlugs(pattern);
+        if (!slugs || typeof slugs['id'] != "number")
+            return "/";
+        const equipe = await EquipeRAM.getInstance().getById(slugs['id']);
+        if (!equipe)
+            return "/";
+        this.item = equipe;
+        const result = await this.loadInventaire(equipe.id);
+        if (!result) {
+            return "/";
+        }
+        return true;
+    }
+    async loadInventaire(id) {
+        const materiels = await Aventus.Process.execute(new App.Http.Controllers.Equipe.Materiel.EquipeMaterielController().request({ id_equipe: id }));
+        if (!materiels) {
+            return false;
+        }
+        const connu = await Aventus.Process.execute(new App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController().request({ id_equipe: id }));
+        if (!connu) {
+            return false;
+        }
+        materiels.sort((a, b) => a.nom.localeCompare(b.nom));
+        const inventaires = [];
+        const addInventaire = (materiel, variation) => {
+            let el;
+            if (variation) {
+                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.materiel.id == materiel.id);
+            }
+            if (el == undefined) {
+                el = new App.Http.Controllers.Equipe.GetInventaire.Response();
+                el.materiel = materiel;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            inventaires.push(el);
+        };
+        for (let materiel of materiels) {
+            if (materiel.variations.length > 0) {
+                for (let variation of materiel.variations) {
+                    addInventaire(materiel, variation);
+                }
+            }
+            else {
+                addInventaire(materiel);
+            }
+        }
+        this.inventaires = inventaires;
+        return true;
+    }
+    configure() {
+        return {};
+    }
+    async editItem() {
+        const result = await EquipeEditModal.open(this.item);
+        if (result) {
+            Aventus.Watcher.trigger("UPDATED", this.item);
+        }
+    }
+    async deleteItem() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cette équipe?"
+        });
+        if (result) {
+            await EquipeRAM.getInstance().delete(this.item);
+            Main.instance.navigate("/", { replace: true });
+        }
+    }
+    search() {
+        const txt = this.searchEl.value;
+        for (let item of this.listItems) {
+            if (StringTools.contains(item.inventaire.materiel.nom, txt)) {
+                item.style.display = "";
+            }
+            else if (StringTools.contains(item.inventaire.variation?.nom, txt)) {
+                item.style.display = "";
+            }
+            else {
+                item.style.display = "none";
+            }
+        }
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method1() {
+        return this.item.nom;
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method2(inventaire) {
+        return inventaire;
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method3() {
+        return this.item;
+    }
+}
+EquipeDetailsPage.Namespace=`Inventaire`;
+EquipeDetailsPage.Tag=`av-equipe-details-page`;
+__as1(_, 'EquipeDetailsPage', EquipeDetailsPage);
+if(!window.customElements.get('av-equipe-details-page')){window.customElements.define('av-equipe-details-page', EquipeDetailsPage);Aventus.WebComponentInstance.registerDefinition(EquipeDetailsPage);}
+
 const MaterielPage = class MaterielPage extends PageFull {
     list = [];
     static __style = `:host{--col-gap: 16px}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{margin:16px;margin-top:0;width:calc(100% - 32px)}@media screen and (max-width: 620px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
@@ -17122,134 +17283,6 @@ MaterielPage.Namespace=`Inventaire`;
 MaterielPage.Tag=`av-materiel-page`;
 __as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
-
-const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
-    get 'inventaire'() {
-						return this.__watch["inventaire"];
-					}
-					set 'inventaire'(val) {
-						this.__watch["inventaire"] = val;
-					}    materiel;
-    __registerWatchesActions() {
-    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
-}
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
-    __getStatic() {
-        return InventaireListItem;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(InventaireListItem.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div _id="inventairelistitem_0">    <div class="main">        <div class="nom">            <span class="key">Nom :</span>            <span class="value" _id="inventairelistitem_1"></span>        </div>        <div class="variation">            <span class="key">Variation : </span>            <span class="value" _id="inventairelistitem_2"></span>        </div>        <div class="quantite">            <span class="key">Quantité : </span>            <span class="value" _id="inventairelistitem_3"></span>        </div>        <div class="modification">            <div class="actions">                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            </div>        </div>    </div>    <div class="last-update" _id="inventairelistitem_6"></div></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "inventairelistitem_0°class": {
-      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod0())}`
-    },
-    "inventairelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
-      "once": true
-    },
-    "inventairelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`
-    },
-    "inventairelistitem_3°@HTML": {
-      "fct": (c) => `\r\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\r\n            `
-    },
-    "inventairelistitem_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
-      "once": true
-    }
-  },
-  "pressEvents": [
-    {
-      "id": "inventairelistitem_4",
-      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    },
-    {
-      "id": "inventairelistitem_5",
-      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "InventaireListItem";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
-    getLastUpdate() {
-        if (this.inventaire.last_update) {
-            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-        return "";
-    }
-    async edit() {
-        const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.variation;
-        modal.equipe = this.inventaire.equipe;
-        modal.materiel = this.materiel;
-        modal.nb = this.inventaire.quantite;
-        const result = await modal.show();
-        if (result) {
-            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
-                id: this.inventaire.id,
-                id_equipe: this.inventaire.equipe.id,
-                id_materiel: this.materiel.id,
-                id_variation: this.inventaire.variation?.id,
-                quantite: result
-            }));
-            if (save) {
-                this.inventaire.id = save.id;
-                this.inventaire.last_update_by = save.last_update_by;
-                this.inventaire.last_update = save.last_update;
-                this.inventaire.quantite = save.quantite;
-                Toast.add({
-                    message: "Inventaire enregistré",
-                    color: "success",
-                    closable: true
-                });
-            }
-        }
-    }
-    async historique() {
-        const modal = new ModalHistorique();
-        modal.materiel = this.materiel;
-        modal.equipe = this.inventaire.equipe;
-        modal.variation = this.inventaire.variation;
-        await modal.show();
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod0() {
-        return this.inventaire.id > 0 ? 'exist' : '';
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod1() {
-        return this.inventaire.equipe.nom;
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod2() {
-        return this.inventaire.variation?.nom;
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod3() {
-        return this.inventaire.quantite ?? '-';
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod4() {
-        return this.getLastUpdate();
-    }
-}
-InventaireListItem.Namespace=`Inventaire`;
-InventaireListItem.Tag=`av-inventaire-list-item`;
-__as1(_, 'InventaireListItem', InventaireListItem);
-if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
 
 const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     get 'inventaires'() {

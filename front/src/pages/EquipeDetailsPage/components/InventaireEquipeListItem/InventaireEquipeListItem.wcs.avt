@@ -1,60 +1,139 @@
 :host {
 	border-top: 1px solid var(--color-base-300);
 	padding: 8px 16px;
+	position: relative;
 
 	.line {
-		align-items: center;
-		display: flex;
-		gap: 20px;
 
-		.img {
-			background-image: url('https://placeholderimage.eu/api/800/600');
-			background-position: center;
-			background-size: cover;
-			flex-shrink: 0;
-			height: 34px;
-			width: 34px;
-		}
-
-		.nom {
-			flex-grow: 1;
-			width: 33%;
-		}
-
-		.quantite {
-			flex-grow: 1;
-			width: 33%;
-		}
-
-		.variation {
-			flex-grow: 1;
-			width: 33%;
-		}
-
-		.modification {
-			align-items: flex-end;
+		.main {
+			align-items: center;
 			display: flex;
-			flex-direction: column;
-			font-size: var(--font-size-sm);
+			gap: 20px;
 
-			.actions {
+			.img {
+				background-image: url('https://placeholderimage.eu/api/800/600');
+				background-position: center;
+				background-size: cover;
+				flex-shrink: 0;
+				height: 34px;
+				transform: translateY(7px);
+				width: 34px;
+			}
+
+			.nom,
+			.variation,
+			.quantite {
+				flex-grow: 1;
+				transform: translateY(7px);
+				width: 33%;
+			}
+
+			.key {
+				display: none;
+				width: 100px;
+			}
+
+
+			.modification {
 				display: flex;
+				justify-content: flex-end;
+				width: 60px;
+
+				.actions {
+					display: flex;
+				}
+
+				av-icon-action {
+					width: fit-content;
+					// transform: translateY(57px);
+				}
 			}
 
-			av-icon-action {
-				width: fit-content;
-				// transform: translateY(57px);
-			}
+		}
 
-			span {
-				transform: translateY(5px);
-				white-space: nowrap;
-			}
+		.last-update {
+			font-size: var(--font-size-sm);
+			text-align: right;
+			transform: translateY(5px);
+			white-space: nowrap;
 		}
 	}
 
+	.line:not(.exist) {
+		.main {
+			.nom,
+			.variation,
+			.quantite,
+			.img {
+				transform: translateY(0px);
+			}
+
+			.modification {
+				.actions {
+					.historique {
+						display: none;
+					}
+				}
+			}
+		}
+
+		.last-update {
+			display: none;
+		}
+	}
 }
 
 :host(:first-child) {
 	border-top: none;
+}
+
+
+@media screen and (max-width:700px) {
+	:host {
+		padding: 16px 16px;
+
+		.line {
+			.main {
+				display: block;
+				margin-bottom: 5px;
+				padding-right: 30px;
+				width: fit-content;
+
+				.nom,
+				.variation,
+				.quantite,
+				.img {
+					flex-grow: 0;
+					margin-top: 5px;
+					transform: translateY(0px);
+					width: 100%;
+				}
+				.img {
+					height: 100px;
+					width: 100px;
+					margin-top: 0;
+				}
+
+				.key {
+					display: inline-block;
+				}
+
+				.modification {
+					position: absolute;
+					right: 10px;
+					top: 10px;
+
+					.actions {
+						flex-direction: column;
+						gap: 14px;
+					}
+				}
+			}
+
+			.last-update {
+				transform: translateY(0px);
+				white-space: wrap;
+			}
+		}
+	}
 }
