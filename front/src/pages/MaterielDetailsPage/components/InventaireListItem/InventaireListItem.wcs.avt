@@ -1,50 +1,128 @@
 :host {
 	border-top: 1px solid var(--color-base-300);
 	padding: 8px 16px;
+	position: relative;
 
 	.line {
-		align-items: center;
-		display: flex;
-		gap: 20px;
 
-		.nom {
-			flex-grow: 1;
-			width: 33%;
-		}
-		.variation {
-			flex-grow: 1;
-			width: 33%;
-		}
-
-		.quantite {
-			flex-grow: 1;
-			width: 33%;
-		}
-
-		.modification {
-			align-items: flex-end;
+		.main {
+			align-items: center;
 			display: flex;
-			flex-direction: column;
-			font-size: var(--font-size-sm);
+			gap: 20px;
 
-			.actions {
+			.nom,
+			.variation,
+			.quantite {
+				flex-grow: 1;
+				transform: translateY(7px);
+				width: 33%;
+			}
+
+			.key {
+				display:none;
+				width: 100px;
+			}
+
+
+			.modification {
 				display: flex;
-			}
+				justify-content: flex-end;
+				width: 60px;
 
-			av-icon-action {
-				width: fit-content;
-				// transform: translateY(57px);
-			}
+				.actions {
+					display: flex;
+				}
 
-			span {
-				transform: translateY(5px);
-				white-space: nowrap;
+				av-icon-action {
+					width: fit-content;
+					// transform: translateY(57px);
+				}
+
 			}
+		}
+
+		.last-update {
+			font-size: var(--font-size-sm);
+			text-align: right;
+			transform: translateY(5px);
+			white-space: nowrap;
 		}
 	}
+
+	.line:not(.exist) {
+		.main {
+			.nom {
+				transform: translateY(0px);
+			}
+
+			.variation {
+				transform: translateY(0px);
+			}
+
+			.quantite {
+				transform: translateY(0px);
+			}
+
+			.modification {
+				.actions {
+					.historique {
+						display: none;
+					}
+				}
+			}
+		}
+
+		.last-update {
+			display: none;
+		}
+	}
+
 }
 
 :host(:first-child) {
 	border-top: none;
+}
 
+@media screen and (max-width:700px) {
+	:host {
+		padding: 16px 16px;
+
+		.line {
+			.main {
+				display: block;
+				margin-bottom: 5px;
+				padding-right: 30px;
+				width: fit-content;
+
+				.nom,
+				.variation,
+				.quantite {
+					flex-grow: 0;
+					margin-top: 5px;
+					transform: translateY(0px);
+					width: 100%;
+				}
+
+				.key {
+					display: inline-block;
+				}
+
+				.modification {
+					position: absolute;
+					right: 10px;
+					top: 10px;
+
+					.actions {
+						flex-direction: column;
+						gap: 14px;
+					}
+				}
+			}
+
+			.last-update {
+				transform: translateY(0px);
+				white-space: wrap;
+			}
+		}
+	}
 }

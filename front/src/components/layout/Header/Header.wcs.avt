@@ -77,10 +77,13 @@
 				background-color: var(--color-neutral);
 				color: var(--color-neutral-content);
 			}
+
+			.item.install {
+				display: none;
+			}
 		}
 	}
 }
-
 
 @media screen and (max-width:700px) {
 	:host {
@@ -91,16 +94,6 @@
 
 			.logo-icon {
 				display: block;
-			}
-		}
-	}
-}
-
-@media screen and (max-width:500px) {
-	:host {
-		.content {
-			.logo {
-				display: none;
 			}
 
 			.menu-icon {
@@ -128,6 +121,16 @@
 					padding: 8px 16px;
 					width: 100%;
 				}
+
+				.logout {
+					justify-content: center;
+					margin-top: 10px;
+				}
+
+				.item.install {
+					display: flex;
+				}
+
 			}
 		}
 	}

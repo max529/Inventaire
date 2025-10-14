@@ -1,5 +1,7 @@
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { AuthLogoutController } from "../../../generated/app/Http/Controllers/Auth/Logout/Controller.lib.avt";
+import { PWA } from "../../../lib/Pwa.lib.avt";
+import { Platform } from "../../../lib/Platform.lib.avt";
 
 export class Header extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -15,7 +17,8 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
 
 
     //#region variables
-
+    @Watch()
+    public hasInstall?: boolean;
     //#endregion
 
 
@@ -25,7 +28,6 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
 
 
     //#region methods
-
 
     /**
      * 
@@ -47,6 +49,24 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
     protected async logout() {
         await Process.execute(new AuthLogoutController().request());
         location.reload();
+    }
+
+    /**
+     * 
+     */
+    protected async installApp() {
+        PWA.onDownloaded.add(async () => {
+            this.hasInstall = false;
+        })
+        await PWA.download();
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+
+        PWA.addOnInit(async () => {
+            this.hasInstall = Platform.device != 'pc';
+        });
     }
     //#endregion
 

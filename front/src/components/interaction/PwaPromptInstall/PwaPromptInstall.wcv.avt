@@ -1,0 +1,9 @@
+<div class="title">{{ this.options.title }}</div>
+<div class="content">
+    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en
+        plein écran</p>
+</div>
+<div class="footer">
+    <av-button @press="cancel">Annuler</av-button>
+    <av-button @press="install" color="primary" loading="{{ this.installing }}">Installer</av-button>
+</div>

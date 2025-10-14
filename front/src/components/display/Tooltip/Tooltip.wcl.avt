@@ -203,8 +203,9 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
         //     });
         // }
         // else {
-            this.parentEv.addEventListener("mouseenter", this.onMouseEnter);
-            this.parentEv.addEventListener("mouseleave", this.onMouseLeave);
+        this.parentEv.addEventListener("mouseenter", this.onMouseEnter);
+        this.parentEv.addEventListener("mouseleave", this.onMouseLeave);
+        this.parentEv.addEventListener("click", this.onMouseLeave);
         // }
         this.addEventListener("transitionend", this.onTransitionEnd);
     }
@@ -226,6 +227,7 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
         if(!this.parentEv) return;
         this.parentEv.removeEventListener("mouseenter", this.onMouseEnter);
         this.parentEv.removeEventListener("mouseleave", this.onMouseLeave);
+        this.parentEv.removeEventListener("click", this.onMouseLeave);
     }
     //#endregion
 

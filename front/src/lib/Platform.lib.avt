@@ -1,0 +1,57 @@
+
+
+export type DeviceType = "pc" | "tablet" | "mobile";
+
+export class Platform {
+
+    public static readonly onScreenChange: Aventus.Callback<(type: DeviceType) => void> = new Aventus.Callback();
+
+    public static init() {
+        let currentDevice = this.device;
+        let screenObserver = new Aventus.ResizeObserver(() => {
+            let newDevice = this.device;
+            if(currentDevice != newDevice) {
+                currentDevice = newDevice;
+                this.onScreenChange.trigger(newDevice);
+            }
+        });
+        screenObserver.observe(document.body);
+    }
+
+    public static onScreenChangeAndRun(cb: (type: DeviceType) => void) {
+        this.onScreenChange.add(cb);
+        cb(this.device);
+    }
+
+    public static get device(): DeviceType {
+        if(document.body.offsetWidth > 1224) {
+            return "pc";
+        }
+        else if(document.body.offsetWidth > 768) {
+            return "tablet";
+        }
+        return "mobile";
+    }
+
+    public static get isStandalone(): boolean {
+        if("standalone" in window.navigator && window.navigator.standalone) {
+            return true;
+        }
+        else if(window.matchMedia('(display-mode: standalone)').matches) {
+            return true;
+        }
+        return false;
+    }
+
+    public static get isiOS(): boolean {
+        let test1 = /iphone|ipad|ipod/.test(
+            window.navigator.userAgent.toLowerCase()
+        );
+        let test2 = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+        return test1 || test2;
+    }
+
+    public static getRatio(element: HTMLElement): string {
+        return element.offsetWidth + " / " + element.offsetHeight;
+    }
+}

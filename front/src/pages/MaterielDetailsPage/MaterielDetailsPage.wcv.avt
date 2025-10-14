@@ -39,11 +39,12 @@ if(this.form.item?.id) {
     <div class="card by-equipe">
         <div class="header">
             <div class="title">Liste dans les équipes</div>
+            <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
         </div>
         <div class="body">
             <div class="list">
                 for(let inventaire of this.inventaires) {
-                    <av-inventaire-list-item :inventaire="inventaire" :materiel="this.item"></av-inventaire-list-item>
+                    <av-inventaire-list-item :inventaire="inventaire" :materiel="this.item" @element="listItems"></av-inventaire-list-item>
                 }
             </div>
         </div>

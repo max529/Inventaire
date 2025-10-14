@@ -11,6 +11,9 @@ import { HttpRequest, VoidWithError } from "Aventus@Main:Aventus.package.avt";
 import { Form } from "Aventus@UI:Aventus.Form.package.avt";
 import { ToastManager } from "Aventus@UI:Aventus.Toast.package.avt";
 import { Toast } from "../components/interaction/Toast/Toast.wcl.avt";
+import { PWA } from "../lib/Pwa.lib.avt";
+import { Platform } from "../lib/Platform.lib.avt";
+import { PwaPromptInstall } from "../components/interaction/PwaPromptInstall/PwaPromptInstall.wcl.avt";
 
 export class Main extends Router implements Aventus.DefaultComponent {
 
@@ -49,6 +52,18 @@ export class Main extends Router implements Aventus.DefaultComponent {
     public override getSlugs(pattern?: string) {
         if(!pattern) return super.getSlugs();
         return this.stateManager.getStateSlugs(pattern);
+    }
+
+    protected addPWA() {
+        PWA.addOnInit(async () => {
+            if(Platform.device != "pc") {
+                if(localStorage.getItem("pwa_ask_install") == null) {
+                    localStorage.setItem("pwa_ask_install", "done");
+                    const p = new PwaPromptInstall();
+                    p.show();
+                }
+            }
+        });
     }
 
     protected override postCreation(): void {
@@ -116,6 +131,8 @@ export class Main extends Router implements Aventus.DefaultComponent {
         Router.configure({
             destroyPage: true,
         })
+
+        this.addPWA();
     }
 
     //#endregion

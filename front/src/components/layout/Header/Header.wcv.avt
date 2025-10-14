@@ -12,7 +12,10 @@
         <av-link class="item" to="/" active_pattern="/equipes/*|/" @click="closeMenu">Equipe</av-link>
         <av-link class="item" to="/materiel" active_pattern="/materiel*" @click="closeMenu">Matériel</av-link>
         <av-link class="item" to="/utilisateurs" @click="closeMenu">Utilisateur</av-link>
-        <div class="item">
+        if(this.hasInstall) {
+            <div class="item install" @press="installApp">Installer l'application</div>
+        }
+        <div class="item logout">
             <mi-icon icon="power_settings_new" @press="logout"></mi-icon>
         </div>
     </div>

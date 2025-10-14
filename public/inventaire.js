@@ -43,6 +43,24 @@ var HttpErrorCode;
 })(HttpErrorCode || (HttpErrorCode = {}));
 __as1(_, 'HttpErrorCode', HttpErrorCode);
 
+var HttpMethod;
+(function (HttpMethod) {
+    HttpMethod["GET"] = "GET";
+    HttpMethod["POST"] = "POST";
+    HttpMethod["DELETE"] = "DELETE";
+    HttpMethod["PUT"] = "PUT";
+    HttpMethod["OPTION"] = "OPTION";
+})(HttpMethod || (HttpMethod = {}));
+__as1(_, 'HttpMethod', HttpMethod);
+
+var RamErrorCode;
+(function (RamErrorCode) {
+    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
+    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
+    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
+})(RamErrorCode || (RamErrorCode = {}));
+__as1(_, 'RamErrorCode', RamErrorCode);
+
 let DateConverter=class DateConverter {
     static __converter = new DateConverter();
     static get converter() {
@@ -66,24 +84,6 @@ let DateConverter=class DateConverter {
 }
 DateConverter.Namespace=`Aventus`;
 __as1(_, 'DateConverter', DateConverter);
-
-var HttpMethod;
-(function (HttpMethod) {
-    HttpMethod["GET"] = "GET";
-    HttpMethod["POST"] = "POST";
-    HttpMethod["DELETE"] = "DELETE";
-    HttpMethod["PUT"] = "PUT";
-    HttpMethod["OPTION"] = "OPTION";
-})(HttpMethod || (HttpMethod = {}));
-__as1(_, 'HttpMethod', HttpMethod);
-
-var RamErrorCode;
-(function (RamErrorCode) {
-    RamErrorCode[RamErrorCode["unknow"] = 0] = "unknow";
-    RamErrorCode[RamErrorCode["noId"] = 1] = "noId";
-    RamErrorCode[RamErrorCode["noItemInsideRam"] = 2] = "noItemInsideRam";
-})(RamErrorCode || (RamErrorCode = {}));
-__as1(_, 'RamErrorCode', RamErrorCode);
 
 let ActionGuard=class ActionGuard {
     /**
@@ -5978,6 +5978,271 @@ let DragAndDrop=class DragAndDrop {
 DragAndDrop.Namespace=`Aventus`;
 __as1(_, 'DragAndDrop', DragAndDrop);
 
+let ConverterTransform=class ConverterTransform {
+    transform(data) {
+        return this.transformLoop(data);
+    }
+    createInstance(data) {
+        if (data.$type) {
+            let cst = Converter.info.get(data.$type);
+            if (cst) {
+                return new cst();
+            }
+        }
+        return undefined;
+    }
+    beforeTransformObject(obj) {
+    }
+    afterTransformObject(obj) {
+    }
+    transformLoop(data) {
+        if (data === null) {
+            return data;
+        }
+        if (Array.isArray(data)) {
+            let result = [];
+            for (let element of data) {
+                result.push(this.transformLoop(element));
+            }
+            return result;
+        }
+        if (data instanceof Date) {
+            return data;
+        }
+        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
+            let objTemp = this.createInstance(data);
+            if (objTemp) {
+                if (objTemp instanceof Map) {
+                    if (data.values) {
+                        for (const keyValue of data.values) {
+                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                        }
+                    }
+                    return objTemp;
+                }
+                let obj = objTemp;
+                this.beforeTransformObject(obj);
+                if (obj.fromJSON) {
+                    obj = obj.fromJSON(data);
+                }
+                else {
+                    obj = Json.classFromJson(obj, data, {
+                        transformValue: (key, value) => {
+                            if (obj[key] instanceof Date) {
+                                return value ? new Date(value) : null;
+                            }
+                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
+                                return value ? DateConverter.converter.fromString(value) : null;
+                            }
+                            else if (obj[key] instanceof Map) {
+                                let map = new Map();
+                                if ("$type" in value && value['$type'] == "Aventus.Map") {
+                                    value = value.values;
+                                }
+                                for (const keyValue of value) {
+                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                                }
+                                return map;
+                            }
+                            else if (obj instanceof Data) {
+                                let cst = obj.constructor;
+                                if (cst.$schema[key] == 'boolean') {
+                                    return value ? true : false;
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'Date') {
+                                    return value ? new Date(value) : null;
+                                }
+                            }
+                            return this.transformLoop(value);
+                        }
+                    });
+                }
+                this.afterTransformObject(obj);
+                return obj;
+            }
+            let result = {};
+            for (let key in data) {
+                result[key] = this.transformLoop(data[key]);
+            }
+            return result;
+        }
+        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
+            return new Date(data);
+        }
+        return data;
+    }
+    copyValuesClass(target, src, options) {
+        const realOptions = {
+            isValidKey: options?.isValidKey ?? (() => true),
+            replaceKey: options?.replaceKey ?? ((key) => key),
+            transformValue: options?.transformValue ?? ((key, value) => value),
+        };
+        this.__classCopyValues(target, src, realOptions);
+    }
+    __classCopyValues(target, src, options) {
+        let props = Object.getOwnPropertyNames(target);
+        for (let prop of props) {
+            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
+            if (propInfo?.writable) {
+                if (options.isValidKey(prop))
+                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+            }
+        }
+        let cstTemp = target.constructor;
+        while (cstTemp.prototype && cstTemp != Object.prototype) {
+            props = Object.getOwnPropertyNames(cstTemp.prototype);
+            for (let prop of props) {
+                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
+                if (propInfo?.set && propInfo.get) {
+                    if (options.isValidKey(prop))
+                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
+                }
+            }
+            cstTemp = Object.getPrototypeOf(cstTemp);
+        }
+    }
+}
+ConverterTransform.Namespace=`Aventus`;
+__as1(_, 'ConverterTransform', ConverterTransform);
+
+let Converter=class Converter {
+    /**
+    * Map storing information about registered types.
+    */
+    static info = new Map([["Aventus.Map", Map]]);
+    /**
+    * Map storing schemas for registered types.
+    */
+    static schema = new Map();
+    /**
+     * Internal converter instance.
+     */
+    static __converter = new ConverterTransform();
+    /**
+     * Getter for the internal converter instance.
+     */
+    static get converterTransform() {
+        return this.__converter;
+    }
+    /**
+    * Sets the converter instance.
+    * @param converter The converter instance to set.
+    */
+    static setConverter(converter) {
+        this.__converter = converter;
+    }
+    /**
+    * Registers a unique string type for any class.
+    * @param $type The unique string type identifier.
+    * @param cst The constructor function for the class.
+    * @param schema Optional schema for the registered type.
+    */
+    static register($type, cst, schema) {
+        this.info.set($type, cst);
+        if (schema) {
+            this.schema.set($type, schema);
+        }
+    }
+    /**
+     * Transforms the provided data using the current converter instance.
+     * @template T
+     * @param {*} data The data to transform.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
+     * @returns {T} Returns the transformed data.
+     */
+    static transform(data, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.transform(data);
+    }
+    /**
+     * Copies values from one class instance to another using the current converter instance.
+     * @template T
+     * @param {T} to The destination class instance to copy values into.
+     * @param {T} from The source class instance to copy values from.
+     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
+     * @returns {T} Returns the destination class instance with copied values.
+     */
+    static copyValuesClass(to, from, options, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.copyValuesClass(to, from, options);
+    }
+}
+Converter.Namespace=`Aventus`;
+__as1(_, 'Converter', Converter);
+
+let clone=function clone(item) {
+    return Converter.transform(JSON.parse(JSON.stringify(item)));
+}
+__as1(_, 'clone', clone);
+
+let RamManager=class RamManager {
+    static _allInit = true;
+    static get allInit() { return this._allInit; }
+    ;
+    static info = new Map([]);
+    static rams = [];
+    static registerRAM(ram) {
+        this._allInit = false;
+        if (!this.rams.includes(ram)) {
+            this.rams.push(ram);
+        }
+    }
+    static check() {
+        if (this._allInit) {
+            this._allInit = true;
+            for (let ramCst of this.rams) {
+                const ram = Instance.get(ramCst);
+                for (let type of ram.ramForTypes()) {
+                    this.info.set(type, ram);
+                }
+            }
+            for (let ramCst of this.rams) {
+                const ram = Instance.get(ramCst);
+                const mapping = {};
+                for (let type of ram.ramForTypes()) {
+                    if ('$schema' in type) {
+                        const schema = type.$schema;
+                        for (let key in schema) {
+                            if (mapping[key])
+                                continue;
+                            let schemaType = schema[key];
+                            let asArray = false;
+                            if (schemaType.endsWith("[]")) {
+                                asArray = true;
+                                schemaType = schemaType.slice(0, -2);
+                            }
+                            const schemaInfo = Converter.info.get(schemaType);
+                            if (schemaInfo) {
+                                const ramLink = this.info.get(schemaInfo);
+                                if (ramLink) {
+                                    mapping[key] = {
+                                        ram: ramLink,
+                                        asArray
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                ram.ramMapping = mapping;
+            }
+        }
+    }
+}
+RamManager.Namespace=`Aventus`;
+__as1(_, 'RamManager', RamManager);
+
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
@@ -5994,6 +6259,7 @@ ResultRamWithError.Namespace=`Aventus`;
 __as1(_, 'ResultRamWithError', ResultRamWithError);
 
 let GenericRam=class GenericRam {
+    static info = new Map([]);
     /**
      * The current namespace
      */
@@ -6014,10 +6280,12 @@ let GenericRam=class GenericRam {
      */
     records = new Map();
     actionGuard = new ActionGuard();
+    ramMapping = {};
     constructor() {
         if (this.constructor == GenericRam) {
             throw "can't instanciate an abstract class";
         }
+        RamManager.check();
         this.getIdWithError = this.getIdWithError.bind(this);
         this.getId = this.getId.bind(this);
         this.save = this.save.bind(this);
@@ -6191,6 +6459,12 @@ let GenericRam=class GenericRam {
         };
     }
     /**
+     * Define all the types you ram is capable of
+     */
+    ramForTypes() {
+        return [this.getTypeForData({})];
+    }
+    /**
      * Transform the object into the object stored inside Ram
      */
     getObjectForRam(objJson) {
@@ -6198,6 +6472,47 @@ let GenericRam=class GenericRam {
         let item = new T();
         this.mergeObject(item, objJson);
         return item;
+    }
+    linkFct = new Map();
+    linkInfo = {};
+    linkRamItem(item) {
+        for (let key in this.ramMapping) {
+            this.linkRamItemByKey(item, key);
+        }
+    }
+    linkRamItemByKey(item, key) {
+        const mapping = this.ramMapping[key];
+        if (key in item) {
+            if (mapping.asArray) {
+                if (Array.isArray(item[key])) {
+                }
+                else {
+                    console.error(key + " in type " + item + " must be an array");
+                }
+            }
+            else {
+                const id = mapping.ram.getId(item[key]);
+                if (!this.linkFct.has(mapping.ram)) {
+                    const fcts = {
+                        onCreated: (item) => {
+                        },
+                        onUpdated: (item) => {
+                        },
+                        onDeleted: (item) => {
+                        },
+                    };
+                    this.linkFct.set(mapping.ram, fcts);
+                    mapping.ram.onCreated(fcts.onCreated);
+                    mapping.ram.onUpdated(fcts.onUpdated);
+                    mapping.ram.onDeleted(fcts.onDeleted);
+                }
+                if (!this.linkInfo[key])
+                    this.linkInfo[key] = {};
+                if (!this.linkInfo[key][id])
+                    this.linkInfo[key][id] = [];
+                this.linkInfo[key][id].push(item);
+            }
+        }
     }
     /**
      * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
@@ -6211,8 +6526,10 @@ let GenericRam=class GenericRam {
                 if (this.records.has(id)) {
                     let uniqueRecord = this.records.get(id);
                     await this.beforeRecordSet(uniqueRecord);
+                    // this.unlinkRamItem(uniqueRecord);
                     this.mergeObject(uniqueRecord, item);
                     await this.afterRecordSet(uniqueRecord);
+                    this.linkRamItem(uniqueRecord);
                     resultTemp = 'updated';
                 }
                 else {
@@ -6220,6 +6537,7 @@ let GenericRam=class GenericRam {
                     await this.beforeRecordSet(realObject);
                     this.records.set(id, realObject);
                     await this.afterRecordSet(realObject);
+                    this.linkRamItem(realObject);
                     resultTemp = 'created';
                 }
                 result.result = this.records.get(id);
@@ -6875,214 +7193,6 @@ let HttpError=class HttpError extends GenericError {
 HttpError.Namespace=`Aventus`;
 __as1(_, 'HttpError', HttpError);
 
-let ConverterTransform=class ConverterTransform {
-    transform(data) {
-        return this.transformLoop(data);
-    }
-    createInstance(data) {
-        if (data.$type) {
-            let cst = Converter.info.get(data.$type);
-            if (cst) {
-                return new cst();
-            }
-        }
-        return undefined;
-    }
-    beforeTransformObject(obj) {
-    }
-    afterTransformObject(obj) {
-    }
-    transformLoop(data) {
-        if (data === null) {
-            return data;
-        }
-        if (Array.isArray(data)) {
-            let result = [];
-            for (let element of data) {
-                result.push(this.transformLoop(element));
-            }
-            return result;
-        }
-        if (data instanceof Date) {
-            return data;
-        }
-        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
-            let objTemp = this.createInstance(data);
-            if (objTemp) {
-                if (objTemp instanceof Map) {
-                    if (data.values) {
-                        for (const keyValue of data.values) {
-                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                        }
-                    }
-                    return objTemp;
-                }
-                let obj = objTemp;
-                this.beforeTransformObject(obj);
-                if (obj.fromJSON) {
-                    obj = obj.fromJSON(data);
-                }
-                else {
-                    obj = Json.classFromJson(obj, data, {
-                        transformValue: (key, value) => {
-                            if (obj[key] instanceof Date) {
-                                return value ? new Date(value) : null;
-                            }
-                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
-                                return value ? DateConverter.converter.fromString(value) : null;
-                            }
-                            else if (obj[key] instanceof Map) {
-                                let map = new Map();
-                                if ("$type" in value && value['$type'] == "Aventus.Map") {
-                                    value = value.values;
-                                }
-                                for (const keyValue of value) {
-                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                                }
-                                return map;
-                            }
-                            else if (obj instanceof Data) {
-                                let cst = obj.constructor;
-                                if (cst.$schema[key] == 'boolean') {
-                                    return value ? true : false;
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'Date') {
-                                    return value ? new Date(value) : null;
-                                }
-                            }
-                            return this.transformLoop(value);
-                        }
-                    });
-                }
-                this.afterTransformObject(obj);
-                return obj;
-            }
-            let result = {};
-            for (let key in data) {
-                result[key] = this.transformLoop(data[key]);
-            }
-            return result;
-        }
-        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
-            return new Date(data);
-        }
-        return data;
-    }
-    copyValuesClass(target, src, options) {
-        const realOptions = {
-            isValidKey: options?.isValidKey ?? (() => true),
-            replaceKey: options?.replaceKey ?? ((key) => key),
-            transformValue: options?.transformValue ?? ((key, value) => value),
-        };
-        this.__classCopyValues(target, src, realOptions);
-    }
-    __classCopyValues(target, src, options) {
-        let props = Object.getOwnPropertyNames(target);
-        for (let prop of props) {
-            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
-            if (propInfo?.writable) {
-                if (options.isValidKey(prop))
-                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-            }
-        }
-        let cstTemp = target.constructor;
-        while (cstTemp.prototype && cstTemp != Object.prototype) {
-            props = Object.getOwnPropertyNames(cstTemp.prototype);
-            for (let prop of props) {
-                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
-                if (propInfo?.set && propInfo.get) {
-                    if (options.isValidKey(prop))
-                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-                }
-            }
-            cstTemp = Object.getPrototypeOf(cstTemp);
-        }
-    }
-}
-ConverterTransform.Namespace=`Aventus`;
-__as1(_, 'ConverterTransform', ConverterTransform);
-
-let Converter=class Converter {
-    /**
-    * Map storing information about registered types.
-    */
-    static info = new Map([["Aventus.Map", Map]]);
-    /**
-    * Map storing schemas for registered types.
-    */
-    static schema = new Map();
-    /**
-     * Internal converter instance.
-     */
-    static __converter = new ConverterTransform();
-    /**
-     * Getter for the internal converter instance.
-     */
-    static get converterTransform() {
-        return this.__converter;
-    }
-    /**
-    * Sets the converter instance.
-    * @param converter The converter instance to set.
-    */
-    static setConverter(converter) {
-        this.__converter = converter;
-    }
-    /**
-    * Registers a unique string type for any class.
-    * @param $type The unique string type identifier.
-    * @param cst The constructor function for the class.
-    * @param schema Optional schema for the registered type.
-    */
-    static register($type, cst, schema) {
-        this.info.set($type, cst);
-        if (schema) {
-            this.schema.set($type, schema);
-        }
-    }
-    /**
-     * Transforms the provided data using the current converter instance.
-     * @template T
-     * @param {*} data The data to transform.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
-     * @returns {T} Returns the transformed data.
-     */
-    static transform(data, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.transform(data);
-    }
-    /**
-     * Copies values from one class instance to another using the current converter instance.
-     * @template T
-     * @param {T} to The destination class instance to copy values into.
-     * @param {T} from The source class instance to copy values from.
-     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
-     * @returns {T} Returns the destination class instance with copied values.
-     */
-    static copyValuesClass(to, from, options, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.copyValuesClass(to, from, options);
-    }
-}
-Converter.Namespace=`Aventus`;
-__as1(_, 'Converter', Converter);
-
-let clone=function clone(item) {
-    return Converter.transform(JSON.parse(JSON.stringify(item)));
-}
-__as1(_, 'clone', clone);
-
 let HttpRequest=class HttpRequest {
     static options;
     static configure(options) {
@@ -7198,13 +7308,13 @@ let HttpRequest=class HttpRequest {
             }
         }
         if (this.methodSpoofing) {
-            if (this.request.method?.toUpperCase() == Aventus.HttpMethod.PUT) {
+            if (this.request.method?.toLowerCase() == Aventus.HttpMethod.PUT) {
                 if (this.request.body instanceof FormData) {
                     this.request.body.append("_method", Aventus.HttpMethod.PUT);
                     this.request.method = Aventus.HttpMethod.POST;
                 }
             }
-            else if (this.request.method?.toUpperCase() == Aventus.HttpMethod.DELETE) {
+            else if (this.request.method?.toLowerCase() == Aventus.HttpMethod.DELETE) {
                 if (this.request.body instanceof FormData) {
                     this.request.body.append("_method", Aventus.HttpMethod.DELETE);
                     this.request.method = Aventus.HttpMethod.POST;
@@ -7688,6 +7798,7 @@ let GenericRamHttp=class GenericRamHttp {
     getAllDone = false;
     getByIdDone = [];
     hasDetails;
+    ramMapping = {};
     constructor() {
         if (this.constructor == Aventus.GenericRam) {
             throw "can't instanciate an abstract class";
@@ -7733,6 +7844,12 @@ let GenericRamHttp=class GenericRamHttp {
         this.deleteWithError = this.deleteWithError.bind(this);
         this.deleteById = this.deleteById.bind(this);
         this.deleteByIdWithError = this.deleteByIdWithError.bind(this);
+    }
+    /**
+    * Define all the types you ram is capable of
+    */
+    ramForTypes() {
+        return [this.getTypeForData({})];
     }
     /**
      * Get item id
@@ -12363,7 +12480,12 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-link _id="equipeitem_0">    <div class="name" _id="equipeitem_1"></div>    <div class="actions">        <mi-icon icon="chevron_right"></mi-icon>    </div></av-link>` }
+        blocks: { 'default':`<av-link _id="equipeitem_0">
+    <div class="name" _id="equipeitem_1"></div>
+    <div class="actions">
+        <mi-icon icon="chevron_right"></mi-icon>
+    </div>
+</av-link>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12496,7 +12618,9 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
+        blocks: { 'default':`<div class="content">
+    <slot></slot>
+</div>` }
     });
 }
     getClassName() {
@@ -12525,7 +12649,11 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll">    <div class="content">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll">
+    <div class="content">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -12534,6 +12662,79 @@ const Page = class Page extends Aventus.Navigation.Page {
 }
 Page.Namespace=`Inventaire`;
 __as1(_, 'Page', Page);
+
+const PwaPromptIos = class PwaPromptIos extends Aventus.WebComponent {
+    get 'visible'() { return this.getBoolAttr('visible') }
+    set 'visible'(val) { this.setBoolAttr('visible', val) }    static get isStandalone() {
+        if ("standalone" in window.navigator && window.navigator.standalone) {
+            return true;
+        }
+        return false;
+    }
+    static get isiOS() {
+        let test1 = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        let test2 = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+        return test1 || test2;
+    }
+    static get isAvailable() {
+        return this.isiOS && !this.isStandalone;
+    }
+    static __style = `:host .noScroll{overflow:hidden}:host .pwaPromptOverlay{background-color:rgba(0,0,0,.8);left:0;min-height:100vh;min-height:-webkit-fill-available;opacity:0;pointer-events:none;position:fixed;top:0;touch-action:none;transition:opacity .2s ease-in;visibility:hidden;width:100vw;z-index:999999}:host .pwaPromptOverlay.modern{background:rgba(10,10,10,.5);color:rgba(235,235,245,.6)}:host .pwaPrompt{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);background-color:rgba(250,250,250,.8);border-radius:var(--radius-box);bottom:0;color:#000;filter:brightness(1.1);left:0;margin:0 8px 10px;overflow:hidden;pointer-events:none;position:fixed;touch-action:none;transform:translateY(calc(100% + 10px));transition:transform .4s cubic-bezier(0.4, 0.24, 0.3, 1);width:calc(100vw - 16px);z-index:999999}:host .pwaPrompt.modern{background:rgba(65,65,65,.7);filter:brightness(1.1)}:host .pwaPromptHeader{align-items:center;border-bottom:1px solid rgba(0,0,0,.1);border-left:0px;border-right:0px;border-top:0px;border-width:.5px;display:flex;flex-flow:row nowrap;justify-content:space-between;padding:13px 16px}:host .modern .pwaPromptHeader{border-color:rgba(140,140,140,.7)}:host .pwaPromptHeader .pwaPromptTitle{color:#333;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:18px;font-weight:500;line-height:1.125;margin:0;padding:0}:host .modern .pwaPromptHeader .pwaPromptTitle{color:#fff}:host .pwaPromptHeader .pwaPromptCancel{background:rgba(0,0,0,0);border:0;color:#2d7cf6;font-size:16px;margin:0;padding:0}:host .modern .pwaPromptHeader .pwaPromptCancel{color:#0984ff}:host .pwaPromptBody{display:flex;width:100%}:host .pwaPromptBody .pwaPromptDescription{border-bottom:1px solid rgba(0,0,0,.1);border-left:0px;border-right:0px;border-top:0px;border-width:.5px;color:inherit;margin:0 16px;padding:16px;width:100%}:host .modern .pwaPromptBody .pwaPromptDescription{border-color:rgba(140,140,140,.7)}:host .pwaPromptCopy{color:#7b7b7a;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:13px;line-height:17px;margin:0;padding:0}:host .pwaPromptCopy.bold{font-weight:600}:host .modern .pwaPromptCopy{border-color:rgba(235,235,245,.6);color:rgba(235,235,245,.6)}:host .pwaPromptInstruction{color:inherit;margin:0 16px;padding:16px}:host .pwaPromptInstruction .pwaPromptInstructionStep{align-items:center;display:flex;flex-flow:row nowrap;justify-content:flex-start;margin-bottom:16px;text-align:left}:host .pwaPromptInstruction .pwaPromptInstructionStep:last-of-type{margin-bottom:0}:host .pwaPromptInstruction .pwaPromptShareIcon,:host .pwaPromptInstruction .pwaPromptHomeIcon{flex:0 0 auto;height:30px;margin-right:32px;width:25px}:host .pwaPromptInstruction .pwaPromptHomeIcon{color:#2d7cf6}:host .modern .pwaPromptInstruction .pwaPromptHomeIcon{color:#fff;fill:#fff}:host .pwaPromptInstruction .pwaPromptShareIcon{color:#2d7cf6;fill:#2d7cf6}:host .modern .pwaPromptInstruction .pwaPromptShareIcon{color:#0984ff;fill:#0984ff}:host([visible]) .pwaPromptOverlay{display:block;opacity:1;pointer-events:initial;touch-action:none;visibility:visible}:host([visible]) .pwaPrompt{display:block;pointer-events:initial;touch-action:none;transform:translateY(0)}`;
+    __getStatic() {
+        return PwaPromptIos;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(PwaPromptIos.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0"></div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">    <div class="pwaPromptHeader iOSPWA-header">        <p class="pwaPromptTitle iOSPWA-title">            Ajouter à la page d'accueil        </p>        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">            Fermer        </button>    </div>    <div class="pwaPromptBody iOSPWA-body">        <div class="pwaPromptDescription iOSPWA-description">            <p class="pwaPromptCopy iOSPWA-description-copy">                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran            </p>        </div>    </div>    <div class="pwaPromptInstruction iOSPWA-steps">        <div class="pwaPromptInstructionStep iOSPWA-step1">            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step1-copy">                1) Appuyez sur le bouton "Partager" dans la barre de menu.            </p>        </div>        <div class="pwaPromptInstructionStep iOSPWA-step2">            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step2-copy">                2) Appuyez sur "Ajouter à l'écran d'accueil".            </p>        </div>    </div></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "overlay",
+      "ids": [
+        "pwapromptios_0"
+      ]
+    },
+    {
+      "name": "prompt",
+      "ids": [
+        "pwapromptios_1"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "pwapromptios_2",
+      "onPress": (e, pressInstance, c) => { c.comp.close(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "PwaPromptIos";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible'); }
+    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    close() {
+        this.addEventListener("transitionend", () => {
+            this.remove();
+        });
+        this.visible = false;
+    }
+    postCreation() {
+        this.visible = true;
+    }
+}
+PwaPromptIos.Namespace=`Inventaire`;
+PwaPromptIos.Tag=`av-pwa-prompt-ios`;
+__as1(_, 'PwaPromptIos', PwaPromptIos);
+if(!window.customElements.get('av-pwa-prompt-ios')){window.customElements.define('av-pwa-prompt-ios', PwaPromptIos);Aventus.WebComponentInstance.registerDefinition(PwaPromptIos);}
 
 App.Http.Controllers.Auth.Logout.AuthLogoutController=class AuthLogoutController extends Aventus.HttpRoute {
     constructor(router) {
@@ -12639,7 +12840,10 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
+    <av-button _id="confirm_2"></av-button>
+    <av-button color="primary" _id="confirm_3"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12832,7 +13036,15 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
+    <div class="preview" _id="inputimage_1">
+        <av-img _id="inputimage_2"></av-img>
+        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
+    </div>
+    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
+</div><div class="errors">
+    <template _id="inputimage_5"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12877,10 +13089,14 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+        <template _id="inputimage_6"></template>
+    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+            <div _id="inputimage_7"></div>
+        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -13089,7 +13305,23 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="toast-content">
+    <div class="toast-flex">
+        <div class="toast-icon-wrapper">
+            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
+        </div>
+        <div class="toast-message-wrapper">
+            <template _id="toast_1"></template>
+            <template _id="toast_3"></template>
+        </div>
+        <div class="toast-close-wrapper">
+            <button class="toast-close-button" _id="toast_5">
+                <span class="sr-only">Close</span>
+                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
+            </button>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13106,7 +13338,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <p class="toast-title" _id="toast_2"></p>
+            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13119,7 +13353,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                <p class="toast-message" _id="toast_4"></p>
+            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13244,7 +13480,13 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
+    <slot name="before"></slot>
+    <input _id="input_1" />
+    <slot name="after"></slot>
+</div><div class="errors">
+    <template _id="input_2"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13305,7 +13547,9 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="input_3"></div>
+    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13380,7 +13624,12 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
+    <av-input label="Nom de la variation" _id="modaltag_1"></av-input>
+</div><div class="footer">
+    <av-button _id="modaltag_2">Annuler</av-button>
+    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13470,7 +13719,11 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="variationtag_0"></span>
+    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
+    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13540,7 +13793,8 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0">
+</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13621,7 +13875,9 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">
+    <div class="loader"></div>
+</div>` }
     });
 }
     getClassName() {
@@ -13848,6 +14104,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
         // else {
         this.parentEv.addEventListener("mouseenter", this.onMouseEnter);
         this.parentEv.addEventListener("mouseleave", this.onMouseLeave);
+        this.parentEv.addEventListener("click", this.onMouseLeave);
         // }
         this.addEventListener("transitionend", this.onTransitionEnd);
     }
@@ -13869,6 +14126,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
             return;
         this.parentEv.removeEventListener("mouseenter", this.onMouseEnter);
         this.parentEv.removeEventListener("mouseleave", this.onMouseLeave);
+        this.parentEv.removeEventListener("click", this.onMouseLeave);
     }
 }
 Tooltip.Namespace=`Inventaire`;
@@ -13909,7 +14167,9 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
+    <slot _id="iconaction_1"></slot>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13986,7 +14246,11 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>
+    <div class="container">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -14096,8 +14360,21 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
+    <slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>
+    <input id="input" autocomplete="off" _id="genericselect_3" />
+    <slot name="append"></slot>
+    <av-img src="/img/angle-left.svg" class="caret"></av-img>
+</div><div class="errors">
+    <template _id="genericselect_4"></template>
+</div><div class="hidden">
+    <slot></slot>
+</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14152,7 +14429,9 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="genericselect_5"></div>
+    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14704,7 +14983,9 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
+    <av-button _id="alert_1"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14756,9 +15037,215 @@ Alert.Tag=`av-alert`;
 __as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
 
+let Platform=class Platform {
+    static onScreenChange = new Aventus.Callback();
+    static init() {
+        let currentDevice = this.device;
+        let screenObserver = new Aventus.ResizeObserver(() => {
+            let newDevice = this.device;
+            if (currentDevice != newDevice) {
+                currentDevice = newDevice;
+                this.onScreenChange.trigger(newDevice);
+            }
+        });
+        screenObserver.observe(document.body);
+    }
+    static onScreenChangeAndRun(cb) {
+        this.onScreenChange.add(cb);
+        cb(this.device);
+    }
+    static get device() {
+        if (document.body.offsetWidth > 1224) {
+            return "pc";
+        }
+        else if (document.body.offsetWidth > 768) {
+            return "tablet";
+        }
+        return "mobile";
+    }
+    static get isStandalone() {
+        if ("standalone" in window.navigator && window.navigator.standalone) {
+            return true;
+        }
+        else if (window.matchMedia('(display-mode: standalone)').matches) {
+            return true;
+        }
+        return false;
+    }
+    static get isiOS() {
+        let test1 = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        let test2 = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+        return test1 || test2;
+    }
+    static getRatio(element) {
+        return element.offsetWidth + " / " + element.offsetHeight;
+    }
+}
+Platform.Namespace=`Inventaire`;
+__as1(_, 'Platform', Platform);
+
+let PWA=class PWA {
+    static get isAvailable() {
+        if (window['deferredPrompt']) {
+            return true;
+        }
+        return false;
+    }
+    static get isAvailableIOS() {
+        return Platform.isiOS && !Platform.isStandalone;
+    }
+    static e;
+    static isInit = false;
+    static startInstall;
+    static onInit = new Aventus.Callback();
+    static onDownloading = new Aventus.Callback();
+    static onDownloaded = new Aventus.Callback();
+    static async init() {
+        if (this.isInit) {
+            return;
+        }
+        if (!this.e && PWA.isAvailable) {
+            this.e = window['deferredPrompt'];
+            let result = this.onInit.trigger();
+            this.isInit = true;
+        }
+        else if (PWA.isAvailableIOS) {
+            let result = this.onInit.trigger();
+            this.isInit = true;
+        }
+        // if(Platform.isStandalone && Platform.device == "pc") {
+        //     const notification = Notification.create({
+        //     })
+        //     Os.instance.notify(notification);
+        if (this.isInit) {
+            window.addEventListener('appinstalled', async (evt) => {
+                let now = new Date();
+                let start = this.startInstall ?? new Date();
+                let diffMs = now.getTime() - start.getTime();
+                if (diffMs < 3000) {
+                    await Aventus.sleep(3000 - diffMs);
+                }
+                this.onDownloaded.trigger();
+            });
+        }
+    }
+    static addOnInit(cb) {
+        if (this.isInit) {
+            cb();
+        }
+        else {
+            this.onInit.add(cb);
+        }
+    }
+    static async download() {
+        if (this.isAvailable && this.e) {
+            this.e.prompt();
+            const choiceResult = await this.e.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+                this.startInstall = new Date();
+                this.onDownloading.trigger();
+            }
+        }
+        else if (this.isAvailableIOS) {
+            let pwaios = new PwaPromptIos();
+            document.body.appendChild(pwaios);
+        }
+    }
+}
+PWA.Namespace=`Inventaire`;
+__as1(_, 'PWA', PWA);
+
+const PwaPromptInstall = class PwaPromptInstall extends Modal {
+    get 'installing'() {
+						return this.__watch["installing"];
+					}
+					set 'installing'(val) {
+						this.__watch["installing"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("installing");    super.__registerWatchesActions();
+}
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return PwaPromptInstall;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(PwaPromptInstall.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en        plein écran</p></div><div class="footer">    <av-button _id="pwapromptinstall_1">Annuler</av-button>    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "pwapromptinstall_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__e2ea24e42183334f5104d32b6a78e8ffmethod0())}`,
+      "once": true
+    },
+    "pwapromptinstall_2°loading": {
+      "fct": (c) => `${c.print(c.comp.__e2ea24e42183334f5104d32b6a78e8ffmethod1())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "pwapromptinstall_1",
+      "onPress": (e, pressInstance, c) => { c.comp.cancel(e, pressInstance); }
+    },
+    {
+      "id": "pwapromptinstall_2",
+      "onPress": (e, pressInstance, c) => { c.comp.install(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "PwaPromptInstall";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["installing"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('installing'); }
+    configure() {
+        return {
+            title: "Installation de l'application",
+            closeWithEsc: false,
+            closeWithClick: false
+        };
+    }
+    cancel() {
+        this.reject();
+    }
+    async install() {
+        if (this.installing)
+            return;
+        this.installing = true;
+        await PWA.download();
+        this.resolve();
+        this.installing = false;
+    }
+    __e2ea24e42183334f5104d32b6a78e8ffmethod0() {
+        return this.options.title;
+    }
+    __e2ea24e42183334f5104d32b6a78e8ffmethod1() {
+        return this.installing;
+    }
+}
+PwaPromptInstall.Namespace=`Inventaire`;
+PwaPromptInstall.Tag=`av-pwa-prompt-install`;
+__as1(_, 'PwaPromptInstall', PwaPromptInstall);
+if(!window.customElements.get('av-pwa-prompt-install')){window.customElements.define('av-pwa-prompt-install', PwaPromptInstall);Aventus.WebComponentInstance.registerDefinition(PwaPromptInstall);}
+
 const Header = class Header extends Aventus.WebComponent {
     get 'open_menu'() { return this.getBoolAttr('open_menu') }
-    set 'open_menu'(val) { this.setBoolAttr('open_menu', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}}@media screen and (max-width: 500px){:host .content .logo{display:none}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}`;
+    set 'open_menu'(val) { this.setBoolAttr('open_menu', val) }    get 'hasInstall'() {
+						return this.__watch["hasInstall"];
+					}
+					set 'hasInstall'(val) {
+						this.__watch["hasInstall"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("hasInstall");    super.__registerWatchesActions();
+}
+    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.install{display:none}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host .content .menu .logout{justify-content:center;margin-top:10px}:host .content .menu .item.install{display:flex}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}`;
     __getStatic() {
         return Header;
     }
@@ -14783,8 +15270,9 @@ const Header = class Header extends Aventus.WebComponent {
         <av-link class="item" to="/" active_pattern="/equipes/*|/" _id="header_2">Equipe</av-link>
         <av-link class="item" to="/materiel" active_pattern="/materiel*" _id="header_3">Matériel</av-link>
         <av-link class="item" to="/utilisateurs" _id="header_4">Utilisateur</av-link>
-        <div class="item">
-            <mi-icon icon="power_settings_new" _id="header_5"></mi-icon>
+        <template _id="header_5"></template>
+        <div class="item logout">
+            <mi-icon icon="power_settings_new" _id="header_7"></mi-icon>
         </div>
     </div>
 </div>` }
@@ -14818,16 +15306,32 @@ const Header = class Header extends Aventus.WebComponent {
       "onPress": (e, pressInstance, c) => { c.comp.closeMenu(e, pressInstance); }
     },
     {
-      "id": "header_5",
+      "id": "header_7",
       "onPress": (e, pressInstance, c) => { c.comp.logout(e, pressInstance); }
     }
   ]
-}); }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+            <div class="item install" _id="header_6">Installer l'application</div>
+        `);templ0.setActions({
+  "pressEvents": [
+    {
+      "id": "header_6",
+      "onPress": (e, pressInstance, c) => { c.comp.installApp(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'header_5',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__8a18ff9f2f6d8c68ca20d6555a280111method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "Header";
     }
     __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('open_menu')) { this.attributeChangedCallback('open_menu', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('open_menu'); }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["hasInstall"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('open_menu');this.__correctGetter('hasInstall'); }
     __listBoolProps() { return ["open_menu"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     openMenu() {
         this.open_menu = true;
@@ -14838,6 +15342,21 @@ const Header = class Header extends Aventus.WebComponent {
     async logout() {
         await Aventus.Process.execute(new App.Http.Controllers.Auth.Logout.AuthLogoutController().request());
         location.reload();
+    }
+    async installApp() {
+        PWA.onDownloaded.add(async () => {
+            this.hasInstall = false;
+        });
+        await PWA.download();
+    }
+    postCreation() {
+        super.postCreation();
+        PWA.addOnInit(async () => {
+            this.hasInstall = Platform.device != 'pc';
+        });
+    }
+    __8a18ff9f2f6d8c68ca20d6555a280111method0() {
+        return this.hasInstall;
     }
 }
 Header.Namespace=`Inventaire`;
@@ -15161,7 +15680,12 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
+    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
+</div><div class="footer">
+    <av-button _id="modalequipe_2">Annuler</av-button>
+    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15284,10 +15808,7 @@ const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">
-    <av-button _id="modalinventaireupdate_2">Annuler</av-button>
-    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15639,13 +16160,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">
-    <av-flex-scroll _id="modalhistorique_1">
-        <template _id="modalhistorique_2"></template>
-    </av-flex-scroll>
-</div><div class="footer">
-    <av-button _id="modalhistorique_6">Fermer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15676,15 +16191,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-            <div class="line">
-                <div class="quantite" _id="modalhistorique_3"></div>
-                <div class="par" _id="modalhistorique_4"></div>
-                <div class="modification">
-                    <span _id="modalhistorique_5"></span>
-                </div>
-            </div>
-        `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite" _id="modalhistorique_3"></div>                <div class="par" _id="modalhistorique_4"></div>                <div class="modification">                    <span _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
   "content": {
     "modalhistorique_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
@@ -15832,82 +16339,88 @@ App.Http.Controllers.Inventaire.Update.InventaireUpdateController=class Inventai
 App.Http.Controllers.Inventaire.Update.InventaireUpdateController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
 __as1(_.App.Http.Controllers.Inventaire.Update, 'InventaireUpdateController', App.Http.Controllers.Inventaire.Update.InventaireUpdateController);
 
-const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
+const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
     get 'inventaire'() {
 						return this.__watch["inventaire"];
 					}
 					set 'inventaire'(val) {
 						this.__watch["inventaire"] = val;
-					}    materiel;
+					}    equipe;
     __registerWatchesActions() {
     this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
 }
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .nom{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
     __getStatic() {
-        return InventaireListItem;
+        return InventaireEquipeListItem;
     }
     __getStyle() {
         let arrStyle = super.__getStyle();
-        arrStyle.push(InventaireListItem.__style);
+        arrStyle.push(InventaireEquipeListItem.__style);
         return arrStyle;
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
         blocks: { 'default':`<div class="line">
-    <div class="nom" _id="inventairelistitem_0"></div>
-    <div class="variation" _id="inventairelistitem_1"></div>
-    <div class="quantite" _id="inventairelistitem_2"></div>
+    <div class="img" _id="inventaireequipelistitem_0"></div>
+    <div class="nom" _id="inventaireequipelistitem_1"></div>
+    <div class="variation" _id="inventaireequipelistitem_2"></div>
+    <div class="quantite" _id="inventaireequipelistitem_3"></div>
     <div class="modification">
         <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_3">Modifier</av-icon-action>
-            <template _id="inventairelistitem_4"></template>
+            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>
+            <template _id="inventaireequipelistitem_5"></template>
         </div>
-        <span _id="inventairelistitem_6"></span>
+        <span _id="inventaireequipelistitem_7"></span>
     </div>
 </div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
-    "inventairelistitem_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
+    "inventaireequipelistitem_0°style": {
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
       "once": true
     },
-    "inventairelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`
+    "inventaireequipelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
+      "once": true
     },
-    "inventairelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}`
+    "inventaireequipelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
     },
-    "inventairelistitem_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
+    "inventaireequipelistitem_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
+      "once": true
+    },
+    "inventaireequipelistitem_7°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
       "once": true
     }
   },
   "pressEvents": [
     {
-      "id": "inventairelistitem_3",
+      "id": "inventaireequipelistitem_4",
       "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-icon-action color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>
+                <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_6">Historique</av-icon-action>
             `);templ0.setActions({
   "pressEvents": [
     {
-      "id": "inventairelistitem_5",
+      "id": "inventaireequipelistitem_6",
       "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
     }
   ]
 });this.__getStatic().__template.addIf({
-                    anchorId: 'inventairelistitem_4',
+                    anchorId: 'inventaireequipelistitem_5',
                     parts: [{once: true,
-                    condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod0(),
+                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
                     template: templ0
                 }]
             }); }
     getClassName() {
-        return "InventaireListItem";
+        return "InventaireEquipeListItem";
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
@@ -15923,18 +16436,24 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
         }
         return "";
     }
+    getPicture() {
+        if (this.inventaire.materiel.image.uri) {
+            return this.inventaire.materiel.image.uri;
+        }
+        return "/img/default_img.svg";
+    }
     async edit() {
         const modal = new ModalInventaireUpdate();
         modal.variation = this.inventaire.variation;
-        modal.equipe = this.inventaire.equipe;
-        modal.materiel = this.materiel;
+        modal.equipe = this.equipe;
+        modal.materiel = this.inventaire.materiel;
         modal.nb = this.inventaire.quantite;
         const result = await modal.show();
         if (result) {
             const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
                 id: this.inventaire.id,
-                id_equipe: this.inventaire.equipe.id,
-                id_materiel: this.materiel.id,
+                id_equipe: this.equipe.id,
+                id_materiel: this.inventaire.materiel.id,
                 id_variation: this.inventaire.variation?.id,
                 quantite: result
             }));
@@ -15953,31 +16472,34 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     }
     async historique() {
         const modal = new ModalHistorique();
-        modal.materiel = this.materiel;
-        modal.equipe = this.inventaire.equipe;
+        modal.materiel = this.inventaire.materiel;
+        modal.equipe = this.equipe;
         modal.variation = this.inventaire.variation;
         await modal.show();
     }
-    __a95c8f763743275e162a27eb63a3f98emethod1() {
-        return this.inventaire.equipe.nom;
+    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+        return this.getPicture();
     }
-    __a95c8f763743275e162a27eb63a3f98emethod2() {
+    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+        return this.inventaire.materiel.nom;
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method3() {
         return this.inventaire.variation?.nom;
     }
-    __a95c8f763743275e162a27eb63a3f98emethod3() {
-        return this.inventaire.quantite ?? '-';
+    __a2ec46d163f7617d318fc452e85fb3c8method4() {
+        return this.inventaire.quantite;
     }
-    __a95c8f763743275e162a27eb63a3f98emethod4() {
+    __a2ec46d163f7617d318fc452e85fb3c8method5() {
         return this.getLastUpdate();
     }
-    __a95c8f763743275e162a27eb63a3f98emethod0() {
+    __a2ec46d163f7617d318fc452e85fb3c8method0() {
         return this.inventaire.id;
     }
 }
-InventaireListItem.Namespace=`Inventaire`;
-InventaireListItem.Tag=`av-inventaire-list-item`;
-__as1(_, 'InventaireListItem', InventaireListItem);
-if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+InventaireEquipeListItem.Namespace=`Inventaire`;
+InventaireEquipeListItem.Tag=`av-inventaire-equipe-list-item`;
+__as1(_, 'InventaireEquipeListItem', InventaireEquipeListItem);
+if(!window.customElements.get('av-inventaire-equipe-list-item')){window.customElements.define('av-inventaire-equipe-list-item', InventaireEquipeListItem);Aventus.WebComponentInstance.registerDefinition(InventaireEquipeListItem);}
 
 App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
     constructor(router) {
@@ -16023,352 +16545,6 @@ let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
 }
 MaterielRAM.Namespace=`Inventaire`;
 __as1(_, 'MaterielRAM', MaterielRAM);
-
-const MaterielDetailsPage = class MaterielDetailsPage extends Page {
-    get 'inventaires'() {
-						return this.__watch["inventaires"];
-					}
-					set 'inventaires'(val) {
-						this.__watch["inventaires"] = val;
-					}get 'objName'() {
-						return this.__watch["objName"];
-					}
-					set 'objName'(val) {
-						this.__watch["objName"] = val;
-					}    form;
-    item;
-    slugId = 0;
-    __registerWatchesActions() {
-    this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
-}
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
-    constructor() {
-        super();
-        this.form = Aventus.Form.Form.create({
-            nom: Aventus.Form.Validators.Required,
-            variations: {},
-            image: {},
-            tout_monde: {},
-            equipes: {}
-        });
-    }
-    __getStatic() {
-        return MaterielDetailsPage;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(MaterielDetailsPage.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title" _id="materieldetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>
-            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>
-        </div>
-    </div>
-    <div class="body">
-        <av-row>
-            <av-col size="12" size_sm="6">
-                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>
-            </av-col>
-            <av-col size="12" size_sm="6" class="contenu">
-                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>
-                <div class="tags">
-                    <div class="label">Variations</div>
-                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>
-                </div>
-                <div class="tags">
-                    <div class="label pour">
-                        <span class="main-label">Pour :</span>
-                        <div class="toggle">
-                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>
-                            <av-toggle _id="materieldetailspage_7"></av-toggle>
-                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>
-                        </div>
-                    </div>
-                    <template _id="materieldetailspage_9"></template>
-                </div>
-            </av-col>
-        </av-row>
-    </div>
-</div><template _id="materieldetailspage_11"></template>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "materieldetailspage_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
-      "once": true
-    }
-  },
-  "injection": [
-    {
-      "id": "materieldetailspage_3",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_4",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_5",
-      "injectionName": "variations",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_7",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
-      "once": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "materieldetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_2",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_6",
-      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_8",
-      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>
-                    `);templ0.setActions({
-  "injection": [
-    {
-      "id": "materieldetailspage_10",
-      "injectionName": "equipes",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
-      "once": true
-    }
-  ]
-});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_9',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
-                    template: templ0
-                }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-    <div class="card by-equipe">
-        <div class="header">
-            <div class="title">Liste dans les équipes</div>
-        </div>
-        <div class="body">
-            <div class="list">
-                <template _id="materieldetailspage_12"></template>
-            </div>
-        </div>
-    </div>
-`);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <av-inventaire-list-item _id="materieldetailspage_13"></av-inventaire-list-item>
-                `);templ2.setActions({
-  "injection": [
-    {
-      "id": "materieldetailspage_13",
-      "injectionName": "inventaire",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(c.data.inventaire),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_13",
-      "injectionName": "materiel",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(),
-      "once": true
-    }
-  ]
-});templ1.addLoop({
-                    anchorId: 'materieldetailspage_12',
-                    template: templ2,
-                simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_11',
-                    parts: [{
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
-                    template: templ1
-                }]
-            }); }
-    getClassName() {
-        return "MaterielDetailsPage";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
-    async isAllowed(state, pattern, router) {
-        const slugs = router.getSlugs(pattern);
-        if (!slugs || typeof slugs['id'] != "number") {
-            return "/materiel";
-        }
-        const id = slugs['id'];
-        this.slugId = id;
-        if (id == 0) {
-            let newItem = new App.Http.Controllers.Materiel.MaterielRequest();
-            newItem.id = 0;
-            newItem.tout_monde = true;
-            newItem.image = new App.Models.MaterielImage();
-            newItem.variations = [];
-            let v1 = new App.Models.Variation();
-            v1.nom = "XS";
-            newItem.variations.push(v1);
-            let v2 = new App.Models.Variation();
-            v2.nom = "S";
-            newItem.variations.push(v2);
-            newItem.equipes = [];
-            this.form.item = newItem;
-            this.objName = "Création de matériel";
-            this.inventaires = [];
-        }
-        else {
-            const ram = MaterielRAM.getInstance();
-            const item = await ram.getById(id);
-            if (!item) {
-                return "/materiel";
-            }
-            this.item = item;
-            this.form.item = ram.toRequest(item);
-            this.objName = this.form.item.nom;
-            await this.loadInventaire(id);
-        }
-        return true;
-    }
-    async loadInventaire(id) {
-        const item = this.item;
-        if (!item)
-            return;
-        const inventaires = [];
-        const connu = await Aventus.Process.execute(new App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController().request({ id_materiel: id }));
-        if (!connu)
-            return;
-        let equipes = [];
-        if (item.tout_monde) {
-            equipes = (await EquipeRAM.getInstance().getList());
-        }
-        else {
-            const equipeIds = item.equipes.map(p => p.id_equipe);
-            equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
-        }
-        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
-        const addInventaire = (equipe, variation) => {
-            let el;
-            if (variation) {
-                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
-            }
-            else {
-                el = connu.find(p => p.equipe.id == equipe.id);
-            }
-            if (el == undefined) {
-                el = new App.Http.Controllers.Materiel.GetInventaire.Response();
-                el.equipe = equipe;
-                el.variation = variation;
-                el.quantite = 0;
-            }
-            inventaires.push(el);
-        };
-        for (let equipe of equipes) {
-            if (item.variations.length > 0) {
-                for (let variation of item.variations) {
-                    addInventaire(equipe, variation);
-                }
-            }
-            else {
-                addInventaire(equipe);
-            }
-        }
-        this.inventaires = inventaires;
-    }
-    configure() {
-        return {};
-    }
-    async save() {
-        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
-        if (result.result) {
-            Toast.add({
-                message: "Matériel enregistré",
-                color: "success",
-                closable: true
-            });
-            if (this.form.item.id == 0) {
-                this.router?.navigate('/materiel/' + result.result.id);
-            }
-            else {
-                const ram = MaterielRAM.getInstance();
-                this.item = result.result;
-                const request = ram.toRequest(result.result);
-                this.form.item = request;
-                this.objName = this.form.item.nom;
-                await this.loadInventaire(this.item.id);
-            }
-        }
-    }
-    async destroy() {
-        const result = await Confirm.open({
-            title: "Confirmation de suppression",
-            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
-        });
-        if (result) {
-            const ram = MaterielRAM.getInstance();
-            const result = await Aventus.Process.execute(ram.deleteByIdWithError(this.slugId));
-            if (result) {
-                this.router?.navigate("/materiel");
-            }
-        }
-    }
-    setToutMonde() {
-        this.form.item.tout_monde = true;
-    }
-    unsetToutMonde() {
-        this.form.item.tout_monde = false;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
-        return this.objName;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
-        return !this.form.item.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
-        return this.form.item?.id;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
-        return this.form.parts.image;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
-        return this.form.parts.nom;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
-        return this.form.item.variations;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
-        return this.form.parts.tout_monde;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
-        return this.form.item.equipes;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9(inventaire) {
-        return inventaire;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
-        return this.item;
-    }
-}
-MaterielDetailsPage.Namespace=`Inventaire`;
-MaterielDetailsPage.Tag=`av-materiel-details-page`;
-__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
-if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
 
 App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
     getRequest() { return _.App.Http.Controllers.User.UserRequest; }
@@ -16420,7 +16596,10 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">    <av-button _id="equipeeditmodal_2">Annuler</av-button>    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div class="actions">
+    <av-button _id="equipeeditmodal_2">Annuler</av-button>
+    <av-button color="primary" _id="equipeeditmodal_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16676,7 +16855,19 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des équipes</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
+            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="equipespage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16807,7 +16998,19 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste du matériel</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
+            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <av-row class="list" _id="materielpage_2">
+        </av-row>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16919,6 +17122,504 @@ MaterielPage.Namespace=`Inventaire`;
 MaterielPage.Tag=`av-materiel-page`;
 __as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
+
+const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
+    get 'inventaire'() {
+						return this.__watch["inventaire"];
+					}
+					set 'inventaire'(val) {
+						this.__watch["inventaire"] = val;
+					}    materiel;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
+}
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
+    __getStatic() {
+        return InventaireListItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(InventaireListItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div _id="inventairelistitem_0">    <div class="main">        <div class="nom">            <span class="key">Nom :</span>            <span class="value" _id="inventairelistitem_1"></span>        </div>        <div class="variation">            <span class="key">Variation : </span>            <span class="value" _id="inventairelistitem_2"></span>        </div>        <div class="quantite">            <span class="key">Quantité : </span>            <span class="value" _id="inventairelistitem_3"></span>        </div>        <div class="modification">            <div class="actions">                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            </div>        </div>    </div>    <div class="last-update" _id="inventairelistitem_6"></div></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "inventairelistitem_0°class": {
+      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod0())}`
+    },
+    "inventairelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
+      "once": true
+    },
+    "inventairelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`
+    },
+    "inventairelistitem_3°@HTML": {
+      "fct": (c) => `\r\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\r\n            `
+    },
+    "inventairelistitem_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_4",
+      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
+    },
+    {
+      "id": "inventairelistitem_5",
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "InventaireListItem";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    getLastUpdate() {
+        if (this.inventaire.last_update) {
+            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+    async edit() {
+        const modal = new ModalInventaireUpdate();
+        modal.variation = this.inventaire.variation;
+        modal.equipe = this.inventaire.equipe;
+        modal.materiel = this.materiel;
+        modal.nb = this.inventaire.quantite;
+        const result = await modal.show();
+        if (result) {
+            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+                id: this.inventaire.id,
+                id_equipe: this.inventaire.equipe.id,
+                id_materiel: this.materiel.id,
+                id_variation: this.inventaire.variation?.id,
+                quantite: result
+            }));
+            if (save) {
+                this.inventaire.id = save.id;
+                this.inventaire.last_update_by = save.last_update_by;
+                this.inventaire.last_update = save.last_update;
+                this.inventaire.quantite = save.quantite;
+                Toast.add({
+                    message: "Inventaire enregistré",
+                    color: "success",
+                    closable: true
+                });
+            }
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.materiel = this.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.variation = this.inventaire.variation;
+        await modal.show();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod0() {
+        return this.inventaire.id > 0 ? 'exist' : '';
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod1() {
+        return this.inventaire.equipe.nom;
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod2() {
+        return this.inventaire.variation?.nom;
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod3() {
+        return this.inventaire.quantite ?? '-';
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod4() {
+        return this.getLastUpdate();
+    }
+}
+InventaireListItem.Namespace=`Inventaire`;
+InventaireListItem.Tag=`av-inventaire-list-item`;
+__as1(_, 'InventaireListItem', InventaireListItem);
+if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+
+const MaterielDetailsPage = class MaterielDetailsPage extends Page {
+    get 'inventaires'() {
+						return this.__watch["inventaires"];
+					}
+					set 'inventaires'(val) {
+						this.__watch["inventaires"] = val;
+					}get 'objName'() {
+						return this.__watch["objName"];
+					}
+					set 'objName'(val) {
+						this.__watch["objName"] = val;
+					}    form;
+    item;
+    slugId = 0;
+    __registerWatchesActions() {
+    this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
+}
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;min-height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .header{align-items:center;display:flex;gap:24px}:host .by-equipe .header av-input{max-width:300px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 660px){:host .by-equipe .header{flex-wrap:wrap;width:100%}:host .by-equipe .header av-input{max-width:none;width:100%}}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
+    constructor() {
+        super();
+        this.form = Aventus.Form.Form.create({
+            nom: Aventus.Form.Validators.Required,
+            variations: {},
+            image: {},
+            tout_monde: {},
+            equipes: {}
+        });
+    }
+    __getStatic() {
+        return MaterielDetailsPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(MaterielDetailsPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title" _id="materieldetailspage_0"></div>
+        <div class="actions">
+            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>
+            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>
+        </div>
+    </div>
+    <div class="body">
+        <av-row>
+            <av-col size="12" size_sm="6">
+                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>
+            </av-col>
+            <av-col size="12" size_sm="6" class="contenu">
+                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>
+                <div class="tags">
+                    <div class="label">Variations</div>
+                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>
+                </div>
+                <div class="tags">
+                    <div class="label pour">
+                        <span class="main-label">Pour :</span>
+                        <div class="toggle">
+                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>
+                            <av-toggle _id="materieldetailspage_7"></av-toggle>
+                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>
+                        </div>
+                    </div>
+                    <template _id="materieldetailspage_9"></template>
+                </div>
+            </av-col>
+        </av-row>
+    </div>
+</div><template _id="materieldetailspage_11"></template>` }
+    });
+}
+    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_12"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_14"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "materieldetailspage_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
+      "once": true
+    }
+  },
+  "injection": [
+    {
+      "id": "materieldetailspage_3",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_4",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_5",
+      "injectionName": "variations",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_7",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "materieldetailspage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_6",
+      "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_8",
+      "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>
+                    `);templ0.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_10",
+      "injectionName": "equipes",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
+      "once": true
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_9',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+    <div class="card by-equipe">
+        <div class="header">
+            <div class="title">Liste dans les équipes</div>
+            <av-input placeholder="Recherche" _id="materieldetailspage_12"></av-input>
+        </div>
+        <div class="body">
+            <div class="list">
+                <template _id="materieldetailspage_13"></template>
+            </div>
+        </div>
+    </div>
+`);templ1.setActions({
+  "events": [
+    {
+      "eventName": "onChange",
+      "id": "materieldetailspage_12",
+      "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
+      "isCallback": true
+    }
+  ]
+});const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <av-inventaire-list-item _id="materieldetailspage_14"></av-inventaire-list-item>
+                `);templ2.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_14",
+      "injectionName": "inventaire",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(c.data.inventaire),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_14",
+      "injectionName": "materiel",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(),
+      "once": true
+    }
+  ]
+});templ1.addLoop({
+                    anchorId: 'materieldetailspage_13',
+                    template: templ2,
+                simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_11',
+                    parts: [{
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
+                    template: templ1
+                }]
+            }); }
+    getClassName() {
+        return "MaterielDetailsPage";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    async isAllowed(state, pattern, router) {
+        const slugs = router.getSlugs(pattern);
+        if (!slugs || typeof slugs['id'] != "number") {
+            return "/materiel";
+        }
+        const id = slugs['id'];
+        this.slugId = id;
+        if (id == 0) {
+            let newItem = new App.Http.Controllers.Materiel.MaterielRequest();
+            newItem.id = 0;
+            newItem.tout_monde = true;
+            newItem.image = new App.Models.MaterielImage();
+            newItem.variations = [];
+            let v1 = new App.Models.Variation();
+            v1.nom = "XS";
+            newItem.variations.push(v1);
+            let v2 = new App.Models.Variation();
+            v2.nom = "S";
+            newItem.variations.push(v2);
+            newItem.equipes = [];
+            this.form.item = newItem;
+            this.objName = "Création de matériel";
+            this.inventaires = [];
+        }
+        else {
+            const ram = MaterielRAM.getInstance();
+            const item = await ram.getById(id);
+            if (!item) {
+                return "/materiel";
+            }
+            this.item = item;
+            this.form.item = ram.toRequest(item);
+            this.objName = this.form.item.nom;
+            await this.loadInventaire(id);
+        }
+        return true;
+    }
+    async loadInventaire(id) {
+        const item = this.item;
+        if (!item)
+            return;
+        const inventaires = [];
+        const connu = await Aventus.Process.execute(new App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController().request({ id_materiel: id }));
+        if (!connu)
+            return;
+        let equipes = [];
+        if (item.tout_monde) {
+            equipes = (await EquipeRAM.getInstance().getList());
+        }
+        else {
+            const equipeIds = item.equipes.map(p => p.id_equipe);
+            equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
+        }
+        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+        const addInventaire = (equipe, variation) => {
+            let el;
+            if (variation) {
+                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
+            }
+            else {
+                el = connu.find(p => p.equipe.id == equipe.id);
+            }
+            if (el == undefined) {
+                el = new App.Http.Controllers.Materiel.GetInventaire.Response();
+                el.equipe = equipe;
+                el.variation = variation;
+                el.quantite = 0;
+            }
+            inventaires.push(el);
+        };
+        for (let equipe of equipes) {
+            if (item.variations.length > 0) {
+                for (let variation of item.variations) {
+                    addInventaire(equipe, variation);
+                }
+            }
+            else {
+                addInventaire(equipe);
+            }
+        }
+        this.inventaires = inventaires;
+    }
+    configure() {
+        return {};
+    }
+    async save() {
+        const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
+        if (result.result) {
+            Toast.add({
+                message: "Matériel enregistré",
+                color: "success",
+                closable: true
+            });
+            if (this.form.item.id == 0) {
+                this.router?.navigate('/materiel/' + result.result.id);
+            }
+            else {
+                const ram = MaterielRAM.getInstance();
+                this.item = result.result;
+                const request = ram.toRequest(result.result);
+                this.form.item = request;
+                this.objName = this.form.item.nom;
+                await this.loadInventaire(this.item.id);
+            }
+        }
+    }
+    async destroy() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer le matériel " + this.objName + "?"
+        });
+        if (result) {
+            const ram = MaterielRAM.getInstance();
+            const result = await Aventus.Process.execute(ram.deleteByIdWithError(this.slugId));
+            if (result) {
+                this.router?.navigate("/materiel");
+            }
+        }
+    }
+    setToutMonde() {
+        this.form.item.tout_monde = true;
+    }
+    unsetToutMonde() {
+        this.form.item.tout_monde = false;
+    }
+    search() {
+        const txt = this.searchEl.value;
+        for (let item of this.listItems) {
+            if (StringTools.contains(item.inventaire.equipe.nom, txt)) {
+                item.style.display = "";
+            }
+            else if (StringTools.contains(item.inventaire.variation?.nom, txt)) {
+                item.style.display = "";
+            }
+            else {
+                item.style.display = "none";
+            }
+        }
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
+        return this.objName;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
+        return !this.form.item.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
+        return this.form.item?.id;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
+        return this.form.parts.image;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
+        return this.form.parts.nom;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
+        return this.form.item.variations;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+        return this.form.parts.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
+        return this.form.item.equipes;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9(inventaire) {
+        return inventaire;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
+        return this.item;
+    }
+}
+MaterielDetailsPage.Namespace=`Inventaire`;
+MaterielDetailsPage.Tag=`av-materiel-details-page`;
+__as1(_, 'MaterielDetailsPage', MaterielDetailsPage);
+if(!window.customElements.get('av-materiel-details-page')){window.customElements.define('av-materiel-details-page', MaterielDetailsPage);Aventus.WebComponentInstance.registerDefinition(MaterielDetailsPage);}
 
 const UserEditModal = class UserEditModal extends Modal {
     form;
@@ -17074,7 +17775,10 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
+    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17144,7 +17848,19 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des utilisateurs</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
+            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="userspage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17270,7 +17986,9 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`    <av-header></av-header>` }
+        blocks: { 'before':`
+    <av-header></av-header>
+` }
     });
 }
     getClassName() {
@@ -17287,6 +18005,17 @@ const Main = class Main extends Aventus.Navigation.Router {
         if (!pattern)
             return super.getSlugs();
         return this.stateManager.getStateSlugs(pattern);
+    }
+    addPWA() {
+        PWA.addOnInit(async () => {
+            if (Platform.device != "pc") {
+                if (localStorage.getItem("pwa_ask_install") == null) {
+                    localStorage.setItem("pwa_ask_install", "done");
+                    const p = new PwaPromptInstall();
+                    p.show();
+                }
+            }
+        });
     }
     postCreation() {
         super.postCreation();
@@ -17352,174 +18081,13 @@ const Main = class Main extends Aventus.Navigation.Router {
         Aventus.Navigation.Router.configure({
             destroyPage: true,
         });
+        this.addPWA();
     }
 }
 Main.Namespace=`Inventaire`;
 Main.Tag=`av-main`;
 __as1(_, 'Main', Main);
 if(!window.customElements.get('av-main')){window.customElements.define('av-main', Main);Aventus.WebComponentInstance.registerDefinition(Main);}
-
-const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
-    get 'inventaire'() {
-						return this.__watch["inventaire"];
-					}
-					set 'inventaire'(val) {
-						this.__watch["inventaire"] = val;
-					}    equipe;
-    __registerWatchesActions() {
-    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
-}
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px}:host .line{align-items:center;display:flex;gap:20px}:host .line .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;width:34px}:host .line .nom{flex-grow:1;width:33%}:host .line .quantite{flex-grow:1;width:33%}:host .line .variation{flex-grow:1;width:33%}:host .line .modification{align-items:flex-end;display:flex;flex-direction:column;font-size:var(--font-size-sm)}:host .line .modification .actions{display:flex}:host .line .modification av-icon-action{width:fit-content}:host .line .modification span{transform:translateY(5px);white-space:nowrap}:host(:first-child){border-top:none}`;
-    __getStatic() {
-        return InventaireEquipeListItem;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(InventaireEquipeListItem.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="line">
-    <div class="img" _id="inventaireequipelistitem_0"></div>
-    <div class="nom" _id="inventaireequipelistitem_1"></div>
-    <div class="variation" _id="inventaireequipelistitem_2"></div>
-    <div class="quantite" _id="inventaireequipelistitem_3"></div>
-    <div class="modification">
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="inventaireequipelistitem_4">Modifier</av-icon-action>
-            <template _id="inventaireequipelistitem_5"></template>
-        </div>
-        <span _id="inventaireequipelistitem_7"></span>
-    </div>
-</div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "inventaireequipelistitem_0°style": {
-      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
-      "once": true
-    },
-    "inventaireequipelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
-      "once": true
-    },
-    "inventaireequipelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
-    },
-    "inventaireequipelistitem_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
-      "once": true
-    },
-    "inventaireequipelistitem_7°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
-      "once": true
-    }
-  },
-  "pressEvents": [
-    {
-      "id": "inventaireequipelistitem_4",
-      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    }
-  ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-icon-action color="info" icon="history" _id="inventaireequipelistitem_6">Historique</av-icon-action>
-            `);templ0.setActions({
-  "pressEvents": [
-    {
-      "id": "inventaireequipelistitem_6",
-      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
-    }
-  ]
-});this.__getStatic().__template.addIf({
-                    anchorId: 'inventaireequipelistitem_5',
-                    parts: [{once: true,
-                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
-                    template: templ0
-                }]
-            }); }
-    getClassName() {
-        return "InventaireEquipeListItem";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
-    getLastUpdate() {
-        if (this.inventaire.last_update) {
-            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-        return "";
-    }
-    getPicture() {
-        if (this.inventaire.materiel.image.uri) {
-            return this.inventaire.materiel.image.uri;
-        }
-        return "/img/default_img.svg";
-    }
-    async edit() {
-        const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.variation;
-        modal.equipe = this.equipe;
-        modal.materiel = this.inventaire.materiel;
-        modal.nb = this.inventaire.quantite;
-        const result = await modal.show();
-        if (result) {
-            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
-                id: this.inventaire.id,
-                id_equipe: this.equipe.id,
-                id_materiel: this.inventaire.materiel.id,
-                id_variation: this.inventaire.variation?.id,
-                quantite: result
-            }));
-            if (save) {
-                this.inventaire.id = save.id;
-                this.inventaire.last_update_by = save.last_update_by;
-                this.inventaire.last_update = save.last_update;
-                this.inventaire.quantite = save.quantite;
-                Toast.add({
-                    message: "Inventaire enregistré",
-                    color: "success",
-                    closable: true
-                });
-            }
-        }
-    }
-    async historique() {
-        const modal = new ModalHistorique();
-        modal.materiel = this.inventaire.materiel;
-        modal.equipe = this.equipe;
-        modal.variation = this.inventaire.variation;
-        await modal.show();
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method1() {
-        return this.getPicture();
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method2() {
-        return this.inventaire.materiel.nom;
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method3() {
-        return this.inventaire.variation?.nom;
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method4() {
-        return this.inventaire.quantite;
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method5() {
-        return this.getLastUpdate();
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method0() {
-        return this.inventaire.id;
-    }
-}
-InventaireEquipeListItem.Namespace=`Inventaire`;
-InventaireEquipeListItem.Tag=`av-inventaire-equipe-list-item`;
-__as1(_, 'InventaireEquipeListItem', InventaireEquipeListItem);
-if(!window.customElements.get('av-inventaire-equipe-list-item')){window.customElements.define('av-inventaire-equipe-list-item', InventaireEquipeListItem);Aventus.WebComponentInstance.registerDefinition(InventaireEquipeListItem);}
 
 const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     equipes = [];
@@ -17538,7 +18106,8 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0">
+</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

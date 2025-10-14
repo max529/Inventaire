@@ -1,0 +1,61 @@
+import { PWA } from "../../../lib/Pwa.lib.avt";
+import { Modal, type ModalOptions } from "../Modal/Modal.wcl.avt";
+
+export class PwaPromptInstall extends Modal<void> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    public installing: boolean = false;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<void> {
+        return {
+            title: "Installation de l'application",
+            closeWithEsc: false,
+            closeWithClick: false
+        };
+    }
+
+
+    /**
+     * 
+     */
+    protected cancel() {
+        this.reject();
+    }
+    /**
+    * 
+    */
+    protected async install() {
+        if(this.installing) return;
+        this.installing = true;
+        await PWA.download();
+        this.resolve();
+        this.installing = false;
+    }
+
+
+
+    //#endregion
+
+}

@@ -1,6 +1,7 @@
 import { Tooltip } from "../Tooltip/Tooltip.wcl.avt";
 import type { ColorsType } from "../../../lib/Colors.lib.avt";
 import { Icon, type IconType } from "MaterialIcon:MaterialIcon.package.avt";
+import { PressManager } from "Aventus@Main:Aventus.package.avt";
 
 @OverrideView()
 export class IconAction extends Icon implements Aventus.DefaultComponent {
@@ -74,6 +75,7 @@ export class IconAction extends Icon implements Aventus.DefaultComponent {
                 this.tooltip.style.color = "#efefef";
                 this.tooltip.style.backgroundColor = "#757575";
                 this.shadowRoot.appendChild(this.tooltip);
+
             }
             this.tooltip.innerHTML = content;
         }
