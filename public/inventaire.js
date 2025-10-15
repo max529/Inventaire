@@ -12288,6 +12288,34 @@ _.App.Http.Controllers.Auth.Login = Inventaire.App?.Http?.Controllers?.Auth?.Log
 App.Http.Controllers.Auth.Logout = {};
 _.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
+const Loading = class Loading extends Aventus.WebComponent {
+    get 'show'() { return this.getBoolAttr('show') }
+    set 'show'(val) { this.setBoolAttr('show', val) }    static __style = `:host{align-items:center;background-color:rgba(0,0,0,.1);display:none;inset:0;justify-content:center;position:absolute;z-index:999}:host .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--color-base-content);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;height:100%;width:100%;max-height:100px;max-width:100px}:host([show]){display:flex}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    __getStatic() {
+        return Loading;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Loading.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="loader"></div>` }
+    });
+}
+    getClassName() {
+        return "Loading";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('show')) { this.attributeChangedCallback('show', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('show'); }
+    __listBoolProps() { return ["show"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+}
+Loading.Namespace=`Inventaire`;
+Loading.Tag=`av-loading`;
+__as1(_, 'Loading', Loading);
+if(!window.customElements.get('av-loading')){window.customElements.define('av-loading', Loading);Aventus.WebComponentInstance.registerDefinition(Loading);}
+
 let StringTools=class StringTools {
     static removeAccents(value) {
         return value
@@ -14126,7 +14154,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
         target.tooltip.delay_touch = target.delay_touch;
     }
 })); }
-    static __style = `:host{border-radius:4px;color:var(--color-base-content);cursor:pointer;font-size:var(--font-size-md);padding:3px;position:relative;transition:background-color var(--transition-duration) var(--bezier)}:host .hidden{display:none}:host([color=neutral]){background-color:rgba(0,0,0,0);color:var(--color-neutral)}:host([color=neutral]:hover){background-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){background-color:rgba(0,0,0,0);color:var(--color-primary)}:host([color=primary]:hover){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){background-color:rgba(0,0,0,0);color:var(--color-secondary)}:host([color=secondary]:hover){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){background-color:rgba(0,0,0,0);color:var(--color-accent)}:host([color=accent]:hover){background-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){background-color:rgba(0,0,0,0);color:var(--color-info)}:host([color=info]:hover){background-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){background-color:rgba(0,0,0,0);color:var(--color-success)}:host([color=success]:hover){background-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){background-color:rgba(0,0,0,0);color:var(--color-warning)}:host([color=warning]:hover){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){background-color:rgba(0,0,0,0);color:var(--color-error)}:host([color=error]:hover){background-color:var(--color-error);color:var(--color-error-content)}`;
+    static __style = `:host{border-radius:4px;color:var(--color-base-content);cursor:pointer;font-size:var(--font-size-md);padding:3px;position:relative;transition:background-color var(--transition-duration) var(--bezier)}:host .hidden{display:none}:host([color=primary]){background-color:rgba(0,0,0,0);color:var(--color-primary)}:host([color=secondary]){background-color:rgba(0,0,0,0);color:var(--color-secondary)}:host([color=green]){background-color:rgba(0,0,0,0);color:var(--color-green)}:host([color=success]){background-color:rgba(0,0,0,0);color:var(--color-success)}:host([color=red]){background-color:rgba(0,0,0,0);color:var(--color-red)}:host([color=error]){background-color:rgba(0,0,0,0);color:var(--color-error)}:host([color=orange]){background-color:rgba(0,0,0,0);color:var(--color-orange)}:host([color=warning]){background-color:rgba(0,0,0,0);color:var(--color-warning)}:host([color=blue]){background-color:rgba(0,0,0,0);color:var(--color-blue)}:host([color=information]){background-color:rgba(0,0,0,0);color:var(--color-information)}@media screen and (min-width: 1225px){:host([color=primary]:hover){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]:hover){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]:hover){background-color:var(--color-green);color:var(--color-green-content)}:host([color=success]:hover){background-color:var(--color-success);color:var(--color-success-content)}:host([color=red]:hover){background-color:var(--color-red);color:var(--color-red-content)}:host([color=error]:hover){background-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]:hover){background-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]:hover){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]:hover){background-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]:hover){background-color:var(--color-information);color:var(--color-information-content)}}`;
     __getStatic() {
         return IconAction;
     }
@@ -15199,7 +15227,7 @@ const Header = class Header extends Aventus.WebComponent {
 					}    __registerWatchesActions() {
     this.__addWatchesActions("hasInstall");    super.__registerWatchesActions();
 }
-    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item:hover,:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.install{display:none}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host .content .menu .logout{justify-content:center;margin-top:10px}:host .content .menu .item.install{display:flex}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}`;
+    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.install{display:none}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host .content .menu .logout{justify-content:center;margin-top:10px}:host .content .menu .item.install{display:flex}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}@media(hover: hover){:host .content .menu .item:hover{background-color:var(--color-neutral);color:var(--color-neutral-content)}}`;
     __getStatic() {
         return Header;
     }
@@ -17255,7 +17283,9 @@ __as1(_, 'MaterielPage', MaterielPage);
 if(!window.customElements.get('av-materiel-page')){window.customElements.define('av-materiel-page', MaterielPage);Aventus.WebComponentInstance.registerDefinition(MaterielPage);}
 
 const MaterielDetailsPage = class MaterielDetailsPage extends Page {
-    get 'inventaires'() {
+    static get observedAttributes() {return ["is_saving"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'is_saving'() { return this.getBoolProp('is_saving') }
+    set 'is_saving'(val) { this.setBoolAttr('is_saving', val) }    get 'inventaires'() {
 						return this.__watch["inventaires"];
 					}
 					set 'inventaires'(val) {
@@ -17271,7 +17301,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     __registerWatchesActions() {
     this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
 }
-    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;min-height:50px;justify-content:space-between;margin-bottom:16px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .header{align-items:center;display:flex;gap:24px}:host .by-equipe .header av-input{max-width:300px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 660px){:host .by-equipe .header{flex-wrap:wrap;width:100%}:host .by-equipe .header av-input{max-width:none;width:100%}}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
+    static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;position:relative;width:100%;overflow:hidden}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;justify-content:space-between;margin-bottom:16px;min-height:50px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .header{align-items:center;display:flex;gap:24px}:host .by-equipe .header av-input{max-width:300px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 660px){:host .by-equipe .header{flex-wrap:wrap;width:100%}:host .by-equipe .header av-input{max-width:none;width:100%}}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
@@ -17325,13 +17355,18 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             </av-col>
         </av-row>
     </div>
-</div><template _id="materieldetailspage_11"></template>` }
+    <av-loading _id="materieldetailspage_11"></av-loading>
+</div><template _id="materieldetailspage_12"></template>` }
     });
 }
-    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_12"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_14"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_13"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_15"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materieldetailspage_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
+      "once": true
+    },
+    "materieldetailspage_11°show": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9())}`,
       "once": true
     }
   },
@@ -17400,11 +17435,11 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     <div class="card by-equipe">
         <div class="header">
             <div class="title">Liste dans les équipes</div>
-            <av-input placeholder="Recherche" _id="materieldetailspage_12"></av-input>
+            <av-input placeholder="Recherche" _id="materieldetailspage_13"></av-input>
         </div>
         <div class="body">
             <div class="list">
-                <template _id="materieldetailspage_13"></template>
+                <template _id="materieldetailspage_14"></template>
             </div>
         </div>
     </div>
@@ -17412,33 +17447,33 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
   "events": [
     {
       "eventName": "onChange",
-      "id": "materieldetailspage_12",
+      "id": "materieldetailspage_13",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
   ]
 });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <av-inventaire-list-item _id="materieldetailspage_14"></av-inventaire-list-item>
+                    <av-inventaire-list-item _id="materieldetailspage_15"></av-inventaire-list-item>
                 `);templ2.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_14",
+      "id": "materieldetailspage_15",
       "injectionName": "inventaire",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(c.data.inventaire),
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(c.data.inventaire),
       "once": true
     },
     {
-      "id": "materieldetailspage_14",
+      "id": "materieldetailspage_15",
       "injectionName": "materiel",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(),
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11(),
       "once": true
     }
   ]
 });templ1.addLoop({
-                    anchorId: 'materieldetailspage_13',
+                    anchorId: 'materieldetailspage_14',
                     template: templ2,
                 simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_11',
+                    anchorId: 'materieldetailspage_12',
                     parts: [{
                     condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
                     template: templ1
@@ -17447,8 +17482,10 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     getClassName() {
         return "MaterielDetailsPage";
     }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('is_saving')) { this.attributeChangedCallback('is_saving', false, false); } }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('is_saving');this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    __listBoolProps() { return ["is_saving"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     async isAllowed(state, pattern, router) {
         const slugs = router.getSlugs(pattern);
         if (!slugs || typeof slugs['id'] != "number") {
@@ -17529,6 +17566,9 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         return {};
     }
     async save() {
+        if (this.is_saving)
+            return;
+        this.is_saving = true;
         const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
         if (result.result) {
             Toast.add({
@@ -17548,6 +17588,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 await this.loadInventaire(this.item.id);
             }
         }
+        this.is_saving = false;
     }
     async destroy() {
         const result = await Confirm.open({
@@ -17585,6 +17626,9 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
         return this.objName;
     }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
+        return this.is_saving;
+    }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
         return !this.form.item.tout_monde;
     }
@@ -17606,10 +17650,10 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
         return this.form.item.equipes;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9(inventaire) {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10(inventaire) {
         return inventaire;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11() {
         return this.item;
     }
 }

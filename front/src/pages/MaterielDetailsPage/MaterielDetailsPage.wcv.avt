@@ -33,6 +33,7 @@
             </av-col>
         </av-row>
     </div>
+    <av-loading show="{{this.is_saving}}"></av-loading>
 </div>
 
 if(this.form.item?.id) {

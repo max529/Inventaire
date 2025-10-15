@@ -20,14 +20,14 @@
 		color: var(--color-#{$color});
 	}
 
-	:host([color="#{$color}"]:hover) {
-		background-color: var(--color-#{$color});
-		color: var(--color-#{$color}-content);
-	}
+
 }
 
-// @include desktop {
-// 	:host(:hover) {
-// 		background-color: var(--lighter);
-// 	}
-// }
+@include desktop {
+	@include eachColor using ($color) {
+		:host([color="#{$color}"]:hover) {
+			background-color: var(--color-#{$color});
+			color: var(--color-#{$color}-content);
+		}
+	}
+}

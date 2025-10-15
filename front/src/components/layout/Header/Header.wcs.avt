@@ -72,7 +72,6 @@
 				}
 			}
 
-			.item:hover,
 			.item.active {
 				background-color: var(--color-neutral);
 				color: var(--color-neutral-content);
@@ -143,6 +142,20 @@
 		.menu-hidden {
 			display: block;
 			z-index: 1;
+		}
+	}
+}
+
+
+@media (hover: hover) {
+	:host {
+		.content {
+			.menu {
+				.item:hover {
+					background-color: var(--color-neutral);
+					color: var(--color-neutral-content);
+				}
+			}
 		}
 	}
 }

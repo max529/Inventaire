@@ -14,3 +14,91 @@ $colors: (
 		@content($color);
 	}
 }
+
+
+$tablet-breakpoint: 1224px;
+$mobile-breakpoint: 768px;
+
+$size-breakpoints: (
+	"xs": 300,
+	"sm": 540,
+	"md": 720,
+	"lg": 960,
+	"xl": 1140,
+	"xxl": 1360,
+);
+
+$colors: (
+	'primary',
+	'secondary',
+	'green',
+	'success',
+	'red',
+	'error',
+	'orange',
+	'warning',
+	'blue',
+	'information'
+);
+
+@mixin tablet {
+	@media screen and (max-width:$tablet-breakpoint) {
+		@content;
+	}
+}
+@mixin tablet-portrait {
+	@media screen and (max-width:$tablet-breakpoint) and (orientation:portrait) {
+		@content;
+	}
+}
+@mixin tablet-landscape {
+	@media screen and (max-width:$tablet-breakpoint) and (orientation:landscape) {
+		@content;
+	}
+}
+
+@mixin mobile {
+	@media screen and (max-width:$mobile-breakpoint) {
+		@content;
+	}
+}
+
+@mixin mobile-portrait {
+	@media screen and (max-width:$mobile-breakpoint) and (orientation:portrait) {
+		@content;
+	}
+}
+@mixin mobile-landscape {
+	@media screen and (max-width:$mobile-breakpoint) and (orientation:landscape) {
+		@content;
+	}
+}
+
+@mixin desktop {
+	@media screen and (min-width:#{$tablet-breakpoint + 1}) {
+		@content;
+	}
+}
+
+@mixin desktop-portrait {
+	@media screen and (min-width:#{$tablet-breakpoint + 1}) and (orientation:portrait) {
+		@content;
+	}
+}
+@mixin desktop-landscape {
+	@media screen and (min-width:#{$tablet-breakpoint + 1}) and (orientation:landscape) {
+		@content;
+	}
+}
+
+@mixin portrait {
+	@media screen and (orientation:portrait) {
+		@content;
+	}
+}
+
+@mixin landscape {
+	@media screen and (orientation:landscape) {
+		@content;
+	}
+}

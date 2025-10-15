@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="/css/default.css">
     <link rel="shortcut icon" href="/img/logo.png" type="image/png">
     <script src="/inventaire.js"></script>
-    <script>
-        const script = document.createElement('script');
-        script.src = "http://localhost:8080/?get_injected_code";
-        document.head.appendChild(script);
-    </script>
 </head>
 <body>
     <av-login-page></av-login-page>

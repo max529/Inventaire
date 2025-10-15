@@ -28,7 +28,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
 
     //#region props
-
+    @Property()
+    private is_saving: boolean = false;
     //#endregion
 
 
@@ -42,6 +43,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     public objName: string = "";
 
     private slugId: number = 0;
+
 
     @ViewElement()
     protected searchEl!: Input;
@@ -161,6 +163,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
      * 
      */
     protected async save() {
+        if(this.is_saving) return;
+        this.is_saving = true;
         const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
 
         if(result.result) {
@@ -181,6 +185,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 await this.loadInventaire(this.item.id);
             }
         }
+        this.is_saving = false;
     }
 
 
