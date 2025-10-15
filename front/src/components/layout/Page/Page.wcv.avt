@@ -1,4 +1,4 @@
-<av-scrollable class="page-scroll">
+<av-scrollable class="page-scroll" floating_scroll>
     <div class="content">
         <slot></slot>
     </div>

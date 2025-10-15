@@ -84,6 +84,8 @@ export class ModalInventaireUpdate extends Modal<number> implements Aventus.Defa
 
     protected override postCreation(): void {
         super.postCreation();
+        this.inputEl.focus();
+        this.inputEl.select();
     }
 
 

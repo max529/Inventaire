@@ -8,15 +8,9 @@
         "framework"
     ],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "C:\\Projets\\av\\Laraventus\\Laraventus"
-        }
-    ],
     "require": {
         "php": "^8.2",
-        "aventus/laraventus": "^0.0.1",
+        "aventus/laraventus": "^1.0.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
     },

@@ -80,12 +80,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             newItem.tout_monde = true;
             newItem.image = new MaterielImage();
             newItem.variations = [];
-            let v1 = new Variation();
-            v1.nom = "XS";
-            newItem.variations.push(v1);
-            let v2 = new Variation();
-            v2.nom = "S";
-            newItem.variations.push(v2);
             newItem.equipes = [];
             this.form.item = newItem;
             this.objName = "Création de matériel";
