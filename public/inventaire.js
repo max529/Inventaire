@@ -12623,7 +12623,7 @@ App.Http.Controllers.Auth.Login.Request.Namespace=`Inventaire.App.Http.Controlle
 __as1(_.App.Http.Controllers.Auth.Login, 'Request', App.Http.Controllers.Auth.Login.Request);
 
 const PageFull = class PageFull extends Aventus.Navigation.Page {
-    static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}`;
+    static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}@media screen and (max-width: 768px){:host .content{padding:16px}}`;
     constructor() {
         super();
         if (this.constructor == PageFull) {
@@ -12652,7 +12652,7 @@ PageFull.Namespace=`Inventaire`;
 __as1(_, 'PageFull', PageFull);
 
 const Page = class Page extends Aventus.Navigation.Page {
-    static __style = `:host{height:100%;width:100%}:host .page-scroll{height:100%;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;margin:auto;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}`;
+    static __style = `:host{height:100%;width:100%}:host .page-scroll{height:100%;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;margin:auto;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}@media screen and (max-width: 768px){:host .content{padding:16px}}`;
     constructor() {
         super();
         if (this.constructor == Page) {
