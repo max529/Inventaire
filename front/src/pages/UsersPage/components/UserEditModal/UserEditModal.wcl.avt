@@ -23,7 +23,7 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
             item.id = 0;
             modal.form.item = ram.toRequest(item);
         }
-        return await UserEditModal._show(modal);
+        return await modal.show();
     }
     //#endregion
 

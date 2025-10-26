@@ -1,7 +1,6 @@
 import { Callback } from "Aventus@Main:Aventus.package.avt";
-import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
 import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
-import { ModalTag } from "../ModalTag/ModalTag.wcl.avt";
+import type { VariationGroupe } from "../../../../generated/app/Models/VariationGroupe.lib.avt";
 
 export class VariationTag extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -19,7 +18,7 @@ export class VariationTag extends Aventus.WebComponent implements Aventus.Defaul
     @ViewElement()
     protected componentEl!: HTMLSpanElement;
     // @Watch()
-    public variation!: Variation;
+    public groupe!: VariationGroupe;
 
     //#endregion
 
@@ -34,23 +33,11 @@ export class VariationTag extends Aventus.WebComponent implements Aventus.Defaul
 
 
     /**
-     * 
-     */
-    protected async triggerEdit() {
-        const p = new ModalTag();
-        p.name = this.variation.nom;
-        const result = await p.show();
-        if(result !== null) {
-            this.variation.nom = result;
-            this.componentEl.innerText = result;
-        }
-    }
-    /**
     * 
     */
     protected async triggerDelete() {
         const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.variation.nom + "?"
+            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.groupe.nom + "?"
         });
         if(result) {
             this.onDelete.trigger(this);
@@ -59,7 +46,7 @@ export class VariationTag extends Aventus.WebComponent implements Aventus.Defaul
 
     protected override postCreation(): void {
         super.postCreation();
-        this.componentEl.innerText = this.variation.nom;
+        this.componentEl.innerText = this.groupe.nom;
     }
     //#endregion
 

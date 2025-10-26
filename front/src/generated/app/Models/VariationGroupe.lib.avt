@@ -1,0 +1,15 @@
+import { Variation } from './Variation.lib.avt';
+
+namespace App.Models {
+
+	@Convertible()
+	export class VariationGroupe extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.VariationGroupe"; }
+		public id!: number;
+		public id_materiel!: number;
+		public id_template?: number = undefined;
+		public nom!: string;
+		public variations!: Variation[];
+	}
+
+}

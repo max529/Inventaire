@@ -1,6 +1,6 @@
 <div class="title">{{ this.options.title }}</div>
 <div class="content">
-    <av-input label="Nom de la variation" @bind="this.name" @element="inputEl"></av-input>
+    <av-variation-groupe-template-select label="Choix de la variation" @element="inputEl" @bind="this.resource"></av-variation-groupe-template-select>
 </div>
 <div class="footer">
     <av-button @press="reject">Annuler</av-button>

@@ -13,7 +13,7 @@ class Request extends AventusRequest
 {
     public ?int $id;
     public float $quantite;
-    public int $id_materiel;
+    public int $id_materiel_variation;
     public int $id_equipe;
     public ?int $id_variation;
 }

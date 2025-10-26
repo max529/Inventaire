@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Collection;
  * @property int $id
  * @property string $nom
  * @property ?MaterielImage $image
- * @property Collection<Variation> $variations
+ * @property Collection<MaterielVariation> $variations
+ * @property Collection<VariationGroupe> $variations_groupes
  * @property bool $tout_monde
  * @property Collection<MaterielEquipe> $equipes
  */
@@ -33,11 +34,16 @@ class Materiel extends AventusModel
 
     public function variations(): HasMany
     {
-        return $this->hasMany(Variation::class, "id_materiel");
+        return $this->hasMany(MaterielVariation::class, "id_materiel");
     }
 
     public function equipes(): HasMany
     {
         return $this->hasMany(MaterielEquipe::class, "id_materiel");
+    }
+
+    public function variations_groupes(): HasMany
+    {
+        return $this->hasMany(VariationGroupe::class, "id_materiel");
     }
 }

@@ -1,0 +1,13 @@
+import { VariationTemplate } from './VariationTemplate.lib.avt';
+
+namespace App.Models {
+
+	@Convertible()
+	export class VariationGroupeTemplate extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.VariationGroupeTemplate"; }
+		public id!: number;
+		public nom!: string;
+		public variations!: VariationTemplate[];
+	}
+
+}

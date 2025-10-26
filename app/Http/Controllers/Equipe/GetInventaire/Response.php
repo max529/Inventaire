@@ -15,7 +15,6 @@ class Response extends AventusModelResource
 {
     public int $id;
     public MaterielResource $materiel;
-    public ?Variation $variation;
     public float $quantite;
     public DateTime $last_update;
     public string $last_update_by;
@@ -29,7 +28,6 @@ class Response extends AventusModelResource
     protected function bind($item): void {
         $this->id = $item->id;
         $this->materiel = new MaterielResource($item->materiel);
-        $this->variation = $item->variation;
         $this->quantite = $item->quantite;
         $this->last_update = $item->last_update;
         $this->last_update_by = $item->last_update_by;

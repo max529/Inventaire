@@ -1,0 +1,11 @@
+import { VariationTemplateRequest } from './VariationTemplateRequest.lib.avt';
+
+namespace App.Http.Controllers.VariationGroupeTemplate {
+
+	export class VariationGroupeTemplateRequest {
+		public variations!: VariationTemplateRequest[];
+		public id?: number = undefined;
+		public nom!: string;
+	}
+
+}

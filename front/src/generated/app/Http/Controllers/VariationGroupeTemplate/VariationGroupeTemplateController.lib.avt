@@ -1,0 +1,16 @@
+import { VariationGroupeTemplate } from '../../../Models/VariationGroupeTemplate.lib.avt';
+import { VariationGroupeTemplateRequest } from './VariationGroupeTemplateRequest.lib.avt';
+import { VariationGroupeTemplateResource } from './VariationGroupeTemplateResource.lib.avt';
+
+namespace App.Http.Controllers.VariationGroupeTemplate {
+
+	export class VariationGroupeTemplateController extends AventusPhp.ModelController<VariationGroupeTemplate, VariationGroupeTemplateRequest, VariationGroupeTemplateResource> {
+		/** @inheritdoc */
+		public override getRequest(): new () => VariationGroupeTemplateRequest { return VariationGroupeTemplateRequest; }
+		/** @inheritdoc */
+		public override getResource(): new () => VariationGroupeTemplateResource { return VariationGroupeTemplateResource; }
+		/** @inheritdoc */
+		public override getUri(): string { return "data/variation_groupe_template"; }
+	}
+
+}

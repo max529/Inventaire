@@ -4,7 +4,8 @@ namespace App.Models {
 	export class Variation extends Aventus.Data implements Aventus.IData {
 		public static override get Fullname(): string { return "App.Models.Variation"; }
 		public id!: number;
-		public id_materiel!: number;
+		public id_groupe!: number;
+		public id_variation_template?: number = undefined;
 		public nom!: string;
 	}
 

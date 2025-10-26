@@ -1,0 +1,128 @@
+import { Form, type FormHandler } from "Aventus@UI:Aventus.Form.package.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import { VariationGroupeTemplateResource } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import { VariationGroupeTemplateRAM } from "../../../../ram/VariationGroupeTemplate.ram.avt";
+import type { VariationGroupeTemplateRequest } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateRequest.lib.avt";
+import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
+import { Input } from "../../../../components/form/Input/Input.wcl.avt";
+import { Icon } from "MaterialIcon:MaterialIcon.package.avt";
+import type { FlexScroll } from "../../../../components/layout/FlexScroll/FlexScroll.wcl.avt";
+import { VariationTemplateRequest } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationTemplateRequest.lib.avt";
+
+export class VariationGroupeTemplateEditModal extends Modal<VariationGroupeTemplateResource> implements Aventus.DefaultComponent {
+
+    //#region static
+    public static async open(item?: VariationGroupeTemplateResource): Promise<VariationGroupeTemplateResource | null> {
+        const modal = new VariationGroupeTemplateEditModal();
+        const ram = VariationGroupeTemplateRAM.getInstance();
+        if(item) {
+            modal.options.title = "Edition d'une variation";
+            if(!item.variations)
+                item.variations = [];
+            modal.form.item = ram.toRequest(item);
+        }
+        else {
+            modal.options.title = "Création d'une variation";
+            item = new VariationGroupeTemplateResource();
+            item.id = 0;
+            item.variations = [];
+            modal.form.item = ram.toRequest(item);
+        }
+        return await modal.show();
+    }
+    //#endregion
+
+
+    //#region props
+    private form: FormHandler<VariationGroupeTemplateRequest>;
+    //#endregion
+
+
+    //#region variables
+    @ViewElement()
+    protected listItems!: FlexScroll;
+    //#endregion
+
+
+    //#region constructor
+    public constructor() {
+        super();
+        this.form = Form.create<VariationGroupeTemplateRequest>({
+            id: {},
+            nom: new Required("Le nom est requis"),
+            variations: {}
+        }, {
+            validateOnChange: false
+        });
+
+    }
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<VariationGroupeTemplateResource> {
+        return {
+            title: ""
+        };
+    }
+
+    public displayVariation(item: VariationTemplateRequest) {
+        const el = document.createElement("div");
+        el.classList.add("item");
+
+        const input = new Input();
+        input.label = "Nom";
+        input.value = item.nom;
+        input.onChange.add((value) => {
+            item.nom = value ?? '';
+        });
+        el.appendChild(input);
+
+        const action = document.createElement("div");
+        action.classList.add("action");
+        el.appendChild(action);
+
+        const icon = new Icon();
+        icon.icon = "delete";
+        icon.addEventListener("click", () => {
+            const index = this.form.item.variations?.indexOf(item) ?? -1;
+            if(index != -1) {
+                this.form.item.variations.splice(index, 1);
+                el.remove();
+            }
+        });
+        action.appendChild(icon);
+
+        this.listItems.appendChild(el);
+    }
+
+    public addVariation() {
+        const item = new VariationTemplateRequest();
+        this.form.item.variations.push(item);
+        this.displayVariation(item);
+    }
+    public override async show(element?: Element): Promise<VariationGroupeTemplateResource | null> {
+        const result = super.show(element);
+        this.listItems.innerHTML = '';
+        for(let item of this.form.item.variations) {
+            this.displayVariation(item);
+        }
+        return await result;
+    }
+
+
+    /**
+     * 
+     */
+    protected async submit() {
+        const result = await this.form.submit(VariationGroupeTemplateRAM.getInstance().saveWithError);
+        if(result?.result) {
+            this.resolve(result.result);
+        }
+    }
+    //#endregion
+
+}

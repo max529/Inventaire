@@ -10,14 +10,14 @@ import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { MaterielRequest } from "../../generated/app/Http/Controllers/Materiel/MaterielRequest.lib.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
-import type { Equipe } from "../../generated/app/Models/Equipe.lib.avt";
-import { DateConverter } from "Aventus@Main:Aventus.package.avt";
 import { MaterielGetInventaireController } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Controller.lib.avt";
 import { Response as Inventaire } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
 import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 import type { Input } from "../../components/form/Input/Input.wcl.avt";
 import type { InventaireListItem } from "./components/InventaireListItem/InventaireListItem.wcl.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
+import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+import type { MaterielVariation } from "../../generated/app/Models/MaterielVariation.lib.avt";
 
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
@@ -57,7 +57,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         super();
         this.form = Form.create<MaterielRequest>({
             nom: Required,
-            variations: {},
+            variations_groupes: {},
             image: {},
             tout_monde: {},
             equipes: {}
@@ -81,7 +81,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             newItem.id = 0;
             newItem.tout_monde = true;
             newItem.image = new MaterielImage();
-            newItem.variations = [];
+            newItem.variations_groupes = [];
             newItem.equipes = [];
             this.form.item = newItem;
             this.objName = "Création de matériel";
@@ -110,7 +110,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         const connu = await Process.execute(new MaterielGetInventaireController().request({ id_materiel: id }));
         if(!connu) return;
 
-        let equipes: Equipe[] = [];
+        let equipes: EquipeResource[] = [];
         if(item.tout_monde) {
             equipes = (await EquipeRAM.getInstance().getList());
         }
@@ -120,10 +120,10 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         }
         equipes.sort((a, b) => a.nom.localeCompare(b.nom));
 
-        const addInventaire = (equipe: Equipe, variation?: Variation) => {
+        const addInventaire = (equipe: EquipeResource, variation?: MaterielVariation) => {
             let el: Inventaire | undefined;
             if(variation) {
-                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
+                el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id_materiel == variation.id);
             }
             else {
                 el = connu.find(p => p.equipe.id == equipe.id);
@@ -131,7 +131,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             if(el == undefined) {
                 el = new Inventaire();
                 el.equipe = equipe;
-                el.variation = variation;
                 el.quantite = 0;
             }
             inventaires.push(el);
@@ -227,9 +226,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         const txt = this.searchEl.value;
         for(let item of this.listItems) {
             if(StringTools.contains(item.inventaire.equipe.nom, txt)) {
-                item.style.display = "";
-            }
-            else if(StringTools.contains(item.inventaire.variation?.nom, txt)) {
                 item.style.display = "";
             }
             else {

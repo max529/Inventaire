@@ -1,0 +1,26 @@
+import { VariationGroupeTemplateController } from "../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateController.lib.avt";
+import type { VariationGroupeTemplateResource } from "../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import { VariationGroupeTemplate } from "../generated/app/Models/VariationGroupeTemplate.lib.avt";
+
+export class VariationGroupeTemplateRAM extends AventusPhp.RamHttp<VariationGroupeTemplateController> implements Aventus.IRam {
+    /**
+     * @inheritdoc
+     */
+    public override defineIndexKey(): keyof VariationGroupeTemplateResource {
+        return 'id';
+    }
+    /**
+     * @inheritdoc
+     */
+    public override defineRoutes(): VariationGroupeTemplateController {
+        return new VariationGroupeTemplateController();
+    }
+
+    /**
+     * Create a singleton to store data
+     */
+    public static getInstance(): VariationGroupeTemplateRAM {
+        return Aventus.Instance.get(VariationGroupeTemplateRAM);
+    }
+
+}

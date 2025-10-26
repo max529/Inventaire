@@ -1,7 +1,9 @@
 import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
 import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import type { VariationGroupeTemplateResource } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import type { VariationGroupeTemplateSelect } from "../VariationGroupeTemplateSelect/VariationGroupeTemplateSelect.wcl.avt";
 
-export class ModalTag extends Modal<string> implements Aventus.DefaultComponent {
+export class ModalTag extends Modal<VariationGroupeTemplateResource> implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -15,10 +17,10 @@ export class ModalTag extends Modal<string> implements Aventus.DefaultComponent 
 
     //#region variables
     @Watch()
-    public name: string = "";
+    public resource?: VariationGroupeTemplateResource;
 
     @ViewElement()
-    protected inputEl!: Input;
+    protected inputEl!: VariationGroupeTemplateSelect;
 
     //#endregion
 
@@ -32,7 +34,7 @@ export class ModalTag extends Modal<string> implements Aventus.DefaultComponent 
     /**
      * @inheritdoc
      */
-    public override configure(): ModalOptions<string> {
+    public override configure(): ModalOptions<VariationGroupeTemplateResource> {
         return {
             title: "Edition de variation",
         };
@@ -43,11 +45,11 @@ export class ModalTag extends Modal<string> implements Aventus.DefaultComponent 
      * 
      */
     protected save() {
-        if(!this.name) {
-			this.inputEl.errors = ["Il faut un nom pour la variation"];
+        if(!this.resource) {
+			this.inputEl.errors = ["Il faut une variation"];
 			return;
 		}
-		this.resolve(this.name);
+		this.resolve(this.resource);
     }
 
 

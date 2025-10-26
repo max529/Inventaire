@@ -61,30 +61,6 @@ var RamErrorCode;
 })(RamErrorCode || (RamErrorCode = {}));
 __as1(_, 'RamErrorCode', RamErrorCode);
 
-let DateConverter=class DateConverter {
-    static __converter = new DateConverter();
-    static get converter() {
-        return this.__converter;
-    }
-    static set converter(value) {
-        this.__converter = value;
-    }
-    isStringDate(txt) {
-        return /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3,6})Z$/.exec(txt) !== null;
-    }
-    fromString(txt) {
-        return new Date(txt);
-    }
-    toString(date) {
-        if (date.getFullYear() < 100) {
-            return "0001-01-01T00:00:00.000Z";
-        }
-        return date.toISOString();
-    }
-}
-DateConverter.Namespace=`Aventus`;
-__as1(_, 'DateConverter', DateConverter);
-
 let ActionGuard=class ActionGuard {
     /**
      * Map to store actions that are currently running.
@@ -156,6 +132,30 @@ let isClass=function isClass(v) {
     return typeof v === 'function' && /^\s*class\s+/.test(v.toString());
 }
 __as1(_, 'isClass', isClass);
+
+let DateConverter=class DateConverter {
+    static __converter = new DateConverter();
+    static get converter() {
+        return this.__converter;
+    }
+    static set converter(value) {
+        this.__converter = value;
+    }
+    isStringDate(txt) {
+        return /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3,6})Z$/.exec(txt) !== null;
+    }
+    fromString(txt) {
+        return new Date(txt);
+    }
+    toString(date) {
+        if (date.getFullYear() < 100) {
+            return "0001-01-01T00:00:00.000Z";
+        }
+        return date.toISOString();
+    }
+}
+DateConverter.Namespace=`Aventus`;
+__as1(_, 'DateConverter', DateConverter);
 
 let ElementExtension=class ElementExtension {
     /**
@@ -1508,11 +1508,13 @@ let Watcher=class Watcher {
                                     el = replaceByAlias(target, el, target.length + '', receiver, false, out);
                                     target.push(el);
                                     const dones = [];
+                                    const dones2 = [];
                                     if (out.otherRoot) {
                                         dones.push(out.otherRoot);
+                                        dones2.push(out.otherRoot);
                                     }
                                     trigger('CREATED', target, receiver, receiver[index], "[" + (index) + "]", dones);
-                                    trigger('UPDATED', target, receiver, target.length, "length", dones);
+                                    trigger('UPDATED', target, receiver, target.length, "length", dones2);
                                     return index;
                                 };
                             }
@@ -1584,13 +1586,16 @@ let Watcher=class Watcher {
                                 result = (key, value) => {
                                     const out = {};
                                     let dones = [];
+                                    let dones2 = [];
                                     key = Watcher.extract(key);
                                     value = replaceByAlias(target, value, key + '', receiver, false, out);
-                                    if (out.otherRoot)
+                                    if (out.otherRoot) {
                                         dones.push(out.otherRoot);
+                                        dones2.push(out.otherRoot);
+                                    }
                                     let result = target.set(key, value);
                                     trigger('CREATED', target, receiver, receiver.get(key), key + '', dones);
-                                    trigger('UPDATED', target, receiver, target.size, "size", dones);
+                                    trigger('UPDATED', target, receiver, target.size, "size", dones2);
                                     return result;
                                 };
                             }
@@ -4953,102 +4958,138 @@ let ResourceLoader=class ResourceLoader {
 ResourceLoader.Namespace=`Aventus`;
 __as1(_, 'ResourceLoader', ResourceLoader);
 
-let GenericError=class GenericError {
-    /**
-     * Code for the error
-     */
-    code;
-    /**
-     * Description of the error
-     */
-    message;
-    /**
-     * Additional details related to the error.
-     */
-    details = [];
-    /**
-     * Creates a new instance of GenericError.
-     * @param {EnumValue<T>} code - The error code.
-     * @param {string} message - The error message.
-     */
-    constructor(code, message) {
-        this.code = code;
-        this.message = message + '';
+let ConverterTransform=class ConverterTransform {
+    transform(data) {
+        return this.transformLoop(data);
     }
-}
-GenericError.Namespace=`Aventus`;
-__as1(_, 'GenericError', GenericError);
-
-let VoidWithError=class VoidWithError {
-    /**
-     * Determine if the action is a success
-     */
-    get success() {
-        return this.errors.length == 0;
+    createInstance(data) {
+        if (data.$type) {
+            let cst = Converter.info.get(data.$type);
+            if (cst) {
+                return new cst();
+            }
+        }
+        return undefined;
     }
-    /**
-     * List of errors
-     */
-    errors = [];
-    /**
-     * Converts the current instance to a VoidWithError object.
-     * @returns {VoidWithError} A new instance of VoidWithError with the same error list.
-     */
-    toGeneric() {
-        const result = new VoidWithError();
-        result.errors = this.errors;
-        return result;
+    beforeTransformObject(obj) {
     }
-    /**
-    * Checks if the error list contains a specific error code.
-    * @template U - The type of error, extending GenericError.
-    * @template T - The type of the error code, which extends either number or Enum.
-    * @param {EnumValue<T>} code - The error code to check for.
-    * @param {new (...args: any[]) => U} [type] - Optional constructor function of the error type.
-    * @returns {boolean} True if the error list contains the specified error code, otherwise false.
-    */
-    containsCode(code, type) {
-        if (type) {
-            for (let error of this.errors) {
-                if (error instanceof type) {
-                    if (error.code == code) {
-                        return true;
+    afterTransformObject(obj) {
+    }
+    transformLoop(data) {
+        if (data === null) {
+            return data;
+        }
+        if (Array.isArray(data)) {
+            let result = [];
+            for (let element of data) {
+                result.push(this.transformLoop(element));
+            }
+            return result;
+        }
+        if (data instanceof Date) {
+            return data;
+        }
+        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
+            let objTemp = this.createInstance(data);
+            if (objTemp) {
+                if (objTemp instanceof Map) {
+                    if (data.values) {
+                        for (const keyValue of data.values) {
+                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                        }
                     }
+                    return objTemp;
                 }
+                let obj = objTemp;
+                this.beforeTransformObject(obj);
+                if (obj.fromJSON) {
+                    obj = obj.fromJSON(data);
+                }
+                else {
+                    obj = Json.classFromJson(obj, data, {
+                        transformValue: (key, value) => {
+                            if (obj[key] instanceof Date) {
+                                return value ? new Date(value) : null;
+                            }
+                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
+                                return value ? DateConverter.converter.fromString(value) : null;
+                            }
+                            else if (obj[key] instanceof Map) {
+                                let map = new Map();
+                                if ("$type" in value && value['$type'] == "Aventus.Map") {
+                                    value = value.values;
+                                }
+                                for (const keyValue of value) {
+                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
+                                }
+                                return map;
+                            }
+                            else if (obj instanceof Data) {
+                                let cst = obj.constructor;
+                                if (cst.$schema[key] == 'boolean') {
+                                    return value ? true : false;
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'number') {
+                                    return isNaN(Number(value)) ? 0 : Number(value);
+                                }
+                                else if (cst.$schema[key] == 'Date') {
+                                    return value ? new Date(value) : null;
+                                }
+                            }
+                            return this.transformLoop(value);
+                        }
+                    });
+                }
+                this.afterTransformObject(obj);
+                return obj;
+            }
+            let result = {};
+            for (let key in data) {
+                result[key] = this.transformLoop(data[key]);
+            }
+            return result;
+        }
+        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
+            return new Date(data);
+        }
+        return data;
+    }
+    copyValuesClass(target, src, options) {
+        const realOptions = {
+            isValidKey: options?.isValidKey ?? (() => true),
+            replaceKey: options?.replaceKey ?? ((key) => key),
+            transformValue: options?.transformValue ?? ((key, value) => value),
+        };
+        this.__classCopyValues(target, src, realOptions);
+    }
+    __classCopyValues(target, src, options) {
+        let props = Object.getOwnPropertyNames(target);
+        for (let prop of props) {
+            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
+            if (propInfo?.writable) {
+                if (options.isValidKey(prop))
+                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
             }
         }
-        else {
-            for (let error of this.errors) {
-                if (error.code == code) {
-                    return true;
+        let cstTemp = target.constructor;
+        while (cstTemp.prototype && cstTemp != Object.prototype) {
+            props = Object.getOwnPropertyNames(cstTemp.prototype);
+            for (let prop of props) {
+                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
+                if (propInfo?.set && propInfo.get) {
+                    if (options.isValidKey(prop))
+                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
                 }
             }
+            cstTemp = Object.getPrototypeOf(cstTemp);
         }
-        return false;
     }
 }
-VoidWithError.Namespace=`Aventus`;
-__as1(_, 'VoidWithError', VoidWithError);
-
-let ResultWithError=class ResultWithError extends VoidWithError {
-    /**
-      * The result value of the action.
-      * @type {U | undefined}
-      */
-    result;
-    /**
-     * Converts the current instance to a ResultWithError object.
-     * @returns {ResultWithError<U>} A new instance of ResultWithError with the same error list and result value.
-     */
-    toGeneric() {
-        const result = new ResultWithError();
-        result.errors = this.errors;
-        result.result = this.result;
-        return result;
-    }
-}
-ResultWithError.Namespace=`Aventus`;
-__as1(_, 'ResultWithError', ResultWithError);
+ConverterTransform.Namespace=`Aventus`;
+__as1(_, 'ConverterTransform', ConverterTransform);
 
 let Json=class Json {
     /**
@@ -5139,7 +5180,79 @@ let Json=class Json {
 Json.Namespace=`Aventus`;
 __as1(_, 'Json', Json);
 
-let Data=class Data {
+let Converter=class Converter {
+    /**
+    * Map storing information about registered types.
+    */
+    static info = new Map([["Aventus.Map", Map]]);
+    /**
+    * Map storing schemas for registered types.
+    */
+    static schema = new Map();
+    /**
+     * Internal converter instance.
+     */
+    static __converter = new ConverterTransform();
+    /**
+     * Getter for the internal converter instance.
+     */
+    static get converterTransform() {
+        return this.__converter;
+    }
+    /**
+    * Sets the converter instance.
+    * @param converter The converter instance to set.
+    */
+    static setConverter(converter) {
+        this.__converter = converter;
+    }
+    /**
+    * Registers a unique string type for any class.
+    * @param $type The unique string type identifier.
+    * @param cst The constructor function for the class.
+    * @param schema Optional schema for the registered type.
+    */
+    static register($type, cst, schema) {
+        this.info.set($type, cst);
+        if (schema) {
+            this.schema.set($type, schema);
+        }
+    }
+    /**
+     * Transforms the provided data using the current converter instance.
+     * @template T
+     * @param {*} data The data to transform.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
+     * @returns {T} Returns the transformed data.
+     */
+    static transform(data, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.transform(data);
+    }
+    /**
+     * Copies values from one class instance to another using the current converter instance.
+     * @template T
+     * @param {T} to The destination class instance to copy values into.
+     * @param {T} from The source class instance to copy values from.
+     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
+     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
+     * @returns {T} Returns the destination class instance with copied values.
+     */
+    static copyValuesClass(to, from, options, converter) {
+        if (!converter) {
+            converter = this.converterTransform;
+        }
+        return converter.copyValuesClass(to, from, options);
+    }
+}
+Converter.Namespace=`Aventus`;
+__as1(_, 'Converter', Converter);
+
+let Data=// @Dependances([{ type: Aventus.Converter, strong: true }, { type: Converter, strong: true }])
+class Data {
+    static converter = new Converter();
     /**
      * The schema for the class
      */
@@ -5187,7 +5300,116 @@ let Data=class Data {
     }
 }
 Data.Namespace=`Aventus`;
+Data.$schema={"namespace":"string","$type":"string","className":"string"};
+Converter.register(Data.Fullname, Data);
 __as1(_, 'Data', Data);
+
+let clone=function clone(item) {
+    return Converter.transform(JSON.parse(JSON.stringify(item)));
+}
+__as1(_, 'clone', clone);
+
+let GenericError=// @Dependances([{ type: Aventus.Converter, strong: true }, { type: Converter, strong: true }])
+class GenericError {
+    static converter = new Converter();
+    static get Fullname() { return "Aventus.GenericError"; }
+    /**
+     * Code for the error
+     */
+    code;
+    /**
+     * Description of the error
+     */
+    message;
+    /**
+     * Additional details related to the error.
+     */
+    details = [];
+    /**
+     * Creates a new instance of GenericError.
+     * @param {EnumValue<T>} code - The error code.
+     * @param {string} message - The error message.
+     */
+    constructor(code, message) {
+        this.code = code;
+        this.message = message + '';
+    }
+}
+GenericError.Namespace=`Aventus`;
+GenericError.$schema={"code":"Aventus.EnumValue","message":"string"};
+Converter.register(GenericError.Fullname, GenericError);
+__as1(_, 'GenericError', GenericError);
+
+let VoidWithError=class VoidWithError {
+    /**
+     * Determine if the action is a success
+     */
+    get success() {
+        return this.errors.length == 0;
+    }
+    /**
+     * List of errors
+     */
+    errors = [];
+    /**
+     * Converts the current instance to a VoidWithError object.
+     * @returns {VoidWithError} A new instance of VoidWithError with the same error list.
+     */
+    toGeneric() {
+        const result = new VoidWithError();
+        result.errors = this.errors;
+        return result;
+    }
+    /**
+    * Checks if the error list contains a specific error code.
+    * @template U - The type of error, extending GenericError.
+    * @template T - The type of the error code, which extends either number or Enum.
+    * @param {EnumValue<T>} code - The error code to check for.
+    * @param {new (...args: any[]) => U} [type] - Optional constructor function of the error type.
+    * @returns {boolean} True if the error list contains the specified error code, otherwise false.
+    */
+    containsCode(code, type) {
+        if (type) {
+            for (let error of this.errors) {
+                if (error instanceof type) {
+                    if (error.code == code) {
+                        return true;
+                    }
+                }
+            }
+        }
+        else {
+            for (let error of this.errors) {
+                if (error.code == code) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+VoidWithError.Namespace=`Aventus`;
+__as1(_, 'VoidWithError', VoidWithError);
+
+let ResultWithError=class ResultWithError extends VoidWithError {
+    /**
+      * The result value of the action.
+      * @type {U | undefined}
+      */
+    result;
+    /**
+     * Converts the current instance to a ResultWithError object.
+     * @returns {ResultWithError<U>} A new instance of ResultWithError with the same error list and result value.
+     */
+    toGeneric() {
+        const result = new ResultWithError();
+        result.errors = this.errors;
+        result.result = this.result;
+        return result;
+    }
+}
+ResultWithError.Namespace=`Aventus`;
+__as1(_, 'ResultWithError', ResultWithError);
 
 let ResizeObserver=class ResizeObserver {
     callback;
@@ -5978,274 +6200,11 @@ let DragAndDrop=class DragAndDrop {
 DragAndDrop.Namespace=`Aventus`;
 __as1(_, 'DragAndDrop', DragAndDrop);
 
-let ConverterTransform=class ConverterTransform {
-    transform(data) {
-        return this.transformLoop(data);
-    }
-    createInstance(data) {
-        if (data.$type) {
-            let cst = Converter.info.get(data.$type);
-            if (cst) {
-                return new cst();
-            }
-        }
-        return undefined;
-    }
-    beforeTransformObject(obj) {
-    }
-    afterTransformObject(obj) {
-    }
-    transformLoop(data) {
-        if (data === null) {
-            return data;
-        }
-        if (Array.isArray(data)) {
-            let result = [];
-            for (let element of data) {
-                result.push(this.transformLoop(element));
-            }
-            return result;
-        }
-        if (data instanceof Date) {
-            return data;
-        }
-        if (typeof data === 'object' && !/^\s*class\s+/.test(data.toString())) {
-            let objTemp = this.createInstance(data);
-            if (objTemp) {
-                if (objTemp instanceof Map) {
-                    if (data.values) {
-                        for (const keyValue of data.values) {
-                            objTemp.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                        }
-                    }
-                    return objTemp;
-                }
-                let obj = objTemp;
-                this.beforeTransformObject(obj);
-                if (obj.fromJSON) {
-                    obj = obj.fromJSON(data);
-                }
-                else {
-                    obj = Json.classFromJson(obj, data, {
-                        transformValue: (key, value) => {
-                            if (obj[key] instanceof Date) {
-                                return value ? new Date(value) : null;
-                            }
-                            else if (typeof value == 'string' && DateConverter.converter.isStringDate(value)) {
-                                return value ? DateConverter.converter.fromString(value) : null;
-                            }
-                            else if (obj[key] instanceof Map) {
-                                let map = new Map();
-                                if ("$type" in value && value['$type'] == "Aventus.Map") {
-                                    value = value.values;
-                                }
-                                for (const keyValue of value) {
-                                    map.set(this.transformLoop(keyValue[0]), this.transformLoop(keyValue[1]));
-                                }
-                                return map;
-                            }
-                            else if (obj instanceof Data) {
-                                let cst = obj.constructor;
-                                if (cst.$schema[key] == 'boolean') {
-                                    return value ? true : false;
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'number') {
-                                    return isNaN(Number(value)) ? 0 : Number(value);
-                                }
-                                else if (cst.$schema[key] == 'Date') {
-                                    return value ? new Date(value) : null;
-                                }
-                            }
-                            return this.transformLoop(value);
-                        }
-                    });
-                }
-                this.afterTransformObject(obj);
-                return obj;
-            }
-            let result = {};
-            for (let key in data) {
-                result[key] = this.transformLoop(data[key]);
-            }
-            return result;
-        }
-        if (typeof data == 'string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/.exec(data)) {
-            return new Date(data);
-        }
-        return data;
-    }
-    copyValuesClass(target, src, options) {
-        const realOptions = {
-            isValidKey: options?.isValidKey ?? (() => true),
-            replaceKey: options?.replaceKey ?? ((key) => key),
-            transformValue: options?.transformValue ?? ((key, value) => value),
-        };
-        this.__classCopyValues(target, src, realOptions);
-    }
-    __classCopyValues(target, src, options) {
-        let props = Object.getOwnPropertyNames(target);
-        for (let prop of props) {
-            let propInfo = Object.getOwnPropertyDescriptor(target, prop);
-            if (propInfo?.writable) {
-                if (options.isValidKey(prop))
-                    target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-            }
-        }
-        let cstTemp = target.constructor;
-        while (cstTemp.prototype && cstTemp != Object.prototype) {
-            props = Object.getOwnPropertyNames(cstTemp.prototype);
-            for (let prop of props) {
-                let propInfo = Object.getOwnPropertyDescriptor(cstTemp.prototype, prop);
-                if (propInfo?.set && propInfo.get) {
-                    if (options.isValidKey(prop))
-                        target[options.replaceKey(prop)] = options.transformValue(prop, src[prop]);
-                }
-            }
-            cstTemp = Object.getPrototypeOf(cstTemp);
-        }
-    }
-}
-ConverterTransform.Namespace=`Aventus`;
-__as1(_, 'ConverterTransform', ConverterTransform);
-
-let Converter=class Converter {
-    /**
-    * Map storing information about registered types.
-    */
-    static info = new Map([["Aventus.Map", Map]]);
-    /**
-    * Map storing schemas for registered types.
-    */
-    static schema = new Map();
-    /**
-     * Internal converter instance.
-     */
-    static __converter = new ConverterTransform();
-    /**
-     * Getter for the internal converter instance.
-     */
-    static get converterTransform() {
-        return this.__converter;
-    }
-    /**
-    * Sets the converter instance.
-    * @param converter The converter instance to set.
-    */
-    static setConverter(converter) {
-        this.__converter = converter;
-    }
-    /**
-    * Registers a unique string type for any class.
-    * @param $type The unique string type identifier.
-    * @param cst The constructor function for the class.
-    * @param schema Optional schema for the registered type.
-    */
-    static register($type, cst, schema) {
-        this.info.set($type, cst);
-        if (schema) {
-            this.schema.set($type, schema);
-        }
-    }
-    /**
-     * Transforms the provided data using the current converter instance.
-     * @template T
-     * @param {*} data The data to transform.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for transformation.
-     * @returns {T} Returns the transformed data.
-     */
-    static transform(data, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.transform(data);
-    }
-    /**
-     * Copies values from one class instance to another using the current converter instance.
-     * @template T
-     * @param {T} to The destination class instance to copy values into.
-     * @param {T} from The source class instance to copy values from.
-     * @param {ClassCopyOptions} [options] Optional options for the copy operation.
-     * @param {IConverterTransform} [converter] Optional converter instance to use for the copy operation.
-     * @returns {T} Returns the destination class instance with copied values.
-     */
-    static copyValuesClass(to, from, options, converter) {
-        if (!converter) {
-            converter = this.converterTransform;
-        }
-        return converter.copyValuesClass(to, from, options);
-    }
-}
-Converter.Namespace=`Aventus`;
-__as1(_, 'Converter', Converter);
-
-let clone=function clone(item) {
-    return Converter.transform(JSON.parse(JSON.stringify(item)));
-}
-__as1(_, 'clone', clone);
-
-let RamManager=class RamManager {
-    static _allInit = true;
-    static get allInit() { return this._allInit; }
-    ;
-    static info = new Map([]);
-    static rams = [];
-    static registerRAM(ram) {
-        this._allInit = false;
-        if (!this.rams.includes(ram)) {
-            this.rams.push(ram);
-        }
-    }
-    static check() {
-        if (this._allInit) {
-            this._allInit = true;
-            for (let ramCst of this.rams) {
-                const ram = Instance.get(ramCst);
-                for (let type of ram.ramForTypes()) {
-                    this.info.set(type, ram);
-                }
-            }
-            for (let ramCst of this.rams) {
-                const ram = Instance.get(ramCst);
-                const mapping = {};
-                for (let type of ram.ramForTypes()) {
-                    if ('$schema' in type) {
-                        const schema = type.$schema;
-                        for (let key in schema) {
-                            if (mapping[key])
-                                continue;
-                            let schemaType = schema[key];
-                            let asArray = false;
-                            if (schemaType.endsWith("[]")) {
-                                asArray = true;
-                                schemaType = schemaType.slice(0, -2);
-                            }
-                            const schemaInfo = Converter.info.get(schemaType);
-                            if (schemaInfo) {
-                                const ramLink = this.info.get(schemaInfo);
-                                if (ramLink) {
-                                    mapping[key] = {
-                                        ram: ramLink,
-                                        asArray
-                                    };
-                                }
-                            }
-                        }
-                    }
-                }
-                ram.ramMapping = mapping;
-            }
-        }
-    }
-}
-RamManager.Namespace=`Aventus`;
-__as1(_, 'RamManager', RamManager);
-
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
+RamError.$schema={...(GenericError?.$schema ?? {}), };
+Converter.register(RamError.Fullname, RamError);
 __as1(_, 'RamError', RamError);
 
 let VoidRamWithError=class VoidRamWithError extends VoidWithError {
@@ -6285,7 +6244,7 @@ let GenericRam=class GenericRam {
         if (this.constructor == GenericRam) {
             throw "can't instanciate an abstract class";
         }
-        RamManager.check();
+        // RamManager.check();
         this.getIdWithError = this.getIdWithError.bind(this);
         this.getId = this.getId.bind(this);
         this.save = this.save.bind(this);
@@ -6473,47 +6432,31 @@ let GenericRam=class GenericRam {
         this.mergeObject(item, objJson);
         return item;
     }
-    linkFct = new Map();
-    linkInfo = {};
-    linkRamItem(item) {
-        for (let key in this.ramMapping) {
-            this.linkRamItemByKey(item, key);
-        }
-    }
-    linkRamItemByKey(item, key) {
-        const mapping = this.ramMapping[key];
-        if (key in item) {
-            if (mapping.asArray) {
-                if (Array.isArray(item[key])) {
-                }
-                else {
-                    console.error(key + " in type " + item + " must be an array");
-                }
-            }
-            else {
-                const id = mapping.ram.getId(item[key]);
-                if (!this.linkFct.has(mapping.ram)) {
-                    const fcts = {
-                        onCreated: (item) => {
-                        },
-                        onUpdated: (item) => {
-                        },
-                        onDeleted: (item) => {
-                        },
-                    };
-                    this.linkFct.set(mapping.ram, fcts);
-                    mapping.ram.onCreated(fcts.onCreated);
-                    mapping.ram.onUpdated(fcts.onUpdated);
-                    mapping.ram.onDeleted(fcts.onDeleted);
-                }
-                if (!this.linkInfo[key])
-                    this.linkInfo[key] = {};
-                if (!this.linkInfo[key][id])
-                    this.linkInfo[key][id] = [];
-                this.linkInfo[key][id].push(item);
-            }
-        }
-    }
+    //     onCreated: (item: any) => void;
+    //     onUpdated: (item: any) => void;
+    //     onDeleted: (item: any) => void;
+    // }> = new Map();
+    // private linkInfo: { [key: string | number]: { [id: string | number]: U[]; }; } = {};
+    // private linkRamItem(item: U) {
+    //     for(let key in this.ramMapping) {
+    //         this.linkRamItemByKey(item, key);
+    // private linkRamItemByKey(item: U, key: string) {
+    //     if(key in item) {
+    //         if(mapping.asArray) {
+    //             if(Array.isArray(item[key])) {
+    //                 console.error(key + " in type " + item + " must be an array");
+    //             const id = mapping.ram.getId(item[key]);
+    //             if(!this.linkFct.has(mapping.ram)) {
+    //                     onCreated: (item) => {
+    //                     onUpdated: (item) => {
+    //                     onDeleted: (item) => {
+    //                 this.linkFct.set(mapping.ram, fcts);
+    //                 mapping.ram.onCreated(fcts.onCreated);
+    //                 mapping.ram.onUpdated(fcts.onUpdated);
+    //                 mapping.ram.onDeleted(fcts.onDeleted);
+    //             if(!this.linkInfo[key])
+    //             if(!this.linkInfo[key][id])
+    //             this.linkInfo[key][id].push(item);
     /**
      * Add element inside Ram or update it. The instance inside the ram is unique and ll never be replaced
      */
@@ -6529,7 +6472,7 @@ let GenericRam=class GenericRam {
                     // this.unlinkRamItem(uniqueRecord);
                     this.mergeObject(uniqueRecord, item);
                     await this.afterRecordSet(uniqueRecord);
-                    this.linkRamItem(uniqueRecord);
+                    // this.linkRamItem(uniqueRecord);
                     resultTemp = 'updated';
                 }
                 else {
@@ -6537,7 +6480,7 @@ let GenericRam=class GenericRam {
                     await this.beforeRecordSet(realObject);
                     this.records.set(id, realObject);
                     await this.afterRecordSet(realObject);
-                    this.linkRamItem(realObject);
+                    // this.linkRamItem(realObject);
                     resultTemp = 'created';
                 }
                 result.result = this.records.get(id);
@@ -7191,6 +7134,8 @@ __as1(_, 'Ram', Ram);
 let HttpError=class HttpError extends GenericError {
 }
 HttpError.Namespace=`Aventus`;
+HttpError.$schema={...(GenericError?.$schema ?? {}), };
+Converter.register(HttpError.Fullname, HttpError);
 __as1(_, 'HttpError', HttpError);
 
 let HttpRequest=class HttpRequest {
@@ -7798,7 +7743,6 @@ let GenericRamHttp=class GenericRamHttp {
     getAllDone = false;
     getByIdDone = [];
     hasDetails;
-    ramMapping = {};
     constructor() {
         if (this.constructor == Aventus.GenericRam) {
             throw "can't instanciate an abstract class";
@@ -7845,12 +7789,8 @@ let GenericRamHttp=class GenericRamHttp {
         this.deleteById = this.deleteById.bind(this);
         this.deleteByIdWithError = this.deleteByIdWithError.bind(this);
     }
-    /**
-    * Define all the types you ram is capable of
-    */
-    ramForTypes() {
-        return [this.getTypeForData({})];
-    }
+    // public ramForTypes(): (new () => RamHttpResourceDetails<C>)[] {
+    //     return [this.getTypeForData({})];
     /**
      * Get item id
      */
@@ -9455,6 +9395,9 @@ Navigation.Page = class Page extends Aventus.WebComponent {
     isAllowed(state, pattern, router) {
         return true;
     }
+    loadData(state) {
+        return true;
+    }
 }
 Navigation.Page.Namespace=`Aventus.Navigation`;
 __as1(_.Navigation, 'Page', Navigation.Page);
@@ -10921,7 +10864,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         }
         let containerSize = direction == 'y' ? container.offsetHeight : container.offsetWidth;
         if (this.contentWrapperSize[direction] != 0) {
-            let scrollPosition = this.position[direction] / this.contentWrapperSize[direction] * containerSize;
+            let scrollPosition = this.div(this.position[direction], this.contentWrapperSize[direction]) * containerSize;
             scroller.style.transform = `translate${direction.toUpperCase()}(${scrollPosition}px)`;
             this.contentWrapper.style.transform = `translate3d(${-1 * this.x}px, ${-1 * this.y}px, 0)`;
         }
@@ -11096,7 +11039,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         else {
             newScale = Math.max(this.min_zoom, newZoom);
         }
-        let scaleDiff = newScale / oldScale;
+        let scaleDiff = this.div(newScale, oldScale);
         const matrix = this.createMatrix()
             .translate(this.x, this.y)
             .translate(mousePositionRelativeToTarget.x, mousePositionRelativeToTarget.y)
@@ -11121,7 +11064,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
             const originY = (positioningElRect.top + this.y - this.startTranslate.y) - prevMidpoint.y;
             const newDistance = this.getDistance(touches[0], touches[1]);
             const prevDistance = this.previousDistance;
-            let scaleDiff = prevDistance ? newDistance / prevDistance : 1;
+            let scaleDiff = prevDistance ? this.div(newDistance, prevDistance) : 1;
             const panX = prevMidpoint.x - newMidpoint.x;
             const panY = prevMidpoint.y - newMidpoint.y;
             let oldScale = this.zoom;
@@ -11132,7 +11075,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
             else {
                 newScale = Math.max(this.min_zoom, oldScale * scaleDiff);
             }
-            scaleDiff = newScale / oldScale;
+            scaleDiff = this.div(newScale, oldScale);
             const matrix = this.createMatrix()
                 .translate(panX, panY)
                 .translate(originX, originY)
@@ -11386,17 +11329,17 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         this.contentWrapperSize.y = this.contentWrapper.offsetHeight;
         if (this.zoom < 1) {
             // scale the container for zoom
-            this.contentZoom.style.width = this.mainContainer.offsetWidth / this.zoom + 'px';
-            this.contentZoom.style.height = this.mainContainer.offsetHeight / this.zoom + 'px';
-            this.contentZoom.style.maxHeight = this.mainContainer.offsetHeight / this.zoom + 'px';
+            this.contentZoom.style.width = this.div(this.mainContainer.offsetWidth, this.zoom) + 'px';
+            this.contentZoom.style.height = this.div(this.mainContainer.offsetHeight, this.zoom) + 'px';
+            this.contentZoom.style.maxHeight = this.div(this.mainContainer.offsetHeight, this.zoom) + 'px';
             if (currentOffsetHeight != this.display.y || currentOffsetWidth != this.display.x)
                 hasChanged = true;
             this.display.y = currentOffsetHeight;
             this.display.x = currentOffsetWidth;
         }
         else {
-            const newX = currentOffsetWidth / this.zoom;
-            const newY = currentOffsetHeight / this.zoom;
+            const newX = this.div(currentOffsetWidth, this.zoom);
+            const newY = this.div(currentOffsetHeight, this.zoom);
             if (newY != this.display.y || newX != this.display.x)
                 hasChanged = true;
             this.display.y = newY;
@@ -11442,7 +11385,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         }
     }
     calculateSizeScroller(direction) {
-        const scrollerSize = ((this.display[direction] - this.margin[direction]) / this.contentWrapperSize[direction] * 100);
+        const scrollerSize = (this.div((this.display[direction] - this.margin[direction]), this.contentWrapperSize[direction]) * 100);
         if (direction == "y") {
             this.scroller[direction]().style.height = scrollerSize + '%';
         }
@@ -11470,8 +11413,8 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         }
         else if (this.loadedOnce) {
             this.savedPercent = {
-                x: this.position.x / this.contentWrapperSize.x,
-                y: this.position.y / this.contentWrapperSize.y
+                x: this.div(this.position.x, this.contentWrapperSize.x),
+                y: this.div(this.position.y, this.contentWrapperSize.y)
             };
         }
         if (!this.calculateRealSize() && !force) {
@@ -11526,6 +11469,11 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
         }
         this.observer.observe(this.contentWrapper);
         this.observer.observe(this);
+    }
+    div(nb1, nb2) {
+        if (!nb2)
+            return nb1;
+        return nb1 / nb2;
     }
     postCreation() {
         this.dimensionRefreshed();
@@ -11665,7 +11613,7 @@ Lib.ShortcutManager=class ShortcutManager {
             }
         }
     }
-    static onKeyDown(e) {
+    static async onKeyDown(e) {
         if (e.ctrlKey) {
             let txt = Lib.SpecialTouch[Lib.SpecialTouch.Control];
             if (!this.arrayKeys.includes(txt)) {
@@ -11702,7 +11650,7 @@ Lib.ShortcutManager=class ShortcutManager {
             }
             this.arrayKeys = [];
             for (let cb of Lib.ShortcutManager.memory[key]) {
-                const result = cb();
+                const result = await cb();
                 if (result === false) {
                     preventDefault = result;
                 }
@@ -11746,6 +11694,15 @@ Lib.ShortcutManager=class ShortcutManager {
         });
         document.body.addEventListener("keydown", this.onKeyDown);
         document.body.addEventListener("keyup", this.onKeyUp);
+    }
+    static setAutoPrevents(combinaisons) {
+        if (!Lib.ShortcutManager.isInit) {
+            this.init();
+        }
+        Lib.ShortcutManager.autoPrevents = [];
+        for (let combinaison of combinaisons) {
+            Lib.ShortcutManager.autoPrevents.push(this.getText(combinaison));
+        }
     }
     static uninit() {
         document.body.removeEventListener("keydown", this.onKeyDown);
@@ -11987,6 +11944,14 @@ Navigation.Router = class Router extends Aventus.WebComponent {
                             return;
                         }
                         this.navigate(canResult, { replace: true });
+                        return;
+                    }
+                    const loadDataResult = await element.loadData(currentState);
+                    if (loadDataResult !== true) {
+                        if (loadDataResult === false) {
+                            return;
+                        }
+                        this.navigate(loadDataResult, { replace: true });
                         return;
                     }
                     if (isNew)
@@ -12254,17 +12219,19 @@ var Inventaire;
 const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Inventaire`;
 const _ = {};
-Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.neutral{background-color:var(--color-neutral)}.content-neutral{color:var(--color-neutral-content)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.accent{background-color:var(--color-accent)}.content-accent{color:var(--color-accent-content)}.info{background-color:var(--color-info)}.content-info{color:var(--color-info-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}`)
+Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.green{background-color:var(--color-green)}.content-green{color:var(--color-green-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.red{background-color:var(--color-red)}.content-red{color:var(--color-red-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}.orange{background-color:var(--color-orange)}.content-orange{color:var(--color-orange-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.blue{background-color:var(--color-blue)}.content-blue{color:var(--color-blue-content)}.information{background-color:var(--color-information)}.content-information{color:var(--color-information-content)}`)
 let App = {};
 _.App = Inventaire.App ?? {};
+App.Models = {};
+_.App.Models = Inventaire.App?.Models ?? {};
 App.Http = {};
 _.App.Http = Inventaire.App?.Http ?? {};
 App.Http.Controllers = {};
 _.App.Http.Controllers = Inventaire.App?.Http?.Controllers ?? {};
+App.Http.Controllers.VariationGroupeTemplate = {};
+_.App.Http.Controllers.VariationGroupeTemplate = Inventaire.App?.Http?.Controllers?.VariationGroupeTemplate ?? {};
 App.Http.Controllers.User = {};
 _.App.Http.Controllers.User = Inventaire.App?.Http?.Controllers?.User ?? {};
-App.Models = {};
-_.App.Models = Inventaire.App?.Models ?? {};
 App.Http.Controllers.Materiel = {};
 _.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
 App.Http.Controllers.Materiel.GetInventaire = {};
@@ -12285,37 +12252,11 @@ App.Http.Controllers.Auth = {};
 _.App.Http.Controllers.Auth = Inventaire.App?.Http?.Controllers?.Auth ?? {};
 App.Http.Controllers.Auth.Login = {};
 _.App.Http.Controllers.Auth.Login = Inventaire.App?.Http?.Controllers?.Auth?.Login ?? {};
+App.Enum = {};
+_.App.Enum = Inventaire.App?.Enum ?? {};
 App.Http.Controllers.Auth.Logout = {};
 _.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
-const Loading = class Loading extends Aventus.WebComponent {
-    get 'show'() { return this.getBoolAttr('show') }
-    set 'show'(val) { this.setBoolAttr('show', val) }    static __style = `:host{align-items:center;background-color:rgba(0,0,0,.1);display:none;inset:0;justify-content:center;position:absolute;z-index:999}:host .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--color-base-content);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;height:100%;width:100%;max-height:100px;max-width:100px}:host([show]){display:flex}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
-    __getStatic() {
-        return Loading;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(Loading.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="loader"></div>` }
-    });
-}
-    getClassName() {
-        return "Loading";
-    }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('show')) { this.attributeChangedCallback('show', false, false); } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('show'); }
-    __listBoolProps() { return ["show"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
-}
-Loading.Namespace=`Inventaire`;
-Loading.Tag=`av-loading`;
-__as1(_, 'Loading', Loading);
-if(!window.customElements.get('av-loading')){window.customElements.define('av-loading', Loading);Aventus.WebComponentInstance.registerDefinition(Loading);}
-
 let StringTools=class StringTools {
     static removeAccents(value) {
         return value
@@ -12354,6 +12295,47 @@ let Colors= [
 ];
 __as1(_, 'Colors', Colors);
 
+App.Models.Role=class Role extends Aventus.Data {
+    static get Fullname() { return "App.Models.Role"; }
+    id;
+    nom;
+}
+App.Models.Role.Namespace=`Inventaire.App.Models`;
+App.Models.Role.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+Aventus.Converter.register(App.Models.Role.Fullname, App.Models.Role);
+__as1(_.App.Models, 'Role', App.Models.Role);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource=class VariationTemplateResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource"; }
+    id;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource.Fullname, App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource);
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationTemplateResource', App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest=class VariationTemplateRequest {
+    static get Fullname() { return "App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest"; }
+    id = undefined;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest.$schema={"id":"number","nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest.Fullname, App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest);
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationTemplateRequest', App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest);
+
+App.Models.VariationTemplate=class VariationTemplate extends Aventus.Data {
+    static get Fullname() { return "App.Models.VariationTemplate"; }
+    id;
+    id_groupe;
+    nom;
+}
+App.Models.VariationTemplate.Namespace=`Inventaire.App.Models`;
+App.Models.VariationTemplate.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_groupe":"number","nom":"string"};
+Aventus.Converter.register(App.Models.VariationTemplate.Fullname, App.Models.VariationTemplate);
+__as1(_.App.Models, 'VariationTemplate', App.Models.VariationTemplate);
+
 App.Http.Controllers.User.UserResource=class UserResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.User.UserResource"; }
     id;
@@ -12383,9 +12365,10 @@ App.Models.User=class User extends Aventus.Data {
     prenom;
     nom_utilisateur;
     mot_passe;
+    id_role;
 }
 App.Models.User.Namespace=`Inventaire.App.Models`;
-App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string"};
+App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string","id_role":"number"};
 Aventus.Converter.register(App.Models.User.Fullname, App.Models.User);
 __as1(_.App.Models, 'User', App.Models.User);
 
@@ -12407,7 +12390,7 @@ __as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Control
 App.Http.Controllers.Inventaire.Update.Request=class Request {
     id = undefined;
     quantite;
-    id_materiel;
+    id_materiel_variation;
     id_equipe;
     id_variation = undefined;
 }
@@ -12418,21 +12401,19 @@ App.Models.InventaireHistorique=class InventaireHistorique extends Aventus.Data 
     static get Fullname() { return "App.Models.InventaireHistorique"; }
     id;
     id_equipe;
-    id_materiel;
-    id_variation = undefined;
+    id_materiel_variation;
     quantite;
     last_update;
     last_update_by;
 }
 App.Models.InventaireHistorique.Namespace=`Inventaire.App.Models`;
-App.Models.InventaireHistorique.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string"};
+App.Models.InventaireHistorique.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string"};
 Aventus.Converter.register(App.Models.InventaireHistorique.Fullname, App.Models.InventaireHistorique);
 __as1(_.App.Models, 'InventaireHistorique', App.Models.InventaireHistorique);
 
 App.Http.Controllers.Inventaire.Historique.Request=class Request {
-    id_materiel;
+    id_materiel_variation;
     id_equipe;
-    id_variation = undefined;
     page;
 }
 App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
@@ -12452,6 +12433,29 @@ App.Http.Controllers.Equipe.Materiel.Request=class Request {
 App.Http.Controllers.Equipe.Materiel.Request.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
 __as1(_.App.Http.Controllers.Equipe.Materiel, 'Request', App.Http.Controllers.Equipe.Materiel.Request);
 
+App.Models.MaterielVariationGroupe=class MaterielVariationGroupe extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielVariationGroupe"; }
+    id;
+    id_materiel_variation;
+    id_variation;
+}
+App.Models.MaterielVariationGroupe.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielVariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel_variation":"number","id_variation":"number"};
+Aventus.Converter.register(App.Models.MaterielVariationGroupe.Fullname, App.Models.MaterielVariationGroupe);
+__as1(_.App.Models, 'MaterielVariationGroupe', App.Models.MaterielVariationGroupe);
+
+App.Models.Variation=class Variation extends Aventus.Data {
+    static get Fullname() { return "App.Models.Variation"; }
+    id;
+    id_groupe;
+    id_variation_template = undefined;
+    nom;
+}
+App.Models.Variation.Namespace=`Inventaire.App.Models`;
+App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_groupe":"number","id_variation_template":"number","nom":"string"};
+Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
+__as1(_.App.Models, 'Variation', App.Models.Variation);
+
 App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
     static get Fullname() { return "App.Models.MaterielImage"; }
 }
@@ -12459,17 +12463,6 @@ App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
 App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
 Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
 __as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
-
-App.Models.Variation=class Variation extends Aventus.Data {
-    static get Fullname() { return "App.Models.Variation"; }
-    id;
-    id_materiel;
-    nom;
-}
-App.Models.Variation.Namespace=`Inventaire.App.Models`;
-App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","nom":"string"};
-Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
-__as1(_.App.Models, 'Variation', App.Models.Variation);
 
 App.Http.Controllers.Equipe.GetInventaire.Request=class Request {
     id_equipe;
@@ -12542,20 +12535,6 @@ EquipeItem.Tag=`av-equipe-item`;
 __as1(_, 'EquipeItem', EquipeItem);
 if(!window.customElements.get('av-equipe-item')){window.customElements.define('av-equipe-item', EquipeItem);Aventus.WebComponentInstance.registerDefinition(EquipeItem);}
 
-App.Http.Controllers.Materiel.GetInventaire.Response=class Response extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
-    id;
-    equipe;
-    variation = undefined;
-    quantite;
-    last_update;
-    last_update_by;
-}
-App.Http.Controllers.Materiel.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
-App.Http.Controllers.Materiel.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource","variation":"Inventaire.App.Models.Variation","quantite":"number","last_update":"Date","last_update_by":"string"};
-Aventus.Converter.register(App.Http.Controllers.Materiel.GetInventaire.Response.Fullname, App.Http.Controllers.Materiel.GetInventaire.Response);
-__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Response', App.Http.Controllers.Materiel.GetInventaire.Response);
-
 App.Http.Controllers.Materiel.MaterielEquipeResource=class MaterielEquipeResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielEquipeResource"; }
     id_equipe;
@@ -12577,9 +12556,10 @@ App.Models.Equipe=class Equipe extends Aventus.Data {
     static get Fullname() { return "App.Models.Equipe"; }
     id;
     nom;
+    favori;
 }
 App.Models.Equipe.Namespace=`Inventaire.App.Models`;
-App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","favori":"boolean"};
 Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
 __as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
@@ -12596,17 +12576,6 @@ App.Models.MaterielEquipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"numbe
 Aventus.Converter.register(App.Models.MaterielEquipe.Fullname, App.Models.MaterielEquipe);
 __as1(_.App.Models, 'MaterielEquipe', App.Models.MaterielEquipe);
 
-App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
-    variations;
-    equipes;
-    id = undefined;
-    nom;
-    image = undefined;
-    tout_monde;
-}
-App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-__as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
-
 App.Http.Controllers.Auth.Login.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Auth.Login.Response"; }
 }
@@ -12621,6 +12590,12 @@ App.Http.Controllers.Auth.Login.Request=class Request {
 }
 App.Http.Controllers.Auth.Login.Request.Namespace=`Inventaire.App.Http.Controllers.Auth.Login`;
 __as1(_.App.Http.Controllers.Auth.Login, 'Request', App.Http.Controllers.Auth.Login.Request);
+
+(function (Role) {
+    Role[Role["Admin"] = 1] = "Admin";
+    Role[Role["User"] = 2] = "User";
+})(App.Enum.Role || (App.Enum.Role = {}));
+__as1(_.App.Enum, 'Role', App.Enum.Role);
 
 const PageFull = class PageFull extends Aventus.Navigation.Page {
     static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}@media screen and (max-width: 768px){:host .content{padding:16px}}`;
@@ -12719,7 +12694,7 @@ __as1(_, 'Footer', Footer);
 if(!window.customElements.get('av-footer')){window.customElements.define('av-footer', Footer);Aventus.WebComponentInstance.registerDefinition(Footer);}
 
 const FlexScroll = class FlexScroll extends Aventus.Layout.Scrollable {
-    static __style = `:host{display:flex;flex-direction:column}:host .scroll-main-container{display:flex;flex-direction:column}:host .scroll-main-container .content-zoom{display:flex;flex-direction:column}`;
+    static __style = `:host{display:flex;flex-direction:column;min-height:0}:host .scroll-main-container{display:flex;flex-direction:column}:host .scroll-main-container .content-zoom{display:flex;flex-direction:column}`;
     __getStatic() {
         return FlexScroll;
     }
@@ -12960,7 +12935,7 @@ const Confirm = class Confirm extends Modal {
     static async open(options) {
         const alert = new Confirm();
         alert.options = { ...alert.options, ...options };
-        return await Confirm._show(alert);
+        return await alert.show();
     }
 }
 Confirm.Namespace=`Inventaire`;
@@ -13311,6 +13286,34 @@ InlineEdit.Tag=`av-inline-edit`;
 __as1(_, 'InlineEdit', InlineEdit);
 if(!window.customElements.get('av-inline-edit')){window.customElements.define('av-inline-edit', InlineEdit);Aventus.WebComponentInstance.registerDefinition(InlineEdit);}
 
+const Loading = class Loading extends Aventus.WebComponent {
+    get 'show'() { return this.getBoolAttr('show') }
+    set 'show'(val) { this.setBoolAttr('show', val) }    static __style = `:host{align-items:center;background-color:rgba(0,0,0,.1);display:none;inset:0;justify-content:center;position:absolute;z-index:999}:host .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--color-base-content);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;height:100%;width:100%;max-height:100px;max-width:100px}:host([show]){display:flex}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    __getStatic() {
+        return Loading;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(Loading.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="loader"></div>` }
+    });
+}
+    getClassName() {
+        return "Loading";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('show')) { this.attributeChangedCallback('show', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('show'); }
+    __listBoolProps() { return ["show"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+}
+Loading.Namespace=`Inventaire`;
+Loading.Tag=`av-loading`;
+__as1(_, 'Loading', Loading);
+if(!window.customElements.get('av-loading')){window.customElements.define('av-loading', Loading);Aventus.WebComponentInstance.registerDefinition(Loading);}
+
 const Toast = class Toast extends Aventus.Toast.ToastElement {
     get 'color'() { return this.getStringAttr('color') }
     set 'color'(val) { this.setStringAttr('color', val) }get 'closing'() { return this.getBoolAttr('closing') }
@@ -13333,7 +13336,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     __registerWatchesActions() {
     this.__addWatchesActions("toastTitle");this.__addWatchesActions("toastMessage");    super.__registerWatchesActions();
 }
-    static __style = `:host{background-color:var(--alert-color, var(--color-base-200));background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px #000,0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08));color:var(--color-base-content);cursor:default;max-width:calc(100vw - 2rem);overflow:hidden;pointer-events:auto;transition:top .2s linear,opacity .2s linear,visibility .2s linear}:host .toast-content{display:grid;font-size:.875rem;gap:1rem;grid-auto-flow:column;grid-template-columns:auto;justify-content:start;line-height:1.25rem;padding-block:.75rem;padding-inline:1rem;place-items:center start;text-align:start}:host .toast-flex{align-items:flex-start;display:flex}:host .toast-icon-wrapper{flex-shrink:0}:host .toast-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host .toast-message-wrapper{flex:1;margin-left:1rem;padding-top:.125rem}:host .toast-title{font-size:.875rem;font-weight:500;margin:0}:host .toast-message{font-size:.875rem;margin-bottom:0;margin-top:0}:host .toast-message:nth-child(3){margin-top:.25rem}:host .toast-close-wrapper{flex-shrink:0;margin-left:1rem}:host .toast-close-wrapper .sr-only{border-width:0;clip:rect(0, 0, 0, 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}:host .toast-close-wrapper .toast-close-button{background-color:rgba(0,0,0,0);border:none;color:inherit;cursor:pointer;display:inline-flex;outline:none}:host .toast-close-wrapper .toast-close-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host([color=neutral]){--alert-color: var(--color-neutral);border-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){--alert-color: var(--color-primary);border-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){--alert-color: var(--color-secondary);border-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){--alert-color: var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){--alert-color: var(--color-info);border-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){--alert-color: var(--color-success);border-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){--alert-color: var(--color-warning);border-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){--alert-color: var(--color-error);border-color:var(--color-error);color:var(--color-error-content)}:host([closing]){opacity:0;visibility:hidden}:host(:not([close_icon])) .toast-close-wrapper{display:none}:host([closable]:not([close_icon])){cursor:pointer}:host([soft]){background:var(--alert-color, var(--color-base-content));background-image:none;border-color:var(--alert-color, var(--color-base-content));box-shadow:none;color:var(--alert-color, var(--color-base-content))}:host([outline]){background-color:rgba(0,0,0,0);background-image:none;box-shadow:none;color:var(--alert-color)}:host([dash]){background-color:rgba(0,0,0,0);background-image:none;border-style:dashed;box-shadow:none;color:var(--alert-color)}@supports(color: color-mix(in lab, red, red)){:host{box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200))) calc(var(--depth) * 20%), rgba(0, 0, 0, 0)),0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08))}:host([soft]){background:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));border-color:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100))}}`;
+    static __style = `:host{background-color:var(--alert-color, var(--color-base-200));background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px #000,0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08));color:var(--color-base-content);cursor:default;max-width:calc(100vw - 2rem);overflow:hidden;pointer-events:auto;transition:top .2s linear,opacity .2s linear,visibility .2s linear}:host .toast-content{display:grid;font-size:.875rem;gap:1rem;grid-auto-flow:column;grid-template-columns:auto;justify-content:start;line-height:1.25rem;padding-block:.75rem;padding-inline:1rem;place-items:center start;text-align:start}:host .toast-flex{align-items:flex-start;display:flex}:host .toast-icon-wrapper{flex-shrink:0}:host .toast-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host .toast-message-wrapper{flex:1;margin-left:1rem;padding-top:.125rem}:host .toast-title{font-size:.875rem;font-weight:500;margin:0}:host .toast-message{font-size:.875rem;margin-bottom:0;margin-top:0}:host .toast-message:nth-child(3){margin-top:.25rem}:host .toast-close-wrapper{flex-shrink:0;margin-left:1rem}:host .toast-close-wrapper .sr-only{border-width:0;clip:rect(0, 0, 0, 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}:host .toast-close-wrapper .toast-close-button{background-color:rgba(0,0,0,0);border:none;color:inherit;cursor:pointer;display:inline-flex;outline:none}:host .toast-close-wrapper .toast-close-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host([color=primary]){--alert-color: var(--color-primary);border-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){--alert-color: var(--color-secondary);border-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]){--alert-color: var(--color-green);border-color:var(--color-green);color:var(--color-green-content)}:host([color=success]){--alert-color: var(--color-success);border-color:var(--color-success);color:var(--color-success-content)}:host([color=red]){--alert-color: var(--color-red);border-color:var(--color-red);color:var(--color-red-content)}:host([color=error]){--alert-color: var(--color-error);border-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]){--alert-color: var(--color-orange);border-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]){--alert-color: var(--color-warning);border-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]){--alert-color: var(--color-blue);border-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]){--alert-color: var(--color-information);border-color:var(--color-information);color:var(--color-information-content)}:host([closing]){opacity:0;visibility:hidden}:host(:not([close_icon])) .toast-close-wrapper{display:none}:host([closable]:not([close_icon])){cursor:pointer}:host([soft]){background:var(--alert-color, var(--color-base-content));background-image:none;border-color:var(--alert-color, var(--color-base-content));box-shadow:none;color:var(--alert-color, var(--color-base-content))}:host([outline]){background-color:rgba(0,0,0,0);background-image:none;box-shadow:none;color:var(--alert-color)}:host([dash]){background-color:rgba(0,0,0,0);background-image:none;border-style:dashed;box-shadow:none;color:var(--alert-color)}@supports(color: color-mix(in lab, red, red)){:host{box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200))) calc(var(--depth) * 20%), rgba(0, 0, 0, 0)),0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08))}:host([soft]){background:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));border-color:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100))}}`;
     __getStatic() {
         return Toast;
     }
@@ -13487,7 +13490,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("value", ((target) => {
     target.inputEl.value = target.value ?? "";
 })); }
-    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);width:100%}:host .label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);width:100%}:host .label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=green]),:host([color=green]):focus,:host([color=green]):focus-within{--input-color: var(--color-green)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=red]),:host([color=red]):focus,:host([color=red]):focus-within{--input-color: var(--color-red)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}:host([color=orange]),:host([color=orange]):focus,:host([color=orange]):focus-within{--input-color: var(--color-orange)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=blue]),:host([color=blue]):focus,:host([color=blue]):focus-within{--input-color: var(--color-blue)}:host([color=information]),:host([color=information]):focus,:host([color=information]):focus-within{--input-color: var(--color-information)}`;
     __getStatic() {
         return Input;
     }
@@ -13615,245 +13618,6 @@ Input.Tag=`av-input`;
 __as1(_, 'Input', Input);
 if(!window.customElements.get('av-input')){window.customElements.define('av-input', Input);Aventus.WebComponentInstance.registerDefinition(Input);}
 
-const ModalTag = class ModalTag extends Modal {
-    get 'name'() {
-						return this.__watch["name"];
-					}
-					set 'name'(val) {
-						this.__watch["name"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("name");    super.__registerWatchesActions();
-}
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
-    __getStatic() {
-        return ModalTag;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalTag.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-input label="Nom de la variation" _id="modaltag_1"></av-input></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "inputEl",
-      "ids": [
-        "modaltag_1"
-      ]
-    }
-  ],
-  "content": {
-    "modaltag_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod0())}`,
-      "once": true
-    }
-  },
-  "bindings": [
-    {
-      "id": "modaltag_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod1(),
-      "extract": (c, v) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod2(v),
-      "once": true,
-      "isCallback": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "modaltag_2",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "modaltag_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalTag";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["name"] = ""; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('name'); }
-    configure() {
-        return {
-            title: "Edition de variation",
-        };
-    }
-    save() {
-        if (!this.name) {
-            this.inputEl.errors = ["Il faut un nom pour la variation"];
-            return;
-        }
-        this.resolve(this.name);
-    }
-    __105132b7f1fa65d09c3cc981e16ef0efmethod0() {
-        return this.options.title;
-    }
-    __105132b7f1fa65d09c3cc981e16ef0efmethod1() {
-        return this.name;
-    }
-    __105132b7f1fa65d09c3cc981e16ef0efmethod2(v) {
-        if (this) {
-            this.name = v;
-        }
-    }
-}
-ModalTag.Namespace=`Inventaire`;
-ModalTag.Tag=`av-modal-tag`;
-__as1(_, 'ModalTag', ModalTag);
-if(!window.customElements.get('av-modal-tag')){window.customElements.define('av-modal-tag', ModalTag);Aventus.WebComponentInstance.registerDefinition(ModalTag);}
-
-const VariationTag = class VariationTag extends Aventus.WebComponent {
-    variation;
-    onDelete = new Aventus.Callback();
-    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-neutral)}`;
-    __getStatic() {
-        return VariationTag;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(VariationTag.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "componentEl",
-      "ids": [
-        "variationtag_0"
-      ]
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "variationtag_1",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerEdit(e, pressInstance); }
-    },
-    {
-      "id": "variationtag_2",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "VariationTag";
-    }
-    async triggerEdit() {
-        const p = new ModalTag();
-        p.name = this.variation.nom;
-        const result = await p.show();
-        if (result !== null) {
-            this.variation.nom = result;
-            this.componentEl.innerText = result;
-        }
-    }
-    async triggerDelete() {
-        const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.variation.nom + "?"
-        });
-        if (result) {
-            this.onDelete.trigger(this);
-        }
-    }
-    postCreation() {
-        super.postCreation();
-        this.componentEl.innerText = this.variation.nom;
-    }
-}
-VariationTag.Namespace=`Inventaire`;
-VariationTag.Tag=`av-variation-tag`;
-__as1(_, 'VariationTag', VariationTag);
-if(!window.customElements.get('av-variation-tag')){window.customElements.define('av-variation-tag', VariationTag);Aventus.WebComponentInstance.registerDefinition(VariationTag);}
-
-const VariationTags = class VariationTags extends Aventus.WebComponent {
-    variations = [];
-    static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
-    constructor() {
-        super();
-        this.onChildDelete = this.onChildDelete.bind(this);
-    }
-    __getStatic() {
-        return VariationTags;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(VariationTags.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "listEl",
-      "ids": [
-        "variationtags_0"
-      ]
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "variationtags_1",
-      "onPress": (e, pressInstance, c) => { c.comp.addVariation(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "VariationTags";
-    }
-    onChildDelete(el) {
-        let children = Array.from(this.listEl.children);
-        let index = children.indexOf(el);
-        this.variations.splice(index, 1);
-        this.listEl.removeChild(el);
-    }
-    render() {
-        this.listEl.innerHTML = "";
-        for (let variation of this.variations) {
-            let el = new VariationTag();
-            el.variation = variation;
-            el.onDelete.add(this.onChildDelete);
-            this.listEl.appendChild(el);
-        }
-    }
-    async addVariation() {
-        const p = new ModalTag();
-        const nom = await p.show();
-        if (nom === null)
-            return;
-        const v = new App.Models.Variation();
-        v.nom = nom;
-        this.variations.push(v);
-        let el = new VariationTag();
-        el.variation = v;
-        el.onDelete.add(this.onChildDelete);
-        this.listEl.appendChild(el);
-    }
-    postCreation() {
-        this.render();
-    }
-}
-VariationTags.Namespace=`Inventaire`;
-VariationTags.Tag=`av-variation-tags`;
-__as1(_, 'VariationTags', VariationTags);
-if(!window.customElements.get('av-variation-tags')){window.customElements.define('av-variation-tags', VariationTags);Aventus.WebComponentInstance.registerDefinition(VariationTags);}
-
 const Button = class Button extends Aventus.Form.ButtonElement {
     get 'color'() { return this.getStringAttr('color') }
     set 'color'(val) { this.setStringAttr('color', val) }get 'outline'() { return this.getBoolAttr('outline') }
@@ -13864,7 +13628,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     set 'link'(val) { this.setBoolAttr('link', val) }get 'active'() { return this.getBoolAttr('active') }
     set 'active'(val) { this.setBoolAttr('active', val) }get 'disabled'() { return this.getBoolAttr('disabled') }
     set 'disabled'(val) { this.setBoolAttr('disabled', val) }get 'loading'() { return this.getBoolAttr('loading') }
-    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=neutral]){--btn-color: var(--color-neutral);--btn-fg: var(--color-neutral-content)}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=accent]){--btn-color: var(--color-accent);--btn-fg: var(--color-accent-content)}:host([color=info]){--btn-color: var(--color-info);--btn-fg: var(--color-info-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=green]){--btn-color: var(--color-green);--btn-fg: var(--color-green-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=red]){--btn-color: var(--color-red);--btn-fg: var(--color-red-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([color=orange]){--btn-color: var(--color-orange);--btn-fg: var(--color-orange-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=blue]){--btn-color: var(--color-blue);--btn-fg: var(--color-blue-content)}:host([color=information]){--btn-color: var(--color-information);--btn-fg: var(--color-information-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
     __getStatic() {
         return Button;
     }
@@ -13893,7 +13657,7 @@ if(!window.customElements.get('av-button')){window.customElements.define('av-but
 
 const Tag = class Tag extends Aventus.WebComponent {
     get 'color'() { return this.getStringAttr('color') }
-    set 'color'(val) { this.setStringAttr('color', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-200);color:var(--color-base-content);border-radius:var(--radius-selector);display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host([color=neutral]){background-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){background-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){background-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){background-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){background-color:var(--color-error);color:var(--color-error-content)}`;
+    set 'color'(val) { this.setStringAttr('color', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-200);color:var(--color-base-content);border-radius:var(--radius-selector);display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host([color=primary]){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]){background-color:var(--color-green);color:var(--color-green-content)}:host([color=success]){background-color:var(--color-success);color:var(--color-success-content)}:host([color=red]){background-color:var(--color-red);color:var(--color-red-content)}:host([color=error]){background-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]){background-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]){background-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]){background-color:var(--color-information);color:var(--color-information-content)}`;
     __getStatic() {
         return Tag;
     }
@@ -13934,7 +13698,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
     timeout = 0;
     pressManager;
     screenMargin = 10;
-    static __style = `:host{--local-tooltip-from-y: 0;--local-tooltip-from-x: 0;--local-tooltip-to-y: 0;--local-tooltip-to-x: 0;--local-offset-carret-x: 0px;--local-offset-carret-y: 0px;--_tooltip-elevation: var(--tooltip-elevation, var(--elevation-4))}:host{border-radius:var(--radius-box);box-shadow:var(--elevation-4);opacity:0;padding:5px 15px;pointer-events:none;position:absolute;transition:.5s opacity var(--bezier),.5s visibility var(--bezier),.5s top var(--bezier),.5s bottom var(--bezier),.5s right var(--bezier),.5s left var(--bezier),.5s transform var(--bezier);visibility:hidden;width:max-content;z-index:1}:host::after{content:"";position:absolute}:host([no_caret])::after{display:none}:host([visible]){opacity:1;visibility:visible}:host([position=bottom]){transform:translateX(-50%)}:host([position=bottom])::after{border-bottom:9px solid var(--_tooltip-background-color);border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);left:calc(50% + var(--local-offset-carret-x));top:-8px;transform:translateX(-50%)}:host([use_absolute][position=bottom]){left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=bottom]){top:var(--local-tooltip-to-y)}:host([position=bottom]:not([use_absolute])){bottom:0px;left:50%;transform:translateX(-50%) translateY(calc(100% - 10px))}:host([position=bottom][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(100% + 10px))}:host([no_caret][use_absolute][position=bottom]){top:calc(var(--local-tooltip-from-y) - 8px)}:host([no_caret][use_absolute][visible][position=bottom]){top:calc(var(--local-tooltip-to-y) - 8px)}:host([position=top]){transform:translateX(-50%)}:host([position=top])::after{border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);border-top:9px solid var(--_tooltip-background-color);bottom:-8px;left:calc(50% + var(--local-offset-carret-x));transform:translateX(-50%)}:host([use_absolute][position=top]){bottom:var(--local-tooltip-from-y);left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px)}:host([use_absolute][visible][position=top]){bottom:var(--local-tooltip-to-y)}:host([position=top]:not([use_absolute])){left:50%;top:0px;transform:translateX(-50%) translateY(calc(-100% + 10px))}:host([position=top][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(-100% - 10px))}:host([no_caret][use_absolute][position=top]){bottom:calc(var(--local-tooltip-from-y) - 6px)}:host([no_caret][use_absolute][visible][position=top]){bottom:calc(var(--local-tooltip-to-y) - 6px)}:host([position=right]){transform:translateY(-50%)}:host([position=right])::after{border-bottom:6px solid rgba(0,0,0,0);border-right:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);left:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=right]){left:var(--local-tooltip-from-x);max-width:calc(100% - var(--local-tooltip-to-x) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=right]){left:var(--local-tooltip-to-x)}:host([position=right]:not([use_absolute])){right:0;top:50%;transform:translateX(calc(100% - 10px)) translateY(-50%)}:host([visible][position=right]:not([use_absolute])){transform:translateX(calc(100% + 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=right]){left:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=right]){left:calc(var(--local-tooltip-to-x) - 6px)}:host([position=left]){right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y);transform:translateY(-50%)}:host([position=left])::after{border-bottom:6px solid rgba(0,0,0,0);border-left:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);right:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=left]){max-width:calc(100% - var(--local-tooltip-to-x) - 10px);right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=left]){right:var(--local-tooltip-to-x)}:host([position=left]:not([use_absolute])){left:0;top:50%;transform:translateX(calc(-100% + 10px)) translateY(-50%)}:host([visible][position=left]:not([use_absolute])){transform:translateX(calc(-100% - 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=left]){right:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=left]){right:calc(var(--local-tooltip-to-x) - 6px)}:host([color=neutral]){--_tooltip-background-color: var(--color-neutral);--_tooltip-color: var(--color-neutral-content)}:host([color=primary]){--_tooltip-background-color: var(--color-primary);--_tooltip-color: var(--color-primary-content)}:host([color=secondary]){--_tooltip-background-color: var(--color-secondary);--_tooltip-color: var(--color-secondary-content)}:host([color=accent]){--_tooltip-background-color: var(--color-accent);--_tooltip-color: var(--color-accent-content)}:host([color=info]){--_tooltip-background-color: var(--color-info);--_tooltip-color: var(--color-info-content)}:host([color=success]){--_tooltip-background-color: var(--color-success);--_tooltip-color: var(--color-success-content)}:host([color=warning]){--_tooltip-background-color: var(--color-warning);--_tooltip-color: var(--color-warning-content)}:host([color=error]){--_tooltip-background-color: var(--color-error);--_tooltip-color: var(--color-error-content)}`;
+    static __style = `:host{--local-tooltip-from-y: 0;--local-tooltip-from-x: 0;--local-tooltip-to-y: 0;--local-tooltip-to-x: 0;--local-offset-carret-x: 0px;--local-offset-carret-y: 0px;--_tooltip-elevation: var(--tooltip-elevation, var(--elevation-4))}:host{border-radius:var(--radius-box);box-shadow:var(--elevation-4);opacity:0;padding:5px 15px;pointer-events:none;position:absolute;transition:.5s opacity var(--bezier),.5s visibility var(--bezier),.5s top var(--bezier),.5s bottom var(--bezier),.5s right var(--bezier),.5s left var(--bezier),.5s transform var(--bezier);visibility:hidden;width:max-content;z-index:1}:host::after{content:"";position:absolute}:host([no_caret])::after{display:none}:host([visible]){opacity:1;visibility:visible}:host([position=bottom]){transform:translateX(-50%)}:host([position=bottom])::after{border-bottom:9px solid var(--_tooltip-background-color);border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);left:calc(50% + var(--local-offset-carret-x));top:-8px;transform:translateX(-50%)}:host([use_absolute][position=bottom]){left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=bottom]){top:var(--local-tooltip-to-y)}:host([position=bottom]:not([use_absolute])){bottom:0px;left:50%;transform:translateX(-50%) translateY(calc(100% - 10px))}:host([position=bottom][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(100% + 10px))}:host([no_caret][use_absolute][position=bottom]){top:calc(var(--local-tooltip-from-y) - 8px)}:host([no_caret][use_absolute][visible][position=bottom]){top:calc(var(--local-tooltip-to-y) - 8px)}:host([position=top]){transform:translateX(-50%)}:host([position=top])::after{border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);border-top:9px solid var(--_tooltip-background-color);bottom:-8px;left:calc(50% + var(--local-offset-carret-x));transform:translateX(-50%)}:host([use_absolute][position=top]){bottom:var(--local-tooltip-from-y);left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px)}:host([use_absolute][visible][position=top]){bottom:var(--local-tooltip-to-y)}:host([position=top]:not([use_absolute])){left:50%;top:0px;transform:translateX(-50%) translateY(calc(-100% + 10px))}:host([position=top][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(-100% - 10px))}:host([no_caret][use_absolute][position=top]){bottom:calc(var(--local-tooltip-from-y) - 6px)}:host([no_caret][use_absolute][visible][position=top]){bottom:calc(var(--local-tooltip-to-y) - 6px)}:host([position=right]){transform:translateY(-50%)}:host([position=right])::after{border-bottom:6px solid rgba(0,0,0,0);border-right:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);left:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=right]){left:var(--local-tooltip-from-x);max-width:calc(100% - var(--local-tooltip-to-x) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=right]){left:var(--local-tooltip-to-x)}:host([position=right]:not([use_absolute])){right:0;top:50%;transform:translateX(calc(100% - 10px)) translateY(-50%)}:host([visible][position=right]:not([use_absolute])){transform:translateX(calc(100% + 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=right]){left:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=right]){left:calc(var(--local-tooltip-to-x) - 6px)}:host([position=left]){right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y);transform:translateY(-50%)}:host([position=left])::after{border-bottom:6px solid rgba(0,0,0,0);border-left:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);right:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=left]){max-width:calc(100% - var(--local-tooltip-to-x) - 10px);right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=left]){right:var(--local-tooltip-to-x)}:host([position=left]:not([use_absolute])){left:0;top:50%;transform:translateX(calc(-100% + 10px)) translateY(-50%)}:host([visible][position=left]:not([use_absolute])){transform:translateX(calc(-100% - 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=left]){right:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=left]){right:calc(var(--local-tooltip-to-x) - 6px)}:host([color=primary]){--_tooltip-background-color: var(--color-primary);--_tooltip-color: var(--color-primary-content)}:host([color=secondary]){--_tooltip-background-color: var(--color-secondary);--_tooltip-color: var(--color-secondary-content)}:host([color=green]){--_tooltip-background-color: var(--color-green);--_tooltip-color: var(--color-green-content)}:host([color=success]){--_tooltip-background-color: var(--color-success);--_tooltip-color: var(--color-success-content)}:host([color=red]){--_tooltip-background-color: var(--color-red);--_tooltip-color: var(--color-red-content)}:host([color=error]){--_tooltip-background-color: var(--color-error);--_tooltip-color: var(--color-error-content)}:host([color=orange]){--_tooltip-background-color: var(--color-orange);--_tooltip-color: var(--color-orange-content)}:host([color=warning]){--_tooltip-background-color: var(--color-warning);--_tooltip-color: var(--color-warning-content)}:host([color=blue]){--_tooltip-background-color: var(--color-blue);--_tooltip-color: var(--color-blue-content)}:host([color=information]){--_tooltip-background-color: var(--color-information);--_tooltip-color: var(--color-information-content)}`;
     constructor() {
         super();
         this.onMouseEnter = this.onMouseEnter.bind(this);
@@ -14336,7 +14100,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         target.inputEl.setAttribute("disabled", "disabled");
     }
 })); }
-    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=green]),:host([color=green]):focus,:host([color=green]):focus-within{--input-color: var(--color-green)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=red]),:host([color=red]):focus,:host([color=red]):focus-within{--input-color: var(--color-red)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}:host([color=orange]),:host([color=orange]):focus,:host([color=orange]):focus-within{--input-color: var(--color-orange)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=blue]),:host([color=blue]):focus,:host([color=blue]):focus-within{--input-color: var(--color-blue)}:host([color=information]),:host([color=information]):focus,:host([color=information]):focus-within{--input-color: var(--color-information)}`;
     constructor() {
         super();
         if (this.constructor == GenericSelect) {
@@ -15005,7 +14769,7 @@ const Alert = class Alert extends Modal {
     static async open(options) {
         const alert = new Alert();
         alert.options = { ...alert.options, ...options };
-        return await Alert._show(alert);
+        return await alert.show();
     }
 }
 Alert.Namespace=`Inventaire`;
@@ -15227,7 +14991,7 @@ const Header = class Header extends Aventus.WebComponent {
 					}    __registerWatchesActions() {
     this.__addWatchesActions("hasInstall");    super.__registerWatchesActions();
 }
-    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.install{display:none}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host .content .menu .logout{justify-content:center;margin-top:10px}:host .content .menu .item.install{display:flex}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}@media(hover: hover){:host .content .menu .item:hover{background-color:var(--color-neutral);color:var(--color-neutral-content)}}`;
+    static __style = `:host{align-items:center;background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:flex;flex-shrink:0;height:50px;justify-content:center;position:relative;width:100%;z-index:2}:host .content{align-items:center;color:var(--color-base-content);display:flex;height:100%;justify-content:space-between;max-width:1200px;padding:0 32px;width:100%}:host .content .logo,:host .content .logo-menu{font-size:var(--font-size-md)}:host .content .logo-menu{display:none;padding:20px 0}:host .content .logo-icon{display:none;height:100%;padding:10px 0}:host .content .logo-icon img{height:100%}:host .content .menu-icon{align-items:center;display:none}:host .content .menu-hidden{display:none;height:100vh;inset:0;position:absolute}:host .content .menu{align-items:center;display:flex;height:100%}:host .content .menu .sub-menu-items{background-color:var(--color-base-100);box-shadow:var(--elevation-3);display:none;flex-direction:column;left:0;position:absolute;top:100%;width:100%}:host .content .menu .sub-menu-items .item{height:50px}:host .content .menu .item{align-items:center;cursor:pointer;display:flex;height:100%;padding:0 16px;position:relative;transition-duration:var(--transition-duration);transition-property:background-color,color;transition-timing-function:var(--bezier)}:host .content .menu .item mi-icon{font-size:20px}:host .content .menu .item.active{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.install{display:none}@media screen and (max-width: 700px){:host .content .logo{display:none}:host .content .logo-icon{display:block}:host .content .menu-icon{display:flex}:host .content .menu{background-color:var(--color-base-100);box-shadow:var(--elevation-3);flex-direction:column;height:100vh;position:absolute;right:-320px;top:0;transition:right .2s ease-in-out;width:300px;z-index:1}:host .content .menu .logo-menu{display:block}:host .content .menu .item{height:fit-content;padding:8px 16px;width:100%}:host .content .menu .logout{justify-content:center;margin-top:10px}:host .content .menu .item.install{display:flex}:host([open_menu]) .menu{right:0}:host([open_menu]) .menu-hidden{display:block;z-index:1}}@media(hover: hover){:host .content .menu .item:not(.sub-menu):hover{background-color:var(--color-neutral);color:var(--color-neutral-content)}:host .content .menu .item.sub-menu:hover .sub-menu-items{display:flex}}`;
     __getStatic() {
         return Header;
     }
@@ -15251,10 +15015,16 @@ const Header = class Header extends Aventus.WebComponent {
         <div class="logo-menu">Inventaire FC Vétroz</div>
         <av-link class="item" to="/" active_pattern="/equipes/*|/" _id="header_2">Equipe</av-link>
         <av-link class="item" to="/materiel" active_pattern="/materiel*" _id="header_3">Matériel</av-link>
-        <av-link class="item" to="/utilisateurs" _id="header_4">Utilisateur</av-link>
-        <template _id="header_5"></template>
+        <div class="item sub-menu" _id="header_4">
+            <span>Configuration</span>
+            <div class="sub-menu-items">
+                <av-link class="item" to="/utilisateurs" _id="header_5">Utilisateur</av-link>
+                <av-link class="item" to="/variations" _id="header_6">Variations</av-link>
+            </div>
+        </div>
+        <template _id="header_7"></template>
         <div class="item logout">
-            <mi-icon icon="power_settings_new" _id="header_7"></mi-icon>
+            <mi-icon icon="power_settings_new" _id="header_9"></mi-icon>
         </div>
     </div>
 </div>` }
@@ -15276,6 +15046,16 @@ const Header = class Header extends Aventus.WebComponent {
       "eventName": "click",
       "id": "header_4",
       "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_5",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_6",
+      "fct": (e, c) => c.comp.closeMenu(e)
     }
   ],
   "pressEvents": [
@@ -15288,21 +15068,21 @@ const Header = class Header extends Aventus.WebComponent {
       "onPress": (e, pressInstance, c) => { c.comp.closeMenu(e, pressInstance); }
     },
     {
-      "id": "header_7",
+      "id": "header_9",
       "onPress": (e, pressInstance, c) => { c.comp.logout(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-            <div class="item install" _id="header_6">Installer l'application</div>
+            <div class="item install" _id="header_8">Installer l'application</div>
         `);templ0.setActions({
   "pressEvents": [
     {
-      "id": "header_6",
+      "id": "header_8",
       "onPress": (e, pressInstance, c) => { c.comp.installApp(e, pressInstance); }
     }
   ]
 });this.__getStatic().__template.addIf({
-                    anchorId: 'header_5',
+                    anchorId: 'header_7',
                     parts: [{once: true,
                     condition: (c) => c.comp.__8a18ff9f2f6d8c68ca20d6555a280111method0(),
                     template: templ0
@@ -15738,9 +15518,145 @@ ModalEquipe.Tag=`av-modal-equipe`;
 __as1(_, 'ModalEquipe', ModalEquipe);
 if(!window.customElements.get('av-modal-equipe')){window.customElements.define('av-modal-equipe', ModalEquipe);Aventus.WebComponentInstance.registerDefinition(ModalEquipe);}
 
+App.Models.VariationGroupe=class VariationGroupe extends Aventus.Data {
+    static get Fullname() { return "App.Models.VariationGroupe"; }
+    id;
+    id_materiel;
+    id_template = undefined;
+    nom;
+    variations;
+}
+App.Models.VariationGroupe.Namespace=`Inventaire.App.Models`;
+App.Models.VariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_template":"number","nom":"string","variations":"Inventaire.App.Models.Variation[]"};
+Aventus.Converter.register(App.Models.VariationGroupe.Fullname, App.Models.VariationGroupe);
+__as1(_.App.Models, 'VariationGroupe', App.Models.VariationGroupe);
+
+const VariationTag = class VariationTag extends Aventus.WebComponent {
+    groupe;
+    onDelete = new Aventus.Callback();
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-neutral)}`;
+    __getStatic() {
+        return VariationTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="delete" _id="variationtag_1"></mi-icon></av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "componentEl",
+      "ids": [
+        "variationtag_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationtag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationTag";
+    }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.groupe.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.componentEl.innerText = this.groupe.nom;
+    }
+}
+VariationTag.Namespace=`Inventaire`;
+VariationTag.Tag=`av-variation-tag`;
+__as1(_, 'VariationTag', VariationTag);
+if(!window.customElements.get('av-variation-tag')){window.customElements.define('av-variation-tag', VariationTag);Aventus.WebComponentInstance.registerDefinition(VariationTag);}
+
+App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
+    variations_groupes;
+    equipes;
+    id = undefined;
+    nom;
+    image = undefined;
+    tout_monde;
+}
+App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+__as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
+
+App.Models.Materiel=class Materiel extends Aventus.Data {
+    static get Fullname() { return "App.Models.Materiel"; }
+    id;
+    nom;
+    image = undefined;
+    variations;
+    variations_groupes;
+    tout_monde;
+    equipes;
+}
+App.Models.Materiel.Namespace=`Inventaire.App.Models`;
+App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.MaterielVariation[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
+Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
+__as1(_.App.Models, 'Materiel', App.Models.Materiel);
+
+App.Models.MaterielVariation=class MaterielVariation extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielVariation"; }
+    id;
+    id_materiel;
+    materiel;
+    variations;
+}
+App.Models.MaterielVariation.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielVariation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","materiel":"Inventaire.App.Models.Materiel","variations":"Inventaire.App.Models.MaterielVariationGroupe[]"};
+Aventus.Converter.register(App.Models.MaterielVariation.Fullname, App.Models.MaterielVariation);
+__as1(_.App.Models, 'MaterielVariation', App.Models.MaterielVariation);
+
+App.Http.Controllers.Materiel.GetInventaire.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
+    id;
+    equipe;
+    materiel;
+    quantite;
+    last_update;
+    last_update_by;
+}
+App.Http.Controllers.Materiel.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+App.Http.Controllers.Materiel.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource","materiel":"Inventaire.App.Models.MaterielVariation","quantite":"number","last_update":"Date","last_update_by":"string"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.GetInventaire.Response.Fullname, App.Http.Controllers.Materiel.GetInventaire.Response);
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Response', App.Http.Controllers.Materiel.GetInventaire.Response);
+
+App.Models.Inventaire=class Inventaire extends Aventus.Data {
+    static get Fullname() { return "App.Models.Inventaire"; }
+    id;
+    id_equipe;
+    id_materiel_variation;
+    quantite;
+    last_update;
+    last_update_by;
+    equipe;
+    materiel;
+}
+App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
+App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
+__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
+
 App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResource"; }
     variations;
+    variations_groupes;
     equipes;
     id;
     nom;
@@ -15748,7 +15664,7 @@ App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Av
     tout_monde;
 }
 App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.Variation[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.MaterielVariation[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
@@ -16042,13 +15958,12 @@ App.Http.Controllers.Equipe.GetInventaire.Response=class Response extends Aventu
     static get Fullname() { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
     id;
     materiel;
-    variation = undefined;
     quantite;
     last_update;
     last_update_by;
 }
 App.Http.Controllers.Equipe.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
-App.Http.Controllers.Equipe.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielResource","variation":"Inventaire.App.Models.Variation","quantite":"number","last_update":"Date","last_update_by":"string"};
+App.Http.Controllers.Equipe.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielResource","quantite":"number","last_update":"Date","last_update_by":"string"};
 Aventus.Converter.register(App.Http.Controllers.Equipe.GetInventaire.Response.Fullname, App.Http.Controllers.Equipe.GetInventaire.Response);
 __as1(_.App.Http.Controllers.Equipe.GetInventaire, 'Response', App.Http.Controllers.Equipe.GetInventaire.Response);
 
@@ -16296,38 +16211,6 @@ ModalHistorique.Tag=`av-modal-historique`;
 __as1(_, 'ModalHistorique', ModalHistorique);
 if(!window.customElements.get('av-modal-historique')){window.customElements.define('av-modal-historique', ModalHistorique);Aventus.WebComponentInstance.registerDefinition(ModalHistorique);}
 
-App.Models.Materiel=class Materiel extends Aventus.Data {
-    static get Fullname() { return "App.Models.Materiel"; }
-    id;
-    nom;
-    image = undefined;
-    variations;
-    tout_monde;
-    equipes;
-}
-App.Models.Materiel.Namespace=`Inventaire.App.Models`;
-App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.Variation[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
-Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
-__as1(_.App.Models, 'Materiel', App.Models.Materiel);
-
-App.Models.Inventaire=class Inventaire extends Aventus.Data {
-    static get Fullname() { return "App.Models.Inventaire"; }
-    id;
-    id_equipe;
-    id_materiel;
-    id_variation = undefined;
-    quantite;
-    last_update;
-    last_update_by;
-    equipe;
-    materiel;
-    variation = undefined;
-}
-App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
-App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel":"number","id_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.Materiel","variation":"Inventaire.App.Models.Variation"};
-Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
-__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
-
 App.Http.Controllers.Inventaire.Update.InventaireUpdateController=class InventaireUpdateController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -16568,6 +16451,101 @@ let UserRAM=class UserRAM extends AventusPhp.RamHttp {
 UserRAM.Namespace=`Inventaire`;
 __as1(_, 'UserRAM', UserRAM);
 
+App.Models.VariationGroupeTemplate=class VariationGroupeTemplate extends Aventus.Data {
+    static get Fullname() { return "App.Models.VariationGroupeTemplate"; }
+    id;
+    nom;
+    variations;
+}
+App.Models.VariationGroupeTemplate.Namespace=`Inventaire.App.Models`;
+App.Models.VariationGroupeTemplate.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","variations":"Inventaire.App.Models.VariationTemplate[]"};
+Aventus.Converter.register(App.Models.VariationGroupeTemplate.Fullname, App.Models.VariationGroupeTemplate);
+__as1(_.App.Models, 'VariationGroupeTemplate', App.Models.VariationGroupeTemplate);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest=class VariationGroupeTemplateRequest {
+    variations;
+    id = undefined;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateRequest', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource=class VariationGroupeTemplateResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource"; }
+    variations;
+    id;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource[]","id":"number","nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Fullname, App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateResource', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController=class VariationGroupeTemplateController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest; }
+    getResource() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource; }
+    getUri() { return "data/variation_groupe_template"; }
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateController', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController);
+
+let VariationGroupeTemplateRAM=class VariationGroupeTemplateRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(VariationGroupeTemplateRAM);
+    }
+}
+VariationGroupeTemplateRAM.Namespace=`Inventaire`;
+__as1(_, 'VariationGroupeTemplateRAM', VariationGroupeTemplateRAM);
+
+const VariationGroupeTemplateSelect = class VariationGroupeTemplateSelect extends SelectData {
+    static __style = ``;
+    __getStatic() {
+        return VariationGroupeTemplateSelect;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationGroupeTemplateSelect.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "VariationGroupeTemplateSelect";
+    }
+    defineRam() {
+        return VariationGroupeTemplateRAM.getInstance();
+    }
+    optionText(item) {
+        return item.nom;
+    }
+    optionValue(item) {
+        return item;
+    }
+}
+VariationGroupeTemplateSelect.Namespace=`Inventaire`;
+VariationGroupeTemplateSelect.Tag=`av-variation-groupe-template-select`;
+__as1(_, 'VariationGroupeTemplateSelect', VariationGroupeTemplateSelect);
+if(!window.customElements.get('av-variation-groupe-template-select')){window.customElements.define('av-variation-groupe-template-select', VariationGroupeTemplateSelect);Aventus.WebComponentInstance.registerDefinition(VariationGroupeTemplateSelect);}
+
 const EquipeEditModal = class EquipeEditModal extends Modal {
     form;
     static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}`;
@@ -16642,7 +16620,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
             clone.id = 0;
         }
         modal.form.item = EquipeRAM.getInstance().toRequest(clone);
-        return await EquipeEditModal._show(modal);
+        return await modal.show();
     }
 }
 EquipeEditModal.Namespace=`Inventaire`;
@@ -17306,7 +17284,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         super();
         this.form = Aventus.Form.Form.create({
             nom: Aventus.Form.Validators.Required,
-            variations: {},
+            variations_groupes: {},
             image: {},
             tout_monde: {},
             equipes: {}
@@ -17498,7 +17476,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             newItem.id = 0;
             newItem.tout_monde = true;
             newItem.image = new App.Models.MaterielImage();
-            newItem.variations = [];
+            newItem.variations_groupes = [];
             newItem.equipes = [];
             this.form.item = newItem;
             this.objName = "Création de matériel";
@@ -17537,7 +17515,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         const addInventaire = (equipe, variation) => {
             let el;
             if (variation) {
-                el = connu.find(p => p.equipe.id == equipe.id && p.variation?.id == variation.id);
+                el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id_materiel == variation.id);
             }
             else {
                 el = connu.find(p => p.equipe.id == equipe.id);
@@ -17545,7 +17523,6 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             if (el == undefined) {
                 el = new App.Http.Controllers.Materiel.GetInventaire.Response();
                 el.equipe = equipe;
-                el.variation = variation;
                 el.quantite = 0;
             }
             inventaires.push(el);
@@ -17615,9 +17592,6 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             if (StringTools.contains(item.inventaire.equipe.nom, txt)) {
                 item.style.display = "";
             }
-            else if (StringTools.contains(item.inventaire.variation?.nom, txt)) {
-                item.style.display = "";
-            }
             else {
                 item.style.display = "none";
             }
@@ -17642,7 +17616,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         return this.form.parts.nom;
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
-        return this.form.item.variations;
+        return this.form.item.variations_groupes;
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
         return this.form.parts.tout_monde;
@@ -17787,7 +17761,7 @@ const UserEditModal = class UserEditModal extends Modal {
             item.id = 0;
             modal.form.item = ram.toRequest(item);
         }
-        return await UserEditModal._show(modal);
+        return await modal.show();
     }
 }
 UserEditModal.Namespace=`Inventaire`;
@@ -17999,6 +17973,353 @@ UsersPage.Tag=`av-users-page`;
 __as1(_, 'UsersPage', UsersPage);
 if(!window.customElements.get('av-users-page')){window.customElements.define('av-users-page', UsersPage);Aventus.WebComponentInstance.registerDefinition(UsersPage);}
 
+const VariationGroupeTemplateEditModal = class VariationGroupeTemplateEditModal extends Modal {
+    form;
+    static __style = `:host{--col-gap: 12px}:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px)}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;flex-shrink:0;gap:8px;justify-content:center}:host .list{display:flex;flex-direction:column;flex-grow:1;overflow:hidden}:host .list .label{margin-bottom:6px}:host .list av-flex-scroll{--scroller-right: 0px}:host .list .item{align-items:center;display:flex;gap:20px;padding:0 10px}:host .list .item av-input{flex-grow:1}:host .list .item .action{flex-shrink:0;margin-top:10px}:host .list .item .action mi-icon{color:var(--color-error);cursor:pointer}:host .list .add-cont{align-items:center;display:flex;justify-content:center;margin-bottom:15px}:host .list .add-cont .add{background-color:var(--color-primary);border-radius:99999px;box-shadow:var(--elevation-3);color:var(--color-primary-content);cursor:pointer;font-size:1.5rem;padding:5px}@media screen and (max-width: 539px){:host{--col-gap: 0px}}`;
+    constructor() {
+        super();
+        this.form = Aventus.Form.Form.create({
+            id: {},
+            nom: new Aventus.Form.Validators.Required("Le nom est requis"),
+            variations: {}
+        }, {
+            validateOnChange: false
+        });
+    }
+    __getStatic() {
+        return VariationGroupeTemplateEditModal;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationGroupeTemplateEditModal.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>    <av-col size="12" use_container="false">        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>    </av-col></av-row><div class="list">    <div class="label">Liste des variations</div>    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">    </av-flex-scroll>    <div class="add-cont">        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>    </div></div><div class="actions">    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "listItems",
+      "ids": [
+        "variationgroupetemplateeditmodal_2"
+      ]
+    }
+  ],
+  "content": {
+    "variationgroupetemplateeditmodal_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__75c93632c13f5e130b6cafb90e27b0b8method0())}`,
+      "once": true
+    }
+  },
+  "injection": [
+    {
+      "id": "variationgroupetemplateeditmodal_1",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__75c93632c13f5e130b6cafb90e27b0b8method1(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationgroupetemplateeditmodal_3",
+      "onPress": (e, pressInstance, c) => { c.comp.addVariation(e, pressInstance); }
+    },
+    {
+      "id": "variationgroupetemplateeditmodal_4",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "variationgroupetemplateeditmodal_5",
+      "onPress": (e, pressInstance, c) => { c.comp.submit(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationGroupeTemplateEditModal";
+    }
+    configure() {
+        return {
+            title: ""
+        };
+    }
+    displayVariation(item) {
+        const el = document.createElement("div");
+        el.classList.add("item");
+        const input = new Input();
+        input.label = "Nom";
+        input.value = item.nom;
+        input.onChange.add((value) => {
+            item.nom = value ?? '';
+        });
+        el.appendChild(input);
+        const action = document.createElement("div");
+        action.classList.add("action");
+        el.appendChild(action);
+        const icon = new MaterialIcon.Icon();
+        icon.icon = "delete";
+        icon.addEventListener("click", () => {
+            const index = this.form.item.variations?.indexOf(item) ?? -1;
+            if (index != -1) {
+                this.form.item.variations.splice(index, 1);
+                el.remove();
+            }
+        });
+        action.appendChild(icon);
+        this.listItems.appendChild(el);
+    }
+    addVariation() {
+        const item = new App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest();
+        this.form.item.variations.push(item);
+        this.displayVariation(item);
+    }
+    async show(element) {
+        const result = super.show(element);
+        this.listItems.innerHTML = '';
+        for (let item of this.form.item.variations) {
+            this.displayVariation(item);
+        }
+        return await result;
+    }
+    async submit() {
+        const result = await this.form.submit(VariationGroupeTemplateRAM.getInstance().saveWithError);
+        if (result?.result) {
+            this.resolve(result.result);
+        }
+    }
+    __75c93632c13f5e130b6cafb90e27b0b8method0() {
+        return this.options.title;
+    }
+    __75c93632c13f5e130b6cafb90e27b0b8method1() {
+        return this.form.parts.nom;
+    }
+    static async open(item) {
+        const modal = new VariationGroupeTemplateEditModal();
+        const ram = VariationGroupeTemplateRAM.getInstance();
+        if (item) {
+            modal.options.title = "Edition d'une variation";
+            if (!item.variations)
+                item.variations = [];
+            modal.form.item = ram.toRequest(item);
+        }
+        else {
+            modal.options.title = "Création d'une variation";
+            item = new App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource();
+            item.id = 0;
+            item.variations = [];
+            modal.form.item = ram.toRequest(item);
+        }
+        return await modal.show();
+    }
+}
+VariationGroupeTemplateEditModal.Namespace=`Inventaire`;
+VariationGroupeTemplateEditModal.Tag=`av-variation-groupe-template-edit-modal`;
+__as1(_, 'VariationGroupeTemplateEditModal', VariationGroupeTemplateEditModal);
+if(!window.customElements.get('av-variation-groupe-template-edit-modal')){window.customElements.define('av-variation-groupe-template-edit-modal', VariationGroupeTemplateEditModal);Aventus.WebComponentInstance.registerDefinition(VariationGroupeTemplateEditModal);}
+
+const VariationGroupeItem = class VariationGroupeItem extends Aventus.WebComponent {
+    get 'visible'() { return this.getBoolAttr('visible') }
+    set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
+						return this.__watch["item"];
+					}
+					set 'item'(val) {
+						this.__watch["item"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("item");    super.__registerWatchesActions();
+}
+    static __style = `:host{align-items:center;border-top:1px solid var(--color-base-300);display:flex;height:50px;padding:0 16px}:host .name{flex-grow:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}:host .actions{display:flex;flex-shrink:0;gap:5px}:host(:first-child){border-top:none}:host(:not([visible])){display:none}`;
+    __getStatic() {
+        return VariationGroupeItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationGroupeItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "variationgroupeitem_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__ff3949ff90bb8030822f86ecbe75aeb6method0())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "variationgroupeitem_1",
+      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
+    },
+    {
+      "id": "variationgroupeitem_2",
+      "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationGroupeItem";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('visible')) { this.attributeChangedCallback('visible', false, false); } }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item'); }
+    __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    async editItem() {
+        await VariationGroupeTemplateEditModal.open(this.item);
+    }
+    async deleteItem() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cette variation?"
+        });
+        if (result) {
+            await VariationGroupeTemplateRAM.getInstance().delete(this.item);
+        }
+    }
+    __ff3949ff90bb8030822f86ecbe75aeb6method0() {
+        return this.item.nom;
+    }
+}
+VariationGroupeItem.Namespace=`Inventaire`;
+VariationGroupeItem.Tag=`av-variation-groupe-item`;
+__as1(_, 'VariationGroupeItem', VariationGroupeItem);
+if(!window.customElements.get('av-variation-groupe-item')){window.customElements.define('av-variation-groupe-item', VariationGroupeItem);Aventus.WebComponentInstance.registerDefinition(VariationGroupeItem);}
+
+const VariationsPage = class VariationsPage extends PageFull {
+    list = [];
+    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 650px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
+    constructor() {
+        super();
+        this.onNewData = this.onNewData.bind(this);
+        this.onRemoveData = this.onRemoveData.bind(this);
+    }
+    __getStatic() {
+        return VariationsPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationsPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des variations</div>        <div class="actions">            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="variationspage_2">        </div>    </av-scrollable></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "searchEl",
+      "ids": [
+        "variationspage_0"
+      ]
+    },
+    {
+      "name": "listEl",
+      "ids": [
+        "variationspage_2"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "eventName": "onChange",
+      "id": "variationspage_0",
+      "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationspage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.add(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationsPage";
+    }
+    configure() {
+        return {};
+    }
+    search() {
+        if (this.searchEl.value) {
+            for (let item of this.list) {
+                item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
+            }
+        }
+        else {
+            for (let item of this.list) {
+                item.visible = true;
+            }
+        }
+    }
+    async add() {
+        await VariationGroupeTemplateEditModal.open();
+    }
+    async bindData() {
+        let list = await VariationGroupeTemplateRAM.getInstance().getList();
+        list.sort((a, b) => a.nom.localeCompare(a.nom));
+        for (let item of list) {
+            let el = new VariationGroupeItem();
+            el.item = item;
+            el.visible = this.searchEl.value ? StringTools.contains(item.nom, this.searchEl.value) : true;
+            this.listEl.appendChild(el);
+            this.list.push(el);
+        }
+        VariationGroupeTemplateRAM.getInstance().onCreated(this.onNewData);
+        VariationGroupeTemplateRAM.getInstance().onUpdated(this.onNewData);
+        VariationGroupeTemplateRAM.getInstance().onDeleted(this.onRemoveData);
+    }
+    onNewData(user) {
+        let itemBefore = undefined;
+        for (let item of this.list) {
+            if (itemBefore == null && user.nom.localeCompare(item.item.nom) < 0) {
+                itemBefore = item;
+            }
+            if (item.item.id == user.id) {
+                item.item = user;
+                Aventus.Watcher.trigger("UPDATED", item.item);
+                return;
+            }
+        }
+        let el = new VariationGroupeItem();
+        el.item = user;
+        el.visible = this.searchEl.value ? StringTools.contains(user.nom, this.searchEl.value) : true;
+        if (itemBefore) {
+            let index = this.list.indexOf(itemBefore);
+            this.list.splice(index, 0, el);
+            this.listEl.insertBefore(el, itemBefore);
+        }
+        else {
+            this.list.push(el);
+            this.listEl.appendChild(el);
+        }
+    }
+    onRemoveData(user) {
+        for (let item of this.list) {
+            if (item.item.id == user.id) {
+                item.remove();
+                let index = this.list.indexOf(item);
+                this.list.splice(index, 1);
+                return;
+            }
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.bindData();
+    }
+}
+VariationsPage.Namespace=`Inventaire`;
+VariationsPage.Tag=`av-variations-page`;
+__as1(_, 'VariationsPage', VariationsPage);
+if(!window.customElements.get('av-variations-page')){window.customElements.define('av-variations-page', VariationsPage);Aventus.WebComponentInstance.registerDefinition(VariationsPage);}
+
 const Main = class Main extends Aventus.Navigation.Router {
     static instance;
     static __style = `:host{display:flex;flex-direction:column;height:100%;width:100%}:host .content{flex-grow:1;min-height:0;position:relative;width:100%;z-index:1}`;
@@ -18024,6 +18345,7 @@ const Main = class Main extends Aventus.Navigation.Router {
         this.addRoute("/materiel", MaterielPage);
         this.addRoute("/materiel/{id:number}", MaterielDetailsPage);
         this.addRoute("/utilisateurs", UsersPage);
+        this.addRoute("/variations", VariationsPage);
     }
     getSlugs(pattern) {
         if (!pattern)
@@ -18189,6 +18511,186 @@ EquipeTags.Namespace=`Inventaire`;
 EquipeTags.Tag=`av-equipe-tags`;
 __as1(_, 'EquipeTags', EquipeTags);
 if(!window.customElements.get('av-equipe-tags')){window.customElements.define('av-equipe-tags', EquipeTags);Aventus.WebComponentInstance.registerDefinition(EquipeTags);}
+
+const ModalTag = class ModalTag extends Modal {
+    get 'resource'() {
+						return this.__watch["resource"];
+					}
+					set 'resource'(val) {
+						this.__watch["resource"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("resource");    super.__registerWatchesActions();
+}
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modaltag_1"
+      ]
+    }
+  ],
+  "content": {
+    "modaltag_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modaltag_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod1(),
+      "extract": (c, v) => c.comp.__105132b7f1fa65d09c3cc981e16ef0efmethod2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modaltag_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modaltag_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalTag";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["resource"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('resource'); }
+    configure() {
+        return {
+            title: "Edition de variation",
+        };
+    }
+    save() {
+        if (!this.resource) {
+            this.inputEl.errors = ["Il faut une variation"];
+            return;
+        }
+        this.resolve(this.resource);
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod0() {
+        return this.options.title;
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod1() {
+        return this.resource;
+    }
+    __105132b7f1fa65d09c3cc981e16ef0efmethod2(v) {
+        if (this) {
+            this.resource = v;
+        }
+    }
+}
+ModalTag.Namespace=`Inventaire`;
+ModalTag.Tag=`av-modal-tag`;
+__as1(_, 'ModalTag', ModalTag);
+if(!window.customElements.get('av-modal-tag')){window.customElements.define('av-modal-tag', ModalTag);Aventus.WebComponentInstance.registerDefinition(ModalTag);}
+
+const VariationTags = class VariationTags extends Aventus.WebComponent {
+    variations = [];
+    static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
+    constructor() {
+        super();
+        this.onChildDelete = this.onChildDelete.bind(this);
+    }
+    __getStatic() {
+        return VariationTags;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationTags.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "listEl",
+      "ids": [
+        "variationtags_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationtags_1",
+      "onPress": (e, pressInstance, c) => { c.comp.addVariation(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationTags";
+    }
+    onChildDelete(el) {
+        let children = Array.from(this.listEl.children);
+        let index = children.indexOf(el);
+        this.variations.splice(index, 1);
+        this.listEl.removeChild(el);
+    }
+    render() {
+        this.listEl.innerHTML = "";
+        for (let variation of this.variations) {
+            let el = new VariationTag();
+            el.groupe = variation;
+            el.onDelete.add(this.onChildDelete);
+            this.listEl.appendChild(el);
+        }
+    }
+    async addVariation() {
+        const p = new ModalTag();
+        const template = await p.show();
+        if (template === null)
+            return;
+        const groupe = new App.Models.VariationGroupe();
+        groupe.nom = template.nom;
+        groupe.id_template = template.id;
+        groupe.variations = [];
+        for (let v of template.variations) {
+            const variation = new App.Models.Variation();
+            variation.nom = v.nom;
+            variation.id_variation_template = v.id;
+            groupe.variations.push(variation);
+        }
+        let el = new VariationTag();
+        el.groupe = groupe;
+        el.onDelete.add(this.onChildDelete);
+        this.listEl.appendChild(el);
+        this.variations.push(groupe);
+    }
+    postCreation() {
+        this.render();
+    }
+}
+VariationTags.Namespace=`Inventaire`;
+VariationTags.Tag=`av-variation-tags`;
+__as1(_, 'VariationTags', VariationTags);
+if(!window.customElements.get('av-variation-tags')){window.customElements.define('av-variation-tags', VariationTags);Aventus.WebComponentInstance.registerDefinition(VariationTags);}
 
 
 for(let key in _) { Inventaire[key] = _[key] }

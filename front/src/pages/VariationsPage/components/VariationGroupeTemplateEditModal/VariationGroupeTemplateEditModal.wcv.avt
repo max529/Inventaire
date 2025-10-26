@@ -1,0 +1,19 @@
+<div class="title">{{ this.options.title }}</div>
+<av-row>
+    <av-col size="12" use_container="false">
+        <av-input label="Titre" :form="this.form.parts.nom"></av-input>
+    </av-col>
+</av-row>
+<div class="list">
+    <div class="label">Liste des variations</div>
+    <av-flex-scroll floating_scroll auto_hide @element="listItems">
+
+    </av-flex-scroll>
+    <div class="add-cont">
+        <mi-icon class="add" icon="add" @press="addVariation"></mi-icon>
+    </div>
+</div>
+<div class="actions">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button color="primary" @press="submit">Enregistrer</av-button>
+</div>

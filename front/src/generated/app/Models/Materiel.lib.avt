@@ -1,5 +1,6 @@
 import { MaterielImage } from './MaterielImage.lib.avt';
-import { Variation } from './Variation.lib.avt';
+import { MaterielVariation } from './MaterielVariation.lib.avt';
+import { VariationGroupe } from './VariationGroupe.lib.avt';
 import { MaterielEquipe } from './MaterielEquipe.lib.avt';
 
 namespace App.Models {
@@ -10,7 +11,8 @@ namespace App.Models {
 		public id!: number;
 		public nom!: string;
 		public image?: MaterielImage = undefined;
-		public variations!: Variation[];
+		public variations!: MaterielVariation[];
+		public variations_groupes!: VariationGroupe[];
 		public tout_monde!: boolean;
 		public equipes!: MaterielEquipe[];
 	}

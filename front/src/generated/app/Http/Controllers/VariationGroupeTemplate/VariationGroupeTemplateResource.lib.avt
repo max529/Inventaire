@@ -1,0 +1,13 @@
+import { VariationTemplateResource } from './VariationTemplateResource.lib.avt';
+
+namespace App.Http.Controllers.VariationGroupeTemplate {
+
+	@Convertible()
+	export class VariationGroupeTemplateResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource"; }
+		public variations!: VariationTemplateResource[];
+		public id!: number;
+		public nom!: string;
+	}
+
+}

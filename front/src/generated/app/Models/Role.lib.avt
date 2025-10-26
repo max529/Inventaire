@@ -1,0 +1,10 @@
+namespace App.Models {
+
+	@Convertible()
+	export class Role extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.Role"; }
+		public id!: number;
+		public nom!: string;
+	}
+
+}

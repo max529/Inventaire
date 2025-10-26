@@ -1,0 +1,54 @@
+import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
+import type { VariationGroupeTemplateResource } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import { VariationGroupeTemplateRAM } from "../../../../ram/VariationGroupeTemplate.ram.avt";
+import { VariationGroupeTemplateEditModal } from "../VariationGroupeTemplateEditModal/VariationGroupeTemplateEditModal.wcl.avt";
+
+export class VariationGroupeItem extends Aventus.WebComponent implements Aventus.DefaultComponent  {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Attribute()
+    public visible!: boolean;
+    //#endregion
+
+
+    //#region variables
+    @Watch()
+    @Injectable()
+    public item!: VariationGroupeTemplateResource;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    /**
+     * 
+     */
+    protected async editItem() {
+        await VariationGroupeTemplateEditModal.open(this.item);
+    }
+    /**
+    * 
+    */
+    protected async deleteItem() {
+        const result = await Confirm.open({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cette variation?"
+        });
+
+        if(result) {
+            await VariationGroupeTemplateRAM.getInstance().delete(this.item);
+        }
+    }
+    //#endregion
+
+}

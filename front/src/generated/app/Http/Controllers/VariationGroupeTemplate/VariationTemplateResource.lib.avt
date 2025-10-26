@@ -1,0 +1,10 @@
+namespace App.Http.Controllers.VariationGroupeTemplate {
+
+	@Convertible()
+	export class VariationTemplateResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource"; }
+		public id!: number;
+		public nom!: string;
+	}
+
+}

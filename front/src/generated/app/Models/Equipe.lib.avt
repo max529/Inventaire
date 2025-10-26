@@ -5,6 +5,7 @@ namespace App.Models {
 		public static override get Fullname(): string { return "App.Models.Equipe"; }
 		public id!: number;
 		public nom!: string;
+		public favori!: boolean;
 	}
 
 }

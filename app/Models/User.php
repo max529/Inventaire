@@ -11,6 +11,7 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $prenom
  * @property string $nom_utilisateur
  * @property string $mot_passe
+ * @property int $id_role
  */
 class User extends AventusModel
 {
@@ -23,6 +24,7 @@ class User extends AventusModel
         "prenom",
         "nom_utilisateur",
         "mot_passe",
+        "id_role"
     ];
 
     /**

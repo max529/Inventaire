@@ -34,9 +34,8 @@ class Controller
         }
 
         $historique = new InventaireHistorique();
-        $historique->id_materiel = $inventaire->id_materiel;
+        $historique->id_materiel_variation = $inventaire->id_materiel_variation;
         $historique->id_equipe = $inventaire->id_equipe;
-        $historique->id_variation = $inventaire->id_variation;
         $historique->quantite = $inventaire->quantite;
         $historique->last_update = $now;
         $historique->last_update_by = $by;

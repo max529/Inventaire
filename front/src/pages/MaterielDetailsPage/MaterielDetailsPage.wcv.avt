@@ -15,7 +15,7 @@
                 <av-input label="Nom du materiel" :form="this.form.parts.nom"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>
-                    <av-variation-tags :variations="this.form.item.variations"></av-variation-tags>
+                    <av-variation-tags :variations="this.form.item.variations_groupes"></av-variation-tags>
                 </div>
                 <div class="tags">
                     <div class="label pour">

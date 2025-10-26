@@ -1,0 +1,15 @@
+import { Materiel } from './Materiel.lib.avt';
+import { MaterielVariationGroupe } from './MaterielVariationGroupe.lib.avt';
+
+namespace App.Models {
+
+	@Convertible()
+	export class MaterielVariation extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.MaterielVariation"; }
+		public id!: number;
+		public id_materiel!: number;
+		public materiel!: Materiel;
+		public variations!: MaterielVariationGroupe[];
+	}
+
+}

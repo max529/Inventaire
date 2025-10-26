@@ -1,4 +1,5 @@
 import { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+import { VariationGroupe } from "../../../../generated/app/Models/VariationGroupe.lib.avt";
 import { ModalTag } from "../ModalTag/ModalTag.wcl.avt";
 import { VariationTag } from "../VariationTag/VariationTag.wcl.avt";
 
@@ -19,7 +20,7 @@ export class VariationTags extends Aventus.WebComponent implements Aventus.Defau
     @ViewElement()
     protected listEl!: HTMLDivElement;
 
-    public variations: Variation[] = [];
+    public variations: VariationGroupe[] = [];
     //#endregion
 
 
@@ -40,22 +41,32 @@ export class VariationTags extends Aventus.WebComponent implements Aventus.Defau
         this.listEl.innerHTML = "";
         for(let variation of this.variations) {
             let el = new VariationTag();
-            el.variation = variation;
+            el.groupe = variation;
             el.onDelete.add(this.onChildDelete);
             this.listEl.appendChild(el);
         }
     }
     protected async addVariation() {
         const p = new ModalTag();
-        const nom = await p.show();
-        if(nom === null) return;
-        const v = new Variation();
-        v.nom = nom;
-        this.variations.push(v);
+        const template = await p.show();
+        if(template === null) return;
+
+
+        const groupe = new VariationGroupe();
+        groupe.nom = template.nom;
+        groupe.id_template = template.id;
+        groupe.variations = [];
+        for(let v of template.variations) {
+            const variation = new Variation();
+            variation.nom = v.nom;
+            variation.id_variation_template = v.id;
+            groupe.variations.push(variation);
+        }
         let el = new VariationTag();
-        el.variation = v;
+        el.groupe = groupe;
         el.onDelete.add(this.onChildDelete);
         this.listEl.appendChild(el);
+        this.variations.push(groupe);
     }
 
     protected override postCreation(): void {

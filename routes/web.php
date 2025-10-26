@@ -3,6 +3,7 @@
 use App\Http\Controllers\Equipe\EquipeController;
 use App\Http\Controllers\Materiel\MaterielController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\VariationGroupeTemplate\VariationGroupeTemplateController;
 use App\Http\Middlewares\IsConnected;
 use Aventus\Laraventus\Routes\Route;
 
@@ -30,6 +31,8 @@ Route::middleware(IsConnected::class)->group(function () {
         
         Route::post('/inventaire/update', [\App\Http\Controllers\Inventaire\Update\Controller::class, "request"]);
         Route::post('/inventaire/historique', [\App\Http\Controllers\Inventaire\Historique\Controller::class, "request"]);
+        
+        Route::resourceWithMany('variation_groupe_template', VariationGroupeTemplateController::class);
     });
 
 

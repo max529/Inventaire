@@ -6,13 +6,15 @@ use Aventus\Laraventus\Models\AventusModel;
 
 /**
  * @property int $id
- * @property int $id_materiel
+ * @property int $id_groupe
+ * @property ?int $id_variation_template
  * @property string $nom
  */
 class Variation extends AventusModel {
     protected $fillable = [
         "id",
-        "id_materiel",
+        "id_groupe",
+        "id_variation_template",
         "nom"
     ];
 }

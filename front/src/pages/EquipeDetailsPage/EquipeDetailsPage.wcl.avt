@@ -14,6 +14,7 @@ import type { Input } from "../../components/form/Input/Input.wcl.avt";
 import type { InventaireEquipeListItem } from "./components/InventaireEquipeListItem/InventaireEquipeListItem.wcl.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
 import { Page } from "../../components/layout/Page/Page.wcl.avt";
+import type { VariationGroupe } from "../../generated/app/Models/VariationGroupe.lib.avt";
 
 export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -84,7 +85,7 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
         const inventaires: Inventaire[] = [];
 
 
-        const addInventaire = (materiel: MaterielResource, variation?: Variation) => {
+        const addInventaire = (materiel: MaterielResource, variation?: VariationGroupe) => {
             let el: Inventaire | undefined;
             if(variation) {
                 el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);

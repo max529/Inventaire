@@ -1,0 +1,10 @@
+namespace App.Http.Controllers.VariationGroupeTemplate {
+
+	@Convertible()
+	export class VariationTemplateRequest {
+		public static get Fullname(): string { return "App.Http.Controllers.VariationGroupeTemplate.VariationTemplateRequest"; }
+		public id?: number = undefined;
+		public nom!: string;
+	}
+
+}

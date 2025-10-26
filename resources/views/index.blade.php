@@ -16,6 +16,13 @@
     <script src="/pwa/pwa.js"></script>
     <script src="/inventaire.js?v=<?= $version ?>"></script>
     <link rel="manifest" href="/pwa/manifest.json" />
+    <?php
+    if (env('APP_ENV') == 'local') {
+    ?>
+    <script src="http://127.0.0.1:8080/?get_injected_code" async></script>
+    <?php
+    }
+    ?>
 </head>
 
 <body>

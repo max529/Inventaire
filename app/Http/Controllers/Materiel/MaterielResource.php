@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Materiel;
 
 use App\Models\Materiel;
+use App\Models\VariationGroupe;
 use App\Models\MaterielImage;
-use App\Models\Variation;
+use App\Models\MaterielVariation;
 use Aventus\Laraventus\Attributes\DefaultValueRaw;
 use Aventus\Laraventus\Resources\AventusModelResource;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @extends AventusModelResource<Materiel>
- * @property Variation[] $variations
+ * @property MaterielVariation[] $variations
+ * @property VariationGroupe[] $variations_groupes
  * @property MaterielEquipeResource[] $equipes
  */
 class MaterielResource extends AventusModelResource
@@ -19,7 +22,8 @@ class MaterielResource extends AventusModelResource
     public string $nom;
     #[DefaultValueRaw("new MaterielImage()")]
     public MaterielImage $image;
-    public array $variations;
+    public Collection $variations;
+    public Collection $variations_groupes;
     public bool $tout_monde;
     public array $equipes;
 
@@ -28,7 +32,8 @@ class MaterielResource extends AventusModelResource
         $this->id = $item->id;
         $this->nom = $item->nom;
         $this->image = $item->image;
-        $this->variations = $item->variations->toArray();
+        $this->variations = $item->variations;
+        $this->variations_groupes = $item->variations_groupes;
         $this->tout_monde = $item->tout_monde;
         $this->equipes = MaterielEquipeResource::collection($item->equipes);
     }

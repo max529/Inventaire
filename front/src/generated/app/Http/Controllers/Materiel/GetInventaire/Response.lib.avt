@@ -1,5 +1,5 @@
 import { EquipeResource } from '../../Equipe/EquipeResource.lib.avt';
-import { Variation } from '../../../../Models/Variation.lib.avt';
+import { MaterielVariation } from '../../../../Models/MaterielVariation.lib.avt';
 
 namespace App.Http.Controllers.Materiel.GetInventaire {
 
@@ -8,7 +8,7 @@ namespace App.Http.Controllers.Materiel.GetInventaire {
 		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
 		public id!: number;
 		public equipe!: EquipeResource;
-		public variation?: Variation = undefined;
+		public materiel!: MaterielVariation;
 		public quantite!: number;
 		public last_update!: Date;
 		public last_update_by!: string;

@@ -17,7 +17,7 @@ export class EquipeEditModal extends Modal<EquipeResource> implements Aventus.De
             clone.id = 0;
         }
         modal.form.item = EquipeRAM.getInstance().toRequest(clone);
-        return await EquipeEditModal._show(modal);
+        return await modal.show();
     }
     //#endregion
 

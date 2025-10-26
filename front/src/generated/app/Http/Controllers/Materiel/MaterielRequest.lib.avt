@@ -1,11 +1,11 @@
-import { Variation } from '../../../Models/Variation.lib.avt';
+import { VariationGroupe } from '../../../Models/VariationGroupe.lib.avt';
 import { MaterielEquipe } from '../../../Models/MaterielEquipe.lib.avt';
 import { MaterielImage } from '../../../Models/MaterielImage.lib.avt';
 
 namespace App.Http.Controllers.Materiel {
 
 	export class MaterielRequest {
-		public variations!: Variation[];
+		public variations_groupes!: VariationGroupe[];
 		public equipes!: MaterielEquipe[];
 		public id?: number = undefined;
 		public nom!: string;

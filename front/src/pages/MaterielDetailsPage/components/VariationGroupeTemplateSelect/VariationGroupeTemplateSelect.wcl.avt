@@ -1,0 +1,50 @@
+import { SelectData } from "../../../../components/form/select/SelectData/SelectData.wcl.avt";
+import type { VariationGroupeTemplateResource } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import type { Ram } from "../../../../lib/Ram.lib.avt";
+import { VariationGroupeTemplateRAM } from "../../../../ram/VariationGroupeTemplate.ram.avt";
+
+export class VariationGroupeTemplateSelect extends SelectData<VariationGroupeTemplateResource> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    protected override defineRam(): Ram<VariationGroupeTemplateResource> {
+        return VariationGroupeTemplateRAM.getInstance();
+    }
+    /**
+     * @inheritdoc
+     */
+    public override optionText(item: VariationGroupeTemplateResource): Aventus.Asyncable<string> {
+        return item.nom;
+    }
+    /**
+     * @inheritdoc
+     */
+    public override optionValue(item: VariationGroupeTemplateResource): Aventus.Asyncable<VariationGroupeTemplateResource> {
+        return item;
+    }
+
+    //#endregion
+
+}

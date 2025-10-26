@@ -5,8 +5,7 @@ namespace App.Models {
 		public static override get Fullname(): string { return "App.Models.InventaireHistorique"; }
 		public id!: number;
 		public id_equipe!: number;
-		public id_materiel!: number;
-		public id_variation?: number = undefined;
+		public id_materiel_variation!: number;
 		public quantite!: number;
 		public last_update!: Date;
 		public last_update_by!: string;

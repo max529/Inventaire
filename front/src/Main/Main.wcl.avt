@@ -14,6 +14,7 @@ import { Toast } from "../components/interaction/Toast/Toast.wcl.avt";
 import { PWA } from "../lib/Pwa.lib.avt";
 import { Platform } from "../lib/Platform.lib.avt";
 import { PwaPromptInstall } from "../components/interaction/PwaPromptInstall/PwaPromptInstall.wcl.avt";
+import { VariationsPage } from "../pages/VariationsPage/VariationsPage.wcl.avt";
 
 export class Main extends Router implements Aventus.DefaultComponent {
 
@@ -47,6 +48,7 @@ export class Main extends Router implements Aventus.DefaultComponent {
         this.addRoute("/materiel", MaterielPage);
         this.addRoute("/materiel/{id:number}", MaterielDetailsPage);
         this.addRoute("/utilisateurs", UsersPage);
+        this.addRoute("/variations", VariationsPage);
     }
 
     public override getSlugs(pattern?: string) {

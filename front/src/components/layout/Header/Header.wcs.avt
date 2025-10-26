@@ -57,12 +57,28 @@
 			display: flex;
 			height: 100%;
 
+			.sub-menu-items {
+				background-color: var(--color-base-100);
+				box-shadow: var(--elevation-3);
+				display: none;
+				flex-direction: column;
+				left: 0;
+				position: absolute;
+				top: 100%;
+				width: 100%;
+
+				.item {
+					height: 50px;
+				}
+			}
+
 			.item {
 				align-items: center;
 				cursor: pointer;
 				display: flex;
 				height: 100%;
 				padding: 0 16px;
+				position: relative;
 				transition-duration: var(--transition-duration);
 				transition-property: background-color, color;
 				transition-timing-function: var(--bezier);
@@ -151,9 +167,15 @@
 	:host {
 		.content {
 			.menu {
-				.item:hover {
+				.item:not(.sub-menu):hover {
 					background-color: var(--color-neutral);
 					color: var(--color-neutral-content);
+				}
+
+				.item.sub-menu:hover {
+					.sub-menu-items {
+						display: flex;
+					}
 				}
 			}
 		}

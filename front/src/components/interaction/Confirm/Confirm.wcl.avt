@@ -11,7 +11,7 @@ export class Confirm extends Modal<boolean, ConfirmOptions> implements Aventus.D
 	public static async open(options: Partial<ConfirmOptions>): Promise<boolean | null> {
         const alert = new Confirm();
         alert.options = { ...alert.options, ...options };
-        return await Confirm._show(alert);
+        return await alert.show();
     }
 	//#endregion
 	

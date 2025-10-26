@@ -10,7 +10,7 @@ export class Alert extends Modal<void, AlertOptions> implements Aventus.DefaultC
 	public static async open(options: Partial<AlertOptions>): Promise<void | null> {
         const alert = new Alert();
         alert.options = { ...alert.options, ...options };
-        return await Alert._show(alert);
+        return await alert.show();
     }
 	//#endregion
 	
