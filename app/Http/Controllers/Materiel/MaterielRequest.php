@@ -22,4 +22,11 @@ class MaterielRequest extends AventusRequest
     public bool $tout_monde;
     #[ArrayOf(MaterielEquipe::class)]
     public array $equipes;
+
+    protected function save_links(): null|array {
+        return [
+            "equipes",
+            "variations_groupes.variations"
+        ];
+    }
 }
