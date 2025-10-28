@@ -17,7 +17,8 @@
         </div>
         <div class="modification">
             <div class="actions">
-                <av-icon-action color="neutral" icon="edit" @press="edit">Modifier</av-icon-action>
+                <av-icon-action color="neutral" icon="arrow_outward" @press="edit">Modifier</av-icon-action>
+                <av-icon-action color="neutral" icon="inventory" @press="edit">Inventaire</av-icon-action>
                 <av-icon-action class="historique" color="info" icon="history" @press="historique">Historique</av-icon-action>
             </div>
         </div>

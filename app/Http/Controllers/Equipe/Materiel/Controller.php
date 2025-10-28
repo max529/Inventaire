@@ -16,7 +16,7 @@ class Controller
      */
     public function request(Request $request): array
     {
-        /** @var Collection<Materiel> */
+        /** @var Collection<int, Materiel> */
         $materiels = Materiel::where('tout_monde', 1)->orWhereHas('equipes', function (Builder $query) use($request) {
             $query->where('id_equipe', $request->id_equipe);
         })->get();

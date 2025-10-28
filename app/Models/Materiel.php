@@ -13,10 +13,10 @@ use Illuminate\Database\Eloquent\Collection;
  * @property int $id
  * @property string $nom
  * @property ?MaterielImage $image
- * @property Collection<MaterielVariation> $variations
- * @property Collection<VariationGroupe> $variations_groupes
+ * @property Collection<int, MaterielVariation> $variations
+ * @property Collection<int, VariationGroupe> $variations_groupes
  * @property bool $tout_monde
- * @property Collection<MaterielEquipe> $equipes
+ * @property Collection<int, MaterielEquipe> $equipes
  */
 class Materiel extends AventusModel
 {

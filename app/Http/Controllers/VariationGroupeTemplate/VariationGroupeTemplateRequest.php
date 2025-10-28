@@ -14,4 +14,11 @@ class VariationGroupeTemplateRequest extends AventusRequest
     public string $nom;
     #[ArrayOf(VariationTemplateRequest::class)]
     public array $variations = [];
+
+    protected function save_links(): null|array
+    {
+        return [
+            "variations"
+        ];
+    }
 }

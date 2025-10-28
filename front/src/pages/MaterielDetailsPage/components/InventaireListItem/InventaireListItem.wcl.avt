@@ -52,18 +52,17 @@ export class InventaireListItem extends Aventus.WebComponent implements Aventus.
      */
     protected async edit() {
         const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.variation;
+        modal.variation = this.inventaire.materiel;
         modal.equipe = this.inventaire.equipe;
         modal.materiel = this.materiel;
         modal.nb = this.inventaire.quantite;
         const result = await modal.show();
         if(result) {
-            const save = await Process.execute(new InventaireUpdateController().request({ 
+            const save = await Process.execute(new InventaireUpdateController().request({
                 id: this.inventaire.id,
                 id_equipe: this.inventaire.equipe.id,
-                id_materiel: this.materiel.id,
-                id_variation: this.inventaire.variation?.id,
-                quantite: result
+                id_materiel_variation: this.inventaire.materiel?.id,
+                quantite: result,
             }));
             if(save) {
                 this.inventaire.id = save.id;
@@ -85,9 +84,17 @@ export class InventaireListItem extends Aventus.WebComponent implements Aventus.
         const modal = new ModalHistorique();
         modal.materiel = this.materiel;
         modal.equipe = this.inventaire.equipe;
-        modal.variation = this.inventaire.variation;
+        modal.variation = this.inventaire.materiel;
         await modal.show();
 
+    }
+
+    protected getVariations(): string {
+        const names:string[] = [];
+        for(let group of this.inventaire.materiel.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
     }
 
     //#endregion

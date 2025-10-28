@@ -14,7 +14,7 @@ class Controller
     public function request(Request $request): array
     {
         return Response::collection(
-            Inventaire::with(['equipe', 'materiel', 'materiel.variations', 'materiel.materiel'])->whereHas('materiel', function ($q) use ($request) {
+            Inventaire::with(['equipe', 'materiel.materiel', 'materiel.groups.variation'])->whereHas('materiel', function ($q) use ($request) {
                 $q->where('id_materiel', $request->id_materiel);
             })->get()
         );

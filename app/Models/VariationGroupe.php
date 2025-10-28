@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id_materiel
  * @property ?int $id_template
  * @property string $nom
- * @property Collection<Variation> $variations
+ * @property Collection<int, Variation> $variations
  */
 class VariationGroupe extends AventusModel {
     protected $fillable = [

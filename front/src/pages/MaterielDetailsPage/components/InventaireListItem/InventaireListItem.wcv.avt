@@ -6,7 +6,7 @@
         </div>
         <div class="variation">
             <span class="key">Variation : </span>
-            <span class="value">{{ this.inventaire.variation?.nom }}</span>
+            <span class="value">{{ this.getVariations() }}</span>
         </div>
         <div class="quantite">
             <span class="key">Quantité : </span>

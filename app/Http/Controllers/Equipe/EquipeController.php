@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Equipe;
 
+use App\Http\Controllers\AdminModelController;
 use App\Models\Equipe;
 use App\Models\Inventaire;
 use Aventus\Laraventus\Attributes\NoExport;
 use Aventus\Laraventus\Controllers\ModelController;
 
 /**
- * @extends ModelController<Equipe, EquipeRequest, EquipeResource>
+ * @extends AdminModelController<Equipe, EquipeRequest, EquipeResource>
  */
-class EquipeController extends ModelController
+class EquipeController extends AdminModelController
 {
 
     public function defineModel(): string

@@ -4,7 +4,6 @@ import { MaterielImage } from "../../generated/app/Models/MaterielImage.lib.avt"
 import type { Main } from "../../Main/Main.wcl.avt";
 import { MaterielRAM } from "../../ram/Materiel.ram.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
-import { Variation } from "../../generated/app/Models/Variation.lib.avt";
 import { Toast } from "../../components/interaction/Toast/Toast.wcl.avt";
 import { Confirm } from "../../components/interaction/Confirm/Confirm.wcl.avt";
 import { Process } from "Aventus@UI:Aventus.package.avt";
@@ -120,7 +119,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         }
         equipes.sort((a, b) => a.nom.localeCompare(b.nom));
 
-        const addInventaire = (equipe: EquipeResource, variation?: MaterielVariation) => {
+        const addInventaire = (equipe: EquipeResource, variation: MaterielVariation) => {
             let el: Inventaire | undefined;
             if(variation) {
                 el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id_materiel == variation.id);
@@ -132,6 +131,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 el = new Inventaire();
                 el.equipe = equipe;
                 el.quantite = 0;
+                el.materiel = variation;
             }
             inventaires.push(el);
         };
@@ -142,11 +142,10 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                     addInventaire(equipe, variation);
                 }
             }
-            else {
-                addInventaire(equipe);
-            }
-
         }
+
+        debugger
+        
         this.inventaires = inventaires;
     }
     /**

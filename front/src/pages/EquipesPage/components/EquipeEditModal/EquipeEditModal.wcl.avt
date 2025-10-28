@@ -37,6 +37,7 @@ export class EquipeEditModal extends Modal<EquipeResource> implements Aventus.De
         super();
         this.form = Form.create<EquipeRequest>({
             nom: new Required("Le nom est requis"),
+            favori: {}
         });
     }
     //#endregion

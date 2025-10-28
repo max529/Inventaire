@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $id_materiel
  * @property Materiel $materiel
- * @property Collection<MaterielVariationGroupe> $variations
+ * @property Collection<int, MaterielVariationGroupe> groups
  */
 class MaterielVariation extends AventusModel
 {
@@ -26,7 +26,7 @@ class MaterielVariation extends AventusModel
         return $this->belongsTo(Materiel::class, "id_materiel");
     }
 
-    public function variations(): HasMany
+    public function groups(): HasMany
     {
         return $this->hasMany(MaterielVariationGroupe::class, "id_materiel_variation");
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Role;
 use Aventus\Laraventus\Attributes\NoExport;
 use Aventus\Laraventus\Models\AventusModel;
 
@@ -11,7 +12,7 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $prenom
  * @property string $nom_utilisateur
  * @property string $mot_passe
- * @property int $id_role
+ * @property Role $id_role
  */
 class User extends AventusModel
 {
@@ -35,7 +36,8 @@ class User extends AventusModel
     protected function casts(): array
     {
         return [
-            'mot_passe' => 'hashed'
+            'mot_passe' => 'hashed',
+            'role' => Role::class
         ];
     }
 }

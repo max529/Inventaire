@@ -5,7 +5,6 @@ namespace App.Http.Controllers.Inventaire.Update {
 		public quantite!: number;
 		public id_materiel_variation!: number;
 		public id_equipe!: number;
-		public id_variation?: number = undefined;
 	}
 
 }

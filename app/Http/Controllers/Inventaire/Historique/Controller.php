@@ -19,7 +19,7 @@ class Controller
         $query->offset($request->page * $limit);
         $query->limit($limit);
 
-        /** @var Collection<InventaireHistorique> */
+        /** @var Collection<int, InventaireHistorique> */
         $historique = $query->get();
 
         return new Response($historique->all());

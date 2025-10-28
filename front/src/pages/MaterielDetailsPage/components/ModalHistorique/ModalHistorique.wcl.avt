@@ -5,6 +5,7 @@ import { InventaireHistorique } from "../../../../generated/app/Models/Inventair
 import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+import type { MaterielVariation } from "../../../../generated/app/Models/MaterielVariation.lib.avt";
 
 export class ModalHistorique extends Modal<void> implements Aventus.DefaultComponent {
 
@@ -24,7 +25,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
     @Signal()
     public equipe!: EquipeResource;
     @Signal()
-    public variation?: Variation;
+    public variation!: MaterielVariation;
 
 
     private isLoading: boolean = false;
@@ -67,8 +68,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
         this.isLoading = true;
         const data = await Process.execute(new InventaireHistoriqueController().request({
             id_equipe: this.equipe.id,
-            id_materiel: this.materiel.id,
-            id_variation: this.variation?.id,
+            id_materiel_variation: this.variation.id,
             page: page
         }));
 

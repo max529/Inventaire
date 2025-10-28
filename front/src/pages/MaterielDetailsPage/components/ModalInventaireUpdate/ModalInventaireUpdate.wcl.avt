@@ -3,6 +3,7 @@ import { Modal, type ModalOptions } from "../../../../components/interaction/Mod
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import { Response as Inventaire } from "../../../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
 import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { MaterielVariation } from "../../../../generated/app/Models/MaterielVariation.lib.avt";
 import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
 
 
@@ -22,7 +23,7 @@ export class ModalInventaireUpdate extends Modal<number> implements Aventus.Defa
     @Signal()
     public materiel!: MaterielResource;
     @Signal()
-    public variation?: Variation;
+    public variation?: MaterielVariation;
     @Signal()
     public equipe!: EquipeResource;
     @Signal()
