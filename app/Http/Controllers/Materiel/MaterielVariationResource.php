@@ -14,9 +14,11 @@ use Illuminate\Database\Eloquent\Collection;
 class MaterielVariationResource extends AventusModelResource
 {
 
+    public int $id;
     public array $groups;
     protected function bind($item): void
     {
+        $this->id = $item->id;
         $this->groups = MaterielVariationGroupeResource::collection($item->groups);
     }
 }

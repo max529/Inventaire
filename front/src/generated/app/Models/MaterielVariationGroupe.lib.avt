@@ -1,3 +1,5 @@
+import { Variation } from './Variation.lib.avt';
+
 namespace App.Models {
 
 	@Convertible()
@@ -6,6 +8,7 @@ namespace App.Models {
 		public id!: number;
 		public id_materiel_variation!: number;
 		public id_variation!: number;
+		public variation!: Variation;
 	}
 
 }

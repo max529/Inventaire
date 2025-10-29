@@ -3,6 +3,7 @@
 namespace App\Http\Middlewares;
 
 use App\Models\User;
+use Aventus\Laraventus\Tools\Console;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class IsConnected
      */
     public function handle(Request $request, Closure $next): Response
     {
+        Console::log("IsConnected");
         if (session("user") == null) {
             return redirect('/login');
         }

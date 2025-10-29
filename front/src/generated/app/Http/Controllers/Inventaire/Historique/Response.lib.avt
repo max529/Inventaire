@@ -1,11 +1,11 @@
-import { InventaireHistorique } from '../../../../Models/InventaireHistorique.lib.avt';
+import { Mouvement } from '../../../../Models/Mouvement.lib.avt';
 
 namespace App.Http.Controllers.Inventaire.Historique {
 
 	@Convertible()
 	export class Response extends Aventus.Data  {
 		public static override get Fullname(): string { return "App.Http.Controllers.Inventaire.Historique.Response"; }
-		public historique!: InventaireHistorique[];
+		public mouvements!: Mouvement[];
 	}
 
 }

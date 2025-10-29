@@ -1,12 +1,12 @@
 import { Request } from './Request.lib.avt';
 import { Inventaire } from '../../../../Models/Inventaire.lib.avt';
 
-namespace App.Http.Controllers.Inventaire.Update {
+namespace App.Http.Controllers.Inventaire.Achat {
 
-	export class InventaireUpdateController extends Aventus.HttpRoute {
+	export class InventaireAchatController extends Aventus.HttpRoute {
 		@BindThis()
 		public async request(body: Request): Promise<Aventus.ResultWithError<Inventaire>> {
-			const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/update`, Aventus.HttpMethod.POST);
+			const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/achat`, Aventus.HttpMethod.POST);
 			request.setBody(body);
 			return await request.queryJSON<Inventaire>(this.router);
 		}

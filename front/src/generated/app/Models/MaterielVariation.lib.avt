@@ -1,5 +1,4 @@
 import { Materiel } from './Materiel.lib.avt';
-import { MaterielVariationGroupe } from './MaterielVariationGroupe.lib.avt';
 
 namespace App.Models {
 
@@ -9,7 +8,6 @@ namespace App.Models {
 		public id!: number;
 		public id_materiel!: number;
 		public materiel!: Materiel;
-		public variations!: MaterielVariationGroupe[];
 	}
 
 }

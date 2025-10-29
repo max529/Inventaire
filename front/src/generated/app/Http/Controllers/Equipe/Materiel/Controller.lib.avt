@@ -1,11 +1,11 @@
-import { Request } from './Request.lib.avt';
+import { EquipeMaterielRequest } from './Request.lib.avt';
 import { MaterielResource } from '../../Materiel/MaterielResource.lib.avt';
 
 namespace App.Http.Controllers.Equipe.Materiel {
 
 	export class EquipeMaterielController extends Aventus.HttpRoute {
 		@BindThis()
-		public async request(body: Request): Promise<Aventus.ResultWithError<MaterielResource[]>> {
+		public async request(body: EquipeMaterielRequest): Promise<Aventus.ResultWithError<MaterielResource[]>> {
 			const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/equipe/materiel`, Aventus.HttpMethod.POST);
 			request.setBody(body);
 			return await request.queryJSON<MaterielResource[]>(this.router);

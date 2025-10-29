@@ -1,0 +1,12 @@
+import { MaterielVariationGroupeResource } from './MaterielVariationGroupeResource.lib.avt';
+
+namespace App.Http.Controllers.Materiel {
+
+	@Convertible()
+	export class MaterielVariationResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.MaterielVariationResource"; }
+		public groups!: MaterielVariationGroupeResource[];
+		public id!: number;
+	}
+
+}

@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Inventaire\Update;
+namespace App\Http\Controllers\Inventaire\Mouvement;
 
-use App\Models\Inventaire;
 use Aventus\Laraventus\Requests\AventusRequest;
-use Illuminate\Http\UploadedFile;
 
 /**
  * 
  */
 class Request extends AventusRequest
 {
-    public ?int $id;
+    public int $id_sortie;
+    public ?int $id_entree;
     public float $quantite;
     public int $id_materiel_variation;
-    public int $id_equipe;
+    public int $id_equipe_entree;
+    public int $id_equipe_sortie;
     public ?int $id_variation;
 }

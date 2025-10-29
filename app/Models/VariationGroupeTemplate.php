@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\VariationGroupeTemplateObserver;
 use App\Observers\VariationTemplateObserver;
 use Aventus\Laraventus\Models\AventusModel;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;

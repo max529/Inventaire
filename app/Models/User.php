@@ -37,7 +37,7 @@ class User extends AventusModel
     {
         return [
             'mot_passe' => 'hashed',
-            'role' => Role::class
+            'id_role' => Role::class
         ];
     }
 }

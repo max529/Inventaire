@@ -1,4 +1,4 @@
-namespace App.Http.Controllers.Inventaire.Update {
+namespace App.Http.Controllers.Inventaire.Achat {
 
 	export class Request {
 		public id?: number = undefined;

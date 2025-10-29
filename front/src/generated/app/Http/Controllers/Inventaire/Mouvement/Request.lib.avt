@@ -1,0 +1,13 @@
+namespace App.Http.Controllers.Inventaire.Mouvement {
+
+	export class Request {
+		public id_sortie!: number;
+		public id_entree?: number = undefined;
+		public quantite!: number;
+		public id_materiel_variation!: number;
+		public id_equipe_entree!: number;
+		public id_equipe_sortie!: number;
+		public id_variation?: number = undefined;
+	}
+
+}

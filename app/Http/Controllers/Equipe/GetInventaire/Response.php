@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Equipe\GetInventaire;
 
 use App\Http\Controllers\Materiel\MaterielResource;
+use App\Http\Controllers\Materiel\MaterielVariationResource;
 use App\Models\Inventaire;
-use App\Models\Variation;
 use Aventus\Laraventus\Resources\AventusModelResource;
 use DateTime;
 
@@ -14,10 +14,10 @@ use DateTime;
 class Response extends AventusModelResource
 {
     public int $id;
-    public MaterielResource $materiel;
+    public MaterielVariationResource $materiel;
     public float $quantite;
-    public DateTime $last_update;
-    public string $last_update_by;
+    public DateTime $date;
+    public string $par;
 
 
     /**
@@ -27,9 +27,9 @@ class Response extends AventusModelResource
      */
     protected function bind($item): void {
         $this->id = $item->id;
-        $this->materiel = new MaterielResource($item->materiel);
+        $this->materiel = new MaterielVariationResource($item->materiel);
         $this->quantite = $item->quantite;
-        $this->last_update = $item->last_update;
-        $this->last_update_by = $item->last_update_by;
+        $this->date = $item->date;
+        $this->par = $item->par;
     }
 }

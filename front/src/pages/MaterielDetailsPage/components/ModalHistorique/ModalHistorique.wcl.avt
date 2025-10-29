@@ -6,6 +6,7 @@ import type { MaterielResource } from "../../../../generated/app/Http/Controller
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
 import type { MaterielVariation } from "../../../../generated/app/Models/MaterielVariation.lib.avt";
+import type { MaterielVariationResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 
 export class ModalHistorique extends Modal<void> implements Aventus.DefaultComponent {
 
@@ -25,7 +26,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
     @Signal()
     public equipe!: EquipeResource;
     @Signal()
-    public variation!: MaterielVariation;
+    public variation!: MaterielVariationResource;
 
 
     private isLoading: boolean = false;
@@ -99,6 +100,14 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
             hour: "2-digit",
             minute: "2-digit"
         });
+    }
+
+    protected getVariations(): string {
+        const names: string[] = [];
+        for(let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
     }
 
     protected override postCreation(): void {

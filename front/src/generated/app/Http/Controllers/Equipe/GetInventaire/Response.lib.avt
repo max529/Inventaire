@@ -1,4 +1,4 @@
-import { MaterielResource } from '../../Materiel/MaterielResource.lib.avt';
+import { MaterielVariationResource } from '../../Materiel/MaterielVariationResource.lib.avt';
 
 namespace App.Http.Controllers.Equipe.GetInventaire {
 
@@ -6,10 +6,10 @@ namespace App.Http.Controllers.Equipe.GetInventaire {
 	export class Response extends Aventus.Data  {
 		public static override get Fullname(): string { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
 		public id!: number;
-		public materiel!: MaterielResource;
+		public materiel!: MaterielVariationResource;
 		public quantite!: number;
-		public last_update!: Date;
-		public last_update_by!: string;
+		public date!: Date;
+		public par!: string;
 	}
 
 }

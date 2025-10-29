@@ -1,6 +1,6 @@
 namespace App.Http.Controllers.Equipe.Materiel {
 
-	export class Request {
+	export class EquipeMaterielRequest {
 		public id_equipe!: number;
 	}
 

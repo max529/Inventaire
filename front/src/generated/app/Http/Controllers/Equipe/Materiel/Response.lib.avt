@@ -1,7 +1,7 @@
 namespace App.Http.Controllers.Equipe.Materiel {
 
 	@Convertible()
-	export class Response extends Aventus.Data  {
+	export class EquipeMaterielResponse extends Aventus.Data  {
 		public static override get Fullname(): string { return "App.Http.Controllers.Equipe.Materiel.Response"; }
 	}
 

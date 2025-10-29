@@ -4,15 +4,17 @@ import { MaterielVariation } from './MaterielVariation.lib.avt';
 namespace App.Models {
 
 	@Convertible()
-	export class Inventaire extends Aventus.Data implements Aventus.IData {
-		public static override get Fullname(): string { return "App.Models.Inventaire"; }
+	export class Mouvement extends Aventus.Data implements Aventus.IData {
+		public static override get Fullname(): string { return "App.Models.Mouvement"; }
 		public id!: number;
-		public id_equipe!: number;
+		public id_equipe_sortie!: number;
+		public id_equipe_entree!: number;
 		public id_materiel_variation!: number;
 		public quantite!: number;
 		public date!: Date;
 		public par!: string;
-		public equipe!: Equipe;
+		public equipe_sortie!: Equipe;
+		public equipe_entree!: Equipe;
 		public materiel!: MaterielVariation;
 	}
 

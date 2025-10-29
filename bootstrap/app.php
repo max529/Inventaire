@@ -21,7 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
             except: ["*"]
         );
         $middleware->append(AventusMiddleware::class);
-        $middleware->appendToGroup("web", AventusAttributesMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         AventusExceptionCatcher::use($exceptions);

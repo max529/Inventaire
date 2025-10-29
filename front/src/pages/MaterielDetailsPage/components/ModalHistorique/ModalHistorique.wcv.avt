@@ -1,4 +1,4 @@
-<div class="title">Historique pour {{ this.materiel.nom }} {{ this.variation?.nom }} pour {{ this.equipe.nom }}</div>
+<div class="title">Historique pour {{ this.materiel.nom }} {{ this.getVariations() }} pour {{ this.equipe.nom }}</div>
 
 <div class="content">
     <av-flex-scroll @scrollChange="loadData" @element="scrollEl" floating_scroll>

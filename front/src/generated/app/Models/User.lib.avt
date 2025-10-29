@@ -1,3 +1,5 @@
+import { Role } from '../Enum/Role.lib.avt';
+
 namespace App.Models {
 
 	@Convertible()
@@ -8,7 +10,7 @@ namespace App.Models {
 		public prenom!: string;
 		public nom_utilisateur!: string;
 		public mot_passe!: string;
-		public id_role!: number;
+		public id_role!: Role;
 	}
 
 }

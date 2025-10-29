@@ -6,7 +6,9 @@ use App\Enum\Role;
 use App\Models\User;
 use Attribute;
 use Aventus\Laraventus\Attributes\Middleware;
+use Aventus\Laraventus\Tools\Console;
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,10 +29,9 @@ class IsAdmin extends Middleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = User::$current;
-
         if ($user->id_role->value == Role::Admin->value) {
             return $next($request);
         }
-        return new Response('', 403);
+        throw new Exception("Pas autorisé", 403);
     }
 }

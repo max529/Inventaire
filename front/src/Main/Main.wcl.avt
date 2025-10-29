@@ -119,12 +119,6 @@ export class Main extends Router implements Aventus.DefaultComponent {
                 if(response.containsCode(401)) {
                     location.reload();
                 }
-                else if(response.containsCode(403)) {
-                    Alert.open({
-                        title: "Pas autorisé",
-                        content: "Vous n'êtes pas autorisés à effectuer cette action"
-                    });
-                }
                 return response;
             }
         });

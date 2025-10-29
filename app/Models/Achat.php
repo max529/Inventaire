@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Equipe $equipe
  * @property MaterielVariation $materiel
  */
-class Inventaire extends AventusModel
+class Achat extends AventusModel
 {
     protected $fillable = [
         "id",

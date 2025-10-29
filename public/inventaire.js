@@ -12238,10 +12238,12 @@ App.Http.Controllers.Materiel.GetInventaire = {};
 _.App.Http.Controllers.Materiel.GetInventaire = Inventaire.App?.Http?.Controllers?.Materiel?.GetInventaire ?? {};
 App.Http.Controllers.Inventaire = {};
 _.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
-App.Http.Controllers.Inventaire.Update = {};
-_.App.Http.Controllers.Inventaire.Update = Inventaire.App?.Http?.Controllers?.Inventaire?.Update ?? {};
+App.Http.Controllers.Inventaire.Mouvement = {};
+_.App.Http.Controllers.Inventaire.Mouvement = Inventaire.App?.Http?.Controllers?.Inventaire?.Mouvement ?? {};
 App.Http.Controllers.Inventaire.Historique = {};
 _.App.Http.Controllers.Inventaire.Historique = Inventaire.App?.Http?.Controllers?.Inventaire?.Historique ?? {};
+App.Http.Controllers.Inventaire.Achat = {};
+_.App.Http.Controllers.Inventaire.Achat = Inventaire.App?.Http?.Controllers?.Inventaire?.Achat ?? {};
 App.Http.Controllers.Equipe = {};
 _.App.Http.Controllers.Equipe = Inventaire.App?.Http?.Controllers?.Equipe ?? {};
 App.Http.Controllers.Equipe.Materiel = {};
@@ -12358,20 +12360,6 @@ App.Http.Controllers.User.UserRequest=class UserRequest {
 App.Http.Controllers.User.UserRequest.Namespace=`Inventaire.App.Http.Controllers.User`;
 __as1(_.App.Http.Controllers.User, 'UserRequest', App.Http.Controllers.User.UserRequest);
 
-App.Models.User=class User extends Aventus.Data {
-    static get Fullname() { return "App.Models.User"; }
-    id;
-    nom;
-    prenom;
-    nom_utilisateur;
-    mot_passe;
-    id_role;
-}
-App.Models.User.Namespace=`Inventaire.App.Models`;
-App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string","id_role":"number"};
-Aventus.Converter.register(App.Models.User.Fullname, App.Models.User);
-__as1(_.App.Models, 'User', App.Models.User);
-
 App.Http.Controllers.Materiel.MaterielImageResource=class MaterielImageResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielImageResource"; }
     uri;
@@ -12387,28 +12375,17 @@ App.Http.Controllers.Materiel.GetInventaire.Request=class Request {
 App.Http.Controllers.Materiel.GetInventaire.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
 __as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Controllers.Materiel.GetInventaire.Request);
 
-App.Http.Controllers.Inventaire.Update.Request=class Request {
-    id = undefined;
+App.Http.Controllers.Inventaire.Mouvement.Request=class Request {
+    id_sortie;
+    id_entree = undefined;
     quantite;
     id_materiel_variation;
-    id_equipe;
+    id_equipe_entree;
+    id_equipe_sortie;
+    id_variation = undefined;
 }
-App.Http.Controllers.Inventaire.Update.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
-__as1(_.App.Http.Controllers.Inventaire.Update, 'Request', App.Http.Controllers.Inventaire.Update.Request);
-
-App.Models.InventaireHistorique=class InventaireHistorique extends Aventus.Data {
-    static get Fullname() { return "App.Models.InventaireHistorique"; }
-    id;
-    id_equipe;
-    id_materiel_variation;
-    quantite;
-    last_update;
-    last_update_by;
-}
-App.Models.InventaireHistorique.Namespace=`Inventaire.App.Models`;
-App.Models.InventaireHistorique.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string"};
-Aventus.Converter.register(App.Models.InventaireHistorique.Fullname, App.Models.InventaireHistorique);
-__as1(_.App.Models, 'InventaireHistorique', App.Models.InventaireHistorique);
+App.Http.Controllers.Inventaire.Mouvement.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
+__as1(_.App.Http.Controllers.Inventaire.Mouvement, 'Request', App.Http.Controllers.Inventaire.Mouvement.Request);
 
 App.Http.Controllers.Inventaire.Historique.Request=class Request {
     id_materiel_variation;
@@ -12418,30 +12395,54 @@ App.Http.Controllers.Inventaire.Historique.Request=class Request {
 App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Request', App.Http.Controllers.Inventaire.Historique.Request);
 
-App.Http.Controllers.Equipe.Materiel.Response=class Response extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.Equipe.Materiel.Response"; }
+App.Models.Equipe=class Equipe extends Aventus.Data {
+    static get Fullname() { return "App.Models.Equipe"; }
+    id;
+    nom;
+    favori;
 }
-App.Http.Controllers.Equipe.Materiel.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
-App.Http.Controllers.Equipe.Materiel.Response.$schema={...(Aventus.Data?.$schema ?? {}), };
-Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.Response.Fullname, App.Http.Controllers.Equipe.Materiel.Response);
-__as1(_.App.Http.Controllers.Equipe.Materiel, 'Response', App.Http.Controllers.Equipe.Materiel.Response);
+App.Models.Equipe.Namespace=`Inventaire.App.Models`;
+App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","favori":"boolean"};
+Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
+__as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
-App.Http.Controllers.Equipe.Materiel.Request=class Request {
+App.Models.MaterielEquipe=class MaterielEquipe extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielEquipe"; }
+    id;
+    id_materiel;
+    id_equipe;
+    equipe;
+    materiel;
+}
+App.Models.MaterielEquipe.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielEquipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_equipe":"number","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.Materiel"};
+Aventus.Converter.register(App.Models.MaterielEquipe.Fullname, App.Models.MaterielEquipe);
+__as1(_.App.Models, 'MaterielEquipe', App.Models.MaterielEquipe);
+
+App.Http.Controllers.Inventaire.Achat.Request=class Request {
+    id = undefined;
+    quantite;
+    id_materiel_variation;
     id_equipe;
 }
-App.Http.Controllers.Equipe.Materiel.Request.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
-__as1(_.App.Http.Controllers.Equipe.Materiel, 'Request', App.Http.Controllers.Equipe.Materiel.Request);
+App.Http.Controllers.Inventaire.Achat.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
+__as1(_.App.Http.Controllers.Inventaire.Achat, 'Request', App.Http.Controllers.Inventaire.Achat.Request);
 
-App.Models.MaterielVariationGroupe=class MaterielVariationGroupe extends Aventus.Data {
-    static get Fullname() { return "App.Models.MaterielVariationGroupe"; }
-    id;
-    id_materiel_variation;
-    id_variation;
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse=class EquipeMaterielResponse extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.Materiel.Response"; }
 }
-App.Models.MaterielVariationGroupe.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielVariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel_variation":"number","id_variation":"number"};
-Aventus.Converter.register(App.Models.MaterielVariationGroupe.Fullname, App.Models.MaterielVariationGroupe);
-__as1(_.App.Models, 'MaterielVariationGroupe', App.Models.MaterielVariationGroupe);
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.$schema={...(Aventus.Data?.$schema ?? {}), };
+Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Fullname, App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielResponse', App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
+
+App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
+    static get Fullname() { return "App.Models.MaterielImage"; }
+}
+App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
+Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
+__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
 App.Models.Variation=class Variation extends Aventus.Data {
     static get Fullname() { return "App.Models.Variation"; }
@@ -12455,13 +12456,32 @@ App.Models.Variation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","i
 Aventus.Converter.register(App.Models.Variation.Fullname, App.Models.Variation);
 __as1(_.App.Models, 'Variation', App.Models.Variation);
 
-App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
-    static get Fullname() { return "App.Models.MaterielImage"; }
+App.Models.MaterielVariationGroupe=class MaterielVariationGroupe extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielVariationGroupe"; }
+    id;
+    id_materiel_variation;
+    id_variation;
+    variation;
 }
-App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
-Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
-__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
+App.Models.MaterielVariationGroupe.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielVariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel_variation":"number","id_variation":"number","variation":"Inventaire.App.Models.Variation"};
+Aventus.Converter.register(App.Models.MaterielVariationGroupe.Fullname, App.Models.MaterielVariationGroupe);
+__as1(_.App.Models, 'MaterielVariationGroupe', App.Models.MaterielVariationGroupe);
+
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest=class EquipeMaterielRequest {
+    id_equipe;
+}
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielRequest', App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest);
+
+App.Http.Controllers.Materiel.VariationResource=class VariationResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.VariationResource"; }
+    nom;
+}
+App.Http.Controllers.Materiel.VariationResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.VariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.VariationResource.Fullname, App.Http.Controllers.Materiel.VariationResource);
+__as1(_.App.Http.Controllers.Materiel, 'VariationResource', App.Http.Controllers.Materiel.VariationResource);
 
 App.Http.Controllers.Equipe.GetInventaire.Request=class Request {
     id_equipe;
@@ -12479,6 +12499,29 @@ App.Http.Controllers.Equipe.EquipeResource.$schema={...(Aventus.Data?.$schema ??
 Aventus.Converter.register(App.Http.Controllers.Equipe.EquipeResource.Fullname, App.Http.Controllers.Equipe.EquipeResource);
 __as1(_.App.Http.Controllers.Equipe, 'EquipeResource', App.Http.Controllers.Equipe.EquipeResource);
 
+let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new EquipeController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(EquipeRAM);
+    }
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+}
+EquipeRAM.Namespace=`Inventaire`;
+__as1(_, 'EquipeRAM', EquipeRAM);
+
 const EquipeItem = class EquipeItem extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
     set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'item'() {
@@ -12489,7 +12532,7 @@ const EquipeItem = class EquipeItem extends Aventus.WebComponent {
 					}    __registerWatchesActions() {
     this.__addWatchesActions("item");    super.__registerWatchesActions();
 }
-    static __style = `:host{align-items:center;border-top:1px solid var(--color-base-300);display:flex;height:50px;padding:0 16px}:host .name{flex-grow:1}:host .actions{display:flex;flex-shrink:0;gap:5px}:host(:first-child){border-top:none}:host(:not([visible])){display:none}`;
+    static __style = `:host{align-items:center;border-top:1px solid var(--color-base-300);display:flex;height:50px;padding:0 16px}:host .name{flex-grow:1;display:flex;align-items:center;gap:20px}:host .name mi-icon{display:none}:host .actions{display:flex;flex-shrink:0;gap:5px}:host(:first-child){border-top:none}:host(:not([visible])){display:none}`;
     __getStatic() {
         return EquipeItem;
     }
@@ -12555,33 +12598,10 @@ __as1(_.App.Http.Controllers.Materiel, 'MaterielEquipeResource', App.Http.Contro
 App.Http.Controllers.Equipe.EquipeRequest=class EquipeRequest {
     id = undefined;
     nom;
+    favori = false;
 }
 App.Http.Controllers.Equipe.EquipeRequest.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
 __as1(_.App.Http.Controllers.Equipe, 'EquipeRequest', App.Http.Controllers.Equipe.EquipeRequest);
-
-App.Models.Equipe=class Equipe extends Aventus.Data {
-    static get Fullname() { return "App.Models.Equipe"; }
-    id;
-    nom;
-    favori;
-}
-App.Models.Equipe.Namespace=`Inventaire.App.Models`;
-App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","favori":"boolean"};
-Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
-__as1(_.App.Models, 'Equipe', App.Models.Equipe);
-
-App.Models.MaterielEquipe=class MaterielEquipe extends Aventus.Data {
-    static get Fullname() { return "App.Models.MaterielEquipe"; }
-    id;
-    id_materiel;
-    id_equipe;
-    equipe;
-    materiel;
-}
-App.Models.MaterielEquipe.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielEquipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_equipe":"number","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.Materiel"};
-Aventus.Converter.register(App.Models.MaterielEquipe.Fullname, App.Models.MaterielEquipe);
-__as1(_.App.Models, 'MaterielEquipe', App.Models.MaterielEquipe);
 
 App.Http.Controllers.Auth.Login.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Auth.Login.Response"; }
@@ -12598,11 +12618,30 @@ App.Http.Controllers.Auth.Login.Request=class Request {
 App.Http.Controllers.Auth.Login.Request.Namespace=`Inventaire.App.Http.Controllers.Auth.Login`;
 __as1(_.App.Http.Controllers.Auth.Login, 'Request', App.Http.Controllers.Auth.Login.Request);
 
+App.Http.Controllers.AdminModelController=class AdminModelController extends AventusPhp.ModelController {
+}
+App.Http.Controllers.AdminModelController.Namespace=`Inventaire.App.Http.Controllers`;
+__as1(_.App.Http.Controllers, 'AdminModelController', App.Http.Controllers.AdminModelController);
+
 (function (Role) {
     Role[Role["Admin"] = 1] = "Admin";
     Role[Role["User"] = 2] = "User";
 })(App.Enum.Role || (App.Enum.Role = {}));
 __as1(_.App.Enum, 'Role', App.Enum.Role);
+
+App.Models.User=class User extends Aventus.Data {
+    static get Fullname() { return "App.Models.User"; }
+    id;
+    nom;
+    prenom;
+    nom_utilisateur;
+    mot_passe;
+    id_role;
+}
+App.Models.User.Namespace=`Inventaire.App.Models`;
+App.Models.User.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","mot_passe":"string","id_role":"Inventaire.App.Enum.Role"};
+Aventus.Converter.register(App.Models.User.Fullname, App.Models.User);
+__as1(_.App.Models, 'User', App.Models.User);
 
 const PageFull = class PageFull extends Aventus.Navigation.Page {
     static __style = `:host{display:flex;height:100%;justify-content:center;width:100%}:host .content{display:flex;flex-direction:column;height:100%;justify-content:space-between;max-width:1200px;padding:32px;padding-bottom:16px;width:100%}@media screen and (max-width: 768px){:host .content{padding:16px}}`;
@@ -12623,9 +12662,7 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">
-    <slot></slot>
-</div>` }
+        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
     });
 }
     getClassName() {
@@ -12654,11 +12691,7 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>
-    <div class="content">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>    <div class="content">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -12758,7 +12791,44 @@ const PwaPromptIos = class PwaPromptIos extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0"></div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">    <div class="pwaPromptHeader iOSPWA-header">        <p class="pwaPromptTitle iOSPWA-title">            Ajouter à la page d'accueil        </p>        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">            Fermer        </button>    </div>    <div class="pwaPromptBody iOSPWA-body">        <div class="pwaPromptDescription iOSPWA-description">            <p class="pwaPromptCopy iOSPWA-description-copy">                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran            </p>        </div>    </div>    <div class="pwaPromptInstruction iOSPWA-steps">        <div class="pwaPromptInstructionStep iOSPWA-step1">            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step1-copy">                1) Appuyez sur le bouton "Partager" dans la barre de menu.            </p>        </div>        <div class="pwaPromptInstructionStep iOSPWA-step2">            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step2-copy">                2) Appuyez sur "Ajouter à l'écran d'accueil".            </p>        </div>    </div></div>` }
+        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0">
+</div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">
+    <div class="pwaPromptHeader iOSPWA-header">
+        <p class="pwaPromptTitle iOSPWA-title">
+            Ajouter à la page d'accueil
+        </p>
+        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">
+            Fermer
+        </button>
+    </div>
+    <div class="pwaPromptBody iOSPWA-body">
+        <div class="pwaPromptDescription iOSPWA-description">
+            <p class="pwaPromptCopy iOSPWA-description-copy">
+                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran
+            </p>
+        </div>
+    </div>
+    <div class="pwaPromptInstruction iOSPWA-steps">
+        <div class="pwaPromptInstructionStep iOSPWA-step1">
+            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">
+                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>
+                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>
+            </svg>
+            <p class="pwaPromptCopy bold iOSPWA-step1-copy">
+                1) Appuyez sur le bouton "Partager" dans la barre de menu.
+            </p>
+        </div>
+        <div class="pwaPromptInstructionStep iOSPWA-step2">
+            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">
+                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>
+                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>
+            </svg>
+            <p class="pwaPromptCopy bold iOSPWA-step2-copy">
+                2) Appuyez sur "Ajouter à l'écran d'accueil".
+            </p>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12845,10 +12915,7 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
-    <av-button _id="confirm_2"></av-button>
-    <av-button color="primary" _id="confirm_3"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12921,6 +12988,85 @@ Confirm.Namespace=`Inventaire`;
 Confirm.Tag=`av-confirm`;
 __as1(_, 'Confirm', Confirm);
 if(!window.customElements.get('av-confirm')){window.customElements.define('av-confirm', Confirm);Aventus.WebComponentInstance.registerDefinition(Confirm);}
+
+const EquipeTag = class EquipeTag extends Aventus.WebComponent {
+    get 'equipe_id'() {
+						return this.__watch["equipe_id"];
+					}
+					set 'equipe_id'(val) {
+						this.__watch["equipe_id"] = val;
+					}get 'equipe'() {
+						return this.__watch["equipe"];
+					}
+					set 'equipe'(val) {
+						this.__watch["equipe"] = val;
+					}    onDelete = new Aventus.Callback();
+    __registerWatchesActions() {
+    this.__addWatchesActions("equipe_id", ((target) => {
+    target.loadData();
+}));this.__addWatchesActions("equipe");    super.__registerWatchesActions();
+}
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
+    __getStatic() {
+        return EquipeTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="equipetag_0"></span>
+    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
+</av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "equipetag_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__6e6550e7a452d01b39466da4997f8b4dmethod0())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "equipetag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipeTag";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe_id"] = undefined;w["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe_id');this.__correctGetter('equipe'); }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    async loadData() {
+        const r = await EquipeRAM.getInstance().getById(this.equipe_id);
+        if (r) {
+            this.equipe = r;
+        }
+    }
+    postCreation() {
+        super.postCreation();
+    }
+    __6e6550e7a452d01b39466da4997f8b4dmethod0() {
+        return this.equipe.nom;
+    }
+}
+EquipeTag.Namespace=`Inventaire`;
+EquipeTag.Tag=`av-equipe-tag`;
+__as1(_, 'EquipeTag', EquipeTag);
+if(!window.customElements.get('av-equipe-tag')){window.customElements.define('av-equipe-tag', EquipeTag);Aventus.WebComponentInstance.registerDefinition(EquipeTag);}
 
 const Toggle = class Toggle extends Aventus.Form.FormElement {
     static get observedAttributes() {return ["checked"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -13041,15 +13187,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
-    <div class="preview" _id="inputimage_1">
-        <av-img _id="inputimage_2"></av-img>
-        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
-    </div>
-    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
-</div><div class="errors">
-    <template _id="inputimage_5"></template>
-</div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13094,14 +13232,10 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-        <template _id="inputimage_6"></template>
-    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-            <div _id="inputimage_7"></div>
-        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -13338,23 +13472,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">
-    <div class="toast-flex">
-        <div class="toast-icon-wrapper">
-            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
-        </div>
-        <div class="toast-message-wrapper">
-            <template _id="toast_1"></template>
-            <template _id="toast_3"></template>
-        </div>
-        <div class="toast-close-wrapper">
-            <button class="toast-close-button" _id="toast_5">
-                <span class="sr-only">Close</span>
-                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
-            </button>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13371,9 +13489,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <p class="toast-title" _id="toast_2"></p>
-            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13386,9 +13502,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-                <p class="toast-message" _id="toast_4"></p>
-            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13513,13 +13627,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
-    <slot name="before"></slot>
-    <input _id="input_1" />
-    <slot name="after"></slot>
-</div><div class="errors">
-    <template _id="input_2"></template>
-</div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13580,9 +13688,7 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="input_3"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13659,9 +13765,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">
-    <div class="loader"></div>
-</div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
     });
 }
     getClassName() {
@@ -13951,9 +14055,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
-    <slot _id="iconaction_1"></slot>
-</div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14030,11 +14132,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>
-    <div class="container">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -14144,21 +14242,8 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
-    <slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>
-    <input id="input" autocomplete="off" _id="genericselect_3" />
-    <slot name="append"></slot>
-    <av-img src="/img/angle-left.svg" class="caret"></av-img>
-</div><div class="errors">
-    <template _id="genericselect_4"></template>
-</div><div class="hidden">
-    <slot></slot>
-</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14213,9 +14298,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="genericselect_5"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14716,6 +14799,136 @@ const SelectData = class SelectData extends GenericSelect {
 SelectData.Namespace=`Inventaire`;
 __as1(_, 'SelectData', SelectData);
 
+const EquipeSelect = class EquipeSelect extends SelectData {
+    static __style = ``;
+    __getStatic() {
+        return EquipeSelect;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeSelect.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "EquipeSelect";
+    }
+    defineRam() {
+        return EquipeRAM.getInstance();
+    }
+    optionText(item) {
+        return item.nom;
+    }
+    optionValue(item) {
+        return item;
+    }
+}
+EquipeSelect.Namespace=`Inventaire`;
+EquipeSelect.Tag=`av-equipe-select`;
+__as1(_, 'EquipeSelect', EquipeSelect);
+if(!window.customElements.get('av-equipe-select')){window.customElements.define('av-equipe-select', EquipeSelect);Aventus.WebComponentInstance.registerDefinition(EquipeSelect);}
+
+const ModalEquipe = class ModalEquipe extends Modal {
+    get 'equipe'() {
+						return this.__watch["equipe"];
+					}
+					set 'equipe'(val) {
+						this.__watch["equipe"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("equipe");    super.__registerWatchesActions();
+}
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalEquipe;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalEquipe.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalequipe_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalequipe_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__392051980c1cd9dd7440f855fabdee56method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalequipe_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__392051980c1cd9dd7440f855fabdee56method1(),
+      "extract": (c, v) => c.comp.__392051980c1cd9dd7440f855fabdee56method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalequipe_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalequipe_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalEquipe";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe'); }
+    configure() {
+        return {
+            title: "Ajout d'une équipe",
+        };
+    }
+    save() {
+        if (!this.equipe) {
+            this.inputEl.errors = ["Il faut choisir une équipe"];
+            return;
+        }
+        this.resolve(this.equipe);
+    }
+    __392051980c1cd9dd7440f855fabdee56method0() {
+        return this.options.title;
+    }
+    __392051980c1cd9dd7440f855fabdee56method1() {
+        return this.equipe;
+    }
+    __392051980c1cd9dd7440f855fabdee56method2(v) {
+        if (this) {
+            this.equipe = v;
+        }
+    }
+}
+ModalEquipe.Namespace=`Inventaire`;
+ModalEquipe.Tag=`av-modal-equipe`;
+__as1(_, 'ModalEquipe', ModalEquipe);
+if(!window.customElements.get('av-modal-equipe')){window.customElements.define('av-modal-equipe', ModalEquipe);Aventus.WebComponentInstance.registerDefinition(ModalEquipe);}
+
 const OptionData = class OptionData extends GenericOption {
     static __style = ``;
     __getStatic() {
@@ -14767,9 +14980,7 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
-    <av-button _id="alert_1"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14959,7 +15170,13 @@ const PwaPromptInstall = class PwaPromptInstall extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en        plein écran</p></div><div class="footer">    <av-button _id="pwapromptinstall_1">Annuler</av-button>    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">
+    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en
+        plein écran</p>
+</div><div class="footer">
+    <av-button _id="pwapromptinstall_1">Annuler</av-button>
+    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15316,250 +15533,65 @@ LoginPage.Tag=`av-login-page`;
 __as1(_, 'LoginPage', LoginPage);
 if(!window.customElements.get('av-login-page')){window.customElements.define('av-login-page', LoginPage);Aventus.WebComponentInstance.registerDefinition(LoginPage);}
 
-App.Http.Controllers.Equipe.EquipeController=class EquipeController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Controllers.Equipe.EquipeRequest; }
-    getResource() { return _.App.Http.Controllers.Equipe.EquipeResource; }
-    getUri() { return "data/equipe"; }
+App.Http.Controllers.Materiel.MaterielVariationGroupeResource=class MaterielVariationGroupeResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielVariationGroupeResource"; }
+    variation;
 }
-App.Http.Controllers.Equipe.EquipeController.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
-__as1(_.App.Http.Controllers.Equipe, 'EquipeController', App.Http.Controllers.Equipe.EquipeController);
+App.Http.Controllers.Materiel.MaterielVariationGroupeResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielVariationGroupeResource.$schema={...(Aventus.Data?.$schema ?? {}), "variation":"Inventaire.App.Http.Controllers.Materiel.VariationResource"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielVariationGroupeResource.Fullname, App.Http.Controllers.Materiel.MaterielVariationGroupeResource);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielVariationGroupeResource', App.Http.Controllers.Materiel.MaterielVariationGroupeResource);
 
-let EquipeRAM=class EquipeRAM extends AventusPhp.RamHttp {
-    /**
-     * @inheritdoc
-     */
-    defineRoutes() {
-        return new App.Http.Controllers.Equipe.EquipeController();
-    }
-    /**
-     * Create a singleton to store data
-     */
-    static getInstance() {
-        return Aventus.Instance.get(EquipeRAM);
-    }
-    /**
-     * @inheritdoc
-     */
-    defineIndexKey() {
-        return 'id';
-    }
+App.Http.Controllers.Materiel.MaterielVariationResource=class MaterielVariationResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.MaterielVariationResource"; }
+    groups;
+    id;
 }
-EquipeRAM.Namespace=`Inventaire`;
-__as1(_, 'EquipeRAM', EquipeRAM);
+App.Http.Controllers.Materiel.MaterielVariationResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.MaterielVariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "groups":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationGroupeResource[]","id":"number"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielVariationResource.Fullname, App.Http.Controllers.Materiel.MaterielVariationResource);
+__as1(_.App.Http.Controllers.Materiel, 'MaterielVariationResource', App.Http.Controllers.Materiel.MaterielVariationResource);
 
-const EquipeTag = class EquipeTag extends Aventus.WebComponent {
-    get 'equipe_id'() {
-						return this.__watch["equipe_id"];
-					}
-					set 'equipe_id'(val) {
-						this.__watch["equipe_id"] = val;
-					}get 'equipe'() {
-						return this.__watch["equipe"];
-					}
-					set 'equipe'(val) {
-						this.__watch["equipe"] = val;
-					}    onDelete = new Aventus.Callback();
-    __registerWatchesActions() {
-    this.__addWatchesActions("equipe_id", ((target) => {
-    target.loadData();
-}));this.__addWatchesActions("equipe");    super.__registerWatchesActions();
+App.Http.Controllers.Materiel.GetInventaire.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
+    id;
+    equipe;
+    materiel;
+    quantite;
+    date;
+    par;
 }
-    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}`;
-    __getStatic() {
-        return EquipeTag;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipeTag.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="equipetag_0"></span>
-    <mi-icon icon="delete" _id="equipetag_1"></mi-icon>
-</av-tag>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "equipetag_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__6e6550e7a452d01b39466da4997f8b4dmethod0())}`,
-      "once": true
-    }
-  },
-  "pressEvents": [
-    {
-      "id": "equipetag_1",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "EquipeTag";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe_id"] = undefined;w["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe_id');this.__correctGetter('equipe'); }
-    async triggerDelete() {
-        const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer l'équipe " + this.equipe.nom + "?"
-        });
-        if (result) {
-            this.onDelete.trigger(this);
-        }
-    }
-    async loadData() {
-        const r = await EquipeRAM.getInstance().getById(this.equipe_id);
-        if (r) {
-            this.equipe = r;
-        }
-    }
-    postCreation() {
-        super.postCreation();
-    }
-    __6e6550e7a452d01b39466da4997f8b4dmethod0() {
-        return this.equipe.nom;
-    }
-}
-EquipeTag.Namespace=`Inventaire`;
-EquipeTag.Tag=`av-equipe-tag`;
-__as1(_, 'EquipeTag', EquipeTag);
-if(!window.customElements.get('av-equipe-tag')){window.customElements.define('av-equipe-tag', EquipeTag);Aventus.WebComponentInstance.registerDefinition(EquipeTag);}
+App.Http.Controllers.Materiel.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+App.Http.Controllers.Materiel.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource","quantite":"number","date":"Date","par":"string"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.GetInventaire.Response.Fullname, App.Http.Controllers.Materiel.GetInventaire.Response);
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Response', App.Http.Controllers.Materiel.GetInventaire.Response);
 
-const EquipeSelect = class EquipeSelect extends SelectData {
-    static __style = ``;
-    __getStatic() {
-        return EquipeSelect;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipeSelect.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
+App.Http.Controllers.Equipe.GetInventaire.Response=class Response extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
+    id;
+    materiel;
+    quantite;
+    date;
+    par;
 }
-    getClassName() {
-        return "EquipeSelect";
-    }
-    defineRam() {
-        return EquipeRAM.getInstance();
-    }
-    optionText(item) {
-        return item.nom;
-    }
-    optionValue(item) {
-        return item;
-    }
-}
-EquipeSelect.Namespace=`Inventaire`;
-EquipeSelect.Tag=`av-equipe-select`;
-__as1(_, 'EquipeSelect', EquipeSelect);
-if(!window.customElements.get('av-equipe-select')){window.customElements.define('av-equipe-select', EquipeSelect);Aventus.WebComponentInstance.registerDefinition(EquipeSelect);}
+App.Http.Controllers.Equipe.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
+App.Http.Controllers.Equipe.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource","quantite":"number","date":"Date","par":"string"};
+Aventus.Converter.register(App.Http.Controllers.Equipe.GetInventaire.Response.Fullname, App.Http.Controllers.Equipe.GetInventaire.Response);
+__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'Response', App.Http.Controllers.Equipe.GetInventaire.Response);
 
-const ModalEquipe = class ModalEquipe extends Modal {
-    get 'equipe'() {
-						return this.__watch["equipe"];
-					}
-					set 'equipe'(val) {
-						this.__watch["equipe"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("equipe");    super.__registerWatchesActions();
-}
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
-    __getStatic() {
-        return ModalEquipe;
+App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController=class EquipeGetInventaireController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
     }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalEquipe.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
-    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
-</div><div class="footer">
-    <av-button _id="modalequipe_2">Annuler</av-button>
-    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
-</div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "inputEl",
-      "ids": [
-        "modalequipe_1"
-      ]
-    }
-  ],
-  "content": {
-    "modalequipe_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__392051980c1cd9dd7440f855fabdee56method0())}`,
-      "once": true
-    }
-  },
-  "bindings": [
-    {
-      "id": "modalequipe_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__392051980c1cd9dd7440f855fabdee56method1(),
-      "extract": (c, v) => c.comp.__392051980c1cd9dd7440f855fabdee56method2(v),
-      "once": true,
-      "isCallback": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "modalequipe_2",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "modalequipe_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalEquipe";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe'); }
-    configure() {
-        return {
-            title: "Ajout d'une équipe",
-        };
-    }
-    save() {
-        if (!this.equipe) {
-            this.inputEl.errors = ["Il faut choisir une équipe"];
-            return;
-        }
-        this.resolve(this.equipe);
-    }
-    __392051980c1cd9dd7440f855fabdee56method0() {
-        return this.options.title;
-    }
-    __392051980c1cd9dd7440f855fabdee56method1() {
-        return this.equipe;
-    }
-    __392051980c1cd9dd7440f855fabdee56method2(v) {
-        if (this) {
-            this.equipe = v;
-        }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/equipe/inventaire`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
     }
 }
-ModalEquipe.Namespace=`Inventaire`;
-ModalEquipe.Tag=`av-modal-equipe`;
-__as1(_, 'ModalEquipe', ModalEquipe);
-if(!window.customElements.get('av-modal-equipe')){window.customElements.define('av-modal-equipe', ModalEquipe);Aventus.WebComponentInstance.registerDefinition(ModalEquipe);}
+App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
+__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'EquipeGetInventaireController', App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController);
 
 App.Models.VariationGroupe=class VariationGroupe extends Aventus.Data {
     static get Fullname() { return "App.Models.VariationGroupe"; }
@@ -15588,10 +15620,7 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="variationtag_0"></span>
-    <mi-icon icon="delete" _id="variationtag_1"></mi-icon>
-</av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="delete" _id="variationtag_1"></mi-icon></av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15642,63 +15671,6 @@ App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
 App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
 __as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
 
-App.Models.Materiel=class Materiel extends Aventus.Data {
-    static get Fullname() { return "App.Models.Materiel"; }
-    id;
-    nom;
-    image = undefined;
-    variations;
-    variations_groupes;
-    tout_monde;
-    equipes;
-}
-App.Models.Materiel.Namespace=`Inventaire.App.Models`;
-App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.MaterielVariation[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
-Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
-__as1(_.App.Models, 'Materiel', App.Models.Materiel);
-
-App.Models.MaterielVariation=class MaterielVariation extends Aventus.Data {
-    static get Fullname() { return "App.Models.MaterielVariation"; }
-    id;
-    id_materiel;
-    materiel;
-    variations;
-}
-App.Models.MaterielVariation.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielVariation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","materiel":"Inventaire.App.Models.Materiel","variations":"Inventaire.App.Models.MaterielVariationGroupe[]"};
-Aventus.Converter.register(App.Models.MaterielVariation.Fullname, App.Models.MaterielVariation);
-__as1(_.App.Models, 'MaterielVariation', App.Models.MaterielVariation);
-
-App.Http.Controllers.Materiel.GetInventaire.Response=class Response extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.Materiel.GetInventaire.Response"; }
-    id;
-    equipe;
-    materiel;
-    quantite;
-    last_update;
-    last_update_by;
-}
-App.Http.Controllers.Materiel.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
-App.Http.Controllers.Materiel.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","equipe":"Inventaire.App.Http.Controllers.Equipe.EquipeResource","materiel":"Inventaire.App.Models.MaterielVariation","quantite":"number","last_update":"Date","last_update_by":"string"};
-Aventus.Converter.register(App.Http.Controllers.Materiel.GetInventaire.Response.Fullname, App.Http.Controllers.Materiel.GetInventaire.Response);
-__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Response', App.Http.Controllers.Materiel.GetInventaire.Response);
-
-App.Models.Inventaire=class Inventaire extends Aventus.Data {
-    static get Fullname() { return "App.Models.Inventaire"; }
-    id;
-    id_equipe;
-    id_materiel_variation;
-    quantite;
-    last_update;
-    last_update_by;
-    equipe;
-    materiel;
-}
-App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
-App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","last_update":"Date","last_update_by":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
-Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
-__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
-
 App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResource"; }
     variations;
@@ -15710,7 +15682,7 @@ App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Av
     tout_monde;
 }
 App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Models.MaterielVariation[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
@@ -15892,7 +15864,10 @@ const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">
+    <av-button _id="modalinventaireupdate_2">Annuler</av-button>
+    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15973,7 +15948,14 @@ const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
         this.inputEl.select();
     }
     getTitle() {
-        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
+        return `Mise à jour de ${this.materiel.nom} ${this.getVariations()} pour ${this.equipe.nom}`;
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
     }
     postCreation() {
         super.postCreation();
@@ -15997,33 +15979,6 @@ ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
 __as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
 if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
 
-App.Http.Controllers.Equipe.GetInventaire.Response=class Response extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.Equipe.GetInventaire.Response"; }
-    id;
-    materiel;
-    quantite;
-    last_update;
-    last_update_by;
-}
-App.Http.Controllers.Equipe.GetInventaire.Response.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
-App.Http.Controllers.Equipe.GetInventaire.Response.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","materiel":"Inventaire.App.Http.Controllers.Materiel.MaterielResource","quantite":"number","last_update":"Date","last_update_by":"string"};
-Aventus.Converter.register(App.Http.Controllers.Equipe.GetInventaire.Response.Fullname, App.Http.Controllers.Equipe.GetInventaire.Response);
-__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'Response', App.Http.Controllers.Equipe.GetInventaire.Response);
-
-App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController=class EquipeGetInventaireController extends Aventus.HttpRoute {
-    constructor(router) {
-        super(router);
-        this.request = this.request.bind(this);
-    }
-    async request(body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/equipe/inventaire`, Aventus.HttpMethod.POST);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-}
-App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
-__as1(_.App.Http.Controllers.Equipe.GetInventaire, 'EquipeGetInventaireController', App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController);
-
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielController=class EquipeMaterielController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -16038,12 +15993,102 @@ App.Http.Controllers.Equipe.Materiel.EquipeMaterielController=class EquipeMateri
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielController.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
 __as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielController', App.Http.Controllers.Equipe.Materiel.EquipeMaterielController);
 
+App.Models.Materiel=class Materiel extends Aventus.Data {
+    static get Fullname() { return "App.Models.Materiel"; }
+    id;
+    nom;
+    image = undefined;
+    variations;
+    variations_groupes;
+    tout_monde;
+    equipes;
+}
+App.Models.Materiel.Namespace=`Inventaire.App.Models`;
+App.Models.Materiel.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","variations":"Inventaire.App.Models.MaterielVariation[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","tout_monde":"boolean","equipes":"Inventaire.App.Models.MaterielEquipe[]"};
+Aventus.Converter.register(App.Models.Materiel.Fullname, App.Models.Materiel);
+__as1(_.App.Models, 'Materiel', App.Models.Materiel);
+
+App.Models.MaterielVariation=class MaterielVariation extends Aventus.Data {
+    static get Fullname() { return "App.Models.MaterielVariation"; }
+    id;
+    id_materiel;
+    materiel;
+}
+App.Models.MaterielVariation.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielVariation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","materiel":"Inventaire.App.Models.Materiel"};
+Aventus.Converter.register(App.Models.MaterielVariation.Fullname, App.Models.MaterielVariation);
+__as1(_.App.Models, 'MaterielVariation', App.Models.MaterielVariation);
+
+App.Models.Achat=class Achat extends Aventus.Data {
+    static get Fullname() { return "App.Models.Achat"; }
+    id;
+    id_equipe;
+    id_materiel_variation;
+    quantite;
+    date;
+    par;
+    equipe;
+    materiel;
+}
+App.Models.Achat.Namespace=`Inventaire.App.Models`;
+App.Models.Achat.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Achat.Fullname, App.Models.Achat);
+__as1(_.App.Models, 'Achat', App.Models.Achat);
+
+App.Models.Mouvement=class Mouvement extends Aventus.Data {
+    static get Fullname() { return "App.Models.Mouvement"; }
+    id;
+    id_equipe_sortie;
+    id_equipe_entree;
+    id_materiel_variation;
+    quantite;
+    date;
+    par;
+    equipe_sortie;
+    equipe_entree;
+    materiel;
+}
+App.Models.Mouvement.Namespace=`Inventaire.App.Models`;
+App.Models.Mouvement.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe_sortie":"number","id_equipe_entree":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe_sortie":"Inventaire.App.Models.Equipe","equipe_entree":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Mouvement.Fullname, App.Models.Mouvement);
+__as1(_.App.Models, 'Mouvement', App.Models.Mouvement);
+
+App.Models.Inventaire=class Inventaire extends Aventus.Data {
+    static get Fullname() { return "App.Models.Inventaire"; }
+    id;
+    id_equipe;
+    id_materiel_variation;
+    quantite;
+    date;
+    par;
+    equipe;
+    materiel;
+}
+App.Models.Inventaire.Namespace=`Inventaire.App.Models`;
+App.Models.Inventaire.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Inventaire.Fullname, App.Models.Inventaire);
+__as1(_.App.Models, 'Inventaire', App.Models.Inventaire);
+
+App.Http.Controllers.Inventaire.Achat.InventaireAchatController=class InventaireAchatController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/achat`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Inventaire.Achat.InventaireAchatController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
+__as1(_.App.Http.Controllers.Inventaire.Achat, 'InventaireAchatController', App.Http.Controllers.Inventaire.Achat.InventaireAchatController);
+
 App.Http.Controllers.Inventaire.Historique.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Inventaire.Historique.Response"; }
-    historique;
+    mouvements;
 }
 App.Http.Controllers.Inventaire.Historique.Response.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
-App.Http.Controllers.Inventaire.Historique.Response.$schema={...(Aventus.Data?.$schema ?? {}), "historique":"Inventaire.App.Models.InventaireHistorique[]"};
+App.Http.Controllers.Inventaire.Historique.Response.$schema={...(Aventus.Data?.$schema ?? {}), "mouvements":"Inventaire.App.Models.Mouvement[]"};
 Aventus.Converter.register(App.Http.Controllers.Inventaire.Historique.Response.Fullname, App.Http.Controllers.Inventaire.Historique.Response);
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Response', App.Http.Controllers.Inventaire.Historique.Response);
 
@@ -16100,7 +16145,13 @@ const ModalHistorique = class ModalHistorique extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">    <av-flex-scroll floating_scroll _id="modalhistorique_1">        <template _id="modalhistorique_2"></template>    </av-flex-scroll></div><div class="footer">    <av-button _id="modalhistorique_6">Fermer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalhistorique_0"></div><div class="content">
+    <av-flex-scroll floating_scroll _id="modalhistorique_1">
+        <template _id="modalhistorique_2"></template>
+    </av-flex-scroll>
+</div><div class="footer">
+    <av-button _id="modalhistorique_6">Fermer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16114,7 +16165,8 @@ const ModalHistorique = class ModalHistorique extends Modal {
   ],
   "content": {
     "modalhistorique_0°@HTML": {
-      "fct": (c) => `Historique pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method1())} ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method2())} pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method3())}`
+      "fct": (c) => `Historique pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method1())} ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method2())} pour ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method3())}`,
+      "once": true
     }
   },
   "events": [
@@ -16131,7 +16183,22 @@ const ModalHistorique = class ModalHistorique extends Modal {
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`            <div class="line">                <div class="quantite">                    <span class="key">Quantité : </span>                    <span class="value" _id="modalhistorique_3"></span>                </div>                <div class="par">                    <span class="key">Modifié par : </span>                    <span class="value" _id="modalhistorique_4"></span>                </div>                <div class="modification">                    <span class="key">Modifié le : </span>                    <span class="value" _id="modalhistorique_5"></span>                </div>            </div>        `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+            <div class="line">
+                <div class="quantite">
+                    <span class="key">Quantité : </span>
+                    <span class="value" _id="modalhistorique_3"></span>
+                </div>
+                <div class="par">
+                    <span class="key">Modifié par : </span>
+                    <span class="value" _id="modalhistorique_4"></span>
+                </div>
+                <div class="modification">
+                    <span class="key">Modifié le : </span>
+                    <span class="value" _id="modalhistorique_5"></span>
+                </div>
+            </div>
+        `);templ0.setActions({
   "content": {
     "modalhistorique_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
@@ -16204,6 +16271,13 @@ const ModalHistorique = class ModalHistorique extends Modal {
             minute: "2-digit"
         });
     }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
     postCreation() {
         super.postCreation();
         this.loadData(0);
@@ -16212,7 +16286,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
         return this.materiel.nom;
     }
     __96088c3823f02341204bbb7914b84118method2() {
-        return this.variation?.nom;
+        return this.getVariations();
     }
     __96088c3823f02341204bbb7914b84118method3() {
         return this.equipe.nom;
@@ -16231,20 +16305,6 @@ ModalHistorique.Namespace=`Inventaire`;
 ModalHistorique.Tag=`av-modal-historique`;
 __as1(_, 'ModalHistorique', ModalHistorique);
 if(!window.customElements.get('av-modal-historique')){window.customElements.define('av-modal-historique', ModalHistorique);Aventus.WebComponentInstance.registerDefinition(ModalHistorique);}
-
-App.Http.Controllers.Inventaire.Update.InventaireUpdateController=class InventaireUpdateController extends Aventus.HttpRoute {
-    constructor(router) {
-        super(router);
-        this.request = this.request.bind(this);
-    }
-    async request(body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/update`, Aventus.HttpMethod.POST);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-}
-App.Http.Controllers.Inventaire.Update.InventaireUpdateController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Update`;
-__as1(_.App.Http.Controllers.Inventaire.Update, 'InventaireUpdateController', App.Http.Controllers.Inventaire.Update.InventaireUpdateController);
 
 const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
     get 'inventaire'() {
@@ -16267,7 +16327,29 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div _id="inventairelistitem_0">    <div class="main">        <div class="nom">            <span class="key">Nom :</span>            <span class="value" _id="inventairelistitem_1"></span>        </div>        <div class="variation">            <span class="key">Variation : </span>            <span class="value" _id="inventairelistitem_2"></span>        </div>        <div class="quantite">            <span class="key">Quantité : </span>            <span class="value" _id="inventairelistitem_3"></span>        </div>        <div class="modification">            <div class="actions">                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            </div>        </div>    </div>    <div class="last-update" _id="inventairelistitem_6"></div></div>` }
+        blocks: { 'default':`<div _id="inventairelistitem_0">
+    <div class="main">
+        <div class="nom">
+            <span class="key">Nom :</span>
+            <span class="value" _id="inventairelistitem_1"></span>
+        </div>
+        <div class="variation">
+            <span class="key">Variation : </span>
+            <span class="value" _id="inventairelistitem_2"></span>
+        </div>
+        <div class="quantite">
+            <span class="key">Quantité : </span>
+            <span class="value" _id="inventairelistitem_3"></span>
+        </div>
+        <div class="modification">
+            <div class="actions">
+                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>
+            </div>
+        </div>
+    </div>
+    <div class="last-update" _id="inventairelistitem_6"></div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16284,7 +16366,7 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
       "once": true
     },
     "inventairelistitem_3°@HTML": {
-      "fct": (c) => `\r\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\r\n            `
+      "fct": (c) => `\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\n            `
     },
     "inventairelistitem_6°@HTML": {
       "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
@@ -16327,7 +16409,7 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
         modal.nb = this.inventaire.quantite;
         const result = await modal.show();
         if (result) {
-            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+            const save = await Aventus.Process.execute(new InventaireUpdateController().request({
                 id: this.inventaire.id,
                 id_equipe: this.inventaire.equipe.id,
                 id_materiel_variation: this.inventaire.materiel?.id,
@@ -16380,6 +16462,20 @@ InventaireListItem.Namespace=`Inventaire`;
 InventaireListItem.Tag=`av-inventaire-list-item`;
 __as1(_, 'InventaireListItem', InventaireListItem);
 if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+
+App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController=class InventaireMouvementController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/mouvement`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
+__as1(_.App.Http.Controllers.Inventaire.Mouvement, 'InventaireMouvementController', App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController);
 
 App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
     constructor(router) {
@@ -16665,19 +16761,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des équipes</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
-            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="equipespage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16908,7 +16992,7 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         modal.nb = this.inventaire.quantite;
         const result = await modal.show();
         if (result) {
-            const save = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Update.InventaireUpdateController().request({
+            const save = await Aventus.Process.execute(new InventaireUpdateController().request({
                 id: this.inventaire.id,
                 id_equipe: this.equipe.id,
                 id_materiel: this.inventaire.materiel.id,
@@ -17183,19 +17267,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste du matériel</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
-            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <av-row class="list" _id="materielpage_2">
-        </av-row>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17563,7 +17635,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         const addInventaire = (equipe, variation) => {
             let el;
             if (variation) {
-                el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id_materiel == variation.id);
+                el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id == variation.id);
             }
             else {
                 el = connu.find(p => p.equipe.id == equipe.id);
@@ -17572,7 +17644,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 el = new App.Http.Controllers.Materiel.GetInventaire.Response();
                 el.equipe = equipe;
                 el.quantite = 0;
-                el.materiel = variation;
+                el.materiel = variation.clone();
             }
             inventaires.push(el);
         };
@@ -17837,10 +17909,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17910,19 +17979,7 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des utilisateurs</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
-            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="userspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18058,21 +18115,7 @@ const VariationGroupeTemplateEditModal = class VariationGroupeTemplateEditModal 
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>
-    <av-col size="12" use_container="false">
-        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>
-    </av-col>
-</av-row><div class="list">
-    <div class="label">Liste des variations</div>
-    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">
-    </av-flex-scroll>
-    <div class="add-cont">
-        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>
-    </div>
-</div><div class="actions">
-    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>
-    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>    <av-col size="12" use_container="false">        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>    </av-col></av-row><div class="list">    <div class="label">Liste des variations</div>    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">    </av-flex-scroll>    <div class="add-cont">        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>    </div></div><div class="actions">    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18216,10 +18259,7 @@ const VariationGroupeItem = class VariationGroupeItem extends Aventus.WebCompone
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18286,19 +18326,7 @@ const VariationsPage = class VariationsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des variations</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>
-            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="variationspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des variations</div>        <div class="actions">            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="variationspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18424,9 +18452,7 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`
-    <av-header></av-header>
-` }
+        blocks: { 'before':`    <av-header></av-header>` }
     });
 }
     getClassName() {
@@ -18506,12 +18532,6 @@ const Main = class Main extends Aventus.Navigation.Router {
                 if (response.containsCode(401)) {
                     location.reload();
                 }
-                else if (response.containsCode(403)) {
-                    Alert.open({
-                        title: "Pas autorisé",
-                        content: "Vous n'êtes pas autorisés à effectuer cette action"
-                    });
-                }
                 return response;
             }
         });
@@ -18551,8 +18571,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0">
-</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18632,12 +18651,7 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
-    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select>
-</div><div class="footer">
-    <av-button _id="modaltag_2">Annuler</av-button>
-    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18730,8 +18744,7 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0">
-</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

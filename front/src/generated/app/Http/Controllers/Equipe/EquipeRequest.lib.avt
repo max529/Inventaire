@@ -3,6 +3,7 @@ namespace App.Http.Controllers.Equipe {
 	export class EquipeRequest {
 		public id?: number = undefined;
 		public nom!: string;
+		public favori?: boolean = false;
 	}
 
 }

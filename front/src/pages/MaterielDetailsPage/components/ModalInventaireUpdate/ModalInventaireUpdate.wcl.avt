@@ -3,6 +3,7 @@ import { Modal, type ModalOptions } from "../../../../components/interaction/Mod
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import { Response as Inventaire } from "../../../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
 import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { MaterielVariationResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 import type { MaterielVariation } from "../../../../generated/app/Models/MaterielVariation.lib.avt";
 import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
 
@@ -23,7 +24,7 @@ export class ModalInventaireUpdate extends Modal<number> implements Aventus.Defa
     @Signal()
     public materiel!: MaterielResource;
     @Signal()
-    public variation?: MaterielVariation;
+    public variation!: MaterielVariationResource;
     @Signal()
     public equipe!: EquipeResource;
     @Signal()
@@ -80,7 +81,14 @@ export class ModalInventaireUpdate extends Modal<number> implements Aventus.Defa
     }
 
     protected getTitle() {
-        return `Mise à jour de ${this.materiel.nom} ${this.variation?.nom} pour ${this.equipe.nom}`;
+        return `Mise à jour de ${this.materiel.nom} ${this.getVariations()} pour ${this.equipe.nom}`;
+    }
+    protected getVariations(): string {
+        const names: string[] = [];
+        for(let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
     }
 
     protected override postCreation(): void {

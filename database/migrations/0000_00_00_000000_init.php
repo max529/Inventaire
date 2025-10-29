@@ -84,18 +84,29 @@ return new class extends Migration
             $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
             $table->foreignId('id_materiel_variation')->constrained('materiel_variations')->cascadeOnDelete();
             $table->float('quantite');
-            $table->dateTime('last_update');
-            $table->string('last_update_by');
+            $table->dateTime('date');
+            $table->string('par');
         });
 
-        Schema::create("inventaire_historiques", function (Blueprint $table) {
+        Schema::create("mouvements", function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_equipe_entree')->constrained('equipes')->cascadeOnDelete();
+            $table->foreignId('id_equipe_sortie')->constrained('equipes')->cascadeOnDelete();
+            $table->foreignId('id_materiel_variation')->constrained('materiel_variations')->cascadeOnDelete();
+            $table->float('quantite');
+            $table->dateTime('date');
+            $table->string('par');
+        });
+
+        Schema::create("achats", function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_equipe')->constrained('equipes')->cascadeOnDelete();
             $table->foreignId('id_materiel_variation')->constrained('materiel_variations')->cascadeOnDelete();
             $table->float('quantite');
-            $table->dateTime('last_update');
-            $table->string('last_update_by');
+            $table->dateTime('date');
+            $table->string('par');
         });
+        
 
         Schema::create("materiel_equipes", function (Blueprint $table) {
             $table->id();

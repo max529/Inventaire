@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Inventaire\Historique;
 
-use App\Models\InventaireHistorique;
+use App\Models\Mouvement;
 use Aventus\Laraventus\Resources\AventusResource;
 
 /**
  * @extends AventusResource
- * @property InventaireHistorique[] $historique
+ * @property Mouvement[] $mouvements
  */
 class Response extends AventusResource
 {
 
     public function __construct(
-        public array $historique
+        public array $mouvements
     ) {}
 }
