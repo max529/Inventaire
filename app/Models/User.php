@@ -13,6 +13,8 @@ use Aventus\Laraventus\Models\AventusModel;
  * @property string $nom_utilisateur
  * @property string $mot_passe
  * @property Role $id_role
+ * 
+ * @noExportProperty $mot_passe
  */
 class User extends AventusModel
 {

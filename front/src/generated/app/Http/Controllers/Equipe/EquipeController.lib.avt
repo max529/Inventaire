@@ -1,0 +1,16 @@
+import { AdminModelController } from '../AdminModelController.lib.avt';
+import { Equipe } from '../../../Models/Equipe.lib.avt';
+import { EquipeRequest } from './EquipeRequest.lib.avt';
+import { EquipeResource } from './EquipeResource.lib.avt';
+
+namespace App.Http.Controllers.Equipe {
+
+	export class EquipeController extends AdminModelController<Equipe, EquipeRequest, EquipeResource> {
+		/** @inheritdoc */
+		public override getRequest(): new () => EquipeRequest { return EquipeRequest; }
+		/** @inheritdoc */
+		public override getResource(): new () => EquipeResource { return EquipeResource; }
+
+	}
+
+}

@@ -1,6 +1,6 @@
 namespace App.Http.Controllers {
 
-	export abstract class AdminModelController<T extends Aventus.Data, U, R extends Aventus.Data, S extends R = R> extends AventusPhp.ModelController<T, U, R, S> {
+	export abstract class AdminModelController<T extends Aventus.Data, U extends object, R extends Aventus.Data, S extends R = R> extends AventusPhp.ModelController<T, U, R, S> {
 
 	}
 

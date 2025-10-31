@@ -9,7 +9,6 @@ namespace App.Models {
 		public nom!: string;
 		public prenom!: string;
 		public nom_utilisateur!: string;
-		public mot_passe!: string;
 		public id_role!: Role;
 	}
 

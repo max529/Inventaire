@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Equipe;
 use App\Http\Controllers\AdminModelController;
 use App\Models\Equipe;
 use App\Models\Inventaire;
+use Aventus\Laraventus\Attributes\IsController;
 use Aventus\Laraventus\Attributes\NoExport;
 use Aventus\Laraventus\Controllers\ModelController;
 
 /**
  * @extends AdminModelController<Equipe, EquipeRequest, EquipeResource>
  */
+#[IsController]
 class EquipeController extends AdminModelController
 {
 

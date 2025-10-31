@@ -19,11 +19,11 @@ use Aventus\Laraventus\Resources\AventusModelResource;
  * @template R of AventusModelResource<T>
  * @template S of R = R
  * @extends ModelController<T, U, R, S>
+ * @exportTemplate U of object
  */
 #[IsController]
 abstract class AdminModelController extends ModelController
 {
-    #[NoExport]
     public function index(): array
     {
         return parent::index();
