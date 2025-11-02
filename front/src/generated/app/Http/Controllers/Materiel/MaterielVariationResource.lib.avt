@@ -1,4 +1,5 @@
 import { MaterielVariationGroupeResource } from './MaterielVariationGroupeResource.lib.avt';
+import { MaterielImage } from '../../../Models/MaterielImage.lib.avt';
 
 namespace App.Http.Controllers.Materiel {
 
@@ -7,6 +8,8 @@ namespace App.Http.Controllers.Materiel {
 		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.MaterielVariationResource"; }
 		public groups!: MaterielVariationGroupeResource[];
 		public id!: number;
+		public nom!: string;
+		public image!: MaterielImage;
 	}
 
 }

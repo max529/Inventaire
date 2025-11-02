@@ -1,0 +1,15 @@
+<div class="title">{{ this.getTitle() }}</div>
+
+<div class="form">
+    <av-equipe-select label="Sortie" @bind="this.equipeSortie" searchable></av-equipe-select>
+    <div class="btn">
+        <av-icon-action icon="swap_vert" @press="swap"></av-icon-action>
+    </div>
+    <av-equipe-select label="Entrée" @bind="this.equipeEntree" searchable></av-equipe-select>
+    <av-input type="number" label="Quantité" @bind="this.nb" @element="inputEl" @focus="select"></av-input>
+</div>
+
+<div class="footer">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button @press="save" color="primary">Enregistrer</av-button>
+</div>

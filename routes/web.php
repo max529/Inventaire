@@ -31,6 +31,7 @@ Route::middleware(IsConnected::class)->group(function () {
         
         Route::post('/inventaire/mouvement', [\App\Http\Controllers\Inventaire\Mouvement\Controller::class, "request"]);
         Route::post('/inventaire/achat', [\App\Http\Controllers\Inventaire\Achat\Controller::class, "request"]);
+        Route::post('/inventaire/perte', [\App\Http\Controllers\Inventaire\Perte\Controller::class, "request"]);
         Route::post('/inventaire/historique', [\App\Http\Controllers\Inventaire\Historique\Controller::class, "request"]);
         
         Route::resourceWithMany('variation_groupe_template', VariationGroupeTemplateController::class);

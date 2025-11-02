@@ -10,7 +10,12 @@
     <div class="body">
         <div class="title">
             <span>Liste de matériel</span>
-            <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
+            <div class="actions">
+                <av-icon-action icon="{{this.voirVide ? 'visibility' : 'visibility_off'}}" @press="toggleVide">
+                    {{ this.voirVide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides'}}
+                </av-icon-action>
+                <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
+        </div>
         </div>
         <div class="list">
             for(let inventaire of this.inventaires) {

@@ -10,7 +10,8 @@ namespace App.Http.Controllers.Equipe {
 		public override getRequest(): new () => EquipeRequest { return EquipeRequest; }
 		/** @inheritdoc */
 		public override getResource(): new () => EquipeResource { return EquipeResource; }
-
+		/** @inheritdoc */
+		public override getUri(): string { return "data/equipe"; }
 	}
 
 }

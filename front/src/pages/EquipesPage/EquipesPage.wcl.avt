@@ -70,7 +70,11 @@ export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
 
     protected async bindData() {
         let list = await EquipeRAM.getInstance().getList();
-        list.sort((a, b) => a.nom.localeCompare(a.nom));
+        list.sort((a, b) => {
+            if(a.stock && !b.stock) return -1;
+            if(!a.stock && b.stock) return 1;
+            return a.nom.localeCompare(b.nom)
+        });
 
         for(let item of list) {
             let el = new EquipeItem();

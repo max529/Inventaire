@@ -40,12 +40,17 @@ if(this.form.item?.id) {
     <div class="card by-equipe">
         <div class="header">
             <div class="title">Liste dans les équipes</div>
-            <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
+            <div class="actions">
+                <av-icon-action icon="{{this.voir_vide ? 'visibility' : 'visibility_off'}}" @press="toggleVide">
+                    {{ this.voir_vide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides'}}
+                </av-icon-action>
+                <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
+            </div>
         </div>
         <div class="body">
             <div class="list">
                 for(let inventaire of this.inventaires) {
-                    <av-inventaire-list-item :inventaire="inventaire" :materiel="this.item" @element="listItems"></av-inventaire-list-item>
+                    <av-inventaire-list-item :inventaire="inventaire" @element="listItems"></av-inventaire-list-item>
                 }
             </div>
         </div>

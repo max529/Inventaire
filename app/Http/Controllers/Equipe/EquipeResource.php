@@ -13,9 +13,11 @@ class EquipeResource extends AventusModelResource
 {
     public int $id;
     public string $nom;
+    public bool $stock;
     protected function bind($item): void
     {
         $this->id = $item->id;
         $this->nom = $item->nom;
+        $this->stock = $item->stock;
     }
 }

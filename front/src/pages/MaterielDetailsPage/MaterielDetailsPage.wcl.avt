@@ -10,7 +10,7 @@ import { Process } from "Aventus@UI:Aventus.package.avt";
 import { MaterielRequest } from "../../generated/app/Http/Controllers/Materiel/MaterielRequest.lib.avt";
 import { EquipeRAM } from "../../ram/Equipe.ram.avt";
 import { MaterielGetInventaireController } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Controller.lib.avt";
-import { Response as Inventaire } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
+import { Response as InventaireResponse } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Response.lib.avt";
 import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 import type { Input } from "../../components/form/Input/Input.wcl.avt";
 import type { InventaireListItem } from "./components/InventaireListItem/InventaireListItem.wcl.avt";
@@ -18,6 +18,7 @@ import { StringTools } from "../../lib/StringTools.lib.avt";
 import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { MaterielVariation } from "../../generated/app/Models/MaterielVariation.lib.avt";
 import { MaterielVariationResource } from "../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
+import type { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
 
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
@@ -38,9 +39,11 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     public item?: MaterielResource;
 
     @Watch()
-    public inventaires: Inventaire[] = [];
+    public inventaires: InventaireResponse[] = [];
     @Watch()
     public objName: string = "";
+    @Signal()
+    public voir_vide: boolean = false;
 
     private slugId: number = 0;
 
@@ -106,7 +109,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     protected async loadInventaire(id: number) {
         const item = this.item;
         if(!item) return;
-        const inventaires: Inventaire[] = [];
+        const inventaires: InventaireResponse[] = [];
         const connu = await Process.execute(new MaterielGetInventaireController().request({ id_materiel: id }));
         if(!connu) return;
 
@@ -118,10 +121,14 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             const equipeIds = item.equipes.map(p => p.id_equipe);
             equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
         }
-        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+        equipes.sort((a, b) => {
+            if(a.stock && !b.stock) return -1;
+            if(!a.stock && b.stock) return 1;
+            return a.nom.localeCompare(b.nom);
+        });
 
         const addInventaire = (equipe: EquipeResource, variation: MaterielVariationResource) => {
-            let el: Inventaire | undefined;
+            let el: InventaireResponse | undefined;
             if(variation) {
                 el = connu.find(p => p.equipe.id == equipe.id && p.materiel.id == variation.id);
             }
@@ -129,7 +136,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 el = connu.find(p => p.equipe.id == equipe.id);
             }
             if(el == undefined) {
-                el = new Inventaire();
+                el = new InventaireResponse();
                 el.equipe = equipe;
                 el.quantite = 0;
                 el.materiel = variation.clone();
@@ -144,9 +151,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 }
             }
         }
-
-        debugger;
-
         this.inventaires = inventaires;
     }
     /**
@@ -156,7 +160,23 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         return {};
     }
 
+    public updateInventaire(inventaire: Inventaire) {
+        let needSearch = false;
+        for(let inv of this.inventaires) {
+            if(inv.materiel.id == inventaire.id_materiel_variation && inv.equipe.id == inventaire.id_equipe) {
+                inv.par = inventaire.par;
+                inv.date = inventaire.date;
+                needSearch = inv.quantite == 0 || inventaire.quantite == 0;
+                inv.quantite = inventaire.quantite;
+                inv.id = inventaire.id
+                break;
+            }
+        }
 
+        if(needSearch) {
+            this.search();
+        }
+    }
 
     /**
      * 
@@ -220,11 +240,22 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     }
 
     /**
+    * 
+    */
+    protected toggleVide() {
+        this.voir_vide = !this.voir_vide;
+        this.search();
+    }
+    /**
      * 
      */
     protected search() {
         const txt = this.searchEl.value;
         for(let item of this.listItems) {
+            if(!this.voir_vide && item.inventaire.quantite == 0) {
+                item.style.display = "none";
+                continue;
+            }
             if(StringTools.contains(item.inventaire.equipe.nom, txt)) {
                 item.style.display = "";
             }

@@ -13,45 +13,49 @@ use Exception;
 #[Rename("InventaireMouvementController")]
 class Controller
 {
+    /**
+     * @return Inventaire[]
+     */
     #[Transaction]
-    public function request(Request $request): Inventaire
+    public function request(Request $request): array
     {
         $now = Carbon::now();
         $by = User::$current->prenom . ' ' . User::$current->nom;
 
-         /** @var Inventaire $inventaire */
-        $inventaire = Inventaire::find($request->id_sortie);
-        if($inventaire->quantite < $request->quantite) {
+        /** @var ?Inventaire $inventaireSortie */
+        $inventaireSortie = Inventaire::where('id_materiel_variation', $request->id_materiel_variation)->where('id_equipe', $request->id_equipe_sortie)->first();
+        if ($inventaireSortie == null || $inventaireSortie->quantite < $request->quantite) {
             throw new Exception("Stock insuffisant");
         }
-        $inventaire->update([
-            "quantite" => $inventaire->quantite - $request->quantite,
+        $inventaireSortie->update([
+            "quantite" => $inventaireSortie->quantite - $request->quantite,
             "date" => $now,
             "par" => $by
         ]);
 
-        if (isset($request->id_entree) && $request->id_entree != 0) {
-            /** @var Inventaire $inventaire */
-            $inventaire = Inventaire::find($request->id_entree);
-            $inventaire->update([
-                "quantite" => $inventaire->quantite + $request->quantite,
+        /** @var ?Inventaire $inventaire */
+        $inventaireEntree = Inventaire::where('id_materiel_variation', $request->id_materiel_variation)->where('id_equipe', $request->id_equipe_entree)->first();
+
+        if ($inventaireEntree != null) {
+            $inventaireEntree->update([
+                "quantite" => $inventaireEntree->quantite + $request->quantite,
                 "date" => $now,
                 "par" => $by
             ]);
         } else {
-            $inventaire = $request->toModel(Inventaire::class);
-            $inventaire->id_equipe = $request->id_equipe_entree;
-            $inventaire->id_materiel_variation = $request->id_materiel_variation;
-            $inventaire->quantite = $request->quantite;
-            $inventaire->date = $now;
-            $inventaire->par = $by;
-            $inventaire->save();
+            $inventaireEntree = $request->toModel(Inventaire::class);
+            $inventaireEntree->id_equipe = $request->id_equipe_entree;
+            $inventaireEntree->id_materiel_variation = $request->id_materiel_variation;
+            $inventaireEntree->quantite = $request->quantite;
+            $inventaireEntree->date = $now;
+            $inventaireEntree->par = $by;
+            $inventaireEntree->save();
         }
 
-       
+
 
         $mouvement = new Mouvement();
-        $mouvement->id_materiel_variation = $inventaire->id_materiel_variation;
+        $mouvement->id_materiel_variation = $inventaireEntree->id_materiel_variation;
         $mouvement->id_equipe_entree = $request->id_equipe_entree;
         $mouvement->id_equipe_sortie = $request->id_equipe_sortie;
         $mouvement->quantite = $request->quantite;
@@ -59,6 +63,6 @@ class Controller
         $mouvement->par = $by;
         $mouvement->save();
 
-        return $inventaire;
+        return [$inventaireSortie, $inventaireEntree];
     }
 }

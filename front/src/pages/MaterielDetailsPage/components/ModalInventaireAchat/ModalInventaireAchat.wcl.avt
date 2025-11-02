@@ -1,0 +1,127 @@
+import { Process } from "Aventus@UI:Aventus.package.avt";
+import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
+import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
+import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
+import type { MaterielVariationResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
+import { EquipeRAM } from "../../../../ram/Equipe.ram.avt";
+import type { Inventaire } from "../../../../generated/app/Models/Inventaire.lib.avt";
+import { InventaireAchatController } from "../../../../generated/app/Http/Controllers/Inventaire/Achat/Controller.lib.avt";
+
+
+export class ModalInventaireAchat extends Modal<Inventaire> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Signal()
+    public variation!: MaterielVariationResource;
+    @Signal()
+    public nb: number = 0;
+    @Signal()
+    public equipe!: EquipeResource;
+
+    @ViewElement()
+    protected inputEl!: Input;
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    /**
+     * @inheritdoc
+     */
+    public override configure(): ModalOptions<Inventaire> {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+
+    protected checkNb(): number | null {
+        let r: number | null = null;
+        if(typeof this.nb == 'number') {
+            r = this.nb;
+        }
+        else {
+            const nbTxt = this.nb as string;
+            if(nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+
+            const nb2 = Number(nbTxt);
+            if(isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            r = nb2;
+        }
+
+        if(r < 1) {
+            this.inputEl.errors = ["Merci de saisir un nombre > 0"];
+            return null;
+        }
+        return r;
+    }
+    /**
+     * 
+     */
+    protected async save() {
+        const nb = this.checkNb();
+        if(nb == null) return;
+
+        if(!this.equipe) return;
+
+        const result = await Process.execute(new InventaireAchatController().request({
+            id_equipe: this.equipe.id,
+            id_materiel_variation: this.variation.id,
+            quantite: nb
+        }));
+
+        if(result) {
+            this.resolve(result);
+        }
+    }
+
+    /**
+     * 
+     */
+    protected select() {
+        this.inputEl.select();
+    }
+
+    protected getTitle() {
+        return `Achat de ${this.variation.nom} ${this.getVariations()}`;
+    }
+    protected getVariations(): string {
+        const names: string[] = [];
+        for(let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+
+    
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.inputEl.focus();
+        this.inputEl.select();
+    }
+
+
+    //#endregion
+
+}

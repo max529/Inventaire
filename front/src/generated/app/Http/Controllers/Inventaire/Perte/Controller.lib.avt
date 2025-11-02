@@ -1,0 +1,15 @@
+import { Request } from './Request.lib.avt';
+import { Inventaire } from '../../../../Models/Inventaire.lib.avt';
+
+namespace App.Http.Controllers.Inventaire.Perte {
+
+	export class InventairePerteController extends Aventus.HttpRoute {
+		@BindThis()
+		public async request(body: Request): Promise<Aventus.ResultWithError<Inventaire>> {
+			const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/perte`, Aventus.HttpMethod.POST);
+			request.setBody(body);
+			return await request.queryJSON<Inventaire>(this.router);
+		}
+	}
+
+}

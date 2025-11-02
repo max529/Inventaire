@@ -12222,12 +12222,16 @@ const _ = {};
 Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.green{background-color:var(--color-green)}.content-green{color:var(--color-green-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.red{background-color:var(--color-red)}.content-red{color:var(--color-red-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}.orange{background-color:var(--color-orange)}.content-orange{color:var(--color-orange-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.blue{background-color:var(--color-blue)}.content-blue{color:var(--color-blue-content)}.information{background-color:var(--color-information)}.content-information{color:var(--color-information-content)}`)
 let App = {};
 _.App = Inventaire.App ?? {};
-App.Models = {};
-_.App.Models = Inventaire.App?.Models ?? {};
 App.Http = {};
 _.App.Http = Inventaire.App?.Http ?? {};
 App.Http.Controllers = {};
 _.App.Http.Controllers = Inventaire.App?.Http?.Controllers ?? {};
+App.Http.Controllers.Inventaire = {};
+_.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
+App.Http.Controllers.Inventaire.Perte = {};
+_.App.Http.Controllers.Inventaire.Perte = Inventaire.App?.Http?.Controllers?.Inventaire?.Perte ?? {};
+App.Models = {};
+_.App.Models = Inventaire.App?.Models ?? {};
 App.Http.Controllers.VariationGroupeTemplate = {};
 _.App.Http.Controllers.VariationGroupeTemplate = Inventaire.App?.Http?.Controllers?.VariationGroupeTemplate ?? {};
 App.Http.Controllers.User = {};
@@ -12236,8 +12240,6 @@ App.Http.Controllers.Materiel = {};
 _.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
 App.Http.Controllers.Materiel.GetInventaire = {};
 _.App.Http.Controllers.Materiel.GetInventaire = Inventaire.App?.Http?.Controllers?.Materiel?.GetInventaire ?? {};
-App.Http.Controllers.Inventaire = {};
-_.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
 App.Http.Controllers.Inventaire.Mouvement = {};
 _.App.Http.Controllers.Inventaire.Mouvement = Inventaire.App?.Http?.Controllers?.Inventaire?.Mouvement ?? {};
 App.Http.Controllers.Inventaire.Historique = {};
@@ -12259,6 +12261,14 @@ _.App.Enum = Inventaire.App?.Enum ?? {};
 App.Http.Controllers.Auth.Logout = {};
 _.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
+App.Http.Controllers.Inventaire.Perte.Request=class Request {
+    quantite;
+    id_materiel_variation;
+    id_equipe;
+}
+App.Http.Controllers.Inventaire.Perte.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
+__as1(_.App.Http.Controllers.Inventaire.Perte, 'Request', App.Http.Controllers.Inventaire.Perte.Request);
+
 let StringTools=class StringTools {
     static removeAccents(value) {
         return value
@@ -12376,16 +12386,28 @@ App.Http.Controllers.Materiel.GetInventaire.Request.Namespace=`Inventaire.App.Ht
 __as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Controllers.Materiel.GetInventaire.Request);
 
 App.Http.Controllers.Inventaire.Mouvement.Request=class Request {
-    id_sortie;
-    id_entree = undefined;
     quantite;
     id_materiel_variation;
     id_equipe_entree;
     id_equipe_sortie;
-    id_variation = undefined;
 }
 App.Http.Controllers.Inventaire.Mouvement.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
 __as1(_.App.Http.Controllers.Inventaire.Mouvement, 'Request', App.Http.Controllers.Inventaire.Mouvement.Request);
+
+App.Http.Controllers.Inventaire.Historique.HistoriqueInfo=class HistoriqueInfo {
+    static get Fullname() { return "App.Http.Controllers.Inventaire.Historique.HistoriqueInfo"; }
+    type;
+    id_materiel_variation;
+    par;
+    date;
+    equipe_entree;
+    equipe_sortie = undefined;
+    quantite;
+}
+App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
+App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.$schema={"type":"string","id_materiel_variation":"number","par":"string","date":"Date","equipe_entree":"string","equipe_sortie":"string","quantite":"number"};
+Aventus.Converter.register(App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.Fullname, App.Http.Controllers.Inventaire.Historique.HistoriqueInfo);
+__as1(_.App.Http.Controllers.Inventaire.Historique, 'HistoriqueInfo', App.Http.Controllers.Inventaire.Historique.HistoriqueInfo);
 
 App.Http.Controllers.Inventaire.Historique.Request=class Request {
     id_materiel_variation;
@@ -12396,7 +12418,6 @@ App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Htt
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Request', App.Http.Controllers.Inventaire.Historique.Request);
 
 App.Http.Controllers.Inventaire.Achat.Request=class Request {
-    id = undefined;
     quantite;
     id_materiel_variation;
     id_equipe;
@@ -12411,14 +12432,6 @@ App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Namespace=`Inventair
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.$schema={...(Aventus.Data?.$schema ?? {}), };
 Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Fullname, App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
 __as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielResponse', App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
-
-App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
-    static get Fullname() { return "App.Models.MaterielImage"; }
-}
-App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
-App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
-Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
-__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
 App.Models.Variation=class Variation extends Aventus.Data {
     static get Fullname() { return "App.Models.Variation"; }
@@ -12450,6 +12463,14 @@ App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest=class EquipeMaterielR
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
 __as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielRequest', App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest);
 
+App.Models.MaterielImage=class MaterielImage extends AventusPhp.AventusImage {
+    static get Fullname() { return "App.Models.MaterielImage"; }
+}
+App.Models.MaterielImage.Namespace=`Inventaire.App.Models`;
+App.Models.MaterielImage.$schema={...(AventusPhp.AventusImage?.$schema ?? {}), };
+Aventus.Converter.register(App.Models.MaterielImage.Fullname, App.Models.MaterielImage);
+__as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
+
 App.Http.Controllers.Materiel.VariationResource=class VariationResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.VariationResource"; }
     nom;
@@ -12469,9 +12490,10 @@ App.Http.Controllers.Equipe.EquipeResource=class EquipeResource extends Aventus.
     static get Fullname() { return "App.Http.Controllers.Equipe.EquipeResource"; }
     id;
     nom;
+    stock;
 }
 App.Http.Controllers.Equipe.EquipeResource.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
-App.Http.Controllers.Equipe.EquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string"};
+App.Http.Controllers.Equipe.EquipeResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","stock":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Equipe.EquipeResource.Fullname, App.Http.Controllers.Equipe.EquipeResource);
 __as1(_.App.Http.Controllers.Equipe, 'EquipeResource', App.Http.Controllers.Equipe.EquipeResource);
 
@@ -12551,7 +12573,7 @@ __as1(_.App.Http.Controllers.Materiel, 'MaterielEquipeResource', App.Http.Contro
 App.Http.Controllers.Equipe.EquipeRequest=class EquipeRequest {
     id = undefined;
     nom;
-    favori = false;
+    stock = false;
 }
 App.Http.Controllers.Equipe.EquipeRequest.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
 __as1(_.App.Http.Controllers.Equipe, 'EquipeRequest', App.Http.Controllers.Equipe.EquipeRequest);
@@ -12560,10 +12582,10 @@ App.Models.Equipe=class Equipe extends Aventus.Data {
     static get Fullname() { return "App.Models.Equipe"; }
     id;
     nom;
-    favori;
+    stock;
 }
 App.Models.Equipe.Namespace=`Inventaire.App.Models`;
-App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","favori":"boolean"};
+App.Models.Equipe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","stock":"boolean"};
 Aventus.Converter.register(App.Models.Equipe.Fullname, App.Models.Equipe);
 __as1(_.App.Models, 'Equipe', App.Models.Equipe);
 
@@ -12638,9 +12660,7 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">
-    <slot></slot>
-</div>` }
+        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
     });
 }
     getClassName() {
@@ -12669,11 +12689,7 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>
-    <div class="content">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>    <div class="content">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -12773,7 +12789,44 @@ const PwaPromptIos = class PwaPromptIos extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0"></div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">    <div class="pwaPromptHeader iOSPWA-header">        <p class="pwaPromptTitle iOSPWA-title">            Ajouter à la page d'accueil        </p>        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">            Fermer        </button>    </div>    <div class="pwaPromptBody iOSPWA-body">        <div class="pwaPromptDescription iOSPWA-description">            <p class="pwaPromptCopy iOSPWA-description-copy">                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran            </p>        </div>    </div>    <div class="pwaPromptInstruction iOSPWA-steps">        <div class="pwaPromptInstructionStep iOSPWA-step1">            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step1-copy">                1) Appuyez sur le bouton "Partager" dans la barre de menu.            </p>        </div>        <div class="pwaPromptInstructionStep iOSPWA-step2">            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step2-copy">                2) Appuyez sur "Ajouter à l'écran d'accueil".            </p>        </div>    </div></div>` }
+        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0">
+</div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">
+    <div class="pwaPromptHeader iOSPWA-header">
+        <p class="pwaPromptTitle iOSPWA-title">
+            Ajouter à la page d'accueil
+        </p>
+        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">
+            Fermer
+        </button>
+    </div>
+    <div class="pwaPromptBody iOSPWA-body">
+        <div class="pwaPromptDescription iOSPWA-description">
+            <p class="pwaPromptCopy iOSPWA-description-copy">
+                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran
+            </p>
+        </div>
+    </div>
+    <div class="pwaPromptInstruction iOSPWA-steps">
+        <div class="pwaPromptInstructionStep iOSPWA-step1">
+            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">
+                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>
+                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>
+            </svg>
+            <p class="pwaPromptCopy bold iOSPWA-step1-copy">
+                1) Appuyez sur le bouton "Partager" dans la barre de menu.
+            </p>
+        </div>
+        <div class="pwaPromptInstructionStep iOSPWA-step2">
+            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">
+                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>
+                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>
+            </svg>
+            <p class="pwaPromptCopy bold iOSPWA-step2-copy">
+                2) Appuyez sur "Ajouter à l'écran d'accueil".
+            </p>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12860,10 +12913,7 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
-    <av-button _id="confirm_2"></av-button>
-    <av-button color="primary" _id="confirm_3"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13056,15 +13106,7 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
-    <div class="preview" _id="inputimage_1">
-        <av-img _id="inputimage_2"></av-img>
-        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
-    </div>
-    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
-</div><div class="errors">
-    <template _id="inputimage_5"></template>
-</div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13109,14 +13151,10 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-        <template _id="inputimage_6"></template>
-    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-            <div _id="inputimage_7"></div>
-        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -13353,23 +13391,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">
-    <div class="toast-flex">
-        <div class="toast-icon-wrapper">
-            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
-        </div>
-        <div class="toast-message-wrapper">
-            <template _id="toast_1"></template>
-            <template _id="toast_3"></template>
-        </div>
-        <div class="toast-close-wrapper">
-            <button class="toast-close-button" _id="toast_5">
-                <span class="sr-only">Close</span>
-                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
-            </button>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13386,9 +13408,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <p class="toast-title" _id="toast_2"></p>
-            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13401,9 +13421,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
-                <p class="toast-message" _id="toast_4"></p>
-            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13528,13 +13546,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
-    <slot name="before"></slot>
-    <input _id="input_1" />
-    <slot name="after"></slot>
-</div><div class="errors">
-    <template _id="input_2"></template>
-</div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13595,9 +13607,7 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="input_3"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13674,9 +13684,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">
-    <div class="loader"></div>
-</div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
     });
 }
     getClassName() {
@@ -13966,9 +13974,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
-    <slot _id="iconaction_1"></slot>
-</div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14045,11 +14051,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>
-    <div class="container">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
     });
 }
     getClassName() {
@@ -14159,21 +14161,8 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
-    <slot name="prepend">
-        <av-img class="icon" _id="genericselect_2"></av-img>
-    </slot>
-    <input id="input" autocomplete="off" _id="genericselect_3" />
-    <slot name="append"></slot>
-    <av-img src="/img/angle-left.svg" class="caret"></av-img>
-</div><div class="errors">
-    <template _id="genericselect_4"></template>
-</div><div class="hidden">
-    <slot></slot>
-</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14228,9 +14217,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-        <div _id="genericselect_5"></div>
-    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14782,9 +14769,7 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
-    <av-button _id="alert_1"></av-button>
-</div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14974,7 +14959,13 @@ const PwaPromptInstall = class PwaPromptInstall extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en        plein écran</p></div><div class="footer">    <av-button _id="pwapromptinstall_1">Annuler</av-button>    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">
+    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en
+        plein écran</p>
+</div><div class="footer">
+    <av-button _id="pwapromptinstall_1">Annuler</av-button>
+    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15334,6 +15325,7 @@ if(!window.customElements.get('av-login-page')){window.customElements.define('av
 App.Http.Controllers.Equipe.EquipeController=class EquipeController extends _.App.Http.Controllers.AdminModelController {
     getRequest() { return _.App.Http.Controllers.Equipe.EquipeRequest; }
     getResource() { return _.App.Http.Controllers.Equipe.EquipeResource; }
+    getUri() { return "data/equipe"; }
 }
 App.Http.Controllers.Equipe.EquipeController.Namespace=`Inventaire.App.Http.Controllers.Equipe`;
 __as1(_.App.Http.Controllers.Equipe, 'EquipeController', App.Http.Controllers.Equipe.EquipeController);
@@ -15494,12 +15486,7 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
-    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
-</div><div class="footer">
-    <av-button _id="modalequipe_2">Annuler</av-button>
-    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15588,9 +15575,11 @@ App.Http.Controllers.Materiel.MaterielVariationResource=class MaterielVariationR
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielVariationResource"; }
     groups;
     id;
+    nom;
+    image;
 }
 App.Http.Controllers.Materiel.MaterielVariationResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielVariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "groups":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationGroupeResource[]","id":"number"};
+App.Http.Controllers.Materiel.MaterielVariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "groups":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationGroupeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielVariationResource.Fullname, App.Http.Controllers.Materiel.MaterielVariationResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielVariationResource', App.Http.Controllers.Materiel.MaterielVariationResource);
 
@@ -15662,10 +15651,7 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">
-    <span _id="variationtag_0"></span>
-    <mi-icon icon="delete" _id="variationtag_1"></mi-icon>
-</av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="delete" _id="variationtag_1"></mi-icon></av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15730,6 +15716,154 @@ App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Co
 App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
+
+const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
+    get 'materiel'() {
+						return this.__signals["materiel"].value;
+					}
+					set 'materiel'(val) {
+						this.__signals["materiel"].value = val;
+					}get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalInventaireUpdate;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventaireUpdate.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">
+    <av-button _id="modalinventaireupdate_2">Annuler</av-button>
+    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button>
+</div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventaireupdate_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventaireupdate_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventaireupdate_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
+      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventaireupdate_1",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventaireupdate_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventaireupdate_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventaireUpdate";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    save() {
+        if (typeof this.nb == 'number') {
+            this.resolve(this.nb);
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return;
+            }
+            this.resolve(nb2);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Mise à jour de ${this.materiel.nom} ${this.getVariations()} pour ${this.equipe.nom}`;
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+    postCreation() {
+        super.postCreation();
+        this.inputEl.focus();
+        this.inputEl.select();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method0() {
+        return this.getTitle();
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method1() {
+        return this.nb;
+    }
+    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventaireUpdate.Namespace=`Inventaire`;
+ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
+__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
+if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
 
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
@@ -15876,151 +16010,6 @@ MaterielCard.Tag=`av-materiel-card`;
 __as1(_, 'MaterielCard', MaterielCard);
 if(!window.customElements.get('av-materiel-card')){window.customElements.define('av-materiel-card', MaterielCard);Aventus.WebComponentInstance.registerDefinition(MaterielCard);}
 
-const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
-    get 'materiel'() {
-						return this.__signals["materiel"].value;
-					}
-					set 'materiel'(val) {
-						this.__signals["materiel"].value = val;
-					}get 'variation'() {
-						return this.__signals["variation"].value;
-					}
-					set 'variation'(val) {
-						this.__signals["variation"].value = val;
-					}get 'equipe'() {
-						return this.__signals["equipe"].value;
-					}
-					set 'equipe'(val) {
-						this.__signals["equipe"].value = val;
-					}get 'nb'() {
-						return this.__signals["nb"].value;
-					}
-					set 'nb'(val) {
-						this.__signals["nb"].value = val;
-					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
-    __getStatic() {
-        return ModalInventaireUpdate;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalInventaireUpdate.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">    <av-button _id="modalinventaireupdate_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "inputEl",
-      "ids": [
-        "modalinventaireupdate_1"
-      ]
-    }
-  ],
-  "content": {
-    "modalinventaireupdate_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
-      "once": true
-    }
-  },
-  "bindings": [
-    {
-      "id": "modalinventaireupdate_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
-      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
-      "once": true,
-      "isCallback": true
-    }
-  ],
-  "events": [
-    {
-      "eventName": "focus",
-      "id": "modalinventaireupdate_1",
-      "fct": (e, c) => c.comp.select(e)
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "modalinventaireupdate_2",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "modalinventaireupdate_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalInventaireUpdate";
-    }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
-    configure() {
-        return {
-            title: "Mise à jour de l'inventaire"
-        };
-    }
-    save() {
-        if (typeof this.nb == 'number') {
-            this.resolve(this.nb);
-        }
-        else {
-            const nbTxt = this.nb;
-            if (nbTxt.trim() == '') {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            const nb2 = Number(nbTxt);
-            if (isNaN(nb2)) {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            this.resolve(nb2);
-        }
-    }
-    select() {
-        this.inputEl.select();
-    }
-    getTitle() {
-        return `Mise à jour de ${this.materiel.nom} ${this.getVariations()} pour ${this.equipe.nom}`;
-    }
-    getVariations() {
-        const names = [];
-        for (let group of this.variation.groups) {
-            names.push(group.variation.nom);
-        }
-        return names.join(" ");
-    }
-    postCreation() {
-        super.postCreation();
-        this.inputEl.focus();
-        this.inputEl.select();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method0() {
-        return this.getTitle();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method1() {
-        return this.nb;
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
-        if (this) {
-            this.nb = v;
-        }
-    }
-}
-ModalInventaireUpdate.Namespace=`Inventaire`;
-ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
-__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
-if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
-
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielController=class EquipeMaterielController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -16061,8 +16050,8 @@ App.Models.MaterielVariation.$schema={...(Aventus.Data?.$schema ?? {}), "id":"nu
 Aventus.Converter.register(App.Models.MaterielVariation.Fullname, App.Models.MaterielVariation);
 __as1(_.App.Models, 'MaterielVariation', App.Models.MaterielVariation);
 
-App.Models.Achat=class Achat extends Aventus.Data {
-    static get Fullname() { return "App.Models.Achat"; }
+App.Models.Perte=class Perte extends Aventus.Data {
+    static get Fullname() { return "App.Models.Perte"; }
     id;
     id_equipe;
     id_materiel_variation;
@@ -16072,10 +16061,10 @@ App.Models.Achat=class Achat extends Aventus.Data {
     equipe;
     materiel;
 }
-App.Models.Achat.Namespace=`Inventaire.App.Models`;
-App.Models.Achat.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
-Aventus.Converter.register(App.Models.Achat.Fullname, App.Models.Achat);
-__as1(_.App.Models, 'Achat', App.Models.Achat);
+App.Models.Perte.Namespace=`Inventaire.App.Models`;
+App.Models.Perte.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Perte.Fullname, App.Models.Perte);
+__as1(_.App.Models, 'Perte', App.Models.Perte);
 
 App.Models.Mouvement=class Mouvement extends Aventus.Data {
     static get Fullname() { return "App.Models.Mouvement"; }
@@ -16094,6 +16083,22 @@ App.Models.Mouvement.Namespace=`Inventaire.App.Models`;
 App.Models.Mouvement.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe_sortie":"number","id_equipe_entree":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe_sortie":"Inventaire.App.Models.Equipe","equipe_entree":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
 Aventus.Converter.register(App.Models.Mouvement.Fullname, App.Models.Mouvement);
 __as1(_.App.Models, 'Mouvement', App.Models.Mouvement);
+
+App.Models.Achat=class Achat extends Aventus.Data {
+    static get Fullname() { return "App.Models.Achat"; }
+    id;
+    id_equipe;
+    id_materiel_variation;
+    quantite;
+    date;
+    par;
+    equipe;
+    materiel;
+}
+App.Models.Achat.Namespace=`Inventaire.App.Models`;
+App.Models.Achat.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+Aventus.Converter.register(App.Models.Achat.Fullname, App.Models.Achat);
+__as1(_.App.Models, 'Achat', App.Models.Achat);
 
 App.Models.Inventaire=class Inventaire extends Aventus.Data {
     static get Fullname() { return "App.Models.Inventaire"; }
@@ -16125,12 +16130,173 @@ App.Http.Controllers.Inventaire.Achat.InventaireAchatController=class Inventaire
 App.Http.Controllers.Inventaire.Achat.InventaireAchatController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
 __as1(_.App.Http.Controllers.Inventaire.Achat, 'InventaireAchatController', App.Http.Controllers.Inventaire.Achat.InventaireAchatController);
 
+const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
+    get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalInventaireAchat;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventaireAchat.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventaireachat_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireachat_1"></av-input></div><div class="footer">    <av-button _id="modalinventaireachat_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireachat_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventaireachat_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventaireachat_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__4efee192411d842bca24f09a939e11e0method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventaireachat_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__4efee192411d842bca24f09a939e11e0method1(),
+      "extract": (c, v) => c.comp.__4efee192411d842bca24f09a939e11e0method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventaireachat_1",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventaireachat_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventaireachat_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventaireAchat";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipe'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    checkNb() {
+        let r = null;
+        if (typeof this.nb == 'number') {
+            r = this.nb;
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            r = nb2;
+        }
+        if (r < 1) {
+            this.inputEl.errors = ["Merci de saisir un nombre > 0"];
+            return null;
+        }
+        return r;
+    }
+    async save() {
+        const nb = this.checkNb();
+        if (nb == null)
+            return;
+        if (!this.equipe)
+            return;
+        const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Achat.InventaireAchatController().request({
+            id_equipe: this.equipe.id,
+            id_materiel_variation: this.variation.id,
+            quantite: nb
+        }));
+        if (result) {
+            this.resolve(result);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Achat de ${this.variation.nom} ${this.getVariations()}`;
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+    postCreation() {
+        super.postCreation();
+        this.inputEl.focus();
+        this.inputEl.select();
+    }
+    __4efee192411d842bca24f09a939e11e0method0() {
+        return this.getTitle();
+    }
+    __4efee192411d842bca24f09a939e11e0method1() {
+        return this.nb;
+    }
+    __4efee192411d842bca24f09a939e11e0method2(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventaireAchat.Namespace=`Inventaire`;
+ModalInventaireAchat.Tag=`av-modal-inventaire-achat`;
+__as1(_, 'ModalInventaireAchat', ModalInventaireAchat);
+if(!window.customElements.get('av-modal-inventaire-achat')){window.customElements.define('av-modal-inventaire-achat', ModalInventaireAchat);Aventus.WebComponentInstance.registerDefinition(ModalInventaireAchat);}
+
 App.Http.Controllers.Inventaire.Historique.Response=class Response extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Inventaire.Historique.Response"; }
-    mouvements;
+    historiques;
 }
 App.Http.Controllers.Inventaire.Historique.Response.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
-App.Http.Controllers.Inventaire.Historique.Response.$schema={...(Aventus.Data?.$schema ?? {}), "mouvements":"Inventaire.App.Models.Mouvement[]"};
+App.Http.Controllers.Inventaire.Historique.Response.$schema={...(Aventus.Data?.$schema ?? {}), "historiques":"Inventaire.App.Http.Controllers.Inventaire.Historique.HistoriqueInfo[]"};
 Aventus.Converter.register(App.Http.Controllers.Inventaire.Historique.Response.Fullname, App.Http.Controllers.Inventaire.Historique.Response);
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Response', App.Http.Controllers.Inventaire.Historique.Response);
 
@@ -16154,12 +16320,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
 					}
 					set 'historiques'(val) {
 						this.__watch["historiques"] = val;
-					}    get 'materiel'() {
-						return this.__signals["materiel"].value;
-					}
-					set 'materiel'(val) {
-						this.__signals["materiel"].value = val;
-					}get 'equipe'() {
+					}    get 'equipe'() {
 						return this.__signals["equipe"].value;
 					}
 					set 'equipe'(val) {
@@ -16175,8 +16336,8 @@ const ModalHistorique = class ModalHistorique extends Modal {
     __registerWatchesActions() {
     this.__addWatchesActions("historiques");    super.__registerWatchesActions();
 }
-    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["equipe"] = null;this.__signals["variation"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;flex-grow:1;min-height:0;width:100%}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;gap:20px;padding:8px 16px}:host .content .line .quantite{flex-shrink:0;width:75px}:host .content .line .par{flex-grow:1}:host .content .line .modification{flex-shrink:0;width:200px}:host .content .key{display:none;width:120px}:host .content .value{display:inline-block}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}@media screen and (max-width: 600px){:host .content .line{flex-direction:column;gap:10px}:host .content .line .quantite,:host .content .line .par,:host .content .line .modification{width:100%;display:flex}:host .content .line .quantite .key,:host .content .line .par .key,:host .content .line .modification .key{display:inline-block;flex-shrink:0}}`;
+    __registerSignalsActions() { this.__signals["equipe"] = null;this.__signals["variation"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;flex-grow:1;min-height:0;width:100%}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;flex-direction:column;padding:8px 16px}:host .content .line .qty{font-weight:bold}:host .content .line .sortie{font-weight:bold;color:var(--color-neutral)}:host .content .line .entree{font-weight:bold;color:var(--color-neutral)}:host .content .line .current{color:var(--color-primary)}:host .content .line .small{font-size:13px;margin-top:4px}:host .content .key{display:none;width:120px}:host .content .value{display:inline-block}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}`;
     __getStatic() {
         return ModalHistorique;
     }
@@ -16192,7 +16353,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
         <template _id="modalhistorique_2"></template>
     </av-flex-scroll>
 </div><div class="footer">
-    <av-button _id="modalhistorique_6">Fermer</av-button>
+    <av-button _id="modalhistorique_4">Fermer</av-button>
 </div>` }
     });
 }
@@ -16215,43 +16376,22 @@ const ModalHistorique = class ModalHistorique extends Modal {
     {
       "eventName": "onScrollChange",
       "id": "modalhistorique_1",
-      "fct": (c, ...args) => c.comp.loadData.apply(c.comp, ...args),
+      "fct": (c, ...args) => c.comp.loadMoreData.apply(c.comp, ...args),
       "isCallback": true
     }
   ],
   "pressEvents": [
     {
-      "id": "modalhistorique_6",
+      "id": "modalhistorique_4",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-            <div class="line">
-                <div class="quantite">
-                    <span class="key">Quantité : </span>
-                    <span class="value" _id="modalhistorique_3"></span>
-                </div>
-                <div class="par">
-                    <span class="key">Modifié par : </span>
-                    <span class="value" _id="modalhistorique_4"></span>
-                </div>
-                <div class="modification">
-                    <span class="key">Modifié le : </span>
-                    <span class="value" _id="modalhistorique_5"></span>
-                </div>
-            </div>
+            <div class="line" _id="modalhistorique_3"></div>
         `);templ0.setActions({
   "content": {
     "modalhistorique_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}`,
-      "once": true
-    },
-    "modalhistorique_4°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method5(c.data.historique))}`,
-      "once": true
-    },
-    "modalhistorique_5°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__96088c3823f02341204bbb7914b84118method6(c.data.historique))}`,
+      "fct": (c) => `\n                ${c.print(c.comp.__96088c3823f02341204bbb7914b84118method4(c.data.historique))}\n            `,
       "once": true
     }
   }
@@ -16263,8 +16403,8 @@ const ModalHistorique = class ModalHistorique extends Modal {
         return "ModalHistorique";
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["historiques"] = []; }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["equipe"] = undefined;s["variation"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('equipe');this.__correctGetter('variation');this.__correctGetter('historiques'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["equipe"] = undefined;s["variation"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('equipe');this.__correctGetter('variation');this.__correctGetter('historiques'); }
     configure() {
         return {
             title: ""
@@ -16290,22 +16430,63 @@ const ModalHistorique = class ModalHistorique extends Modal {
         if (data) {
             this.page = page;
             if (this.page == 0) {
-                this.historiques = data.historique;
+                this.historiques = data.historiques;
             }
             else {
-                this.historiques.splice(this.historiques.length - 1, 0, ...data.historique);
+                this.historiques.splice(this.historiques.length, 0, ...data.historiques);
             }
-            if (data.historique.length < 20) {
-                this.canLoadMore = false;
-            }
+            this.canLoadMore = data.historiques.length == 20;
         }
         else {
             this.reject();
         }
         this.isLoading = false;
     }
-    getLastUpdate(inventaire) {
-        return inventaire.last_update.toLocaleDateString(undefined, {
+    getTxt(historique) {
+        let txt = "";
+        if (historique.type == "achat") {
+            txt = "<div class=\"info\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            if (historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        else if (historique.type == "perte") {
+            txt = "<div class=\"info\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            if (historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        else {
+            if (!historique.equipe_sortie)
+                return "";
+            txt = "<div class=\"info\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
+            if (historique.equipe_sortie == this.equipe.nom) {
+                txt += "<span class=\"sortie current\">" + historique.equipe_sortie + "</span> vers ";
+            }
+            else {
+                txt += "<span class=\"sortie\">" + historique.equipe_sortie + "</span> vers ";
+            }
+            if (historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
+        return txt;
+    }
+    getLastUpdate(historique) {
+        return historique.date.toLocaleDateString(undefined, {
             year: "numeric",
             month: "long",
             day: "2-digit",
@@ -16325,7 +16506,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
         this.loadData(0);
     }
     __96088c3823f02341204bbb7914b84118method1() {
-        return this.materiel.nom;
+        return this.variation.nom;
     }
     __96088c3823f02341204bbb7914b84118method2() {
         return this.getVariations();
@@ -16334,154 +16515,13 @@ const ModalHistorique = class ModalHistorique extends Modal {
         return this.equipe.nom;
     }
     __96088c3823f02341204bbb7914b84118method4(historique) {
-        return historique.quantite;
-    }
-    __96088c3823f02341204bbb7914b84118method5(historique) {
-        return historique.last_update_by;
-    }
-    __96088c3823f02341204bbb7914b84118method6(historique) {
-        return this.getLastUpdate(historique);
+        return this.getTxt(historique);
     }
 }
 ModalHistorique.Namespace=`Inventaire`;
 ModalHistorique.Tag=`av-modal-historique`;
 __as1(_, 'ModalHistorique', ModalHistorique);
 if(!window.customElements.get('av-modal-historique')){window.customElements.define('av-modal-historique', ModalHistorique);Aventus.WebComponentInstance.registerDefinition(ModalHistorique);}
-
-const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
-    get 'inventaire'() {
-						return this.__watch["inventaire"];
-					}
-					set 'inventaire'(val) {
-						this.__watch["inventaire"] = val;
-					}    materiel;
-    __registerWatchesActions() {
-    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
-}
-    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
-    __getStatic() {
-        return InventaireListItem;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(InventaireListItem.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div _id="inventairelistitem_0">    <div class="main">        <div class="nom">            <span class="key">Nom :</span>            <span class="value" _id="inventairelistitem_1"></span>        </div>        <div class="variation">            <span class="key">Variation : </span>            <span class="value" _id="inventairelistitem_2"></span>        </div>        <div class="quantite">            <span class="key">Quantité : </span>            <span class="value" _id="inventairelistitem_3"></span>        </div>        <div class="modification">            <div class="actions">                <av-icon-action color="neutral" icon="edit" _id="inventairelistitem_4">Modifier</av-icon-action>                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_5">Historique</av-icon-action>            </div>        </div>    </div>    <div class="last-update" _id="inventairelistitem_6"></div></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "inventairelistitem_0°class": {
-      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod0())}`
-    },
-    "inventairelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`,
-      "once": true
-    },
-    "inventairelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`,
-      "once": true
-    },
-    "inventairelistitem_3°@HTML": {
-      "fct": (c) => `\r\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}\r\n            `
-    },
-    "inventairelistitem_6°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
-      "once": true
-    }
-  },
-  "pressEvents": [
-    {
-      "id": "inventairelistitem_4",
-      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    },
-    {
-      "id": "inventairelistitem_5",
-      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "InventaireListItem";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
-    getLastUpdate() {
-        if (this.inventaire.last_update) {
-            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-        return "";
-    }
-    async edit() {
-        const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.materiel;
-        modal.equipe = this.inventaire.equipe;
-        modal.materiel = this.materiel;
-        modal.nb = this.inventaire.quantite;
-        const result = await modal.show();
-        if (result) {
-            const save = await Aventus.Process.execute(new InventaireUpdateController().request({
-                id: this.inventaire.id,
-                id_equipe: this.inventaire.equipe.id,
-                id_materiel_variation: this.inventaire.materiel?.id,
-                quantite: result,
-            }));
-            if (save) {
-                this.inventaire.id = save.id;
-                this.inventaire.last_update_by = save.last_update_by;
-                this.inventaire.last_update = save.last_update;
-                this.inventaire.quantite = save.quantite;
-                Toast.add({
-                    message: "Inventaire enregistré",
-                    color: "success",
-                    closable: true
-                });
-            }
-        }
-    }
-    async historique() {
-        const modal = new ModalHistorique();
-        modal.materiel = this.materiel;
-        modal.equipe = this.inventaire.equipe;
-        modal.variation = this.inventaire.materiel;
-        await modal.show();
-    }
-    getVariations() {
-        const names = [];
-        for (let group of this.inventaire.materiel.groups) {
-            names.push(group.variation.nom);
-        }
-        return names.join(" ");
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod0() {
-        return this.inventaire.id > 0 ? 'exist' : '';
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod1() {
-        return this.inventaire.equipe.nom;
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod2() {
-        return this.getVariations();
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod3() {
-        return this.inventaire.quantite ?? '-';
-    }
-    __a95c8f763743275e162a27eb63a3f98emethod4() {
-        return this.getLastUpdate();
-    }
-}
-InventaireListItem.Namespace=`Inventaire`;
-InventaireListItem.Tag=`av-inventaire-list-item`;
-__as1(_, 'InventaireListItem', InventaireListItem);
-if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
 
 App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController=class InventaireMouvementController extends Aventus.HttpRoute {
     constructor(router) {
@@ -16496,6 +16536,232 @@ App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController=class In
 }
 App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
 __as1(_.App.Http.Controllers.Inventaire.Mouvement, 'InventaireMouvementController', App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController);
+
+const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
+    get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}get 'equipeSortie'() {
+						return this.__signals["equipeSortie"].value;
+					}
+					set 'equipeSortie'(val) {
+						this.__signals["equipeSortie"].value = val;
+					}get 'equipeEntree'() {
+						return this.__signals["equipeEntree"].value;
+					}
+					set 'equipeEntree'(val) {
+						this.__signals["equipeEntree"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipeSortie"] = null;this.__signals["equipeEntree"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .form .btn{align-items:center;display:flex;justify-content:center}:host .footer{display:flex;gap:.5rem;justify-content:flex-end;margin-top:2rem}`;
+    __getStatic() {
+        return ModalInventaireMouvement;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventaireMouvement.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventairemouvement_0"></div><div class="form">    <av-equipe-select label="Sortie" searchable _id="modalinventairemouvement_1"></av-equipe-select>    <div class="btn">        <av-icon-action icon="swap_vert" _id="modalinventairemouvement_2"></av-icon-action>    </div>    <av-equipe-select label="Entrée" searchable _id="modalinventairemouvement_3"></av-equipe-select>    <av-input type="number" label="Quantité" _id="modalinventairemouvement_4"></av-input></div><div class="footer">    <av-button _id="modalinventairemouvement_5">Annuler</av-button>    <av-button color="primary" _id="modalinventairemouvement_6">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventairemouvement_4"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventairemouvement_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__86aa5df7aefa315fd11dd30e333e28b4method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventairemouvement_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method1(),
+      "extract": (c, v) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method2(v),
+      "once": true,
+      "isCallback": true
+    },
+    {
+      "id": "modalinventairemouvement_3",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method3(),
+      "extract": (c, v) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method4(v),
+      "once": true,
+      "isCallback": true
+    },
+    {
+      "id": "modalinventairemouvement_4",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method5(),
+      "extract": (c, v) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method6(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventairemouvement_4",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventairemouvement_2",
+      "onPress": (e, pressInstance, c) => { c.comp.swap(e, pressInstance); }
+    },
+    {
+      "id": "modalinventairemouvement_5",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventairemouvement_6",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventaireMouvement";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipeSortie"] = undefined;s["equipeEntree"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipeSortie');this.__correctGetter('equipeEntree'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    swap() {
+        const temp = this.equipeEntree;
+        this.equipeEntree = this.equipeSortie;
+        this.equipeSortie = temp;
+    }
+    checkNb() {
+        let r = null;
+        if (typeof this.nb == 'number') {
+            r = this.nb;
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            r = nb2;
+        }
+        if (r < 1) {
+            this.inputEl.errors = ["Merci de saisir un nombre > 0"];
+            return null;
+        }
+        return r;
+    }
+    async save() {
+        const nb = this.checkNb();
+        if (nb == null)
+            return;
+        if (!this.equipeEntree)
+            return;
+        if (!this.equipeSortie)
+            return;
+        const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController().request({
+            id_equipe_entree: this.equipeEntree.id,
+            id_equipe_sortie: this.equipeSortie.id,
+            id_materiel_variation: this.variation.id,
+            quantite: nb,
+        }));
+        if (result) {
+            this.resolve(result);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Mouvement pour ${this.variation.nom} ${this.getVariations()}`;
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+    async loadData() {
+        const list = await Aventus.Process.execute(EquipeRAM.getInstance().getListWithError());
+        if (list) {
+            const stock = list.find(p => p.stock);
+            if (stock) {
+                this.equipeSortie = stock;
+            }
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.loadData();
+        this.inputEl.focus();
+        this.inputEl.select();
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method0() {
+        return this.getTitle();
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method1() {
+        return this.equipeSortie;
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method2(v) {
+        if (this) {
+            this.equipeSortie = v;
+        }
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method3() {
+        return this.equipeEntree;
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method4(v) {
+        if (this) {
+            this.equipeEntree = v;
+        }
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method5() {
+        return this.nb;
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method6(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventaireMouvement.Namespace=`Inventaire`;
+ModalInventaireMouvement.Tag=`av-modal-inventaire-mouvement`;
+__as1(_, 'ModalInventaireMouvement', ModalInventaireMouvement);
+if(!window.customElements.get('av-modal-inventaire-mouvement')){window.customElements.define('av-modal-inventaire-mouvement', ModalInventaireMouvement);Aventus.WebComponentInstance.registerDefinition(ModalInventaireMouvement);}
 
 App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
     constructor(router) {
@@ -16670,12 +16936,12 @@ if(!window.customElements.get('av-variation-groupe-template-select')){window.cus
 
 const EquipeEditModal = class EquipeEditModal extends Modal {
     form;
-    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}`;
+    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center;margin-top:12px}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
             nom: new Aventus.Form.Validators.Required("Le nom est requis"),
-            favori: {}
+            stock: {}
         });
     }
     __getStatic() {
@@ -16688,7 +16954,10 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><av-toggle _id="equipeeditmodal_2"></av-toggle><div class="actions">
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div>
+    <span>Est un stock ?</span>
+    <av-toggle _id="equipeeditmodal_2"></av-toggle>
+</div><div class="actions">
     <av-button _id="equipeeditmodal_3">Annuler</av-button>
     <av-button color="primary" _id="equipeeditmodal_4">Enregistrer</av-button>
 </div>` }
@@ -16745,7 +17014,7 @@ const EquipeEditModal = class EquipeEditModal extends Modal {
         return this.form.parts.nom;
     }
     __96d74d247ad5518bea626dc8edc60f69method2() {
-        return this.form.parts.favori;
+        return this.form.parts.stock;
     }
     static async open(item) {
         const modal = new EquipeEditModal();
@@ -16781,19 +17050,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des équipes</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
-            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="equipespage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16849,7 +17106,13 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     async bindData() {
         let list = await EquipeRAM.getInstance().getList();
-        list.sort((a, b) => a.nom.localeCompare(a.nom));
+        list.sort((a, b) => {
+            if (a.stock && !b.stock)
+                return -1;
+            if (!a.stock && b.stock)
+                return 1;
+            return a.nom.localeCompare(b.nom);
+        });
         for (let item of list) {
             let el = new EquipeItem();
             el.item = item;
@@ -16906,6 +17169,370 @@ EquipesPage.Tag=`av-equipes-page`;
 __as1(_, 'EquipesPage', EquipesPage);
 if(!window.customElements.get('av-equipes-page')){window.customElements.define('av-equipes-page', EquipesPage);Aventus.WebComponentInstance.registerDefinition(EquipesPage);}
 
+App.Http.Controllers.Inventaire.Perte.InventairePerteController=class InventairePerteController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/inventaire/perte`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Inventaire.Perte.InventairePerteController.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
+__as1(_.App.Http.Controllers.Inventaire.Perte, 'InventairePerteController', App.Http.Controllers.Inventaire.Perte.InventairePerteController);
+
+const ModalInventairePerte = class ModalInventairePerte extends Modal {
+    get 'variation'() {
+						return this.__signals["variation"].value;
+					}
+					set 'variation'(val) {
+						this.__signals["variation"].value = val;
+					}get 'nb'() {
+						return this.__signals["nb"].value;
+					}
+					set 'nb'(val) {
+						this.__signals["nb"].value = val;
+					}get 'equipe'() {
+						return this.__signals["equipe"].value;
+					}
+					set 'equipe'(val) {
+						this.__signals["equipe"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+    __getStatic() {
+        return ModalInventairePerte;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalInventairePerte.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="modalinventaireperte_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireperte_1"></av-input></div><div class="footer">    <av-button _id="modalinventaireperte_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireperte_3">Enregistrer</av-button></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "inputEl",
+      "ids": [
+        "modalinventaireperte_1"
+      ]
+    }
+  ],
+  "content": {
+    "modalinventaireperte_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__3c04e62a0c816dca149557743a338609method0())}`,
+      "once": true
+    }
+  },
+  "bindings": [
+    {
+      "id": "modalinventaireperte_1",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__3c04e62a0c816dca149557743a338609method1(),
+      "extract": (c, v) => c.comp.__3c04e62a0c816dca149557743a338609method2(v),
+      "once": true,
+      "isCallback": true
+    }
+  ],
+  "events": [
+    {
+      "eventName": "focus",
+      "id": "modalinventaireperte_1",
+      "fct": (e, c) => c.comp.select(e)
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "modalinventaireperte_2",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "modalinventaireperte_3",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalInventairePerte";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipe'); }
+    configure() {
+        return {
+            title: "Mise à jour de l'inventaire"
+        };
+    }
+    checkNb() {
+        let r = null;
+        if (typeof this.nb == 'number') {
+            r = this.nb;
+        }
+        else {
+            const nbTxt = this.nb;
+            if (nbTxt.trim() == '') {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            const nb2 = Number(nbTxt);
+            if (isNaN(nb2)) {
+                this.inputEl.errors = ["Merci de saisir un nombre"];
+                return r;
+            }
+            r = nb2;
+        }
+        if (r < 1) {
+            this.inputEl.errors = ["Merci de saisir un nombre > 0"];
+            return null;
+        }
+        return r;
+    }
+    async save() {
+        const nb = this.checkNb();
+        if (nb == null)
+            return;
+        if (!this.equipe)
+            return;
+        const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Perte.InventairePerteController().request({
+            id_equipe: this.equipe.id,
+            id_materiel_variation: this.variation.id,
+            quantite: nb
+        }));
+        if (result) {
+            this.resolve(result);
+        }
+    }
+    select() {
+        this.inputEl.select();
+    }
+    getTitle() {
+        return `Perte de ${this.variation.nom} ${this.getVariations()}`;
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.variation.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+    postCreation() {
+        super.postCreation();
+        this.inputEl.focus();
+        this.inputEl.select();
+    }
+    __3c04e62a0c816dca149557743a338609method0() {
+        return this.getTitle();
+    }
+    __3c04e62a0c816dca149557743a338609method1() {
+        return this.nb;
+    }
+    __3c04e62a0c816dca149557743a338609method2(v) {
+        if (this) {
+            this.nb = v;
+        }
+    }
+}
+ModalInventairePerte.Namespace=`Inventaire`;
+ModalInventairePerte.Tag=`av-modal-inventaire-perte`;
+__as1(_, 'ModalInventairePerte', ModalInventairePerte);
+if(!window.customElements.get('av-modal-inventaire-perte')){window.customElements.define('av-modal-inventaire-perte', ModalInventairePerte);Aventus.WebComponentInstance.registerDefinition(ModalInventairePerte);}
+
+const InventaireListItem = class InventaireListItem extends Aventus.WebComponent {
+    get 'inventaire'() {
+						return this.__watch["inventaire"];
+					}
+					set 'inventaire'(val) {
+						this.__watch["inventaire"] = val;
+					}    __registerWatchesActions() {
+    this.__addWatchesActions("inventaire", ((target, action, path, value) => {
+    if (target.inventaire.quantite == 0) {
+        target.style.display = "none";
+    }
+}));    super.__registerWatchesActions();
+}
+    static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
+    __getStatic() {
+        return InventaireListItem;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(InventaireListItem.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div _id="inventairelistitem_0">
+    <div class="main">
+        <div class="nom">
+            <span class="key">Nom :</span>
+            <span class="value" _id="inventairelistitem_1"></span>
+        </div>
+        <div class="variation">
+            <span class="key">Variation : </span>
+            <span class="value" _id="inventairelistitem_2"></span>
+        </div>
+        <div class="quantite">
+            <span class="key">Quantité : </span>
+            <span class="value" _id="inventairelistitem_3"></span>
+        </div>
+        <div class="modification">
+            <div class="actions">
+                <template _id="inventairelistitem_4"></template>
+                <av-icon-action color="neutral" icon="compare_arrows" _id="inventairelistitem_6">Transfert</av-icon-action>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_7">Historique</av-icon-action>
+                <av-icon-action color="neutral" icon="delete_forever" _id="inventairelistitem_8">Perte</av-icon-action>
+            </div>
+        </div>
+    </div>
+    <div class="last-update" _id="inventairelistitem_9"></div>
+</div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "inventairelistitem_0°class": {
+      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`
+    },
+    "inventairelistitem_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`,
+      "once": true
+    },
+    "inventairelistitem_2°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}`,
+      "once": true
+    },
+    "inventairelistitem_3°@HTML": {
+      "fct": (c) => `\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}\n            `
+    },
+    "inventairelistitem_9°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod5())}`,
+      "once": true
+    }
+  },
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_6",
+      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
+    },
+    {
+      "id": "inventairelistitem_7",
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    },
+    {
+      "id": "inventairelistitem_8",
+      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
+    }
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                    <av-icon-action color="neutral" icon="attach_money" _id="inventairelistitem_5">Achat</av-icon-action>
+                `);templ0.setActions({
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_5",
+      "onPress": (e, pressInstance, c) => { c.comp.achat(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventairelistitem_4',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod0(),
+                    template: templ0
+                }]
+            }); }
+    getClassName() {
+        return "InventaireListItem";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    getLastUpdate() {
+        if (this.inventaire.date) {
+            return this.inventaire.par + ", le " + this.inventaire.date.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+        return "";
+    }
+    async achat() {
+        const modal = new ModalInventaireAchat();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(MaterielDetailsPage)?.updateInventaire(result);
+        }
+    }
+    async perte() {
+        const modal = new ModalInventairePerte();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.inventaire.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(MaterielDetailsPage)?.updateInventaire(result);
+        }
+    }
+    async transfert() {
+        const modal = new ModalInventaireMouvement();
+        modal.variation = this.inventaire.materiel;
+        if (!this.inventaire.equipe.stock) {
+            modal.equipeEntree = this.inventaire.equipe;
+        }
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(MaterielDetailsPage)?.updateInventaire(result[0]);
+            this.findParentByType(MaterielDetailsPage)?.updateInventaire(result[1]);
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.equipe = this.inventaire.equipe;
+        modal.variation = this.inventaire.materiel;
+        await modal.show();
+    }
+    getVariations() {
+        const names = [];
+        for (let group of this.inventaire.materiel.groups) {
+            names.push(group.variation.nom);
+        }
+        return names.join(" ");
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod1() {
+        return this.inventaire.id > 0 ? 'exist' : '';
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod2() {
+        return this.inventaire.equipe.nom;
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod3() {
+        return this.getVariations();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod4() {
+        return this.inventaire.quantite ?? '-';
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod5() {
+        return this.getLastUpdate();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod0() {
+        return this.inventaire.equipe.stock;
+    }
+}
+InventaireListItem.Namespace=`Inventaire`;
+InventaireListItem.Tag=`av-inventaire-list-item`;
+__as1(_, 'InventaireListItem', InventaireListItem);
+if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+
 const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
     get 'inventaire'() {
 						return this.__watch["inventaire"];
@@ -16914,7 +17541,11 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
 						this.__watch["inventaire"] = val;
 					}    equipe;
     __registerWatchesActions() {
-    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
+    this.__addWatchesActions("inventaire", ((target, action, path, value) => {
+    if (target.inventaire.quantite == 0) {
+        target.style.display = "none";
+    }
+}));    super.__registerWatchesActions();
 }
     static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;transform:translateY(7px);width:34px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom,:host .line:not(.exist) .main .variation,:host .line:not(.exist) .main .quantite,:host .line:not(.exist) .main .img{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite,:host .line .main .img{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .img{height:100px;width:100px;margin-top:0}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
     __getStatic() {
@@ -16944,63 +17575,119 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         </div>
         <div class="modification">
             <div class="actions">
-                <av-icon-action color="neutral" icon="arrow_outward" _id="inventaireequipelistitem_5">Modifier</av-icon-action>
-                <av-icon-action color="neutral" icon="inventory" _id="inventaireequipelistitem_6">Inventaire</av-icon-action>
-                <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_7">Historique</av-icon-action>
+                <template _id="inventaireequipelistitem_5"></template>
+                <av-icon-action color="neutral" icon="compare_arrows" _id="inventaireequipelistitem_7">Transfert</av-icon-action>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_8">Historique</av-icon-action>
+                <av-icon-action color="neutral" icon="delete_forever" _id="inventaireequipelistitem_9">Perte</av-icon-action>
             </div>
         </div>
     </div>
-    <div class="last-update" _id="inventaireequipelistitem_8"></div>
+    <div class="last-update" _id="inventaireequipelistitem_10"></div>
 </div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "inventaireequipelistitem_0°class": {
-      "fct": (c) => `line ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0())}`
+      "fct": (c) => `line ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())}`
     },
     "inventaireequipelistitem_1°style": {
-      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())});`,
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())});`,
       "once": true
     },
     "inventaireequipelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())}`,
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`,
       "once": true
     },
     "inventaireequipelistitem_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
+      "once": true
     },
     "inventaireequipelistitem_4°@HTML": {
-      "fct": (c) => `\n                ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}\n            `
+      "fct": (c) => `\n                ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}\n            `
     },
-    "inventaireequipelistitem_8°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
+    "inventaireequipelistitem_10°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method6())}`,
       "once": true
     }
   },
   "pressEvents": [
     {
-      "id": "inventaireequipelistitem_5",
-      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    },
-    {
-      "id": "inventaireequipelistitem_6",
-      "onPress": (e, pressInstance, c) => { c.comp.edit(e, pressInstance); }
-    },
-    {
       "id": "inventaireequipelistitem_7",
+      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
+    },
+    {
+      "id": "inventaireequipelistitem_8",
       "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
+    },
+    {
+      "id": "inventaireequipelistitem_9",
+      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
     }
   ]
-}); }
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                    <av-icon-action color="neutral" icon="attach_money" _id="inventaireequipelistitem_6">Achat</av-icon-action>
+                `);templ0.setActions({
+  "pressEvents": [
+    {
+      "id": "inventaireequipelistitem_6",
+      "onPress": (e, pressInstance, c) => { c.comp.achat(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventaireequipelistitem_5',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "InventaireEquipeListItem";
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    async achat() {
+        const modal = new ModalInventaireAchat();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result);
+        }
+    }
+    async perte() {
+        const modal = new ModalInventairePerte();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result);
+        }
+    }
+    async transfert() {
+        const modal = new ModalInventaireMouvement();
+        modal.variation = this.inventaire.materiel;
+        if (!this.equipe.stock) {
+            modal.equipeEntree = this.equipe;
+        }
+        modal.nb = 0;
+        const result = await modal.show();
+        if (result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result[0]);
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result[1]);
+        }
+    }
+    async historique() {
+        const modal = new ModalHistorique();
+        modal.equipe = this.equipe;
+        modal.variation = this.inventaire.materiel;
+        await modal.show();
+    }
     getLastUpdate() {
-        if (this.inventaire.last_update) {
-            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+        if (this.inventaire.date) {
+            return this.inventaire.par + ", le " + this.inventaire.date.toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "short",
                 day: "2-digit",
@@ -17016,58 +17703,33 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         }
         return "/img/default_img.svg";
     }
-    async edit() {
-        const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.variation;
-        modal.equipe = this.equipe;
-        modal.materiel = this.inventaire.materiel;
-        modal.nb = this.inventaire.quantite;
-        const result = await modal.show();
-        if (result) {
-            const save = await Aventus.Process.execute(new InventaireUpdateController().request({
-                id: this.inventaire.id,
-                id_equipe: this.equipe.id,
-                id_materiel: this.inventaire.materiel.id,
-                id_variation: this.inventaire.variation?.id,
-                quantite: result
-            }));
-            if (save) {
-                this.inventaire.id = save.id;
-                this.inventaire.last_update_by = save.last_update_by;
-                this.inventaire.last_update = save.last_update;
-                this.inventaire.quantite = save.quantite;
-                Toast.add({
-                    message: "Inventaire enregistré",
-                    color: "success",
-                    closable: true
-                });
-            }
+    getVariations() {
+        const names = [];
+        for (let group of this.inventaire.materiel.groups) {
+            names.push(group.variation.nom);
         }
-    }
-    async historique() {
-        const modal = new ModalHistorique();
-        modal.materiel = this.inventaire.materiel;
-        modal.equipe = this.equipe;
-        modal.variation = this.inventaire.variation;
-        await modal.show();
-    }
-    __a2ec46d163f7617d318fc452e85fb3c8method0() {
-        return this.inventaire.id > 0 ? 'exist' : '';
+        return names.join(" ");
     }
     __a2ec46d163f7617d318fc452e85fb3c8method1() {
-        return this.getPicture();
+        return this.inventaire.id > 0 ? 'exist' : '';
     }
     __a2ec46d163f7617d318fc452e85fb3c8method2() {
-        return this.inventaire.materiel.nom;
+        return this.getPicture();
     }
     __a2ec46d163f7617d318fc452e85fb3c8method3() {
-        return this.inventaire.variation?.nom;
+        return this.inventaire.materiel.nom;
     }
     __a2ec46d163f7617d318fc452e85fb3c8method4() {
-        return this.inventaire.quantite ?? '-';
+        return this.getVariations();
     }
     __a2ec46d163f7617d318fc452e85fb3c8method5() {
+        return this.inventaire.quantite ?? '-';
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method6() {
         return this.getLastUpdate();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method0() {
+        return this.equipe.stock;
     }
 }
 InventaireEquipeListItem.Namespace=`Inventaire`;
@@ -17086,10 +17748,16 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
 					}
 					set 'inventaires'(val) {
 						this.__watch["inventaires"] = val;
+					}    get 'voirVide'() {
+						return this.__signals["voirVide"].value;
+					}
+					set 'voirVide'(val) {
+						this.__signals["voirVide"].value = val;
 					}    __registerWatchesActions() {
     this.__addWatchesActions("item");this.__addWatchesActions("inventaires");    super.__registerWatchesActions();
 }
-    static __style = `:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .title{align-items:center;display:flex;flex-shrink:0;gap:16px;justify-content:space-between;margin-bottom:16px}:host .card .body .title av-input{max-width:300px}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;margin-top:8px;width:100%}@media screen and (max-width: 660px){:host .card .body .title{flex-wrap:wrap;width:100%}:host .card .body .title av-input{max-width:none;width:100%}}`;
+    __registerSignalsActions() { this.__signals["voirVide"] = null; super.__registerSignalsActions();  }
+    static __style = `:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-direction:row;flex-shrink:0;height:min-content;justify-content:space-between;margin-bottom:24px;width:100%}:host .card .header .title{font-size:var(--font-size-lg)}:host .card .header .actions{align-items:center;display:flex;gap:8px;justify-content:center}:host .card .body{flex-grow:1;min-height:0}:host .card .body .title{align-items:center;display:flex;flex-shrink:0;gap:16px;justify-content:space-between;margin-bottom:16px}:host .card .body .title .actions{align-items:center;display:flex;gap:24px}:host .card .body .title .actions av-input{max-width:300px}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;margin-top:8px;width:100%}@media screen and (max-width: 660px){:host .card .body .title{flex-wrap:wrap;width:100%}:host .card .body .title av-input{max-width:none;width:100%}}`;
     __getStatic() {
         return EquipeDetailsPage;
     }
@@ -17111,21 +17779,24 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
     <div class="body">
         <div class="title">
             <span>Liste de matériel</span>
-            <av-input placeholder="Recherche" _id="equipedetailspage_3"></av-input>
+            <div class="actions">
+                <av-icon-action _id="equipedetailspage_3"></av-icon-action>
+                <av-input placeholder="Recherche" _id="equipedetailspage_4"></av-input>
+        </div>
         </div>
         <div class="list">
-            <template _id="equipedetailspage_4"></template>
+            <template _id="equipedetailspage_5"></template>
         </div>
     </div>
 </div>` }
     });
 }
-    get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="equipedetailspage_5"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="equipedetailspage_6"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "elements": [
     {
       "name": "searchEl",
       "ids": [
-        "equipedetailspage_3"
+        "equipedetailspage_4"
       ]
     }
   ],
@@ -17133,12 +17804,18 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
     "equipedetailspage_0°@HTML": {
       "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1())}`,
       "once": true
+    },
+    "equipedetailspage_3°icon": {
+      "fct": (c) => `${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2())}`
+    },
+    "equipedetailspage_3°@HTML": {
+      "fct": (c) => `\n                    ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3())}\n                `
     }
   },
   "events": [
     {
       "eventName": "onChange",
-      "id": "equipedetailspage_3",
+      "id": "equipedetailspage_4",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
@@ -17151,34 +17828,39 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
     {
       "id": "equipedetailspage_2",
       "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
+    },
+    {
+      "id": "equipedetailspage_3",
+      "onPress": (e, pressInstance, c) => { c.comp.toggleVide(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-inventaire-equipe-list-item _id="equipedetailspage_5"></av-inventaire-equipe-list-item>
+                <av-inventaire-equipe-list-item _id="equipedetailspage_6"></av-inventaire-equipe-list-item>
             `);templ0.setActions({
   "injection": [
     {
-      "id": "equipedetailspage_5",
+      "id": "equipedetailspage_6",
       "injectionName": "inventaire",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2(c.data.inventaire),
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method4(c.data.inventaire),
       "once": true
     },
     {
-      "id": "equipedetailspage_5",
+      "id": "equipedetailspage_6",
       "injectionName": "equipe",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3(),
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method5(),
       "once": true
     }
   ]
 });this.__getStatic().__template.addLoop({
-                    anchorId: 'equipedetailspage_4',
+                    anchorId: 'equipedetailspage_5',
                     template: templ0,
                 simple:{data: "this.inventaires",item:"inventaire"}}); }
     getClassName() {
         return "EquipeDetailsPage";
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["item"] = undefined;w["inventaires"] = []; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('item');this.__correctGetter('inventaires'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["voirVide"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('voirVide');this.__correctGetter('item');this.__correctGetter('inventaires'); }
     async isAllowed(state, pattern) {
         let slugs = Main.instance.getSlugs(pattern);
         if (!slugs || typeof slugs['id'] != "number")
@@ -17204,18 +17886,11 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
         }
         materiels.sort((a, b) => a.nom.localeCompare(b.nom));
         const inventaires = [];
-        const addInventaire = (materiel, variation) => {
-            let el;
-            if (variation) {
-                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
-            }
-            else {
-                el = connu.find(p => p.materiel.id == materiel.id);
-            }
+        const addInventaire = (materiel) => {
+            let el = connu.find(p => p.materiel.id == materiel.id);
             if (el == undefined) {
                 el = new App.Http.Controllers.Equipe.GetInventaire.Response();
                 el.materiel = materiel;
-                el.variation = variation;
                 el.quantite = 0;
             }
             inventaires.push(el);
@@ -17223,11 +17898,8 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
         for (let materiel of materiels) {
             if (materiel.variations.length > 0) {
                 for (let variation of materiel.variations) {
-                    addInventaire(materiel, variation);
+                    addInventaire(variation);
                 }
-            }
-            else {
-                addInventaire(materiel);
             }
         }
         this.inventaires = inventaires;
@@ -17252,13 +17924,18 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
             Main.instance.navigate("/", { replace: true });
         }
     }
+    toggleVide() {
+        this.voirVide = !this.voirVide;
+        this.search();
+    }
     search() {
         const txt = this.searchEl.value;
         for (let item of this.listItems) {
-            if (StringTools.contains(item.inventaire.materiel.nom, txt)) {
-                item.style.display = "";
+            if (!this.voirVide && item.inventaire.quantite == 0) {
+                item.style.display = "none";
+                continue;
             }
-            else if (StringTools.contains(item.inventaire.variation?.nom, txt)) {
+            if (StringTools.contains(this.item.nom, txt)) {
                 item.style.display = "";
             }
             else {
@@ -17266,13 +17943,35 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
             }
         }
     }
+    updateInventaire(inventaire) {
+        let needSearch = false;
+        for (let inv of this.inventaires) {
+            if (inv.materiel.id == inventaire.id_materiel_variation) {
+                inv.par = inventaire.par;
+                inv.date = inventaire.date;
+                needSearch = inv.quantite == 0 || inventaire.quantite == 0;
+                inv.quantite = inventaire.quantite;
+                inv.id = inventaire.id;
+                break;
+            }
+        }
+        if (needSearch) {
+            this.search();
+        }
+    }
     __1235ef0c4a20ffaa552fd37f83cb4912method1() {
         return this.item.nom;
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method2(inventaire) {
-        return inventaire;
+    __1235ef0c4a20ffaa552fd37f83cb4912method2() {
+        return this.voirVide ? 'visibility' : 'visibility_off';
     }
     __1235ef0c4a20ffaa552fd37f83cb4912method3() {
+        return this.voirVide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides';
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method4(inventaire) {
+        return inventaire;
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method5() {
         return this.item;
     }
 }
@@ -17299,19 +17998,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste du matériel</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
-            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <av-row class="list" _id="materielpage_2">
-        </av-row>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17437,12 +18124,18 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
 					}
 					set 'objName'(val) {
 						this.__watch["objName"] = val;
+					}    get 'voir_vide'() {
+						return this.__signals["voir_vide"].value;
+					}
+					set 'voir_vide'(val) {
+						this.__signals["voir_vide"].value = val;
 					}    form;
     item;
     slugId = 0;
     __registerWatchesActions() {
     this.__addWatchesActions("inventaires");this.__addWatchesActions("objName");    super.__registerWatchesActions();
 }
+    __registerSignalsActions() { this.__signals["voir_vide"] = null; super.__registerSignalsActions();  }
     static __style = `:host{--col-gap: 16px}:host .content{justify-content:flex-start}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;padding:24px;position:relative;width:100%;overflow:hidden}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;justify-content:space-between;margin-bottom:16px;min-height:50px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{--input-image-height: 150px;width:100%}:host .card .body .contenu{flex-direction:column}:host .card .body .contenu .tags{margin-top:16px}:host .card .body .contenu .tags .label{align-items:center;display:flex;font-size:calc(var(--font-size)*.95);margin-bottom:6px}:host .card .body .contenu .tags .label .toggle{align-items:center;display:flex;gap:6px}:host .card .body .contenu .tags .label .main-label{margin-right:16px}:host .card .body .contenu .tags .label .sub-label{cursor:pointer;font-size:calc(var(--font-size)*.9)}:host .card .body .contenu .tags .liste{display:flex;flex-wrap:wrap;gap:6px}:host .card .body .contenu .tags .liste av-tag{padding-left:12px}:host .card .body .contenu .tags .liste mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host .by-equipe{margin-top:24px}:host .by-equipe .header{align-items:center;display:flex;gap:24px}:host .by-equipe .header av-input{max-width:300px}:host .by-equipe .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;width:100%}@media screen and (max-width: 660px){:host .by-equipe .header{flex-wrap:wrap;width:100%}:host .by-equipe .header av-input{max-width:none;width:100%}}@media screen and (max-width: 500px){:host .label{flex-wrap:wrap}:host .main-label{margin-bottom:6px;width:100%}}`;
     constructor() {
         super();
@@ -17501,7 +18194,7 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
 </div><template _id="materieldetailspage_12"></template>` }
     });
 }
-    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_13"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_15"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_14"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_16"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materieldetailspage_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
@@ -17577,42 +18270,53 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     <div class="card by-equipe">
         <div class="header">
             <div class="title">Liste dans les équipes</div>
-            <av-input placeholder="Recherche" _id="materieldetailspage_13"></av-input>
+            <div class="actions">
+                <av-icon-action _id="materieldetailspage_13"></av-icon-action>
+                <av-input placeholder="Recherche" _id="materieldetailspage_14"></av-input>
+            </div>
         </div>
         <div class="body">
             <div class="list">
-                <template _id="materieldetailspage_14"></template>
+                <template _id="materieldetailspage_15"></template>
             </div>
         </div>
     </div>
 `);templ1.setActions({
+  "content": {
+    "materieldetailspage_13°icon": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10())}`
+    },
+    "materieldetailspage_13°@HTML": {
+      "fct": (c) => `\n                    ${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11())}\n                `
+    }
+  },
   "events": [
     {
       "eventName": "onChange",
-      "id": "materieldetailspage_13",
+      "id": "materieldetailspage_14",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
+  ],
+  "pressEvents": [
+    {
+      "id": "materieldetailspage_13",
+      "onPress": (e, pressInstance, c) => { c.comp.toggleVide(e, pressInstance); }
+    }
   ]
 });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <av-inventaire-list-item _id="materieldetailspage_15"></av-inventaire-list-item>
+                    <av-inventaire-list-item _id="materieldetailspage_16"></av-inventaire-list-item>
                 `);templ2.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_15",
+      "id": "materieldetailspage_16",
       "injectionName": "inventaire",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10(c.data.inventaire),
-      "once": true
-    },
-    {
-      "id": "materieldetailspage_15",
-      "injectionName": "materiel",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11(),
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12(c.data.inventaire),
       "once": true
     }
   ]
 });templ1.addLoop({
-                    anchorId: 'materieldetailspage_14',
+                    anchorId: 'materieldetailspage_15',
                     template: templ2,
                 simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
                     anchorId: 'materieldetailspage_12',
@@ -17626,7 +18330,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('is_saving')) { this.attributeChangedCallback('is_saving', false, false); } }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaires"] = [];w["objName"] = ""; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('is_saving');this.__correctGetter('inventaires');this.__correctGetter('objName'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["voir_vide"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('is_saving');this.__correctGetter('voir_vide');this.__correctGetter('inventaires');this.__correctGetter('objName'); }
     __listBoolProps() { return ["is_saving"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     async isAllowed(state, pattern, router) {
         const slugs = router.getSlugs(pattern);
@@ -17675,7 +18380,13 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             const equipeIds = item.equipes.map(p => p.id_equipe);
             equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
         }
-        equipes.sort((a, b) => a.nom.localeCompare(b.nom));
+        equipes.sort((a, b) => {
+            if (a.stock && !b.stock)
+                return -1;
+            if (!a.stock && b.stock)
+                return 1;
+            return a.nom.localeCompare(b.nom);
+        });
         const addInventaire = (equipe, variation) => {
             let el;
             if (variation) {
@@ -17699,11 +18410,26 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 }
             }
         }
-        debugger;
         this.inventaires = inventaires;
     }
     configure() {
         return {};
+    }
+    updateInventaire(inventaire) {
+        let needSearch = false;
+        for (let inv of this.inventaires) {
+            if (inv.materiel.id == inventaire.id_materiel_variation && inv.equipe.id == inventaire.id_equipe) {
+                inv.par = inventaire.par;
+                inv.date = inventaire.date;
+                needSearch = inv.quantite == 0 || inventaire.quantite == 0;
+                inv.quantite = inventaire.quantite;
+                inv.id = inventaire.id;
+                break;
+            }
+        }
+        if (needSearch) {
+            this.search();
+        }
     }
     async save() {
         if (this.is_saving)
@@ -17749,9 +18475,17 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     unsetToutMonde() {
         this.form.item.tout_monde = false;
     }
+    toggleVide() {
+        this.voir_vide = !this.voir_vide;
+        this.search();
+    }
     search() {
         const txt = this.searchEl.value;
         for (let item of this.listItems) {
+            if (!this.voir_vide && item.inventaire.quantite == 0) {
+                item.style.display = "none";
+                continue;
+            }
             if (StringTools.contains(item.inventaire.equipe.nom, txt)) {
                 item.style.display = "";
             }
@@ -17765,6 +18499,12 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
         return this.is_saving;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
+        return this.voir_vide ? 'visibility' : 'visibility_off';
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11() {
+        return this.voir_vide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides';
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
         return !this.form.item.tout_monde;
@@ -17787,11 +18527,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
         return this.form.item.equipes;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10(inventaire) {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod12(inventaire) {
         return inventaire;
-    }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11() {
-        return this.item;
     }
 }
 MaterielDetailsPage.Namespace=`Inventaire`;
@@ -17953,10 +18690,7 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18026,19 +18760,7 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des utilisateurs</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
-            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="userspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18174,21 +18896,7 @@ const VariationGroupeTemplateEditModal = class VariationGroupeTemplateEditModal 
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>
-    <av-col size="12" use_container="false">
-        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>
-    </av-col>
-</av-row><div class="list">
-    <div class="label">Liste des variations</div>
-    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">
-    </av-flex-scroll>
-    <div class="add-cont">
-        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>
-    </div>
-</div><div class="actions">
-    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>
-    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>    <av-col size="12" use_container="false">        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>    </av-col></av-row><div class="list">    <div class="label">Liste des variations</div>    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">    </av-flex-scroll>    <div class="add-cont">        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>    </div></div><div class="actions">    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18332,10 +19040,7 @@ const VariationGroupeItem = class VariationGroupeItem extends Aventus.WebCompone
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">
-    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>
-    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action>
-</div>` }
+        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18402,19 +19107,7 @@ const VariationsPage = class VariationsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">
-    <div class="header">
-        <div class="title">Liste des variations</div>
-        <div class="actions">
-            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>
-            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>
-        </div>
-    </div>
-    <av-scrollable class="body" floating_scroll auto_hide>
-        <div class="list" _id="variationspage_2">
-        </div>
-    </av-scrollable>
-</div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des variations</div>        <div class="actions">            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="variationspage_2">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18540,9 +19233,7 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`
-    <av-header></av-header>
-` }
+        blocks: { 'before':`    <av-header></av-header>` }
     });
 }
     getClassName() {
@@ -18661,8 +19352,7 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0">
-</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18742,12 +19432,7 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
-    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select>
-</div><div class="footer">
-    <av-button _id="modaltag_2">Annuler</av-button>
-    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18840,8 +19525,7 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0">
-</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({

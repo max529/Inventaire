@@ -1,4 +1,4 @@
-namespace App.Http.Controllers.Inventaire.Achat {
+namespace App.Http.Controllers.Inventaire.Perte {
 
 	export class Request {
 		public quantite!: number;

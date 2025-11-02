@@ -5,16 +5,15 @@ import { EquipeEditModal } from "../EquipesPage/components/EquipeEditModal/Equip
 import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { EquipeGetInventaireController } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Controller.lib.avt";
-import { Response as Inventaire } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
+import { Response as InventaireResponse } from "../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
 import { Watcher } from "Aventus@Main:Aventus.package.avt";
 import { EquipeMaterielController } from "../../generated/app/Http/Controllers/Equipe/Materiel/Controller.lib.avt";
-import type { MaterielResource } from "../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
-import type { Variation } from "../../generated/app/Models/Variation.lib.avt";
 import type { Input } from "../../components/form/Input/Input.wcl.avt";
 import type { InventaireEquipeListItem } from "./components/InventaireEquipeListItem/InventaireEquipeListItem.wcl.avt";
 import { StringTools } from "../../lib/StringTools.lib.avt";
 import { Page } from "../../components/layout/Page/Page.wcl.avt";
-import type { VariationGroupe } from "../../generated/app/Models/VariationGroupe.lib.avt";
+import type { MaterielVariationResource } from "../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
+import type { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
 
 export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -33,7 +32,9 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
     public item!: EquipeResource;
 
     @Watch()
-    public inventaires: Inventaire[] = [];
+    public inventaires: InventaireResponse[] = [];
+    @Signal()
+    public voirVide: boolean = false;
 
     @ViewElement()
     protected searchEl!: Input;
@@ -82,21 +83,14 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
         }
         materiels.sort((a, b) => a.nom.localeCompare(b.nom));
 
-        const inventaires: Inventaire[] = [];
+        const inventaires: InventaireResponse[] = [];
 
 
-        const addInventaire = (materiel: MaterielResource, variation?: VariationGroupe) => {
-            let el: Inventaire | undefined;
-            if(variation) {
-                el = connu.find(p => p.materiel.id == materiel.id && p.variation?.id == variation.id);
-            }
-            else {
-                el = connu.find(p => p.materiel.id == materiel.id);
-            }
+        const addInventaire = (materiel: MaterielVariationResource) => {
+            let el = connu.find(p => p.materiel.id == materiel.id);
             if(el == undefined) {
-                el = new Inventaire();
+                el = new InventaireResponse();
                 el.materiel = materiel;
-                el.variation = variation;
                 el.quantite = 0;
             }
             inventaires.push(el);
@@ -105,13 +99,9 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
         for(let materiel of materiels) {
             if(materiel.variations.length > 0) {
                 for(let variation of materiel.variations) {
-                    addInventaire(materiel, variation);
+                    addInventaire(variation);
                 }
             }
-            else {
-                addInventaire(materiel);
-            }
-
         }
         this.inventaires = inventaires;
         return true;
@@ -150,20 +140,46 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
     }
 
     /**
+    * 
+    */
+    protected toggleVide() {
+        this.voirVide = !this.voirVide;
+        this.search();
+    }
+    /**
      * 
      */
     protected search() {
         const txt = this.searchEl.value;
         for(let item of this.listItems) {
-            if(StringTools.contains(item.inventaire.materiel.nom, txt)) {
-                item.style.display = "";
+            if(!this.voirVide && item.inventaire.quantite == 0) {
+                item.style.display = "none";
+                continue;
             }
-            else if(StringTools.contains(item.inventaire.variation?.nom, txt)) {
+            if(StringTools.contains(this.item.nom, txt)) {
                 item.style.display = "";
             }
             else {
                 item.style.display = "none";
             }
+        }
+    }
+
+    public updateInventaire(inventaire: Inventaire) {
+        let needSearch = false;
+        for(let inv of this.inventaires) {
+            if(inv.materiel.id == inventaire.id_materiel_variation) {
+                inv.par = inventaire.par;
+                inv.date = inventaire.date;
+                needSearch = inv.quantite == 0 || inventaire.quantite == 0;
+                inv.quantite = inventaire.quantite;
+                inv.id = inventaire.id;
+                break;
+            }
+        }
+
+        if(needSearch) {
+            this.search();
         }
     }
 

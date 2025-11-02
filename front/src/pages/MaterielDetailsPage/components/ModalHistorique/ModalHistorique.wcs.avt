@@ -26,21 +26,30 @@
 		.line {
 			border-top: 1px solid var(--color-base-300);
 			display: flex;
-			gap: 20px;
+			flex-direction: column;
 			padding: 8px 16px;
 
-			.quantite {
-				flex-shrink: 0;
-				width: 75px;
+			.qty {
+				font-weight: bold;
 			}
 
-			.par {
-				flex-grow: 1;
+			.sortie {
+				font-weight: bold;
+				color: var(--color-neutral);
 			}
 
-			.modification {
-				flex-shrink: 0;
-				width: 200px;
+			.entree {
+				font-weight: bold;
+				color: var(--color-neutral);
+			}
+
+			.current {
+				color: var(--color-primary);
+			}
+
+			.small {
+				font-size: 13px;
+				margin-top: 4px;
 			}
 		}
 
@@ -48,6 +57,7 @@
 			display: none;
 			width: 120px;
 		}
+
 		.value {
 			display: inline-block;
 		}
@@ -64,29 +74,5 @@
 		gap: 0.5rem;
 		justify-content: flex-end;
 		margin-top: 1rem;
-	}
-}
-
-
-@media screen and (max-width:600px) {
-	:host {
-		.content {
-			.line {
-				flex-direction: column;
-				gap: 10px;
-
-				.quantite,
-				.par,
-				.modification {
-					width: 100%;
-					display: flex;
-
-					.key {
-						display: inline-block;
-						flex-shrink: 0;
-					}
-				}
-			}
-		}
 	}
 }

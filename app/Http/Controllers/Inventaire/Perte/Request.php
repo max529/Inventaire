@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Inventaire\Achat;
+namespace App\Http\Controllers\Inventaire\Perte;
 
 use Aventus\Laraventus\Requests\AventusRequest;
 

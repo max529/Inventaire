@@ -1,0 +1,10 @@
+<div class="title">{{ this.getTitle() }}</div>
+
+<div class="form">
+    <av-input type="number" label="Quantité" @bind="this.nb" @element="inputEl" @focus="select"></av-input>
+</div>
+
+<div class="footer">
+    <av-button @press="reject">Annuler</av-button>
+    <av-button @press="save" color="primary">Enregistrer</av-button>
+</div>

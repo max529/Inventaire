@@ -5,6 +5,7 @@ namespace App.Http.Controllers.Equipe {
 		public static override get Fullname(): string { return "App.Http.Controllers.Equipe.EquipeResource"; }
 		public id!: number;
 		public nom!: string;
+		public stock!: boolean;
 	}
 
 }

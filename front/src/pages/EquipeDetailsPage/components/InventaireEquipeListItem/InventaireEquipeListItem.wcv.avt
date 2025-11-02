@@ -7,7 +7,7 @@
         </div>
         <div class="variation">
             <span class="key">Variation : </span>
-            <span class="value">{{ this.inventaire.variation?.nom }}</span>
+            <span class="value">{{ this.getVariations() }}</span>
         </div>
         <div class="quantite">
             <span class="key">Quantité : </span>
@@ -17,9 +17,13 @@
         </div>
         <div class="modification">
             <div class="actions">
-                <av-icon-action color="neutral" icon="arrow_outward" @press="edit">Modifier</av-icon-action>
-                <av-icon-action color="neutral" icon="inventory" @press="edit">Inventaire</av-icon-action>
+                if(this.equipe.stock) {
+                    <av-icon-action color="neutral" icon="attach_money" @press="achat">Achat</av-icon-action>
+                }
+                <av-icon-action color="neutral" icon="compare_arrows" @press="transfert">Transfert</av-icon-action>
+                <!-- <av-icon-action color="neutral" icon="inventory" @press="doInventaire">Inventaire</av-icon-action> -->
                 <av-icon-action class="historique" color="info" icon="history" @press="historique">Historique</av-icon-action>
+                <av-icon-action color="neutral" icon="delete_forever" @press="perte">Perte</av-icon-action>
             </div>
         </div>
     </div>

@@ -8,5 +8,5 @@ class EquipeRequest extends AventusRequest
 {
     public ?int $id;
     public string $nom;
-    public ?bool $favori = false;
+    public ?bool $stock = false;
 }

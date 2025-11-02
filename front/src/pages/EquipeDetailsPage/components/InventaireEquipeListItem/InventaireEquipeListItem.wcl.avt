@@ -1,10 +1,10 @@
-import { Process } from "Aventus@UI:Aventus.package.avt";
-import { Toast } from "../../../../components/interaction/Toast/Toast.wcl.avt";
 import { Response as Inventaire } from "../../../../generated/app/Http/Controllers/Equipe/GetInventaire/Response.lib.avt";
-import { InventaireUpdateController } from "../../../../generated/app/Http/Controllers/Inventaire/Update/Controller.lib.avt";
-import { ModalInventaireUpdate } from "../../../MaterielDetailsPage/components/ModalInventaireUpdate/ModalInventaireUpdate.wcl.avt";
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import { ModalHistorique } from "../../../MaterielDetailsPage/components/ModalHistorique/ModalHistorique.wcl.avt";
+import { ModalInventaireAchat } from "../../../MaterielDetailsPage/components/ModalInventaireAchat/ModalInventaireAchat.wcl.avt";
+import { EquipeDetailsPage } from "../../EquipeDetailsPage.wcl.avt";
+import { ModalInventaireMouvement } from "../../../MaterielDetailsPage/components/ModalInventaireMouvement/ModalInventaireMouvement.wcl.avt";
+import { ModalInventairePerte } from "../../../MaterielDetailsPage/components/ModalInventairePerte/ModalInventairePerte.wcl.avt";
 
 export class InventaireEquipeListItem extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -20,7 +20,11 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
 
     //#region variables
     @Injectable()
-    @Watch()
+    @Watch((target: InventaireEquipeListItem, action: Aventus.WatchAction, path: string, value: any) => {
+        if(target.inventaire.quantite == 0) {
+            target.style.display = "none";
+        }
+    })
     public inventaire!: Inventaire;
 
     @Injectable()
@@ -34,9 +38,58 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
 
 
     //#region methods
+    /**
+     * 
+     */
+    protected async achat() {
+        const modal = new ModalInventaireAchat();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if(result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result);
+        }
+    }
+    /**
+     * 
+     */
+    protected async perte() {
+        const modal = new ModalInventairePerte();
+        modal.variation = this.inventaire.materiel;
+        modal.equipe = this.equipe;
+        modal.nb = 0;
+        const result = await modal.show();
+        if(result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result);
+        }
+    }
+    protected async transfert() {
+        const modal = new ModalInventaireMouvement();
+        modal.variation = this.inventaire.materiel;
+        if(!this.equipe.stock) {
+            modal.equipeEntree = this.equipe;
+        }
+        modal.nb = 0;
+        const result = await modal.show();
+        if(result) {
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result[0]);
+            this.findParentByType(EquipeDetailsPage)?.updateInventaire(result[1]);
+        }
+    }
+
+    /**
+   * 
+   */
+    protected async historique() {
+        const modal = new ModalHistorique();
+        modal.equipe = this.equipe;
+        modal.variation = this.inventaire.materiel;
+        await modal.show();
+    }
     protected getLastUpdate() {
-        if(this.inventaire.last_update) {
-            return this.inventaire.last_update_by + ", le " + this.inventaire.last_update.toLocaleDateString(undefined, {
+        if(this.inventaire.date) {
+            return this.inventaire.par + ", le " + this.inventaire.date.toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "short",
                 day: "2-digit",
@@ -54,48 +107,12 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
         return "/img/default_img.svg";
     }
 
-    /**
-     * 
-     */
-    protected async edit() {
-        const modal = new ModalInventaireUpdate();
-        modal.variation = this.inventaire.variation;
-        modal.equipe = this.equipe;
-        modal.materiel = this.inventaire.materiel;
-        modal.nb = this.inventaire.quantite;
-        const result = await modal.show();
-        if(result) {
-            const save = await Process.execute(new InventaireUpdateController().request({
-                id: this.inventaire.id,
-                id_equipe: this.equipe.id,
-                id_materiel: this.inventaire.materiel.id,
-                id_variation: this.inventaire.variation?.id,
-                quantite: result
-            }));
-            if(save) {
-                this.inventaire.id = save.id;
-                this.inventaire.last_update_by = save.last_update_by;
-                this.inventaire.last_update = save.last_update;
-                this.inventaire.quantite = save.quantite;
-                Toast.add({
-                    message: "Inventaire enregistré",
-                    color: "success",
-                    closable: true
-                });
-            }
+    protected getVariations(): string {
+        const names: string[] = [];
+        for(let group of this.inventaire.materiel.groups) {
+            names.push(group.variation.nom);
         }
-
-    }
-    /**
-    * 
-    */
-     protected async historique() {
-        const modal = new ModalHistorique();
-        modal.materiel = this.inventaire.materiel;
-        modal.equipe = this.equipe;
-        modal.variation = this.inventaire.variation;
-        await modal.show();
-
+        return names.join(" ");
     }
 
     //#endregion

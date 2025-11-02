@@ -15,7 +15,7 @@ class Controller
     public function request(Request $request): array
     {
         return Response::collection(
-            Inventaire::with(['materiel', 'variation'])->where('id_equipe', $request->id_equipe)->get()
+            Inventaire::with(['materiel', 'materiel'])->where('id_equipe', $request->id_equipe)->get()
         );
     }
 }

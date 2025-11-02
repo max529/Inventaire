@@ -1,0 +1,15 @@
+namespace App.Http.Controllers.Inventaire.Historique {
+
+	@Convertible()
+	export class HistoriqueInfo {
+		public static get Fullname(): string { return "App.Http.Controllers.Inventaire.Historique.HistoriqueInfo"; }
+		public type!: string;
+		public id_materiel_variation!: number;
+		public par!: string;
+		public date!: Date;
+		public equipe_entree!: string;
+		public equipe_sortie?: string = undefined;
+		public quantite!: number;
+	}
+
+}

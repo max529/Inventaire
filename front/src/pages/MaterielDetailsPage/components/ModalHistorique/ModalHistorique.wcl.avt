@@ -1,12 +1,10 @@
 import { Process } from "Aventus@UI:Aventus.package.avt";
 import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
 import { InventaireHistoriqueController } from "../../../../generated/app/Http/Controllers/Inventaire/Historique/Controller.lib.avt";
-import { InventaireHistorique } from "../../../../generated/app/Models/InventaireHistorique.lib.avt";
 import type { MaterielResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
-import type { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
-import type { MaterielVariation } from "../../../../generated/app/Models/MaterielVariation.lib.avt";
 import type { MaterielVariationResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
+import type { HistoriqueInfo } from "../../../../generated/app/Http/Controllers/Inventaire/Historique/HistoriqueInfo.lib.avt";
 
 export class ModalHistorique extends Modal<void> implements Aventus.DefaultComponent {
 
@@ -22,8 +20,6 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
 
     //#region variables
     @Signal()
-    public materiel!: MaterielResource;
-    @Signal()
     public equipe!: EquipeResource;
     @Signal()
     public variation!: MaterielVariationResource;
@@ -34,10 +30,11 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
     private canLoadMore: boolean = true;
 
     @Watch()
-    private historiques: InventaireHistorique[] = [];
+    private historiques: HistoriqueInfo[] = [];
 
     @ViewElement()
     protected scrollEl!: Aventus.Layout.Scrollable;
+
     //#endregion
 
 
@@ -76,15 +73,13 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
         if(data) {
             this.page = page;
             if(this.page == 0) {
-                this.historiques = data.historique;
+                this.historiques = data.historiques;
             }
             else {
-                this.historiques.splice(this.historiques.length - 1, 0, ...data.historique);
+                this.historiques.splice(this.historiques.length, 0, ...data.historiques);
             }
 
-            if(data.historique.length < 20) {
-                this.canLoadMore = false;
-            }
+            this.canLoadMore = data.historiques.length == 20;
         }
         else {
             this.reject();
@@ -92,8 +87,52 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
         this.isLoading = false;
     }
 
-    protected getLastUpdate(inventaire: InventaireHistorique) {
-        return inventaire.last_update.toLocaleDateString(undefined, {
+    protected getTxt(historique: HistoriqueInfo) {
+        let txt = "";
+        if(historique.type == "achat") {
+            txt = "<div class=\"info\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            if(historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        else  if(historique.type == "perte") {
+            txt = "<div class=\"info\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            if(historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        else {
+            if(!historique.equipe_sortie) return "";
+            txt = "<div class=\"info\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
+            if(historique.equipe_sortie == this.equipe.nom) {
+                txt += "<span class=\"sortie current\">" + historique.equipe_sortie + "</span> vers ";
+            }
+            else {
+                txt += "<span class=\"sortie\">" + historique.equipe_sortie + "</span> vers ";
+            }
+
+            if(historique.equipe_entree == this.equipe.nom) {
+                txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
+            }
+            else {
+                txt += "<span class=\"entree\">" + historique.equipe_entree + "</span>";
+            }
+            txt += "</div>";
+        }
+        txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
+        return txt;
+    }
+
+    protected getLastUpdate(historique: HistoriqueInfo) {
+        return historique.date.toLocaleDateString(undefined, {
             year: "numeric",
             month: "long",
             day: "2-digit",

@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Inventaire\Achat;
+namespace App\Http\Controllers\Inventaire\Perte;
 
 use App\Http\Middlewares\Transaction;
 use App\Models\Achat;
 use App\Models\Inventaire;
+use App\Models\Perte;
 use App\Models\User;
 use Aventus\Laraventus\Attributes\Rename;
 use Carbon\Carbon;
+use Exception;
 
-#[Rename("InventaireAchatController")]
+#[Rename("InventairePerteController")]
 class Controller
 {
     #[Transaction]
@@ -19,23 +21,17 @@ class Controller
         $by = User::$current->prenom . ' ' . User::$current->nom;
         /** @var ?Inventaire $inventaire */
         $inventaire = Inventaire::where('id_materiel_variation', $request->id_materiel_variation)->where('id_equipe', $request->id_equipe)->first();
-        if ($inventaire != null) {
-            $inventaire->update([
-                "quantite" => $inventaire->quantite + $request->quantite,
-                "date" => $now,
-                "par" => $by
-            ]);
-        } else {
-            $inventaire = $request->toModel(Inventaire::class);
-            $inventaire->id_equipe = $request->id_equipe;
-            $inventaire->id_materiel_variation = $request->id_materiel_variation;
-            $inventaire->quantite = $request->quantite;
-            $inventaire->date = $now;
-            $inventaire->par = $by;
-            $inventaire->save();
+        if ($inventaire == null || $inventaire->quantite < $request->quantite) {
+            throw new Exception("Stock insuffisant");
         }
+        $inventaire->update([
+            "quantite" => $inventaire->quantite - $request->quantite,
+            "date" => $now,
+            "par" => $by
+        ]);
 
-        $achat = new Achat();
+
+        $achat = new Perte();
         $achat->id_materiel_variation = $inventaire->id_materiel_variation;
         $achat->id_equipe = $inventaire->id_equipe;
         $achat->quantite = $inventaire->quantite;

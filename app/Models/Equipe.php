@@ -8,7 +8,7 @@ use Aventus\Laraventus\Models\AventusModel;
 /**
  * @property int $id
  * @property string $nom
- * @property bool $favori
+ * @property bool $stock
  */
 class Equipe extends AventusModel
 {
@@ -16,10 +16,10 @@ class Equipe extends AventusModel
     protected $fillable = [
         "id",
         "nom",
-        "favori"
+        "stock"
     ];
 
     protected $casts = [
-        "favori" => ToBoolCast::class
+        "stock" => ToBoolCast::class
     ];
 }
