@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('prenom');
             $table->string('nom_utilisateur');
             $table->string('mot_passe');
-            $table->foreignId('id_role')->nullable()->constrained('roles')->nullOnDelete();
+            $table->foreignId('id_role')->constrained('roles');
         });
 
         Schema::create("materiels", function (Blueprint $table) {
@@ -130,6 +130,10 @@ return new class extends Migration
         $admin = new Role();
         $admin->nom = "Admin";
         $admin->save();
+
+        $user = new Role();
+        $user->nom = "User";
+        $user->save();
 
         $user = new User();
         $user->nom = "Bonnaz";

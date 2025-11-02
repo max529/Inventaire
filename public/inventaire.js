@@ -12354,9 +12354,10 @@ App.Http.Controllers.User.UserResource=class UserResource extends Aventus.Data {
     nom;
     prenom;
     nom_utilisateur;
+    id_role;
 }
 App.Http.Controllers.User.UserResource.Namespace=`Inventaire.App.Http.Controllers.User`;
-App.Http.Controllers.User.UserResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string"};
+App.Http.Controllers.User.UserResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","prenom":"string","nom_utilisateur":"string","id_role":"number"};
 Aventus.Converter.register(App.Http.Controllers.User.UserResource.Fullname, App.Http.Controllers.User.UserResource);
 __as1(_.App.Http.Controllers.User, 'UserResource', App.Http.Controllers.User.UserResource);
 
@@ -12365,6 +12366,7 @@ App.Http.Controllers.User.UserRequest=class UserRequest {
     nom;
     prenom;
     nom_utilisateur;
+    id_role;
     mot_passe = undefined;
 }
 App.Http.Controllers.User.UserRequest.Namespace=`Inventaire.App.Http.Controllers.User`;
@@ -18538,11 +18540,12 @@ if(!window.customElements.get('av-materiel-details-page')){window.customElements
 
 const UserEditModal = class UserEditModal extends Modal {
     form;
-    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}@media screen and (max-width: 539px){:host{--col-gap: 0px}}`;
+    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input,:host av-select{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center}@media screen and (max-width: 539px){:host{--col-gap: 0px}}`;
     constructor() {
         super();
         this.form = Aventus.Form.Form.create({
             id: {},
+            id_role: {},
             nom: new Aventus.Form.Validators.Required("Le nom est requis"),
             prenom: new Aventus.Form.Validators.Required("Le prénom est requis"),
             nom_utilisateur: new Aventus.Form.Validators.Required("Le nom d'utilisateur est requis"),
@@ -18571,9 +18574,12 @@ const UserEditModal = class UserEditModal extends Modal {
     <av-col size="12" size_sm="6" use_container="false">
         <av-input label="Prénom" _id="usereditmodal_2"></av-input>
     </av-col>
-</av-row><av-input label="Nom d'utilisateur" _id="usereditmodal_3"></av-input><av-input label="Mot de passe" _id="usereditmodal_4"></av-input><div class="actions">
-    <av-button _id="usereditmodal_5">Annuler</av-button>
-    <av-button color="primary" _id="usereditmodal_6">Enregistrer</av-button>
+</av-row><av-select label="Rôle" _id="usereditmodal_3">
+    <av-option value="1">Administrateur</av-option>
+    <av-option value="2">Utilisateur</av-option>
+</av-select><av-input label="Nom d'utilisateur" _id="usereditmodal_4"></av-input><av-input label="Mot de passe" type="password" _id="usereditmodal_5"></av-input><div class="actions">
+    <av-button _id="usereditmodal_6">Annuler</av-button>
+    <av-button color="primary" _id="usereditmodal_7">Enregistrer</av-button>
 </div>` }
     });
 }
@@ -18608,15 +18614,21 @@ const UserEditModal = class UserEditModal extends Modal {
       "injectionName": "form",
       "inject": (c) => c.comp.__6848f700f8ec2cc23ac7557213854d62method4(),
       "once": true
+    },
+    {
+      "id": "usereditmodal_5",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__6848f700f8ec2cc23ac7557213854d62method5(),
+      "once": true
     }
   ],
   "pressEvents": [
     {
-      "id": "usereditmodal_5",
+      "id": "usereditmodal_6",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     },
     {
-      "id": "usereditmodal_6",
+      "id": "usereditmodal_7",
       "onPress": (e, pressInstance, c) => { c.comp.submit(e, pressInstance); }
     }
   ]
@@ -18643,9 +18655,12 @@ const UserEditModal = class UserEditModal extends Modal {
         return this.form.parts.prenom;
     }
     __6848f700f8ec2cc23ac7557213854d62method3() {
-        return this.form.parts.nom_utilisateur;
+        return this.form.parts.id_role;
     }
     __6848f700f8ec2cc23ac7557213854d62method4() {
+        return this.form.parts.nom_utilisateur;
+    }
+    __6848f700f8ec2cc23ac7557213854d62method5() {
         return this.form.parts.mot_passe;
     }
     static async open(item) {

@@ -43,6 +43,7 @@ export class UserEditModal extends Modal<UserResource> implements Aventus.Defaul
         super();
         this.form = Form.create<UserRequest>({
             id: {},
+            id_role: {},
             nom: new Required("Le nom est requis"),
             prenom: new Required("Le prénom est requis"),
             nom_utilisateur: new Required("Le nom d'utilisateur est requis"),

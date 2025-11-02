@@ -7,8 +7,12 @@
         <av-input label="Prénom" :form="this.form.parts.prenom"></av-input>
     </av-col>
 </av-row>
+<av-select :form="this.form.parts.id_role" label="Rôle">
+    <av-option value="1">Administrateur</av-option>
+    <av-option value="2">Utilisateur</av-option>
+</av-select>
 <av-input label="Nom d'utilisateur" :form="this.form.parts.nom_utilisateur"></av-input>
-<av-input label="Mot de passe" :form="this.form.parts.mot_passe"></av-input>
+<av-input label="Mot de passe" type="password" :form="this.form.parts.mot_passe"></av-input>
 <div class="actions">
     <av-button @press="reject">Annuler</av-button>
     <av-button color="primary" @press="submit">Enregistrer</av-button>

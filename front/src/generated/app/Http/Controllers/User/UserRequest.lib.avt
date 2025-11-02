@@ -5,6 +5,7 @@ namespace App.Http.Controllers.User {
 		public nom!: string;
 		public prenom!: string;
 		public nom_utilisateur!: string;
+		public id_role!: number;
 		public mot_passe?: string = undefined;
 	}
 

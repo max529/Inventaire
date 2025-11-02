@@ -6,7 +6,8 @@
 		margin-bottom: 16px;
 	}
 
-	av-input {
+	av-input,
+	av-select {
 		margin-bottom: 12px;
 	}
 

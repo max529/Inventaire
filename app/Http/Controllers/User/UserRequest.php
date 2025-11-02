@@ -10,5 +10,6 @@ class UserRequest extends AventusRequest
     public string $nom;
     public string $prenom;
     public string $nom_utilisateur;
+    public int $id_role;
     public ?string $mot_passe;
 }
