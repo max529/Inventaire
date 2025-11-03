@@ -1,3 +1,5 @@
+import { ResultWithError, type RamItem } from "Aventus@Main:Aventus.package.avt";
+import { MaterielDuplicateController } from "../generated/app/Http/Controllers/Materiel/Duplicate/Controller.lib.avt";
 import { MaterielController } from "../generated/app/Http/Controllers/Materiel/MaterielController.lib.avt";
 import type { MaterielResource } from "../generated/app/Http/Controllers/Materiel/MaterielResource.lib.avt";
 
@@ -9,7 +11,7 @@ export class MaterielRAM extends AventusPhp.RamHttp<MaterielController> implemen
     public override defineRoutes(): MaterielController {
         return new MaterielController();
     }
-   
+
 
     /**
      * Create a singleton to store data
@@ -24,5 +26,15 @@ export class MaterielRAM extends AventusPhp.RamHttp<MaterielController> implemen
     public override defineIndexKey(): keyof MaterielResource {
         return 'id';
     }
-    
+
+    public async duplicate(id_materiel: number): Promise<ResultWithError<MaterielResource>> {
+        const result = await new MaterielDuplicateController().request({ id_materiel });
+
+        if(result.result) {
+            const temp: ResultWithError<RamItem<MaterielResource>> = new ResultWithError();
+            this.addOrUpdateData(result.result, temp);
+        }
+        return result;
+    }
+
 }

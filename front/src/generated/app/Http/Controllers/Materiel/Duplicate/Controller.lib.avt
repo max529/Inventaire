@@ -1,0 +1,15 @@
+import { Request } from './Request.lib.avt';
+import { MaterielResource } from '../MaterielResource.lib.avt';
+
+namespace App.Http.Controllers.Materiel.Duplicate {
+
+	export class MaterielDuplicateController extends Aventus.HttpRoute {
+		@BindThis()
+		public async request(body: Request): Promise<Aventus.ResultWithError<MaterielResource>> {
+			const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/duplicate`, Aventus.HttpMethod.POST);
+			request.setBody(body);
+			return await request.queryJSON<MaterielResource>(this.router);
+		}
+	}
+
+}

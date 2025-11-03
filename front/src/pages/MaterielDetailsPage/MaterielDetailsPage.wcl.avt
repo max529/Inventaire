@@ -19,6 +19,7 @@ import type { EquipeResource } from "../../generated/app/Http/Controllers/Equipe
 import type { MaterielVariation } from "../../generated/app/Models/MaterielVariation.lib.avt";
 import { MaterielVariationResource } from "../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 import type { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
+import { MaterielDuplicateController } from "../../generated/app/Http/Controllers/Materiel/Duplicate/Controller.lib.avt";
 
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
@@ -168,7 +169,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 inv.date = inventaire.date;
                 needSearch = inv.quantite == 0 || inventaire.quantite == 0;
                 inv.quantite = inventaire.quantite;
-                inv.id = inventaire.id
+                inv.id = inventaire.id;
                 break;
             }
         }
@@ -262,6 +263,15 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             else {
                 item.style.display = "none";
             }
+        }
+    }
+
+    protected async duplicate() {
+        let id = this.form.item.id;
+        if(!id) return;
+        let clone = await Process.execute(MaterielRAM.getInstance().duplicate(id));
+        if(clone) {
+            this.router?.navigate('/materiel/' + clone.id);
         }
     }
 

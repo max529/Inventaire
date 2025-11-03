@@ -28,18 +28,6 @@ $size-breakpoints: (
 	"xxl": 1360,
 );
 
-$colors: (
-	'primary',
-	'secondary',
-	'green',
-	'success',
-	'red',
-	'error',
-	'orange',
-	'warning',
-	'blue',
-	'information'
-);
 
 @mixin tablet {
 	@media screen and (max-width:$tablet-breakpoint) {

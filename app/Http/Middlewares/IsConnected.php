@@ -17,7 +17,6 @@ class IsConnected
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Console::log("IsConnected");
         if (session("user") == null) {
             return redirect('/login');
         }

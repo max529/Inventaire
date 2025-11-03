@@ -12226,20 +12226,22 @@ App.Http = {};
 _.App.Http = Inventaire.App?.Http ?? {};
 App.Http.Controllers = {};
 _.App.Http.Controllers = Inventaire.App?.Http?.Controllers ?? {};
-App.Http.Controllers.Inventaire = {};
-_.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
-App.Http.Controllers.Inventaire.Perte = {};
-_.App.Http.Controllers.Inventaire.Perte = Inventaire.App?.Http?.Controllers?.Inventaire?.Perte ?? {};
+App.Http.Controllers.Materiel = {};
+_.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
+App.Http.Controllers.Materiel.Duplicate = {};
+_.App.Http.Controllers.Materiel.Duplicate = Inventaire.App?.Http?.Controllers?.Materiel?.Duplicate ?? {};
 App.Models = {};
 _.App.Models = Inventaire.App?.Models ?? {};
 App.Http.Controllers.VariationGroupeTemplate = {};
 _.App.Http.Controllers.VariationGroupeTemplate = Inventaire.App?.Http?.Controllers?.VariationGroupeTemplate ?? {};
 App.Http.Controllers.User = {};
 _.App.Http.Controllers.User = Inventaire.App?.Http?.Controllers?.User ?? {};
-App.Http.Controllers.Materiel = {};
-_.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
 App.Http.Controllers.Materiel.GetInventaire = {};
 _.App.Http.Controllers.Materiel.GetInventaire = Inventaire.App?.Http?.Controllers?.Materiel?.GetInventaire ?? {};
+App.Http.Controllers.Inventaire = {};
+_.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
+App.Http.Controllers.Inventaire.Perte = {};
+_.App.Http.Controllers.Inventaire.Perte = Inventaire.App?.Http?.Controllers?.Inventaire?.Perte ?? {};
 App.Http.Controllers.Inventaire.Mouvement = {};
 _.App.Http.Controllers.Inventaire.Mouvement = Inventaire.App?.Http?.Controllers?.Inventaire?.Mouvement ?? {};
 App.Http.Controllers.Inventaire.Historique = {};
@@ -12261,13 +12263,11 @@ _.App.Enum = Inventaire.App?.Enum ?? {};
 App.Http.Controllers.Auth.Logout = {};
 _.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
-App.Http.Controllers.Inventaire.Perte.Request=class Request {
-    quantite;
-    id_materiel_variation;
-    id_equipe;
+App.Http.Controllers.Materiel.Duplicate.Request=class Request {
+    id_materiel;
 }
-App.Http.Controllers.Inventaire.Perte.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
-__as1(_.App.Http.Controllers.Inventaire.Perte, 'Request', App.Http.Controllers.Inventaire.Perte.Request);
+App.Http.Controllers.Materiel.Duplicate.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
+__as1(_.App.Http.Controllers.Materiel.Duplicate, 'Request', App.Http.Controllers.Materiel.Duplicate.Request);
 
 let StringTools=class StringTools {
     static removeAccents(value) {
@@ -12386,6 +12386,14 @@ App.Http.Controllers.Materiel.GetInventaire.Request=class Request {
 }
 App.Http.Controllers.Materiel.GetInventaire.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
 __as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Controllers.Materiel.GetInventaire.Request);
+
+App.Http.Controllers.Inventaire.Perte.Request=class Request {
+    quantite;
+    id_materiel_variation;
+    id_equipe;
+}
+App.Http.Controllers.Inventaire.Perte.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
+__as1(_.App.Http.Controllers.Inventaire.Perte, 'Request', App.Http.Controllers.Inventaire.Perte.Request);
 
 App.Http.Controllers.Inventaire.Mouvement.Request=class Request {
     quantite;
@@ -13964,7 +13972,7 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
         target.tooltip.delay_touch = target.delay_touch;
     }
 })); }
-    static __style = `:host{border-radius:4px;color:var(--color-base-content);cursor:pointer;font-size:var(--font-size-md);padding:3px;position:relative;transition:background-color var(--transition-duration) var(--bezier)}:host .hidden{display:none}:host([color=primary]){background-color:rgba(0,0,0,0);color:var(--color-primary)}:host([color=secondary]){background-color:rgba(0,0,0,0);color:var(--color-secondary)}:host([color=green]){background-color:rgba(0,0,0,0);color:var(--color-green)}:host([color=success]){background-color:rgba(0,0,0,0);color:var(--color-success)}:host([color=red]){background-color:rgba(0,0,0,0);color:var(--color-red)}:host([color=error]){background-color:rgba(0,0,0,0);color:var(--color-error)}:host([color=orange]){background-color:rgba(0,0,0,0);color:var(--color-orange)}:host([color=warning]){background-color:rgba(0,0,0,0);color:var(--color-warning)}:host([color=blue]){background-color:rgba(0,0,0,0);color:var(--color-blue)}:host([color=information]){background-color:rgba(0,0,0,0);color:var(--color-information)}@media screen and (min-width: 1225px){:host([color=primary]:hover){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]:hover){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]:hover){background-color:var(--color-green);color:var(--color-green-content)}:host([color=success]:hover){background-color:var(--color-success);color:var(--color-success-content)}:host([color=red]:hover){background-color:var(--color-red);color:var(--color-red-content)}:host([color=error]:hover){background-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]:hover){background-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]:hover){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]:hover){background-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]:hover){background-color:var(--color-information);color:var(--color-information-content)}}`;
+    static __style = `:host{border-radius:4px;color:var(--color-base-content);cursor:pointer;font-size:var(--font-size-md);padding:3px;position:relative;transition:background-color var(--transition-duration) var(--bezier)}:host .hidden{display:none}:host([color=neutral]){background-color:rgba(0,0,0,0);color:var(--color-neutral)}:host([color=primary]){background-color:rgba(0,0,0,0);color:var(--color-primary)}:host([color=secondary]){background-color:rgba(0,0,0,0);color:var(--color-secondary)}:host([color=accent]){background-color:rgba(0,0,0,0);color:var(--color-accent)}:host([color=info]){background-color:rgba(0,0,0,0);color:var(--color-info)}:host([color=success]){background-color:rgba(0,0,0,0);color:var(--color-success)}:host([color=warning]){background-color:rgba(0,0,0,0);color:var(--color-warning)}:host([color=error]){background-color:rgba(0,0,0,0);color:var(--color-error)}@media screen and (min-width: 1225px){:host([color=neutral]:hover){background-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]:hover){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]:hover){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]:hover){background-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]:hover){background-color:var(--color-info);color:var(--color-info-content)}:host([color=success]:hover){background-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]:hover){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]:hover){background-color:var(--color-error);color:var(--color-error-content)}}`;
     __getStatic() {
         return IconAction;
     }
@@ -15719,154 +15727,6 @@ App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schem
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
-const ModalInventaireUpdate = class ModalInventaireUpdate extends Modal {
-    get 'materiel'() {
-						return this.__signals["materiel"].value;
-					}
-					set 'materiel'(val) {
-						this.__signals["materiel"].value = val;
-					}get 'variation'() {
-						return this.__signals["variation"].value;
-					}
-					set 'variation'(val) {
-						this.__signals["variation"].value = val;
-					}get 'equipe'() {
-						return this.__signals["equipe"].value;
-					}
-					set 'equipe'(val) {
-						this.__signals["equipe"].value = val;
-					}get 'nb'() {
-						return this.__signals["nb"].value;
-					}
-					set 'nb'(val) {
-						this.__signals["nb"].value = val;
-					}    __registerSignalsActions() { this.__signals["materiel"] = null;this.__signals["variation"] = null;this.__signals["equipe"] = null;this.__signals["nb"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
-    __getStatic() {
-        return ModalInventaireUpdate;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalInventaireUpdate.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireupdate_0"></div><av-input type="number" label="Quantité" _id="modalinventaireupdate_1"></av-input><div class="footer">
-    <av-button _id="modalinventaireupdate_2">Annuler</av-button>
-    <av-button color="primary" _id="modalinventaireupdate_3">Enregistrer</av-button>
-</div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "inputEl",
-      "ids": [
-        "modalinventaireupdate_1"
-      ]
-    }
-  ],
-  "content": {
-    "modalinventaireupdate_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__b1342dd6d9991aa98e016ec58cde09f1method0())}`,
-      "once": true
-    }
-  },
-  "bindings": [
-    {
-      "id": "modalinventaireupdate_1",
-      "injectionName": "value",
-      "eventNames": [
-        "onChange"
-      ],
-      "inject": (c) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method1(),
-      "extract": (c, v) => c.comp.__b1342dd6d9991aa98e016ec58cde09f1method2(v),
-      "once": true,
-      "isCallback": true
-    }
-  ],
-  "events": [
-    {
-      "eventName": "focus",
-      "id": "modalinventaireupdate_1",
-      "fct": (e, c) => c.comp.select(e)
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "modalinventaireupdate_2",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "modalinventaireupdate_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalInventaireUpdate";
-    }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["materiel"] = undefined;s["variation"] = undefined;s["equipe"] = undefined;s["nb"] = 0; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('materiel');this.__correctGetter('variation');this.__correctGetter('equipe');this.__correctGetter('nb'); }
-    configure() {
-        return {
-            title: "Mise à jour de l'inventaire"
-        };
-    }
-    save() {
-        if (typeof this.nb == 'number') {
-            this.resolve(this.nb);
-        }
-        else {
-            const nbTxt = this.nb;
-            if (nbTxt.trim() == '') {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            const nb2 = Number(nbTxt);
-            if (isNaN(nb2)) {
-                this.inputEl.errors = ["Merci de saisir un nombre"];
-                return;
-            }
-            this.resolve(nb2);
-        }
-    }
-    select() {
-        this.inputEl.select();
-    }
-    getTitle() {
-        return `Mise à jour de ${this.materiel.nom} ${this.getVariations()} pour ${this.equipe.nom}`;
-    }
-    getVariations() {
-        const names = [];
-        for (let group of this.variation.groups) {
-            names.push(group.variation.nom);
-        }
-        return names.join(" ");
-    }
-    postCreation() {
-        super.postCreation();
-        this.inputEl.focus();
-        this.inputEl.select();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method0() {
-        return this.getTitle();
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method1() {
-        return this.nb;
-    }
-    __b1342dd6d9991aa98e016ec58cde09f1method2(v) {
-        if (this) {
-            this.nb = v;
-        }
-    }
-}
-ModalInventaireUpdate.Namespace=`Inventaire`;
-ModalInventaireUpdate.Tag=`av-modal-inventaire-update`;
-__as1(_, 'ModalInventaireUpdate', ModalInventaireUpdate);
-if(!window.customElements.get('av-modal-inventaire-update')){window.customElements.define('av-modal-inventaire-update', ModalInventaireUpdate);Aventus.WebComponentInstance.registerDefinition(ModalInventaireUpdate);}
-
 const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     get 'visible'() { return this.getBoolAttr('visible') }
     set 'visible'(val) { this.setBoolAttr('visible', val) }    get 'equipes'() {
@@ -16765,412 +16625,6 @@ ModalInventaireMouvement.Tag=`av-modal-inventaire-mouvement`;
 __as1(_, 'ModalInventaireMouvement', ModalInventaireMouvement);
 if(!window.customElements.get('av-modal-inventaire-mouvement')){window.customElements.define('av-modal-inventaire-mouvement', ModalInventaireMouvement);Aventus.WebComponentInstance.registerDefinition(ModalInventaireMouvement);}
 
-App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
-    constructor(router) {
-        super(router);
-        this.request = this.request.bind(this);
-    }
-    async request(body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/inventaire`, Aventus.HttpMethod.POST);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-}
-App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
-__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'MaterielGetInventaireController', App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController);
-
-App.Http.Controllers.Materiel.MaterielController=class MaterielController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Controllers.Materiel.MaterielRequest; }
-    getResource() { return _.App.Http.Controllers.Materiel.MaterielResource; }
-    getUri() { return "data/materiel"; }
-}
-App.Http.Controllers.Materiel.MaterielController.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-__as1(_.App.Http.Controllers.Materiel, 'MaterielController', App.Http.Controllers.Materiel.MaterielController);
-
-let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
-    /**
-     * @inheritdoc
-     */
-    defineRoutes() {
-        return new App.Http.Controllers.Materiel.MaterielController();
-    }
-    /**
-     * Create a singleton to store data
-     */
-    static getInstance() {
-        return Aventus.Instance.get(MaterielRAM);
-    }
-    /**
-     * @inheritdoc
-     */
-    defineIndexKey() {
-        return 'id';
-    }
-}
-MaterielRAM.Namespace=`Inventaire`;
-__as1(_, 'MaterielRAM', MaterielRAM);
-
-App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Controllers.User.UserRequest; }
-    getResource() { return _.App.Http.Controllers.User.UserResource; }
-    getUri() { return "data/user"; }
-}
-App.Http.Controllers.User.UserController.Namespace=`Inventaire.App.Http.Controllers.User`;
-__as1(_.App.Http.Controllers.User, 'UserController', App.Http.Controllers.User.UserController);
-
-let UserRAM=class UserRAM extends AventusPhp.RamHttp {
-    /**
-     * @inheritdoc
-     */
-    defineRoutes() {
-        return new App.Http.Controllers.User.UserController();
-    }
-    /**
-     * Create a singleton to store data
-     */
-    static getInstance() {
-        return Aventus.Instance.get(UserRAM);
-    }
-    /**
-     * @inheritdoc
-     */
-    defineIndexKey() {
-        return 'id';
-    }
-}
-UserRAM.Namespace=`Inventaire`;
-__as1(_, 'UserRAM', UserRAM);
-
-App.Models.VariationGroupeTemplate=class VariationGroupeTemplate extends Aventus.Data {
-    static get Fullname() { return "App.Models.VariationGroupeTemplate"; }
-    id;
-    nom;
-    variations;
-}
-App.Models.VariationGroupeTemplate.Namespace=`Inventaire.App.Models`;
-App.Models.VariationGroupeTemplate.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","variations":"Inventaire.App.Models.VariationTemplate[]"};
-Aventus.Converter.register(App.Models.VariationGroupeTemplate.Fullname, App.Models.VariationGroupeTemplate);
-__as1(_.App.Models, 'VariationGroupeTemplate', App.Models.VariationGroupeTemplate);
-
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest=class VariationGroupeTemplateRequest {
-    variations;
-    id = undefined;
-    nom;
-}
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
-__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateRequest', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest);
-
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource=class VariationGroupeTemplateResource extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource"; }
-    variations;
-    id;
-    nom;
-}
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource[]","id":"number","nom":"string"};
-Aventus.Converter.register(App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Fullname, App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
-__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateResource', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
-
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController=class VariationGroupeTemplateController extends AventusPhp.ModelController {
-    getRequest() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest; }
-    getResource() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource; }
-    getUri() { return "data/variation_groupe_template"; }
-}
-App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
-__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateController', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController);
-
-let VariationGroupeTemplateRAM=class VariationGroupeTemplateRAM extends AventusPhp.RamHttp {
-    /**
-     * @inheritdoc
-     */
-    defineIndexKey() {
-        return 'id';
-    }
-    /**
-     * @inheritdoc
-     */
-    defineRoutes() {
-        return new App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController();
-    }
-    /**
-     * Create a singleton to store data
-     */
-    static getInstance() {
-        return Aventus.Instance.get(VariationGroupeTemplateRAM);
-    }
-}
-VariationGroupeTemplateRAM.Namespace=`Inventaire`;
-__as1(_, 'VariationGroupeTemplateRAM', VariationGroupeTemplateRAM);
-
-const VariationGroupeTemplateSelect = class VariationGroupeTemplateSelect extends SelectData {
-    static __style = ``;
-    __getStatic() {
-        return VariationGroupeTemplateSelect;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(VariationGroupeTemplateSelect.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot>` }
-    });
-}
-    getClassName() {
-        return "VariationGroupeTemplateSelect";
-    }
-    defineRam() {
-        return VariationGroupeTemplateRAM.getInstance();
-    }
-    optionText(item) {
-        return item.nom;
-    }
-    optionValue(item) {
-        return item;
-    }
-}
-VariationGroupeTemplateSelect.Namespace=`Inventaire`;
-VariationGroupeTemplateSelect.Tag=`av-variation-groupe-template-select`;
-__as1(_, 'VariationGroupeTemplateSelect', VariationGroupeTemplateSelect);
-if(!window.customElements.get('av-variation-groupe-template-select')){window.customElements.define('av-variation-groupe-template-select', VariationGroupeTemplateSelect);Aventus.WebComponentInstance.registerDefinition(VariationGroupeTemplateSelect);}
-
-const EquipeEditModal = class EquipeEditModal extends Modal {
-    form;
-    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center;margin-top:12px}`;
-    constructor() {
-        super();
-        this.form = Aventus.Form.Form.create({
-            nom: new Aventus.Form.Validators.Required("Le nom est requis"),
-            stock: {}
-        });
-    }
-    __getStatic() {
-        return EquipeEditModal;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipeEditModal.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div>
-    <span>Est un stock ?</span>
-    <av-toggle _id="equipeeditmodal_2"></av-toggle>
-</div><div class="actions">
-    <av-button _id="equipeeditmodal_3">Annuler</av-button>
-    <av-button color="primary" _id="equipeeditmodal_4">Enregistrer</av-button>
-</div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "content": {
-    "equipeeditmodal_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__96d74d247ad5518bea626dc8edc60f69method0())}`,
-      "once": true
-    }
-  },
-  "injection": [
-    {
-      "id": "equipeeditmodal_1",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__96d74d247ad5518bea626dc8edc60f69method1(),
-      "once": true
-    },
-    {
-      "id": "equipeeditmodal_2",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__96d74d247ad5518bea626dc8edc60f69method2(),
-      "once": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "equipeeditmodal_3",
-      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
-    },
-    {
-      "id": "equipeeditmodal_4",
-      "onPress": (e, pressInstance, c) => { c.comp.submit(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "EquipeEditModal";
-    }
-    configure() {
-        return { title: "" };
-    }
-    async submit() {
-        const result = await this.form.submit(EquipeRAM.getInstance().saveWithError);
-        if (result?.result) {
-            this.resolve(result.result);
-        }
-    }
-    __96d74d247ad5518bea626dc8edc60f69method0() {
-        return this.options.title;
-    }
-    __96d74d247ad5518bea626dc8edc60f69method1() {
-        return this.form.parts.nom;
-    }
-    __96d74d247ad5518bea626dc8edc60f69method2() {
-        return this.form.parts.stock;
-    }
-    static async open(item) {
-        const modal = new EquipeEditModal();
-        modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
-        const clone = item ? item.clone() : new App.Http.Controllers.Equipe.EquipeResource();
-        if (!clone.id) {
-            clone.id = 0;
-        }
-        modal.form.item = EquipeRAM.getInstance().toRequest(clone);
-        return await modal.show();
-    }
-}
-EquipeEditModal.Namespace=`Inventaire`;
-EquipeEditModal.Tag=`av-equipe-edit-modal`;
-__as1(_, 'EquipeEditModal', EquipeEditModal);
-if(!window.customElements.get('av-equipe-edit-modal')){window.customElements.define('av-equipe-edit-modal', EquipeEditModal);Aventus.WebComponentInstance.registerDefinition(EquipeEditModal);}
-
-const EquipesPage = class EquipesPage extends PageFull {
-    list = [];
-    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 600px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
-    constructor() {
-        super();
-        this.onNewData = this.onNewData.bind(this);
-        this.onRemoveData = this.onRemoveData.bind(this);
-    }
-    __getStatic() {
-        return EquipesPage;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(EquipesPage.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "searchEl",
-      "ids": [
-        "equipespage_0"
-      ]
-    },
-    {
-      "name": "listEl",
-      "ids": [
-        "equipespage_2"
-      ]
-    }
-  ],
-  "events": [
-    {
-      "eventName": "onChange",
-      "id": "equipespage_0",
-      "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
-      "isCallback": true
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "equipespage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.add(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "EquipesPage";
-    }
-    configure() {
-        return {};
-    }
-    search() {
-        if (this.searchEl.value) {
-            for (let item of this.list) {
-                item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
-            }
-        }
-        else {
-            for (let item of this.list) {
-                item.visible = true;
-            }
-        }
-    }
-    async add() {
-        await EquipeEditModal.open();
-    }
-    async bindData() {
-        let list = await EquipeRAM.getInstance().getList();
-        list.sort((a, b) => {
-            if (a.stock && !b.stock)
-                return -1;
-            if (!a.stock && b.stock)
-                return 1;
-            return a.nom.localeCompare(b.nom);
-        });
-        for (let item of list) {
-            let el = new EquipeItem();
-            el.item = item;
-            el.visible = this.searchEl.value ? StringTools.contains(item.nom, this.searchEl.value) : true;
-            this.listEl.appendChild(el);
-            this.list.push(el);
-        }
-        EquipeRAM.getInstance().onCreated(this.onNewData);
-        EquipeRAM.getInstance().onUpdated(this.onNewData);
-        EquipeRAM.getInstance().onDeleted(this.onRemoveData);
-    }
-    onNewData(newData) {
-        let itemBefore = undefined;
-        for (let item of this.list) {
-            if (itemBefore == null && newData.nom.localeCompare(item.item.nom) < 0) {
-                itemBefore = item;
-            }
-            if (item.item.id == newData.id) {
-                item.item = newData;
-                Aventus.Watcher.trigger("UPDATED", item.item);
-                return;
-            }
-        }
-        let el = new EquipeItem();
-        el.item = newData;
-        el.visible = this.searchEl.value ? StringTools.contains(newData.nom, this.searchEl.value) : true;
-        if (itemBefore) {
-            let index = this.list.indexOf(itemBefore);
-            this.list.splice(index, 0, el);
-            this.listEl.insertBefore(el, itemBefore);
-        }
-        else {
-            this.list.push(el);
-            this.listEl.appendChild(el);
-        }
-    }
-    onRemoveData(App, Models, Equipe) {
-        for (let item of this.list) {
-            if (item.item.id == App.Models.Equipe.id) {
-                item.remove();
-                let index = this.list.indexOf(item);
-                this.list.splice(index, 1);
-                return;
-            }
-        }
-    }
-    postCreation() {
-        super.postCreation();
-        this.bindData();
-    }
-}
-EquipesPage.Namespace=`Inventaire`;
-EquipesPage.Tag=`av-equipes-page`;
-__as1(_, 'EquipesPage', EquipesPage);
-if(!window.customElements.get('av-equipes-page')){window.customElements.define('av-equipes-page', EquipesPage);Aventus.WebComponentInstance.registerDefinition(EquipesPage);}
-
 App.Http.Controllers.Inventaire.Perte.InventairePerteController=class InventairePerteController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -17534,6 +16988,389 @@ InventaireListItem.Namespace=`Inventaire`;
 InventaireListItem.Tag=`av-inventaire-list-item`;
 __as1(_, 'InventaireListItem', InventaireListItem);
 if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
+
+App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/inventaire`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
+__as1(_.App.Http.Controllers.Materiel.GetInventaire, 'MaterielGetInventaireController', App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController);
+
+App.Http.Controllers.Materiel.MaterielController=class MaterielController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.Materiel.MaterielRequest; }
+    getResource() { return _.App.Http.Controllers.Materiel.MaterielResource; }
+    getUri() { return "data/materiel"; }
+}
+App.Http.Controllers.Materiel.MaterielController.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+__as1(_.App.Http.Controllers.Materiel, 'MaterielController', App.Http.Controllers.Materiel.MaterielController);
+
+App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.User.UserRequest; }
+    getResource() { return _.App.Http.Controllers.User.UserResource; }
+    getUri() { return "data/user"; }
+}
+App.Http.Controllers.User.UserController.Namespace=`Inventaire.App.Http.Controllers.User`;
+__as1(_.App.Http.Controllers.User, 'UserController', App.Http.Controllers.User.UserController);
+
+let UserRAM=class UserRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new App.Http.Controllers.User.UserController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(UserRAM);
+    }
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+}
+UserRAM.Namespace=`Inventaire`;
+__as1(_, 'UserRAM', UserRAM);
+
+App.Models.VariationGroupeTemplate=class VariationGroupeTemplate extends Aventus.Data {
+    static get Fullname() { return "App.Models.VariationGroupeTemplate"; }
+    id;
+    nom;
+    variations;
+}
+App.Models.VariationGroupeTemplate.Namespace=`Inventaire.App.Models`;
+App.Models.VariationGroupeTemplate.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","variations":"Inventaire.App.Models.VariationTemplate[]"};
+Aventus.Converter.register(App.Models.VariationGroupeTemplate.Fullname, App.Models.VariationGroupeTemplate);
+__as1(_.App.Models, 'VariationGroupeTemplate', App.Models.VariationGroupeTemplate);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest=class VariationGroupeTemplateRequest {
+    variations;
+    id = undefined;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateRequest', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource=class VariationGroupeTemplateResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource"; }
+    variations;
+    id;
+    nom;
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.VariationGroupeTemplate.VariationTemplateResource[]","id":"number","nom":"string"};
+Aventus.Converter.register(App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource.Fullname, App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateResource', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource);
+
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController=class VariationGroupeTemplateController extends AventusPhp.ModelController {
+    getRequest() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateRequest; }
+    getResource() { return _.App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateResource; }
+    getUri() { return "data/variation_groupe_template"; }
+}
+App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController.Namespace=`Inventaire.App.Http.Controllers.VariationGroupeTemplate`;
+__as1(_.App.Http.Controllers.VariationGroupeTemplate, 'VariationGroupeTemplateController', App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController);
+
+let VariationGroupeTemplateRAM=class VariationGroupeTemplateRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new App.Http.Controllers.VariationGroupeTemplate.VariationGroupeTemplateController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(VariationGroupeTemplateRAM);
+    }
+}
+VariationGroupeTemplateRAM.Namespace=`Inventaire`;
+__as1(_, 'VariationGroupeTemplateRAM', VariationGroupeTemplateRAM);
+
+const VariationGroupeTemplateSelect = class VariationGroupeTemplateSelect extends SelectData {
+    static __style = ``;
+    __getStatic() {
+        return VariationGroupeTemplateSelect;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationGroupeTemplateSelect.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<slot></slot>` }
+    });
+}
+    getClassName() {
+        return "VariationGroupeTemplateSelect";
+    }
+    defineRam() {
+        return VariationGroupeTemplateRAM.getInstance();
+    }
+    optionText(item) {
+        return item.nom;
+    }
+    optionValue(item) {
+        return item;
+    }
+}
+VariationGroupeTemplateSelect.Namespace=`Inventaire`;
+VariationGroupeTemplateSelect.Tag=`av-variation-groupe-template-select`;
+__as1(_, 'VariationGroupeTemplateSelect', VariationGroupeTemplateSelect);
+if(!window.customElements.get('av-variation-groupe-template-select')){window.customElements.define('av-variation-groupe-template-select', VariationGroupeTemplateSelect);Aventus.WebComponentInstance.registerDefinition(VariationGroupeTemplateSelect);}
+
+const EquipeEditModal = class EquipeEditModal extends Modal {
+    form;
+    static __style = `:host{--col-gap: 12px}:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host av-input{margin-bottom:12px}:host .actions{display:flex;gap:8px;justify-content:center;margin-top:12px}`;
+    constructor() {
+        super();
+        this.form = Aventus.Form.Form.create({
+            nom: new Aventus.Form.Validators.Required("Le nom est requis"),
+            stock: {}
+        });
+    }
+    __getStatic() {
+        return EquipeEditModal;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipeEditModal.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="title" _id="equipeeditmodal_0"></div><av-input label="Nom" _id="equipeeditmodal_1"></av-input><div>
+    <span>Est un stock ?</span>
+    <av-toggle _id="equipeeditmodal_2"></av-toggle>
+</div><div class="actions">
+    <av-button _id="equipeeditmodal_3">Annuler</av-button>
+    <av-button color="primary" _id="equipeeditmodal_4">Enregistrer</av-button>
+</div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "content": {
+    "equipeeditmodal_0°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__96d74d247ad5518bea626dc8edc60f69method0())}`,
+      "once": true
+    }
+  },
+  "injection": [
+    {
+      "id": "equipeeditmodal_1",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__96d74d247ad5518bea626dc8edc60f69method1(),
+      "once": true
+    },
+    {
+      "id": "equipeeditmodal_2",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__96d74d247ad5518bea626dc8edc60f69method2(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "equipeeditmodal_3",
+      "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
+    },
+    {
+      "id": "equipeeditmodal_4",
+      "onPress": (e, pressInstance, c) => { c.comp.submit(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipeEditModal";
+    }
+    configure() {
+        return { title: "" };
+    }
+    async submit() {
+        const result = await this.form.submit(EquipeRAM.getInstance().saveWithError);
+        if (result?.result) {
+            this.resolve(result.result);
+        }
+    }
+    __96d74d247ad5518bea626dc8edc60f69method0() {
+        return this.options.title;
+    }
+    __96d74d247ad5518bea626dc8edc60f69method1() {
+        return this.form.parts.nom;
+    }
+    __96d74d247ad5518bea626dc8edc60f69method2() {
+        return this.form.parts.stock;
+    }
+    static async open(item) {
+        const modal = new EquipeEditModal();
+        modal.options.title = item ? "Edition d'une équipe" : "Création d'une équipe";
+        const clone = item ? item.clone() : new App.Http.Controllers.Equipe.EquipeResource();
+        if (!clone.id) {
+            clone.id = 0;
+        }
+        modal.form.item = EquipeRAM.getInstance().toRequest(clone);
+        return await modal.show();
+    }
+}
+EquipeEditModal.Namespace=`Inventaire`;
+EquipeEditModal.Tag=`av-equipe-edit-modal`;
+__as1(_, 'EquipeEditModal', EquipeEditModal);
+if(!window.customElements.get('av-equipe-edit-modal')){window.customElements.define('av-equipe-edit-modal', EquipeEditModal);Aventus.WebComponentInstance.registerDefinition(EquipeEditModal);}
+
+const EquipesPage = class EquipesPage extends PageFull {
+    list = [];
+    static __style = `:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{border:1px solid var(--color-base-300);border-radius:var(--radius-field);width:100%}@media screen and (max-width: 600px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
+    constructor() {
+        super();
+        this.onNewData = this.onNewData.bind(this);
+        this.onRemoveData = this.onRemoveData.bind(this);
+    }
+    __getStatic() {
+        return EquipesPage;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(EquipesPage.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "searchEl",
+      "ids": [
+        "equipespage_0"
+      ]
+    },
+    {
+      "name": "listEl",
+      "ids": [
+        "equipespage_2"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "eventName": "onChange",
+      "id": "equipespage_0",
+      "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
+      "isCallback": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "equipespage_1",
+      "onPress": (e, pressInstance, c) => { c.comp.add(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "EquipesPage";
+    }
+    configure() {
+        return {};
+    }
+    search() {
+        if (this.searchEl.value) {
+            for (let item of this.list) {
+                item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
+            }
+        }
+        else {
+            for (let item of this.list) {
+                item.visible = true;
+            }
+        }
+    }
+    async add() {
+        await EquipeEditModal.open();
+    }
+    async bindData() {
+        let list = await EquipeRAM.getInstance().getList();
+        list.sort((a, b) => {
+            if (a.stock && !b.stock)
+                return -1;
+            if (!a.stock && b.stock)
+                return 1;
+            return a.nom.localeCompare(b.nom);
+        });
+        for (let item of list) {
+            let el = new EquipeItem();
+            el.item = item;
+            el.visible = this.searchEl.value ? StringTools.contains(item.nom, this.searchEl.value) : true;
+            this.listEl.appendChild(el);
+            this.list.push(el);
+        }
+        EquipeRAM.getInstance().onCreated(this.onNewData);
+        EquipeRAM.getInstance().onUpdated(this.onNewData);
+        EquipeRAM.getInstance().onDeleted(this.onRemoveData);
+    }
+    onNewData(newData) {
+        let itemBefore = undefined;
+        for (let item of this.list) {
+            if (itemBefore == null && newData.nom.localeCompare(item.item.nom) < 0) {
+                itemBefore = item;
+            }
+            if (item.item.id == newData.id) {
+                item.item = newData;
+                Aventus.Watcher.trigger("UPDATED", item.item);
+                return;
+            }
+        }
+        let el = new EquipeItem();
+        el.item = newData;
+        el.visible = this.searchEl.value ? StringTools.contains(newData.nom, this.searchEl.value) : true;
+        if (itemBefore) {
+            let index = this.list.indexOf(itemBefore);
+            this.list.splice(index, 0, el);
+            this.listEl.insertBefore(el, itemBefore);
+        }
+        else {
+            this.list.push(el);
+            this.listEl.appendChild(el);
+        }
+    }
+    onRemoveData(App, Models, Equipe) {
+        for (let item of this.list) {
+            if (item.item.id == App.Models.Equipe.id) {
+                item.remove();
+                let index = this.list.indexOf(item);
+                this.list.splice(index, 1);
+                return;
+            }
+        }
+    }
+    postCreation() {
+        super.postCreation();
+        this.bindData();
+    }
+}
+EquipesPage.Namespace=`Inventaire`;
+EquipesPage.Tag=`av-equipes-page`;
+__as1(_, 'EquipesPage', EquipesPage);
+if(!window.customElements.get('av-equipes-page')){window.customElements.define('av-equipes-page', EquipesPage);Aventus.WebComponentInstance.registerDefinition(EquipesPage);}
 
 const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.WebComponent {
     get 'inventaire'() {
@@ -17982,6 +17819,51 @@ EquipeDetailsPage.Tag=`av-equipe-details-page`;
 __as1(_, 'EquipeDetailsPage', EquipeDetailsPage);
 if(!window.customElements.get('av-equipe-details-page')){window.customElements.define('av-equipe-details-page', EquipeDetailsPage);Aventus.WebComponentInstance.registerDefinition(EquipeDetailsPage);}
 
+App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController=class MaterielDuplicateController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/duplicate`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
+__as1(_.App.Http.Controllers.Materiel.Duplicate, 'MaterielDuplicateController', App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController);
+
+let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new App.Http.Controllers.Materiel.MaterielController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(MaterielRAM);
+    }
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+    async duplicate(id_materiel) {
+        const result = await new App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController().request({ id_materiel });
+        if (result.result) {
+            const temp = new Aventus.ResultWithError();
+            this.addOrUpdateData(result.result, temp);
+        }
+        return result;
+    }
+}
+MaterielRAM.Namespace=`Inventaire`;
+__as1(_, 'MaterielRAM', MaterielRAM);
+
 const MaterielPage = class MaterielPage extends PageFull {
     list = [];
     static __style = `:host{--col-gap: 16px}:host .card{background-color:var(--color-base-100);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;max-height:100%;padding:24px;width:100%}:host .card .header{align-items:center;display:flex;flex-shrink:0;gap:24px;height:50px;justify-content:space-between;margin-bottom:24px}:host .card .header .title{font-size:var(--font-size-md)}:host .card .header .actions{align-items:center;display:flex;gap:24px}:host .card .header .actions av-input{max-width:300px}:host .card .body{flex-grow:1;min-height:0;width:100%}:host .card .body .list{margin:16px;margin-top:0;width:calc(100% - 32px)}@media screen and (max-width: 620px){:host .card{position:relative}:host .card .header{flex-wrap:wrap;height:auto}:host .card .header .title{width:100%}:host .card .header .actions{width:100%}:host .card .header .actions av-input{max-width:none;width:100%}:host .card .header .actions av-button{position:absolute;right:16px;top:16px}}`;
@@ -18163,71 +18045,72 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     <div class="header">
         <div class="title" _id="materieldetailspage_0"></div>
         <div class="actions">
-            <av-icon-action color="error" icon="delete" _id="materieldetailspage_1">Supprimer</av-icon-action>
-            <av-icon-action color="success" icon="save" _id="materieldetailspage_2">Enregistrer</av-icon-action>
+            <av-icon-action color="info" icon="tab_duplicate" _id="materieldetailspage_1">Dupliquer</av-icon-action>
+            <av-icon-action color="error" icon="delete" _id="materieldetailspage_2">Supprimer</av-icon-action>
+            <av-icon-action color="success" icon="save" _id="materieldetailspage_3">Enregistrer</av-icon-action>
         </div>
     </div>
     <div class="body">
         <av-row>
             <av-col size="12" size_sm="6">
-                <av-input-image label="Image" _id="materieldetailspage_3"></av-input-image>
+                <av-input-image label="Image" _id="materieldetailspage_4"></av-input-image>
             </av-col>
             <av-col size="12" size_sm="6" class="contenu">
-                <av-input label="Nom du materiel" _id="materieldetailspage_4"></av-input>
+                <av-input label="Nom du materiel" _id="materieldetailspage_5"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>
-                    <av-variation-tags _id="materieldetailspage_5"></av-variation-tags>
+                    <av-variation-tags _id="materieldetailspage_6"></av-variation-tags>
                 </div>
                 <div class="tags">
                     <div class="label pour">
                         <span class="main-label">Pour :</span>
                         <div class="toggle">
-                            <span class="sub-label" _id="materieldetailspage_6">Equipe spécifique</span>
-                            <av-toggle _id="materieldetailspage_7"></av-toggle>
-                            <span class="sub-label" _id="materieldetailspage_8">Tout le monde</span>
+                            <span class="sub-label" _id="materieldetailspage_7">Equipe spécifique</span>
+                            <av-toggle _id="materieldetailspage_8"></av-toggle>
+                            <span class="sub-label" _id="materieldetailspage_9">Tout le monde</span>
                         </div>
                     </div>
-                    <template _id="materieldetailspage_9"></template>
+                    <template _id="materieldetailspage_10"></template>
                 </div>
             </av-col>
         </av-row>
     </div>
-    <av-loading _id="materieldetailspage_11"></av-loading>
-</div><template _id="materieldetailspage_12"></template>` }
+    <av-loading _id="materieldetailspage_12"></av-loading>
+</div><template _id="materieldetailspage_13"></template>` }
     });
 }
-    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_14"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_16"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_15"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_17"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materieldetailspage_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
       "once": true
     },
-    "materieldetailspage_11°show": {
+    "materieldetailspage_12°show": {
       "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9())}`,
       "once": true
     }
   },
   "injection": [
     {
-      "id": "materieldetailspage_3",
+      "id": "materieldetailspage_4",
       "injectionName": "form",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4(),
       "once": true
     },
     {
-      "id": "materieldetailspage_4",
+      "id": "materieldetailspage_5",
       "injectionName": "form",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod5(),
       "once": true
     },
     {
-      "id": "materieldetailspage_5",
+      "id": "materieldetailspage_6",
       "injectionName": "variations",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
       "once": true
     },
     {
-      "id": "materieldetailspage_7",
+      "id": "materieldetailspage_8",
       "injectionName": "form",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
       "once": true
@@ -18236,34 +18119,38 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
   "pressEvents": [
     {
       "id": "materieldetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+      "onPress": (e, pressInstance, c) => { c.comp.duplicate(e, pressInstance); }
     },
     {
       "id": "materieldetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_3",
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     },
     {
-      "id": "materieldetailspage_6",
+      "id": "materieldetailspage_7",
       "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
     },
     {
-      "id": "materieldetailspage_8",
+      "id": "materieldetailspage_9",
       "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                        <av-equipe-tags _id="materieldetailspage_10"></av-equipe-tags>
+                        <av-equipe-tags _id="materieldetailspage_11"></av-equipe-tags>
                     `);templ0.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_10",
+      "id": "materieldetailspage_11",
       "injectionName": "equipes",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
       "once": true
     }
   ]
 });this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_9',
+                    anchorId: 'materieldetailspage_10',
                     parts: [{once: true,
                     condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
                     template: templ0
@@ -18273,55 +18160,55 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         <div class="header">
             <div class="title">Liste dans les équipes</div>
             <div class="actions">
-                <av-icon-action _id="materieldetailspage_13"></av-icon-action>
-                <av-input placeholder="Recherche" _id="materieldetailspage_14"></av-input>
+                <av-icon-action _id="materieldetailspage_14"></av-icon-action>
+                <av-input placeholder="Recherche" _id="materieldetailspage_15"></av-input>
             </div>
         </div>
         <div class="body">
             <div class="list">
-                <template _id="materieldetailspage_15"></template>
+                <template _id="materieldetailspage_16"></template>
             </div>
         </div>
     </div>
 `);templ1.setActions({
   "content": {
-    "materieldetailspage_13°icon": {
+    "materieldetailspage_14°icon": {
       "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10())}`
     },
-    "materieldetailspage_13°@HTML": {
+    "materieldetailspage_14°@HTML": {
       "fct": (c) => `\n                    ${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11())}\n                `
     }
   },
   "events": [
     {
       "eventName": "onChange",
-      "id": "materieldetailspage_14",
+      "id": "materieldetailspage_15",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
   ],
   "pressEvents": [
     {
-      "id": "materieldetailspage_13",
+      "id": "materieldetailspage_14",
       "onPress": (e, pressInstance, c) => { c.comp.toggleVide(e, pressInstance); }
     }
   ]
 });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <av-inventaire-list-item _id="materieldetailspage_16"></av-inventaire-list-item>
+                    <av-inventaire-list-item _id="materieldetailspage_17"></av-inventaire-list-item>
                 `);templ2.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_16",
+      "id": "materieldetailspage_17",
       "injectionName": "inventaire",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12(c.data.inventaire),
       "once": true
     }
   ]
 });templ1.addLoop({
-                    anchorId: 'materieldetailspage_15',
+                    anchorId: 'materieldetailspage_16',
                     template: templ2,
                 simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_12',
+                    anchorId: 'materieldetailspage_13',
                     parts: [{
                     condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
                     template: templ1
@@ -18494,6 +18381,15 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             else {
                 item.style.display = "none";
             }
+        }
+    }
+    async duplicate() {
+        let id = this.form.item.id;
+        if (!id)
+            return;
+        let clone = await Aventus.Process.execute(MaterielRAM.getInstance().duplicate(id));
+        if (clone) {
+            this.router?.navigate('/materiel/' + clone.id);
         }
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {

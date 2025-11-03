@@ -1,0 +1,7 @@
+namespace App.Http.Controllers.Materiel.Duplicate {
+
+	export class Request {
+		public id_materiel!: number;
+	}
+
+}
