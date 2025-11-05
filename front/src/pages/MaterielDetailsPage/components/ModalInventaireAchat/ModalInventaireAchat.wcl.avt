@@ -27,6 +27,8 @@ export class ModalInventaireAchat extends Modal<Inventaire> implements Aventus.D
     @Signal()
     public nb: number = 0;
     @Signal()
+    public comment: string = "";
+    @Signal()
     public equipe!: EquipeResource;
 
     @ViewElement()
@@ -87,7 +89,8 @@ export class ModalInventaireAchat extends Modal<Inventaire> implements Aventus.D
         const result = await Process.execute(new InventaireAchatController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
-            quantite: nb
+            quantite: nb,
+            commentaire: this.comment
         }));
 
         if(result) {
@@ -113,7 +116,7 @@ export class ModalInventaireAchat extends Modal<Inventaire> implements Aventus.D
         return names.join(" ");
     }
 
-    
+
 
     protected override postCreation(): void {
         super.postCreation();

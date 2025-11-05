@@ -27,6 +27,8 @@ export class ModalInventaireMouvement extends Modal<Inventaire[]> implements Ave
     @Signal()
     public nb: number = 0;
     @Signal()
+    public comment: string = "";
+    @Signal()
     public equipeSortie?: EquipeResource;
     @Signal()
     public equipeEntree?: EquipeResource;
@@ -101,6 +103,7 @@ export class ModalInventaireMouvement extends Modal<Inventaire[]> implements Ave
             id_equipe_sortie: this.equipeSortie.id,
             id_materiel_variation: this.variation.id,
             quantite: nb,
+            commentaire: this.comment
         }));
 
         if(result) {

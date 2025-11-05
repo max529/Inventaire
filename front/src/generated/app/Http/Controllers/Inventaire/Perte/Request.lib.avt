@@ -4,6 +4,7 @@ namespace App.Http.Controllers.Inventaire.Perte {
 		public quantite!: number;
 		public id_materiel_variation!: number;
 		public id_equipe!: number;
+		public commentaire!: string;
 	}
 
 }

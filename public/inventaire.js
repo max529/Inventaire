@@ -12219,25 +12219,25 @@ var Inventaire;
 const __as1 = (o, k, c) => { if (o[k] !== undefined) for (let w in o[k]) { c[w] = o[k][w] } o[k] = c; }
 const moduleName = `Inventaire`;
 const _ = {};
-Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.green{background-color:var(--color-green)}.content-green{color:var(--color-green-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.red{background-color:var(--color-red)}.content-red{color:var(--color-red-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}.orange{background-color:var(--color-orange)}.content-orange{color:var(--color-orange-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.blue{background-color:var(--color-blue)}.content-blue{color:var(--color-blue-content)}.information{background-color:var(--color-information)}.content-information{color:var(--color-information-content)}`)
+Aventus.Style.store("@default", `:host{box-sizing:border-box;display:inline-block;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);font-size:16px}:host *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}.neutral{background-color:var(--color-neutral)}.content-neutral{color:var(--color-neutral-content)}.primary{background-color:var(--color-primary)}.content-primary{color:var(--color-primary-content)}.secondary{background-color:var(--color-secondary)}.content-secondary{color:var(--color-secondary-content)}.accent{background-color:var(--color-accent)}.content-accent{color:var(--color-accent-content)}.info{background-color:var(--color-info)}.content-info{color:var(--color-info-content)}.success{background-color:var(--color-success)}.content-success{color:var(--color-success-content)}.warning{background-color:var(--color-warning)}.content-warning{color:var(--color-warning-content)}.error{background-color:var(--color-error)}.content-error{color:var(--color-error-content)}`)
 let App = {};
 _.App = Inventaire.App ?? {};
+App.Models = {};
+_.App.Models = Inventaire.App?.Models ?? {};
 App.Http = {};
 _.App.Http = Inventaire.App?.Http ?? {};
 App.Http.Controllers = {};
 _.App.Http.Controllers = Inventaire.App?.Http?.Controllers ?? {};
-App.Http.Controllers.Materiel = {};
-_.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
-App.Http.Controllers.Materiel.Duplicate = {};
-_.App.Http.Controllers.Materiel.Duplicate = Inventaire.App?.Http?.Controllers?.Materiel?.Duplicate ?? {};
-App.Models = {};
-_.App.Models = Inventaire.App?.Models ?? {};
 App.Http.Controllers.VariationGroupeTemplate = {};
 _.App.Http.Controllers.VariationGroupeTemplate = Inventaire.App?.Http?.Controllers?.VariationGroupeTemplate ?? {};
 App.Http.Controllers.User = {};
 _.App.Http.Controllers.User = Inventaire.App?.Http?.Controllers?.User ?? {};
+App.Http.Controllers.Materiel = {};
+_.App.Http.Controllers.Materiel = Inventaire.App?.Http?.Controllers?.Materiel ?? {};
 App.Http.Controllers.Materiel.GetInventaire = {};
 _.App.Http.Controllers.Materiel.GetInventaire = Inventaire.App?.Http?.Controllers?.Materiel?.GetInventaire ?? {};
+App.Http.Controllers.Materiel.Duplicate = {};
+_.App.Http.Controllers.Materiel.Duplicate = Inventaire.App?.Http?.Controllers?.Materiel?.Duplicate ?? {};
 App.Http.Controllers.Inventaire = {};
 _.App.Http.Controllers.Inventaire = Inventaire.App?.Http?.Controllers?.Inventaire ?? {};
 App.Http.Controllers.Inventaire.Perte = {};
@@ -12263,12 +12263,6 @@ _.App.Enum = Inventaire.App?.Enum ?? {};
 App.Http.Controllers.Auth.Logout = {};
 _.App.Http.Controllers.Auth.Logout = Inventaire.App?.Http?.Controllers?.Auth?.Logout ?? {};
 let _n;
-App.Http.Controllers.Materiel.Duplicate.Request=class Request {
-    id_materiel;
-}
-App.Http.Controllers.Materiel.Duplicate.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
-__as1(_.App.Http.Controllers.Materiel.Duplicate, 'Request', App.Http.Controllers.Materiel.Duplicate.Request);
-
 let StringTools=class StringTools {
     static removeAccents(value) {
         return value
@@ -12387,10 +12381,17 @@ App.Http.Controllers.Materiel.GetInventaire.Request=class Request {
 App.Http.Controllers.Materiel.GetInventaire.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.GetInventaire`;
 __as1(_.App.Http.Controllers.Materiel.GetInventaire, 'Request', App.Http.Controllers.Materiel.GetInventaire.Request);
 
+App.Http.Controllers.Materiel.Duplicate.Request=class Request {
+    id_materiel;
+}
+App.Http.Controllers.Materiel.Duplicate.Request.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
+__as1(_.App.Http.Controllers.Materiel.Duplicate, 'Request', App.Http.Controllers.Materiel.Duplicate.Request);
+
 App.Http.Controllers.Inventaire.Perte.Request=class Request {
     quantite;
     id_materiel_variation;
     id_equipe;
+    commentaire;
 }
 App.Http.Controllers.Inventaire.Perte.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
 __as1(_.App.Http.Controllers.Inventaire.Perte, 'Request', App.Http.Controllers.Inventaire.Perte.Request);
@@ -12400,6 +12401,7 @@ App.Http.Controllers.Inventaire.Mouvement.Request=class Request {
     id_materiel_variation;
     id_equipe_entree;
     id_equipe_sortie;
+    commentaire;
 }
 App.Http.Controllers.Inventaire.Mouvement.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
 __as1(_.App.Http.Controllers.Inventaire.Mouvement, 'Request', App.Http.Controllers.Inventaire.Mouvement.Request);
@@ -12413,9 +12415,10 @@ App.Http.Controllers.Inventaire.Historique.HistoriqueInfo=class HistoriqueInfo {
     equipe_entree;
     equipe_sortie = undefined;
     quantite;
+    commentaire;
 }
 App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
-App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.$schema={"type":"string","id_materiel_variation":"number","par":"string","date":"Date","equipe_entree":"string","equipe_sortie":"string","quantite":"number"};
+App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.$schema={"type":"string","id_materiel_variation":"number","par":"string","date":"Date","equipe_entree":"string","equipe_sortie":"string","quantite":"number","commentaire":"string"};
 Aventus.Converter.register(App.Http.Controllers.Inventaire.Historique.HistoriqueInfo.Fullname, App.Http.Controllers.Inventaire.Historique.HistoriqueInfo);
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'HistoriqueInfo', App.Http.Controllers.Inventaire.Historique.HistoriqueInfo);
 
@@ -12426,22 +12429,6 @@ App.Http.Controllers.Inventaire.Historique.Request=class Request {
 }
 App.Http.Controllers.Inventaire.Historique.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Historique`;
 __as1(_.App.Http.Controllers.Inventaire.Historique, 'Request', App.Http.Controllers.Inventaire.Historique.Request);
-
-App.Http.Controllers.Inventaire.Achat.Request=class Request {
-    quantite;
-    id_materiel_variation;
-    id_equipe;
-}
-App.Http.Controllers.Inventaire.Achat.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
-__as1(_.App.Http.Controllers.Inventaire.Achat, 'Request', App.Http.Controllers.Inventaire.Achat.Request);
-
-App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse=class EquipeMaterielResponse extends Aventus.Data {
-    static get Fullname() { return "App.Http.Controllers.Equipe.Materiel.Response"; }
-}
-App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
-App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.$schema={...(Aventus.Data?.$schema ?? {}), };
-Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Fullname, App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
-__as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielResponse', App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
 
 App.Models.Variation=class Variation extends Aventus.Data {
     static get Fullname() { return "App.Models.Variation"; }
@@ -12467,6 +12454,23 @@ App.Models.MaterielVariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "i
 Aventus.Converter.register(App.Models.MaterielVariationGroupe.Fullname, App.Models.MaterielVariationGroupe);
 __as1(_.App.Models, 'MaterielVariationGroupe', App.Models.MaterielVariationGroupe);
 
+App.Http.Controllers.Inventaire.Achat.Request=class Request {
+    quantite;
+    id_materiel_variation;
+    id_equipe;
+    commentaire;
+}
+App.Http.Controllers.Inventaire.Achat.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
+__as1(_.App.Http.Controllers.Inventaire.Achat, 'Request', App.Http.Controllers.Inventaire.Achat.Request);
+
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse=class EquipeMaterielResponse extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Equipe.Materiel.Response"; }
+}
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
+App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.$schema={...(Aventus.Data?.$schema ?? {}), };
+Aventus.Converter.register(App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse.Fullname, App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
+__as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielResponse', App.Http.Controllers.Equipe.Materiel.EquipeMaterielResponse);
+
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielRequest=class EquipeMaterielRequest {
     id_equipe;
 }
@@ -12483,12 +12487,26 @@ __as1(_.App.Models, 'MaterielImage', App.Models.MaterielImage);
 
 App.Http.Controllers.Materiel.VariationResource=class VariationResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.VariationResource"; }
+    id;
     nom;
+    id_variation_template;
 }
 App.Http.Controllers.Materiel.VariationResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.VariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "nom":"string"};
+App.Http.Controllers.Materiel.VariationResource.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","nom":"string","id_variation_template":"number"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.VariationResource.Fullname, App.Http.Controllers.Materiel.VariationResource);
 __as1(_.App.Http.Controllers.Materiel, 'VariationResource', App.Http.Controllers.Materiel.VariationResource);
+
+App.Http.Controllers.Materiel.VariationGroupeResource=class VariationGroupeResource extends Aventus.Data {
+    static get Fullname() { return "App.Http.Controllers.Materiel.VariationGroupeResource"; }
+    variations;
+    id;
+    nom;
+    id_template;
+}
+App.Http.Controllers.Materiel.VariationGroupeResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+App.Http.Controllers.Materiel.VariationGroupeResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.VariationResource[]","id":"number","nom":"string","id_template":"number"};
+Aventus.Converter.register(App.Http.Controllers.Materiel.VariationGroupeResource.Fullname, App.Http.Controllers.Materiel.VariationGroupeResource);
+__as1(_.App.Http.Controllers.Materiel, 'VariationGroupeResource', App.Http.Controllers.Materiel.VariationGroupeResource);
 
 App.Http.Controllers.Equipe.GetInventaire.Request=class Request {
     id_equipe;
@@ -13340,6 +13358,52 @@ InlineEdit.Tag=`av-inline-edit`;
 __as1(_, 'InlineEdit', InlineEdit);
 if(!window.customElements.get('av-inline-edit')){window.customElements.define('av-inline-edit', InlineEdit);Aventus.WebComponentInstance.registerDefinition(InlineEdit);}
 
+const CheckboxTag = class CheckboxTag extends Aventus.Form.FormElement {
+    static get observedAttributes() {return ["checked"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
+    get 'checked'() { return this.getBoolProp('checked') }
+    set 'checked'(val) { this.setBoolAttr('checked', val) }    __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("checked", ((target) => {
+    target.value = target.checked;
+})); }
+    static __style = `:host{cursor:pointer;opacity:.7}:host av-tag{align-items:center;display:flex;gap:8px;padding-right:12px}:host .square{align-items:center;background-color:var(--color-base-300);border:2px solid rgba(0,0,0,0);border-radius:10px;cursor:pointer;display:flex;flex-shrink:0;height:18px;justify-content:center;position:relative;transition:border .4s cubic-bezier(0.65, 0, 0.15, 1),background-color .4s cubic-bezier(0.65, 0, 0.15, 1);width:18px}:host .square svg{height:90%;opacity:0;stroke:var(--color-success-content);stroke-width:2px;visibility:hidden;width:90%}:host([checked]){opacity:1}:host([checked]) .square{background-color:var(--color-success);border:2px solid var(--color-success)}:host([checked]) .square svg{opacity:1;visibility:visible}:host([checked]) .square .tick{animation:dash .3s linear forwards;animation-delay:.2s;stroke-dasharray:100;stroke-dashoffset:100}@keyframes dash{to{stroke-dashoffset:70}}`;
+    __getStatic() {
+        return CheckboxTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(CheckboxTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<av-tag>    <div class="square">        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">            <polyline fill="none" points="3.7 14.3 9.6 19 20.3 5" stroke-linecap="round" stroke-linejoin="round" class="tick"></polyline>        </svg>    </div>    <span>        <slot></slot>    </span></av-tag>` }
+    });
+}
+    getClassName() {
+        return "CheckboxTag";
+    }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('checked')) { this.attributeChangedCallback('checked', false, false); } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('checked'); }
+    __listBoolProps() { return ["checked"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    onValueChange(value) {
+        super.onValueChange(value);
+        this.checked = this.value ?? false;
+    }
+    postCreation() {
+        super.postCreation();
+        new Aventus.PressManager({
+            element: this,
+            onPress: () => {
+                this.checked = !this.checked;
+            }
+        });
+    }
+}
+CheckboxTag.Namespace=`Inventaire`;
+CheckboxTag.Tag=`av-checkbox-tag`;
+__as1(_, 'CheckboxTag', CheckboxTag);
+if(!window.customElements.get('av-checkbox-tag')){window.customElements.define('av-checkbox-tag', CheckboxTag);Aventus.WebComponentInstance.registerDefinition(CheckboxTag);}
+
 const Loading = class Loading extends Aventus.WebComponent {
     get 'show'() { return this.getBoolAttr('show') }
     set 'show'(val) { this.setBoolAttr('show', val) }    static __style = `:host{align-items:center;background-color:rgba(0,0,0,.1);display:none;inset:0;justify-content:center;position:absolute;z-index:999}:host .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--color-base-content);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;height:100%;width:100%;max-height:100px;max-width:100px}:host([show]){display:flex}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
@@ -13390,7 +13454,7 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     __registerWatchesActions() {
     this.__addWatchesActions("toastTitle");this.__addWatchesActions("toastMessage");    super.__registerWatchesActions();
 }
-    static __style = `:host{background-color:var(--alert-color, var(--color-base-200));background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px #000,0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08));color:var(--color-base-content);cursor:default;max-width:calc(100vw - 2rem);overflow:hidden;pointer-events:auto;transition:top .2s linear,opacity .2s linear,visibility .2s linear}:host .toast-content{display:grid;font-size:.875rem;gap:1rem;grid-auto-flow:column;grid-template-columns:auto;justify-content:start;line-height:1.25rem;padding-block:.75rem;padding-inline:1rem;place-items:center start;text-align:start}:host .toast-flex{align-items:flex-start;display:flex}:host .toast-icon-wrapper{flex-shrink:0}:host .toast-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host .toast-message-wrapper{flex:1;margin-left:1rem;padding-top:.125rem}:host .toast-title{font-size:.875rem;font-weight:500;margin:0}:host .toast-message{font-size:.875rem;margin-bottom:0;margin-top:0}:host .toast-message:nth-child(3){margin-top:.25rem}:host .toast-close-wrapper{flex-shrink:0;margin-left:1rem}:host .toast-close-wrapper .sr-only{border-width:0;clip:rect(0, 0, 0, 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}:host .toast-close-wrapper .toast-close-button{background-color:rgba(0,0,0,0);border:none;color:inherit;cursor:pointer;display:inline-flex;outline:none}:host .toast-close-wrapper .toast-close-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host([color=primary]){--alert-color: var(--color-primary);border-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){--alert-color: var(--color-secondary);border-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]){--alert-color: var(--color-green);border-color:var(--color-green);color:var(--color-green-content)}:host([color=success]){--alert-color: var(--color-success);border-color:var(--color-success);color:var(--color-success-content)}:host([color=red]){--alert-color: var(--color-red);border-color:var(--color-red);color:var(--color-red-content)}:host([color=error]){--alert-color: var(--color-error);border-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]){--alert-color: var(--color-orange);border-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]){--alert-color: var(--color-warning);border-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]){--alert-color: var(--color-blue);border-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]){--alert-color: var(--color-information);border-color:var(--color-information);color:var(--color-information-content)}:host([closing]){opacity:0;visibility:hidden}:host(:not([close_icon])) .toast-close-wrapper{display:none}:host([closable]:not([close_icon])){cursor:pointer}:host([soft]){background:var(--alert-color, var(--color-base-content));background-image:none;border-color:var(--alert-color, var(--color-base-content));box-shadow:none;color:var(--alert-color, var(--color-base-content))}:host([outline]){background-color:rgba(0,0,0,0);background-image:none;box-shadow:none;color:var(--alert-color)}:host([dash]){background-color:rgba(0,0,0,0);background-image:none;border-style:dashed;box-shadow:none;color:var(--alert-color)}@supports(color: color-mix(in lab, red, red)){:host{box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200))) calc(var(--depth) * 20%), rgba(0, 0, 0, 0)),0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08))}:host([soft]){background:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));border-color:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100))}}`;
+    static __style = `:host{background-color:var(--alert-color, var(--color-base-200));background-image:none,var(--fx-noise);background-size:auto,calc(var(--noise)*100%);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px #000,0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08));color:var(--color-base-content);cursor:default;max-width:calc(100vw - 2rem);overflow:hidden;pointer-events:auto;transition:top .2s linear,opacity .2s linear,visibility .2s linear}:host .toast-content{display:grid;font-size:.875rem;gap:1rem;grid-auto-flow:column;grid-template-columns:auto;justify-content:start;line-height:1.25rem;padding-block:.75rem;padding-inline:1rem;place-items:center start;text-align:start}:host .toast-flex{align-items:flex-start;display:flex}:host .toast-icon-wrapper{flex-shrink:0}:host .toast-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host .toast-message-wrapper{flex:1;margin-left:1rem;padding-top:.125rem}:host .toast-title{font-size:.875rem;font-weight:500;margin:0}:host .toast-message{font-size:.875rem;margin-bottom:0;margin-top:0}:host .toast-message:nth-child(3){margin-top:.25rem}:host .toast-close-wrapper{flex-shrink:0;margin-left:1rem}:host .toast-close-wrapper .sr-only{border-width:0;clip:rect(0, 0, 0, 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}:host .toast-close-wrapper .toast-close-button{background-color:rgba(0,0,0,0);border:none;color:inherit;cursor:pointer;display:inline-flex;outline:none}:host .toast-close-wrapper .toast-close-icon{align-items:center;display:flex;font-size:calc(var(--spacing)*6);height:calc(var(--spacing)*6);justify-content:center;width:calc(var(--spacing)*6)}:host([color=neutral]){--alert-color: var(--color-neutral);border-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){--alert-color: var(--color-primary);border-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){--alert-color: var(--color-secondary);border-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){--alert-color: var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){--alert-color: var(--color-info);border-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){--alert-color: var(--color-success);border-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){--alert-color: var(--color-warning);border-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){--alert-color: var(--color-error);border-color:var(--color-error);color:var(--color-error-content)}:host([closing]){opacity:0;visibility:hidden}:host(:not([close_icon])) .toast-close-wrapper{display:none}:host([closable]:not([close_icon])){cursor:pointer}:host([soft]){background:var(--alert-color, var(--color-base-content));background-image:none;border-color:var(--alert-color, var(--color-base-content));box-shadow:none;color:var(--alert-color, var(--color-base-content))}:host([outline]){background-color:rgba(0,0,0,0);background-image:none;box-shadow:none;color:var(--alert-color)}:host([dash]){background-color:rgba(0,0,0,0);background-image:none;border-style:dashed;box-shadow:none;color:var(--alert-color)}@supports(color: color-mix(in lab, red, red)){:host{box-shadow:0 3px 0 -2px oklch(100% 0 0/calc(var(--depth) * 0.08)) inset,0 1px color-mix(in oklab, color-mix(in oklab, #000 20%, var(--alert-color, var(--color-base-200))) calc(var(--depth) * 20%), rgba(0, 0, 0, 0)),0 4px 3px -2px oklch(0% 0 0/calc(var(--depth) * 0.08))}:host([soft]){background:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 8%, var(--color-base-100));border-color:color-mix(in oklab, var(--alert-color, var(--color-base-content)) 10%, var(--color-base-100))}}`;
     __getStatic() {
         return Toast;
     }
@@ -13544,7 +13608,7 @@ const Input = class Input extends Aventus.Form.FormElement {
     __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("value", ((target) => {
     target.inputEl.value = target.value ?? "";
 })); }
-    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);width:100%}:host .label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=green]),:host([color=green]):focus,:host([color=green]):focus-within{--input-color: var(--color-green)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=red]),:host([color=red]):focus,:host([color=red]):focus-within{--input-color: var(--color-red)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}:host([color=orange]),:host([color=orange]):focus,:host([color=orange]):focus-within{--input-color: var(--color-orange)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=blue]),:host([color=blue]):focus,:host([color=blue]):focus-within{--input-color: var(--color-blue)}:host([color=information]),:host([color=information]):focus,:host([color=information]):focus-within{--input-color: var(--color-information)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);width:100%}:host .label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
     __getStatic() {
         return Input;
     }
@@ -13682,7 +13746,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     set 'link'(val) { this.setBoolAttr('link', val) }get 'active'() { return this.getBoolAttr('active') }
     set 'active'(val) { this.setBoolAttr('active', val) }get 'disabled'() { return this.getBoolAttr('disabled') }
     set 'disabled'(val) { this.setBoolAttr('disabled', val) }get 'loading'() { return this.getBoolAttr('loading') }
-    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=green]){--btn-color: var(--color-green);--btn-fg: var(--color-green-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=red]){--btn-color: var(--color-red);--btn-fg: var(--color-red-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([color=orange]){--btn-color: var(--color-orange);--btn-fg: var(--color-orange-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=blue]){--btn-color: var(--color-blue);--btn-fg: var(--color-blue-content)}:host([color=information]){--btn-color: var(--color-information);--btn-fg: var(--color-information-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=neutral]){--btn-color: var(--color-neutral);--btn-fg: var(--color-neutral-content)}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=accent]){--btn-color: var(--color-accent);--btn-fg: var(--color-accent-content)}:host([color=info]){--btn-color: var(--color-info);--btn-fg: var(--color-info-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
     __getStatic() {
         return Button;
     }
@@ -13711,7 +13775,7 @@ if(!window.customElements.get('av-button')){window.customElements.define('av-but
 
 const Tag = class Tag extends Aventus.WebComponent {
     get 'color'() { return this.getStringAttr('color') }
-    set 'color'(val) { this.setStringAttr('color', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-200);color:var(--color-base-content);border-radius:var(--radius-selector);display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host([color=primary]){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=green]){background-color:var(--color-green);color:var(--color-green-content)}:host([color=success]){background-color:var(--color-success);color:var(--color-success-content)}:host([color=red]){background-color:var(--color-red);color:var(--color-red-content)}:host([color=error]){background-color:var(--color-error);color:var(--color-error-content)}:host([color=orange]){background-color:var(--color-orange);color:var(--color-orange-content)}:host([color=warning]){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=blue]){background-color:var(--color-blue);color:var(--color-blue-content)}:host([color=information]){background-color:var(--color-information);color:var(--color-information-content)}`;
+    set 'color'(val) { this.setStringAttr('color', val) }    static __style = `:host{align-items:center;background-color:var(--color-base-200);color:var(--color-base-content);border-radius:var(--radius-selector);display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host([color=neutral]){background-color:var(--color-neutral);color:var(--color-neutral-content)}:host([color=primary]){background-color:var(--color-primary);color:var(--color-primary-content)}:host([color=secondary]){background-color:var(--color-secondary);color:var(--color-secondary-content)}:host([color=accent]){background-color:var(--color-accent);color:var(--color-accent-content)}:host([color=info]){background-color:var(--color-info);color:var(--color-info-content)}:host([color=success]){background-color:var(--color-success);color:var(--color-success-content)}:host([color=warning]){background-color:var(--color-warning);color:var(--color-warning-content)}:host([color=error]){background-color:var(--color-error);color:var(--color-error-content)}`;
     __getStatic() {
         return Tag;
     }
@@ -13752,7 +13816,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
     timeout = 0;
     pressManager;
     screenMargin = 10;
-    static __style = `:host{--local-tooltip-from-y: 0;--local-tooltip-from-x: 0;--local-tooltip-to-y: 0;--local-tooltip-to-x: 0;--local-offset-carret-x: 0px;--local-offset-carret-y: 0px;--_tooltip-elevation: var(--tooltip-elevation, var(--elevation-4))}:host{border-radius:var(--radius-box);box-shadow:var(--elevation-4);opacity:0;padding:5px 15px;pointer-events:none;position:absolute;transition:.5s opacity var(--bezier),.5s visibility var(--bezier),.5s top var(--bezier),.5s bottom var(--bezier),.5s right var(--bezier),.5s left var(--bezier),.5s transform var(--bezier);visibility:hidden;width:max-content;z-index:1}:host::after{content:"";position:absolute}:host([no_caret])::after{display:none}:host([visible]){opacity:1;visibility:visible}:host([position=bottom]){transform:translateX(-50%)}:host([position=bottom])::after{border-bottom:9px solid var(--_tooltip-background-color);border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);left:calc(50% + var(--local-offset-carret-x));top:-8px;transform:translateX(-50%)}:host([use_absolute][position=bottom]){left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=bottom]){top:var(--local-tooltip-to-y)}:host([position=bottom]:not([use_absolute])){bottom:0px;left:50%;transform:translateX(-50%) translateY(calc(100% - 10px))}:host([position=bottom][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(100% + 10px))}:host([no_caret][use_absolute][position=bottom]){top:calc(var(--local-tooltip-from-y) - 8px)}:host([no_caret][use_absolute][visible][position=bottom]){top:calc(var(--local-tooltip-to-y) - 8px)}:host([position=top]){transform:translateX(-50%)}:host([position=top])::after{border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);border-top:9px solid var(--_tooltip-background-color);bottom:-8px;left:calc(50% + var(--local-offset-carret-x));transform:translateX(-50%)}:host([use_absolute][position=top]){bottom:var(--local-tooltip-from-y);left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px)}:host([use_absolute][visible][position=top]){bottom:var(--local-tooltip-to-y)}:host([position=top]:not([use_absolute])){left:50%;top:0px;transform:translateX(-50%) translateY(calc(-100% + 10px))}:host([position=top][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(-100% - 10px))}:host([no_caret][use_absolute][position=top]){bottom:calc(var(--local-tooltip-from-y) - 6px)}:host([no_caret][use_absolute][visible][position=top]){bottom:calc(var(--local-tooltip-to-y) - 6px)}:host([position=right]){transform:translateY(-50%)}:host([position=right])::after{border-bottom:6px solid rgba(0,0,0,0);border-right:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);left:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=right]){left:var(--local-tooltip-from-x);max-width:calc(100% - var(--local-tooltip-to-x) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=right]){left:var(--local-tooltip-to-x)}:host([position=right]:not([use_absolute])){right:0;top:50%;transform:translateX(calc(100% - 10px)) translateY(-50%)}:host([visible][position=right]:not([use_absolute])){transform:translateX(calc(100% + 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=right]){left:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=right]){left:calc(var(--local-tooltip-to-x) - 6px)}:host([position=left]){right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y);transform:translateY(-50%)}:host([position=left])::after{border-bottom:6px solid rgba(0,0,0,0);border-left:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);right:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=left]){max-width:calc(100% - var(--local-tooltip-to-x) - 10px);right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=left]){right:var(--local-tooltip-to-x)}:host([position=left]:not([use_absolute])){left:0;top:50%;transform:translateX(calc(-100% + 10px)) translateY(-50%)}:host([visible][position=left]:not([use_absolute])){transform:translateX(calc(-100% - 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=left]){right:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=left]){right:calc(var(--local-tooltip-to-x) - 6px)}:host([color=primary]){--_tooltip-background-color: var(--color-primary);--_tooltip-color: var(--color-primary-content)}:host([color=secondary]){--_tooltip-background-color: var(--color-secondary);--_tooltip-color: var(--color-secondary-content)}:host([color=green]){--_tooltip-background-color: var(--color-green);--_tooltip-color: var(--color-green-content)}:host([color=success]){--_tooltip-background-color: var(--color-success);--_tooltip-color: var(--color-success-content)}:host([color=red]){--_tooltip-background-color: var(--color-red);--_tooltip-color: var(--color-red-content)}:host([color=error]){--_tooltip-background-color: var(--color-error);--_tooltip-color: var(--color-error-content)}:host([color=orange]){--_tooltip-background-color: var(--color-orange);--_tooltip-color: var(--color-orange-content)}:host([color=warning]){--_tooltip-background-color: var(--color-warning);--_tooltip-color: var(--color-warning-content)}:host([color=blue]){--_tooltip-background-color: var(--color-blue);--_tooltip-color: var(--color-blue-content)}:host([color=information]){--_tooltip-background-color: var(--color-information);--_tooltip-color: var(--color-information-content)}`;
+    static __style = `:host{--local-tooltip-from-y: 0;--local-tooltip-from-x: 0;--local-tooltip-to-y: 0;--local-tooltip-to-x: 0;--local-offset-carret-x: 0px;--local-offset-carret-y: 0px;--_tooltip-elevation: var(--tooltip-elevation, var(--elevation-4))}:host{border-radius:var(--radius-box);box-shadow:var(--elevation-4);opacity:0;padding:5px 15px;pointer-events:none;position:absolute;transition:.5s opacity var(--bezier),.5s visibility var(--bezier),.5s top var(--bezier),.5s bottom var(--bezier),.5s right var(--bezier),.5s left var(--bezier),.5s transform var(--bezier);visibility:hidden;width:max-content;z-index:1}:host::after{content:"";position:absolute}:host([no_caret])::after{display:none}:host([visible]){opacity:1;visibility:visible}:host([position=bottom]){transform:translateX(-50%)}:host([position=bottom])::after{border-bottom:9px solid var(--_tooltip-background-color);border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);left:calc(50% + var(--local-offset-carret-x));top:-8px;transform:translateX(-50%)}:host([use_absolute][position=bottom]){left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=bottom]){top:var(--local-tooltip-to-y)}:host([position=bottom]:not([use_absolute])){bottom:0px;left:50%;transform:translateX(-50%) translateY(calc(100% - 10px))}:host([position=bottom][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(100% + 10px))}:host([no_caret][use_absolute][position=bottom]){top:calc(var(--local-tooltip-from-y) - 8px)}:host([no_caret][use_absolute][visible][position=bottom]){top:calc(var(--local-tooltip-to-y) - 8px)}:host([position=top]){transform:translateX(-50%)}:host([position=top])::after{border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);border-top:9px solid var(--_tooltip-background-color);bottom:-8px;left:calc(50% + var(--local-offset-carret-x));transform:translateX(-50%)}:host([use_absolute][position=top]){bottom:var(--local-tooltip-from-y);left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px)}:host([use_absolute][visible][position=top]){bottom:var(--local-tooltip-to-y)}:host([position=top]:not([use_absolute])){left:50%;top:0px;transform:translateX(-50%) translateY(calc(-100% + 10px))}:host([position=top][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(-100% - 10px))}:host([no_caret][use_absolute][position=top]){bottom:calc(var(--local-tooltip-from-y) - 6px)}:host([no_caret][use_absolute][visible][position=top]){bottom:calc(var(--local-tooltip-to-y) - 6px)}:host([position=right]){transform:translateY(-50%)}:host([position=right])::after{border-bottom:6px solid rgba(0,0,0,0);border-right:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);left:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=right]){left:var(--local-tooltip-from-x);max-width:calc(100% - var(--local-tooltip-to-x) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=right]){left:var(--local-tooltip-to-x)}:host([position=right]:not([use_absolute])){right:0;top:50%;transform:translateX(calc(100% - 10px)) translateY(-50%)}:host([visible][position=right]:not([use_absolute])){transform:translateX(calc(100% + 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=right]){left:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=right]){left:calc(var(--local-tooltip-to-x) - 6px)}:host([position=left]){right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y);transform:translateY(-50%)}:host([position=left])::after{border-bottom:6px solid rgba(0,0,0,0);border-left:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);right:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=left]){max-width:calc(100% - var(--local-tooltip-to-x) - 10px);right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=left]){right:var(--local-tooltip-to-x)}:host([position=left]:not([use_absolute])){left:0;top:50%;transform:translateX(calc(-100% + 10px)) translateY(-50%)}:host([visible][position=left]:not([use_absolute])){transform:translateX(calc(-100% - 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=left]){right:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=left]){right:calc(var(--local-tooltip-to-x) - 6px)}:host([color=neutral]){--_tooltip-background-color: var(--color-neutral);--_tooltip-color: var(--color-neutral-content)}:host([color=primary]){--_tooltip-background-color: var(--color-primary);--_tooltip-color: var(--color-primary-content)}:host([color=secondary]){--_tooltip-background-color: var(--color-secondary);--_tooltip-color: var(--color-secondary-content)}:host([color=accent]){--_tooltip-background-color: var(--color-accent);--_tooltip-color: var(--color-accent-content)}:host([color=info]){--_tooltip-background-color: var(--color-info);--_tooltip-color: var(--color-info-content)}:host([color=success]){--_tooltip-background-color: var(--color-success);--_tooltip-color: var(--color-success-content)}:host([color=warning]){--_tooltip-background-color: var(--color-warning);--_tooltip-color: var(--color-warning-content)}:host([color=error]){--_tooltip-background-color: var(--color-error);--_tooltip-color: var(--color-error-content)}`;
     constructor() {
         super();
         this.onMouseEnter = this.onMouseEnter.bind(this);
@@ -14154,7 +14218,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         target.inputEl.setAttribute("disabled", "disabled");
     }
 })); }
-    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=green]),:host([color=green]):focus,:host([color=green]):focus-within{--input-color: var(--color-green)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=red]),:host([color=red]):focus,:host([color=red]):focus-within{--input-color: var(--color-red)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}:host([color=orange]),:host([color=orange]):focus,:host([color=orange]):focus-within{--input-color: var(--color-orange)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=blue]),:host([color=blue]):focus,:host([color=blue]):focus-within{--input-color: var(--color-blue)}:host([color=information]),:host([color=information]):focus,:host([color=information]):focus-within{--input-color: var(--color-information)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
     constructor() {
         super();
         if (this.constructor == GenericSelect) {
@@ -15634,84 +15698,6 @@ App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController=class Eq
 App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController.Namespace=`Inventaire.App.Http.Controllers.Equipe.GetInventaire`;
 __as1(_.App.Http.Controllers.Equipe.GetInventaire, 'EquipeGetInventaireController', App.Http.Controllers.Equipe.GetInventaire.EquipeGetInventaireController);
 
-App.Models.VariationGroupe=class VariationGroupe extends Aventus.Data {
-    static get Fullname() { return "App.Models.VariationGroupe"; }
-    id;
-    id_materiel;
-    id_template = undefined;
-    nom;
-    variations;
-}
-App.Models.VariationGroupe.Namespace=`Inventaire.App.Models`;
-App.Models.VariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_template":"number","nom":"string","variations":"Inventaire.App.Models.Variation[]"};
-Aventus.Converter.register(App.Models.VariationGroupe.Fullname, App.Models.VariationGroupe);
-__as1(_.App.Models, 'VariationGroupe', App.Models.VariationGroupe);
-
-const VariationTag = class VariationTag extends Aventus.WebComponent {
-    groupe;
-    onDelete = new Aventus.Callback();
-    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-neutral)}`;
-    __getStatic() {
-        return VariationTag;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(VariationTag.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="delete" _id="variationtag_1"></mi-icon></av-tag>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "componentEl",
-      "ids": [
-        "variationtag_0"
-      ]
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "variationtag_1",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "VariationTag";
-    }
-    async triggerDelete() {
-        const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.groupe.nom + "?"
-        });
-        if (result) {
-            this.onDelete.trigger(this);
-        }
-    }
-    postCreation() {
-        super.postCreation();
-        this.componentEl.innerText = this.groupe.nom;
-    }
-}
-VariationTag.Namespace=`Inventaire`;
-VariationTag.Tag=`av-variation-tag`;
-__as1(_, 'VariationTag', VariationTag);
-if(!window.customElements.get('av-variation-tag')){window.customElements.define('av-variation-tag', VariationTag);Aventus.WebComponentInstance.registerDefinition(VariationTag);}
-
-App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
-    variations_groupes;
-    equipes;
-    id = undefined;
-    nom;
-    image = undefined;
-    tout_monde;
-}
-App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-__as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
-
 App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Aventus.Data {
     static get Fullname() { return "App.Http.Controllers.Materiel.MaterielResource"; }
     variations;
@@ -15723,7 +15709,7 @@ App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Av
     tout_monde;
 }
 App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Models.VariationGroupe[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Http.Controllers.Materiel.VariationGroupeResource[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
@@ -15745,7 +15731,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __registerSignalsActions() { this.__signals["item"] = null; super.__registerSignalsActions(); this.__addSignalActions("item", ((target) => {
     target.loadEquipes();
 })); }
-    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;justify-content:stretch;overflow:hidden}:host av-col .img{max-height:250px;width:100%;flex-shrink:0}:host av-col .img av-img{aspect-ratio:1;max-height:250px;width:100%}:host av-col .info{background-color:rgba(0,0,0,0);display:flex;flex-direction:column;flex-grow:1;padding:16px;padding-top:0}:host av-col .info .title{flex-shrink:0;font-size:var(--font-size-md);margin-top:8px}:host av-col .info .variations{display:flex;flex-grow:1;gap:6px;margin-bottom:12px;margin-top:12px}:host av-col .info .variations .tag{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .info .visible{align-items:center;display:flex;flex-shrink:0;min-height:30px;flex-wrap:wrap}:host av-col .info .visible .visible-label{width:100%}:host av-col .info .visible .everybody{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:3px}:host av-col .info .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .info .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
+    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;justify-content:stretch;overflow:hidden}:host av-col .img{max-height:250px;width:100%;flex-shrink:0}:host av-col .img av-img{aspect-ratio:1;max-height:250px;width:100%}:host av-col .info{background-color:rgba(0,0,0,0);display:flex;flex-direction:column;flex-grow:1;padding:16px;padding-top:0}:host av-col .info .title{flex-shrink:0;font-size:var(--font-size-md);margin-top:8px}:host av-col .info .visible{align-items:center;display:flex;flex-shrink:0;min-height:30px;flex-wrap:wrap}:host av-col .info .visible .visible-label{width:100%}:host av-col .info .visible .everybody{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:3px}:host av-col .info .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .info .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
     __getStatic() {
         return MaterielCard;
     }
@@ -15763,12 +15749,9 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         </div>
         <div class="info">
             <div class="title" _id="materielcard_2"></div>
-            <div class="variations">
-                <template _id="materielcard_3"></template>
-            </div>
             <div class="visible">
                 <div class="visible-label">Visible pour :</div>
-                <template _id="materielcard_5"></template>
+                <template _id="materielcard_3"></template>
             </div>
         </div>
     </av-link>
@@ -15778,56 +15761,44 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materielcard_0°to": {
-      "fct": (c) => `/materiel/${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
+      "fct": (c) => `/materiel/${c.print(c.comp.__98d262679bf6afafa524060227ae1154method2())}`,
       "once": true
     },
     "materielcard_1°src": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
       "once": true
     },
     "materielcard_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5())}`,
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
       "once": true
     }
   }
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-                    <av-tag color="accent" _id="materielcard_4"></av-tag>
-                `);templ0.setActions({
-  "content": {
-    "materielcard_4°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6(c.data.variation))}`,
-      "once": true
-    }
-  }
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'materielcard_3',
-                    template: templ0,
-                simple:{data: "this.item.variations_groupes",item:"variation"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
                     <div class="everybody">Tout le monde</div>
-                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                `);const templ1 = new Aventus.Template(this);templ1.setTemplate(`
                     <div class="visible-for">
-                        <template _id="materielcard_6"></template>
+                        <template _id="materielcard_4"></template>
                     </div>
-                `);const templ3 = new Aventus.Template(this);templ3.setTemplate(` 
-                            <av-tag color="accent" _id="materielcard_7"></av-tag>
-                        `);templ3.setActions({
+                `);const templ2 = new Aventus.Template(this);templ2.setTemplate(` 
+                            <av-tag color="accent" _id="materielcard_5"></av-tag>
+                        `);templ2.setActions({
   "content": {
-    "materielcard_7°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method7(c.data.equipe))}`,
+    "materielcard_5°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5(c.data.equipe))}`,
       "once": true
     }
   }
-});templ2.addLoop({
-                    anchorId: 'materielcard_6',
-                    template: templ3,
+});templ1.addLoop({
+                    anchorId: 'materielcard_4',
+                    template: templ2,
                 simple:{data: "this.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materielcard_5',
+                    anchorId: 'materielcard_3',
                     parts: [{once: true,
-                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method1(),
-                    template: templ1
+                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method0(),
+                    template: templ0
                 },{once: true,
                     condition: (c) => true,
-                    template: templ2
+                    template: templ1
                 }]
             }); }
     getClassName() {
@@ -15848,22 +15819,19 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         }
         return "/img/default_img.svg";
     }
-    __98d262679bf6afafa524060227ae1154method3() {
+    __98d262679bf6afafa524060227ae1154method2() {
         return this.item.id;
     }
-    __98d262679bf6afafa524060227ae1154method4() {
+    __98d262679bf6afafa524060227ae1154method3() {
         return this.getSrc();
     }
-    __98d262679bf6afafa524060227ae1154method5() {
+    __98d262679bf6afafa524060227ae1154method4() {
         return this.item.nom;
     }
-    __98d262679bf6afafa524060227ae1154method6(variation) {
-        return variation.nom;
-    }
-    __98d262679bf6afafa524060227ae1154method7(equipe) {
+    __98d262679bf6afafa524060227ae1154method5(equipe) {
         return equipe.nom;
     }
-    __98d262679bf6afafa524060227ae1154method1() {
+    __98d262679bf6afafa524060227ae1154method0() {
         return this.item.tout_monde;
     }
 }
@@ -15885,6 +15853,30 @@ App.Http.Controllers.Equipe.Materiel.EquipeMaterielController=class EquipeMateri
 }
 App.Http.Controllers.Equipe.Materiel.EquipeMaterielController.Namespace=`Inventaire.App.Http.Controllers.Equipe.Materiel`;
 __as1(_.App.Http.Controllers.Equipe.Materiel, 'EquipeMaterielController', App.Http.Controllers.Equipe.Materiel.EquipeMaterielController);
+
+App.Models.VariationGroupe=class VariationGroupe extends Aventus.Data {
+    static get Fullname() { return "App.Models.VariationGroupe"; }
+    id;
+    id_materiel;
+    id_template = undefined;
+    nom;
+    variations;
+}
+App.Models.VariationGroupe.Namespace=`Inventaire.App.Models`;
+App.Models.VariationGroupe.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_materiel":"number","id_template":"number","nom":"string","variations":"Inventaire.App.Models.Variation[]"};
+Aventus.Converter.register(App.Models.VariationGroupe.Fullname, App.Models.VariationGroupe);
+__as1(_.App.Models, 'VariationGroupe', App.Models.VariationGroupe);
+
+App.Http.Controllers.Materiel.MaterielRequest=class MaterielRequest {
+    variations_groupes;
+    equipes;
+    id = undefined;
+    nom;
+    image = undefined;
+    tout_monde;
+}
+App.Http.Controllers.Materiel.MaterielRequest.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
+__as1(_.App.Http.Controllers.Materiel, 'MaterielRequest', App.Http.Controllers.Materiel.MaterielRequest);
 
 App.Models.Materiel=class Materiel extends Aventus.Data {
     static get Fullname() { return "App.Models.Materiel"; }
@@ -15920,11 +15912,12 @@ App.Models.Perte=class Perte extends Aventus.Data {
     quantite;
     date;
     par;
+    commentaire;
     equipe;
     materiel;
 }
 App.Models.Perte.Namespace=`Inventaire.App.Models`;
-App.Models.Perte.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+App.Models.Perte.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","commentaire":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
 Aventus.Converter.register(App.Models.Perte.Fullname, App.Models.Perte);
 __as1(_.App.Models, 'Perte', App.Models.Perte);
 
@@ -15937,12 +15930,13 @@ App.Models.Mouvement=class Mouvement extends Aventus.Data {
     quantite;
     date;
     par;
+    commentaire;
     equipe_sortie;
     equipe_entree;
     materiel;
 }
 App.Models.Mouvement.Namespace=`Inventaire.App.Models`;
-App.Models.Mouvement.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe_sortie":"number","id_equipe_entree":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe_sortie":"Inventaire.App.Models.Equipe","equipe_entree":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+App.Models.Mouvement.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe_sortie":"number","id_equipe_entree":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","commentaire":"string","equipe_sortie":"Inventaire.App.Models.Equipe","equipe_entree":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
 Aventus.Converter.register(App.Models.Mouvement.Fullname, App.Models.Mouvement);
 __as1(_.App.Models, 'Mouvement', App.Models.Mouvement);
 
@@ -15954,11 +15948,12 @@ App.Models.Achat=class Achat extends Aventus.Data {
     quantite;
     date;
     par;
+    commentaire;
     equipe;
     materiel;
 }
 App.Models.Achat.Namespace=`Inventaire.App.Models`;
-App.Models.Achat.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
+App.Models.Achat.$schema={...(Aventus.Data?.$schema ?? {}), "id":"number","id_equipe":"number","id_materiel_variation":"number","quantite":"number","date":"Date","par":"string","commentaire":"string","equipe":"Inventaire.App.Models.Equipe","materiel":"Inventaire.App.Models.MaterielVariation"};
 Aventus.Converter.register(App.Models.Achat.Fullname, App.Models.Achat);
 __as1(_.App.Models, 'Achat', App.Models.Achat);
 
@@ -16003,12 +15998,17 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
 					}
 					set 'nb'(val) {
 						this.__signals["nb"].value = val;
+					}get 'comment'() {
+						return this.__signals["comment"].value;
+					}
+					set 'comment'(val) {
+						this.__signals["comment"].value = val;
 					}get 'equipe'() {
 						return this.__signals["equipe"].value;
 					}
 					set 'equipe'(val) {
 						this.__signals["equipe"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
     __getStatic() {
         return ModalInventaireAchat;
@@ -16020,7 +16020,7 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireachat_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireachat_1"></av-input></div><div class="footer">    <av-button _id="modalinventaireachat_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireachat_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireachat_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireachat_1"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventaireachat_2"></av-input></div><div class="footer">    <av-button _id="modalinventaireachat_3">Annuler</av-button>    <av-button color="primary" _id="modalinventaireachat_4">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16049,6 +16049,17 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
       "extract": (c, v) => c.comp.__4efee192411d842bca24f09a939e11e0method2(v),
       "once": true,
       "isCallback": true
+    },
+    {
+      "id": "modalinventaireachat_2",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__4efee192411d842bca24f09a939e11e0method3(),
+      "extract": (c, v) => c.comp.__4efee192411d842bca24f09a939e11e0method4(v),
+      "once": true,
+      "isCallback": true
     }
   ],
   "events": [
@@ -16060,11 +16071,11 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
   ],
   "pressEvents": [
     {
-      "id": "modalinventaireachat_2",
+      "id": "modalinventaireachat_3",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     },
     {
-      "id": "modalinventaireachat_3",
+      "id": "modalinventaireachat_4",
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     }
   ]
@@ -16072,8 +16083,8 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     getClassName() {
         return "ModalInventaireAchat";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipe'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -16112,7 +16123,8 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
         const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Achat.InventaireAchatController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
-            quantite: nb
+            quantite: nb,
+            commentaire: this.comment
         }));
         if (result) {
             this.resolve(result);
@@ -16145,6 +16157,14 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     __4efee192411d842bca24f09a939e11e0method2(v) {
         if (this) {
             this.nb = v;
+        }
+    }
+    __4efee192411d842bca24f09a939e11e0method3() {
+        return this.comment;
+    }
+    __4efee192411d842bca24f09a939e11e0method4(v) {
+        if (this) {
+            this.comment = v;
         }
     }
 }
@@ -16199,7 +16219,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
     this.__addWatchesActions("historiques");    super.__registerWatchesActions();
 }
     __registerSignalsActions() { this.__signals["equipe"] = null;this.__signals["variation"] = null; super.__registerSignalsActions();  }
-    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;flex-grow:1;min-height:0;width:100%}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;flex-direction:column;padding:8px 16px}:host .content .line .qty{font-weight:bold}:host .content .line .sortie{font-weight:bold;color:var(--color-neutral)}:host .content .line .entree{font-weight:bold;color:var(--color-neutral)}:host .content .line .current{color:var(--color-primary)}:host .content .line .small{font-size:13px;margin-top:4px}:host .content .key{display:none;width:120px}:host .content .value{display:inline-block}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}`;
+    static __style = `:host .modal{display:flex;flex-direction:column;max-height:calc(100% - 40px);max-width:min(100% - 40px,700px);min-height:0;overflow:hidden}:host .title{flex-shrink:0;font-size:var(--font-size-md);margin-bottom:16px}:host .content{border:1px solid var(--color-base-300);border-radius:var(--radius-field);display:flex;flex-direction:column;flex-grow:1;min-height:0;width:100%}:host .content .line{border-top:1px solid var(--color-base-300);display:flex;flex-direction:column;padding:8px 16px}:host .content .line .qty{font-weight:bold}:host .content .line .sortie{font-weight:bold;color:var(--color-neutral)}:host .content .line .entree{font-weight:bold;color:var(--color-neutral)}:host .content .line .current{color:var(--color-primary)}:host .content .line .comment{font-size:14px}:host .content .line .small{font-size:13px;margin-top:4px}:host .content .key{display:none;width:120px}:host .content .value{display:inline-block}:host .content .line:first-child{border-top:none}:host .footer{display:flex;flex-shrink:0;gap:.5rem;justify-content:flex-end;margin-top:1rem}`;
     __getStatic() {
         return ModalHistorique;
     }
@@ -16307,7 +16327,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
     getTxt(historique) {
         let txt = "";
         if (historique.type == "achat") {
-            txt = "<div class=\"info\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            txt = "<div class=\"action\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
             if (historique.equipe_entree == this.equipe.nom) {
                 txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
             }
@@ -16317,7 +16337,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
             txt += "</div>";
         }
         else if (historique.type == "perte") {
-            txt = "<div class=\"info\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            txt = "<div class=\"action\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
             if (historique.equipe_entree == this.equipe.nom) {
                 txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
             }
@@ -16329,7 +16349,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
         else {
             if (!historique.equipe_sortie)
                 return "";
-            txt = "<div class=\"info\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
+            txt = "<div class=\"action\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
             if (historique.equipe_sortie == this.equipe.nom) {
                 txt += "<span class=\"sortie current\">" + historique.equipe_sortie + "</span> vers ";
             }
@@ -16344,6 +16364,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
             }
             txt += "</div>";
         }
+        txt += "<div class=\"comment\">" + historique.commentaire + "</div>";
         txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
         return txt;
     }
@@ -16410,6 +16431,11 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
 					}
 					set 'nb'(val) {
 						this.__signals["nb"].value = val;
+					}get 'comment'() {
+						return this.__signals["comment"].value;
+					}
+					set 'comment'(val) {
+						this.__signals["comment"].value = val;
 					}get 'equipeSortie'() {
 						return this.__signals["equipeSortie"].value;
 					}
@@ -16420,7 +16446,7 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
 					}
 					set 'equipeEntree'(val) {
 						this.__signals["equipeEntree"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipeSortie"] = null;this.__signals["equipeEntree"] = null; super.__registerSignalsActions();  }
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipeSortie"] = null;this.__signals["equipeEntree"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .form .btn{align-items:center;display:flex;justify-content:center}:host .footer{display:flex;gap:.5rem;justify-content:flex-end;margin-top:2rem}`;
     __getStatic() {
         return ModalInventaireMouvement;
@@ -16432,7 +16458,7 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventairemouvement_0"></div><div class="form">    <av-equipe-select label="Sortie" searchable _id="modalinventairemouvement_1"></av-equipe-select>    <div class="btn">        <av-icon-action icon="swap_vert" _id="modalinventairemouvement_2"></av-icon-action>    </div>    <av-equipe-select label="Entrée" searchable _id="modalinventairemouvement_3"></av-equipe-select>    <av-input type="number" label="Quantité" _id="modalinventairemouvement_4"></av-input></div><div class="footer">    <av-button _id="modalinventairemouvement_5">Annuler</av-button>    <av-button color="primary" _id="modalinventairemouvement_6">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventairemouvement_0"></div><div class="form">    <av-equipe-select label="Sortie" searchable _id="modalinventairemouvement_1"></av-equipe-select>    <div class="btn">        <av-icon-action icon="swap_vert" _id="modalinventairemouvement_2"></av-icon-action>    </div>    <av-equipe-select label="Entrée" searchable _id="modalinventairemouvement_3"></av-equipe-select>    <av-input type="number" label="Quantité" _id="modalinventairemouvement_4"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventairemouvement_5"></av-input></div><div class="footer">    <av-button _id="modalinventairemouvement_6">Annuler</av-button>    <av-button color="primary" _id="modalinventairemouvement_7">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16483,6 +16509,17 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
       "extract": (c, v) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method6(v),
       "once": true,
       "isCallback": true
+    },
+    {
+      "id": "modalinventairemouvement_5",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method7(),
+      "extract": (c, v) => c.comp.__86aa5df7aefa315fd11dd30e333e28b4method8(v),
+      "once": true,
+      "isCallback": true
     }
   ],
   "events": [
@@ -16498,11 +16535,11 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
       "onPress": (e, pressInstance, c) => { c.comp.swap(e, pressInstance); }
     },
     {
-      "id": "modalinventairemouvement_5",
+      "id": "modalinventairemouvement_6",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     },
     {
-      "id": "modalinventairemouvement_6",
+      "id": "modalinventairemouvement_7",
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     }
   ]
@@ -16510,8 +16547,8 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
     getClassName() {
         return "ModalInventaireMouvement";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipeSortie"] = undefined;s["equipeEntree"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipeSortie');this.__correctGetter('equipeEntree'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipeSortie"] = undefined;s["equipeEntree"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipeSortie');this.__correctGetter('equipeEntree'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -16559,6 +16596,7 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
             id_equipe_sortie: this.equipeSortie.id,
             id_materiel_variation: this.variation.id,
             quantite: nb,
+            commentaire: this.comment
         }));
         if (result) {
             this.resolve(result);
@@ -16619,6 +16657,14 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
             this.nb = v;
         }
     }
+    __86aa5df7aefa315fd11dd30e333e28b4method7() {
+        return this.comment;
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method8(v) {
+        if (this) {
+            this.comment = v;
+        }
+    }
 }
 ModalInventaireMouvement.Namespace=`Inventaire`;
 ModalInventaireMouvement.Tag=`av-modal-inventaire-mouvement`;
@@ -16650,12 +16696,17 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
 					}
 					set 'nb'(val) {
 						this.__signals["nb"].value = val;
+					}get 'comment'() {
+						return this.__signals["comment"].value;
+					}
+					set 'comment'(val) {
+						this.__signals["comment"].value = val;
 					}get 'equipe'() {
 						return this.__signals["equipe"].value;
 					}
 					set 'equipe'(val) {
 						this.__signals["equipe"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
     __getStatic() {
         return ModalInventairePerte;
@@ -16667,7 +16718,7 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireperte_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireperte_1"></av-input></div><div class="footer">    <av-button _id="modalinventaireperte_2">Annuler</av-button>    <av-button color="primary" _id="modalinventaireperte_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireperte_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireperte_1"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventaireperte_2"></av-input></div><div class="footer">    <av-button _id="modalinventaireperte_3">Annuler</av-button>    <av-button color="primary" _id="modalinventaireperte_4">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16696,6 +16747,17 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
       "extract": (c, v) => c.comp.__3c04e62a0c816dca149557743a338609method2(v),
       "once": true,
       "isCallback": true
+    },
+    {
+      "id": "modalinventaireperte_2",
+      "injectionName": "value",
+      "eventNames": [
+        "onChange"
+      ],
+      "inject": (c) => c.comp.__3c04e62a0c816dca149557743a338609method3(),
+      "extract": (c, v) => c.comp.__3c04e62a0c816dca149557743a338609method4(v),
+      "once": true,
+      "isCallback": true
     }
   ],
   "events": [
@@ -16707,11 +16769,11 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
   ],
   "pressEvents": [
     {
-      "id": "modalinventaireperte_2",
+      "id": "modalinventaireperte_3",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     },
     {
-      "id": "modalinventaireperte_3",
+      "id": "modalinventaireperte_4",
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     }
   ]
@@ -16719,8 +16781,8 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
     getClassName() {
         return "ModalInventairePerte";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('equipe'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -16759,7 +16821,8 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
         const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Perte.InventairePerteController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
-            quantite: nb
+            quantite: nb,
+            commentaire: this.comment
         }));
         if (result) {
             this.resolve(result);
@@ -16794,6 +16857,14 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
             this.nb = v;
         }
     }
+    __3c04e62a0c816dca149557743a338609method3() {
+        return this.comment;
+    }
+    __3c04e62a0c816dca149557743a338609method4(v) {
+        if (this) {
+            this.comment = v;
+        }
+    }
 }
 ModalInventairePerte.Namespace=`Inventaire`;
 ModalInventairePerte.Tag=`av-modal-inventaire-perte`;
@@ -16807,11 +16878,7 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
 					set 'inventaire'(val) {
 						this.__watch["inventaire"] = val;
 					}    __registerWatchesActions() {
-    this.__addWatchesActions("inventaire", ((target, action, path, value) => {
-    if (target.inventaire.quantite == 0) {
-        target.style.display = "none";
-    }
-}));    super.__registerWatchesActions();
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
 }
     static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom{transform:translateY(0px)}:host .line:not(.exist) .main .variation{transform:translateY(0px)}:host .line:not(.exist) .main .quantite{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
     __getStatic() {
@@ -16841,9 +16908,9 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
         <div class="modification">
             <div class="actions">
                 <template _id="inventairelistitem_4"></template>
-                <av-icon-action color="neutral" icon="compare_arrows" _id="inventairelistitem_6">Transfert</av-icon-action>
+                <av-icon-action color="warning" icon="compare_arrows" _id="inventairelistitem_6">Transfert</av-icon-action>
                 <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_7">Historique</av-icon-action>
-                <av-icon-action color="neutral" icon="delete_forever" _id="inventairelistitem_8">Perte</av-icon-action>
+                <av-icon-action color="error" icon="delete_forever" _id="inventairelistitem_8">Perte</av-icon-action>
             </div>
         </div>
     </div>
@@ -16887,7 +16954,7 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                    <av-icon-action color="neutral" icon="attach_money" _id="inventairelistitem_5">Achat</av-icon-action>
+                    <av-icon-action color="accent" icon="attach_money" _id="inventairelistitem_5">Achat</av-icon-action>
                 `);templ0.setActions({
   "pressEvents": [
     {
@@ -16907,6 +16974,14 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     }
     __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["inventaire"] = undefined; }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('inventaire'); }
+    defaultHide() {
+        const frame = this.findParentByType(MaterielDetailsPage);
+        if (frame && !frame.voir_vide) {
+            if (this.inventaire.quantite == 0) {
+                this.style.display = "none";
+            }
+        }
+    }
     getLastUpdate() {
         if (this.inventaire.date) {
             return this.inventaire.par + ", le " + this.inventaire.date.toLocaleDateString(undefined, {
@@ -16965,6 +17040,9 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
         }
         return names.join(" ");
     }
+    postCreation() {
+        this.defaultHide();
+    }
     __a95c8f763743275e162a27eb63a3f98emethod1() {
         return this.inventaire.id > 0 ? 'exist' : '';
     }
@@ -16989,6 +17067,20 @@ InventaireListItem.Tag=`av-inventaire-list-item`;
 __as1(_, 'InventaireListItem', InventaireListItem);
 if(!window.customElements.get('av-inventaire-list-item')){window.customElements.define('av-inventaire-list-item', InventaireListItem);Aventus.WebComponentInstance.registerDefinition(InventaireListItem);}
 
+App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController=class MaterielDuplicateController extends Aventus.HttpRoute {
+    constructor(router) {
+        super(router);
+        this.request = this.request.bind(this);
+    }
+    async request(body) {
+        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/duplicate`, Aventus.HttpMethod.POST);
+        request.setBody(body);
+        return await request.queryJSON(this.router);
+    }
+}
+App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
+__as1(_.App.Http.Controllers.Materiel.Duplicate, 'MaterielDuplicateController', App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController);
+
 App.Http.Controllers.Materiel.GetInventaire.MaterielGetInventaireController=class MaterielGetInventaireController extends Aventus.HttpRoute {
     constructor(router) {
         super(router);
@@ -17010,6 +17102,37 @@ App.Http.Controllers.Materiel.MaterielController=class MaterielController extend
 }
 App.Http.Controllers.Materiel.MaterielController.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
 __as1(_.App.Http.Controllers.Materiel, 'MaterielController', App.Http.Controllers.Materiel.MaterielController);
+
+let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
+    /**
+     * @inheritdoc
+     */
+    defineRoutes() {
+        return new App.Http.Controllers.Materiel.MaterielController();
+    }
+    /**
+     * Create a singleton to store data
+     */
+    static getInstance() {
+        return Aventus.Instance.get(MaterielRAM);
+    }
+    /**
+     * @inheritdoc
+     */
+    defineIndexKey() {
+        return 'id';
+    }
+    async duplicate(id_materiel) {
+        const result = await new App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController().request({ id_materiel });
+        if (result.result) {
+            const temp = new Aventus.ResultWithError();
+            this.addOrUpdateData(result.result, temp);
+        }
+        return result;
+    }
+}
+MaterielRAM.Namespace=`Inventaire`;
+__as1(_, 'MaterielRAM', MaterielRAM);
 
 App.Http.Controllers.User.UserController=class UserController extends AventusPhp.ModelController {
     getRequest() { return _.App.Http.Controllers.User.UserRequest; }
@@ -17380,11 +17503,7 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
 						this.__watch["inventaire"] = val;
 					}    equipe;
     __registerWatchesActions() {
-    this.__addWatchesActions("inventaire", ((target, action, path, value) => {
-    if (target.inventaire.quantite == 0) {
-        target.style.display = "none";
-    }
-}));    super.__registerWatchesActions();
+    this.__addWatchesActions("inventaire");    super.__registerWatchesActions();
 }
     static __style = `:host{border-top:1px solid var(--color-base-300);padding:8px 16px;position:relative}:host .line .main{align-items:center;display:flex;gap:20px}:host .line .main .img{background-image:url("https://placeholderimage.eu/api/800/600");background-position:center;background-size:cover;flex-shrink:0;height:34px;transform:translateY(7px);width:34px}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite{flex-grow:1;transform:translateY(7px);width:33%}:host .line .main .key{display:none;width:100px}:host .line .main .modification{display:flex;justify-content:flex-end;width:60px}:host .line .main .modification .actions{display:flex}:host .line .main .modification av-icon-action{width:fit-content}:host .line .last-update{font-size:var(--font-size-sm);text-align:right;transform:translateY(5px);white-space:nowrap}:host .line:not(.exist) .main .nom,:host .line:not(.exist) .main .variation,:host .line:not(.exist) .main .quantite,:host .line:not(.exist) .main .img{transform:translateY(0px)}:host .line:not(.exist) .main .modification .actions .historique{display:none}:host .line:not(.exist) .last-update{display:none}:host(:first-child){border-top:none}@media screen and (max-width: 700px){:host{padding:16px 16px}:host .line .main{display:block;margin-bottom:5px;padding-right:30px;width:fit-content}:host .line .main .nom,:host .line .main .variation,:host .line .main .quantite,:host .line .main .img{flex-grow:0;margin-top:5px;transform:translateY(0px);width:100%}:host .line .main .img{height:100px;width:100px;margin-top:0}:host .line .main .key{display:inline-block}:host .line .main .modification{position:absolute;right:10px;top:10px}:host .line .main .modification .actions{flex-direction:column;gap:14px}:host .line .last-update{transform:translateY(0px);white-space:wrap}}`;
     __getStatic() {
@@ -17415,9 +17534,9 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         <div class="modification">
             <div class="actions">
                 <template _id="inventaireequipelistitem_5"></template>
-                <av-icon-action color="neutral" icon="compare_arrows" _id="inventaireequipelistitem_7">Transfert</av-icon-action>
+                <av-icon-action color="warning" icon="compare_arrows" _id="inventaireequipelistitem_7">Transfert</av-icon-action>
                 <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_8">Historique</av-icon-action>
-                <av-icon-action color="neutral" icon="delete_forever" _id="inventaireequipelistitem_9">Perte</av-icon-action>
+                <av-icon-action color="error" icon="delete_forever" _id="inventaireequipelistitem_9">Perte</av-icon-action>
             </div>
         </div>
     </div>
@@ -17465,7 +17584,7 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                    <av-icon-action color="neutral" icon="attach_money" _id="inventaireequipelistitem_6">Achat</av-icon-action>
+                    <av-icon-action color="accent" icon="attach_money" _id="inventaireequipelistitem_6">Achat</av-icon-action>
                 `);templ0.setActions({
   "pressEvents": [
     {
@@ -17548,6 +17667,17 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
             names.push(group.variation.nom);
         }
         return names.join(" ");
+    }
+    defaultHide() {
+        const frame = this.findParentByType(EquipeDetailsPage);
+        if (frame && !frame.voirVide) {
+            if (this.inventaire.quantite == 0) {
+                this.style.display = "none";
+            }
+        }
+    }
+    postCreation() {
+        this.defaultHide();
     }
     __a2ec46d163f7617d318fc452e85fb3c8method1() {
         return this.inventaire.id > 0 ? 'exist' : '';
@@ -17818,51 +17948,6 @@ EquipeDetailsPage.Namespace=`Inventaire`;
 EquipeDetailsPage.Tag=`av-equipe-details-page`;
 __as1(_, 'EquipeDetailsPage', EquipeDetailsPage);
 if(!window.customElements.get('av-equipe-details-page')){window.customElements.define('av-equipe-details-page', EquipeDetailsPage);Aventus.WebComponentInstance.registerDefinition(EquipeDetailsPage);}
-
-App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController=class MaterielDuplicateController extends Aventus.HttpRoute {
-    constructor(router) {
-        super(router);
-        this.request = this.request.bind(this);
-    }
-    async request(body) {
-        const request = new Aventus.HttpRequest(`${this.getPrefix()}/data/materiel/duplicate`, Aventus.HttpMethod.POST);
-        request.setBody(body);
-        return await request.queryJSON(this.router);
-    }
-}
-App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController.Namespace=`Inventaire.App.Http.Controllers.Materiel.Duplicate`;
-__as1(_.App.Http.Controllers.Materiel.Duplicate, 'MaterielDuplicateController', App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController);
-
-let MaterielRAM=class MaterielRAM extends AventusPhp.RamHttp {
-    /**
-     * @inheritdoc
-     */
-    defineRoutes() {
-        return new App.Http.Controllers.Materiel.MaterielController();
-    }
-    /**
-     * Create a singleton to store data
-     */
-    static getInstance() {
-        return Aventus.Instance.get(MaterielRAM);
-    }
-    /**
-     * @inheritdoc
-     */
-    defineIndexKey() {
-        return 'id';
-    }
-    async duplicate(id_materiel) {
-        const result = await new App.Http.Controllers.Materiel.Duplicate.MaterielDuplicateController().request({ id_materiel });
-        if (result.result) {
-            const temp = new Aventus.ResultWithError();
-            this.addOrUpdateData(result.result, temp);
-        }
-        return result;
-    }
-}
-MaterielRAM.Namespace=`Inventaire`;
-__as1(_, 'MaterielRAM', MaterielRAM);
 
 const MaterielPage = class MaterielPage extends PageFull {
     list = [];
@@ -18247,11 +18332,35 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 return "/materiel";
             }
             this.item = item;
-            this.form.item = ram.toRequest(item);
+            this.form.item = this.itemToRequest(item);
             this.objName = this.form.item.nom;
             await this.loadInventaire(id);
         }
         return true;
+    }
+    itemToRequest(item) {
+        const ram = MaterielRAM.getInstance();
+        const itemForm = ram.toRequest(item);
+        for (let i = 0; i < itemForm.variations_groupes.length; i++) {
+            const groupe = itemForm.variations_groupes[i];
+            if (groupe instanceof App.Http.Controllers.Materiel.VariationGroupeResource) {
+                const newGroupe = new App.Models.VariationGroupe();
+                newGroupe.id = groupe.id;
+                newGroupe.id_template = groupe.id_template;
+                newGroupe.nom = groupe.nom;
+                newGroupe.variations = [];
+                for (let v of groupe.variations) {
+                    const variation = new App.Models.Variation();
+                    variation.id = v.id;
+                    variation.id_groupe = newGroupe.id;
+                    variation.id_variation_template = v.id_variation_template;
+                    variation.nom = v.nom;
+                    newGroupe.variations.push(variation);
+                }
+                itemForm.variations_groupes.splice(i, 1, groupe);
+            }
+        }
+        return itemForm;
     }
     async loadInventaire(id) {
         const item = this.item;
@@ -18335,9 +18444,8 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
                 this.router?.navigate('/materiel/' + result.result.id);
             }
             else {
-                const ram = MaterielRAM.getInstance();
                 this.item = result.result;
-                const request = ram.toRequest(result.result);
+                const request = this.itemToRequest(result.result);
                 this.form.item = request;
                 this.objName = this.form.item.nom;
                 await this.loadInventaire(this.item.id);
@@ -19325,14 +19433,21 @@ if(!window.customElements.get('av-equipe-tags')){window.customElements.define('a
 
 const ModalTag = class ModalTag extends Modal {
     get 'resource'() {
-						return this.__watch["resource"];
+						return this.__signals["resource"].value;
 					}
 					set 'resource'(val) {
-						this.__watch["resource"] = val;
-					}    __registerWatchesActions() {
-    this.__addWatchesActions("resource");    super.__registerWatchesActions();
-}
-    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
+						this.__signals["resource"].value = val;
+					}get 'variationGroupe'() {
+						return this.__signals["variationGroupe"].value;
+					}
+					set 'variationGroupe'(val) {
+						this.__signals["variationGroupe"].value = val;
+					}    __registerSignalsActions() { this.__signals["resource"] = null;this.__signals["variationGroupe"] = null; super.__registerSignalsActions(); this.__addSignalActions("resource", ((target) => {
+    target.renderList();
+}));this.__addSignalActions("variationGroupe", ((target) => {
+    target.setValue();
+})); }
+    static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .tag-container{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
     __getStatic() {
         return ModalTag;
     }
@@ -19343,7 +19458,7 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select></div><div class="footer">    <av-button _id="modaltag_2">Annuler</av-button>    <av-button color="primary" _id="modaltag_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select>    <div class="tag-container" _id="modaltag_2">    </div></div><div class="footer">    <av-button _id="modaltag_3">Annuler</av-button>    <av-button color="primary" _id="modaltag_4">Enregistrer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19352,6 +19467,12 @@ const ModalTag = class ModalTag extends Modal {
       "name": "inputEl",
       "ids": [
         "modaltag_1"
+      ]
+    },
+    {
+      "name": "tagContainer",
+      "ids": [
+        "modaltag_2"
       ]
     }
   ],
@@ -19376,11 +19497,11 @@ const ModalTag = class ModalTag extends Modal {
   ],
   "pressEvents": [
     {
-      "id": "modaltag_2",
+      "id": "modaltag_3",
       "onPress": (e, pressInstance, c) => { c.comp.reject(e, pressInstance); }
     },
     {
-      "id": "modaltag_3",
+      "id": "modaltag_4",
       "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     }
   ]
@@ -19388,19 +19509,69 @@ const ModalTag = class ModalTag extends Modal {
     getClassName() {
         return "ModalTag";
     }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["resource"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('resource'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["resource"] = undefined;s["variationGroupe"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('resource');this.__correctGetter('variationGroupe'); }
     configure() {
         return {
             title: "Edition de variation",
         };
+    }
+    async setValue() {
+        if (!this.variationGroupe?.id_template) {
+            this.resource = undefined;
+        }
+        else {
+            const result = await VariationGroupeTemplateRAM.getInstance().getById(this.variationGroupe.id_template);
+            this.resource = result;
+        }
+    }
+    renderList() {
+        this.tagContainer.innerHTML = "";
+        if (this.resource) {
+            for (let variation of this.resource.variations) {
+                const tag = new CheckboxTag();
+                tag.innerHTML = variation.nom;
+                tag.setAttribute("id_variation_template", variation.id + '');
+                if (this.variationGroupe?.id) {
+                    tag.checked = this.variationGroupe ? this.variationGroupe.variations.some(p => p.id_variation_template == variation.id) : false;
+                }
+                else {
+                    tag.checked = true;
+                }
+                this.tagContainer.appendChild(tag);
+            }
+        }
     }
     save() {
         if (!this.resource) {
             this.inputEl.errors = ["Il faut une variation"];
             return;
         }
-        this.resolve(this.resource);
+        const groupe = this.variationGroupe ?? new App.Models.VariationGroupe();
+        groupe.nom = this.resource.nom;
+        groupe.id_template = this.resource.id;
+        groupe.variations = groupe.variations ?? [];
+        let children = Array.from(this.tagContainer.children);
+        for (let child of children) {
+            if (child instanceof CheckboxTag) {
+                let id = Number(child.getAttribute('id_variation_template'));
+                if (child.checked) {
+                    if (!groupe.variations.find(p => p.id_variation_template == id)) {
+                        const variation = new App.Models.Variation();
+                        variation.nom = child.innerHTML;
+                        variation.id_variation_template = id;
+                        groupe.variations.push(variation);
+                    }
+                }
+                else {
+                    const index = groupe.variations.findIndex(p => p.id_variation_template == id);
+                    if (index != -1) {
+                        groupe.variations.splice(index, 1);
+                    }
+                }
+            }
+        }
+        this.resolve(groupe);
     }
     __105132b7f1fa65d09c3cc981e16ef0efmethod0() {
         return this.options.title;
@@ -19419,8 +19590,81 @@ ModalTag.Tag=`av-modal-tag`;
 __as1(_, 'ModalTag', ModalTag);
 if(!window.customElements.get('av-modal-tag')){window.customElements.define('av-modal-tag', ModalTag);Aventus.WebComponentInstance.registerDefinition(ModalTag);}
 
+const VariationTag = class VariationTag extends Aventus.WebComponent {
+    groupe;
+    onDelete = new Aventus.Callback();
+    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-primary)}`;
+    __getStatic() {
+        return VariationTag;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(VariationTag.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "componentEl",
+      "ids": [
+        "variationtag_0"
+      ]
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "variationtag_1",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerUpdate(e, pressInstance); }
+    },
+    {
+      "id": "variationtag_2",
+      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
+    }
+  ]
+}); }
+    getClassName() {
+        return "VariationTag";
+    }
+    async triggerDelete() {
+        const result = await Confirm.open({
+            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.groupe.nom + "?"
+        });
+        if (result) {
+            this.onDelete.trigger(this);
+        }
+    }
+    async triggerUpdate() {
+        const p = new ModalTag();
+        p.variationGroupe = this.groupe;
+        const template = await p.show();
+        if (template === null)
+            return;
+        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
+    }
+    postCreation() {
+        super.postCreation();
+        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
+    }
+}
+VariationTag.Namespace=`Inventaire`;
+VariationTag.Tag=`av-variation-tag`;
+__as1(_, 'VariationTag', VariationTag);
+if(!window.customElements.get('av-variation-tag')){window.customElements.define('av-variation-tag', VariationTag);Aventus.WebComponentInstance.registerDefinition(VariationTag);}
+
 const VariationTags = class VariationTags extends Aventus.WebComponent {
-    variations = [];
+    get 'variations'() {
+						return this.__signals["variations"].value;
+					}
+					set 'variations'(val) {
+						this.__signals["variations"].value = val;
+					}    __registerSignalsActions() { this.__signals["variations"] = null; super.__registerSignalsActions(); this.__addSignalActions("variations", ((target) => {
+    target.render();
+})); }
     static __style = `:host{display:flex;flex-wrap:wrap;gap:6px}:host .list{display:flex;flex-wrap:wrap;gap:6px}`;
     constructor() {
         super();
@@ -19458,6 +19702,8 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     getClassName() {
         return "VariationTags";
     }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variations"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variations'); }
     onChildDelete(el) {
         let children = Array.from(this.listEl.children);
         let index = children.indexOf(el);
@@ -19475,19 +19721,9 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     async addVariation() {
         const p = new ModalTag();
-        const template = await p.show();
-        if (template === null)
+        const groupe = await p.show();
+        if (groupe === null)
             return;
-        const groupe = new App.Models.VariationGroupe();
-        groupe.nom = template.nom;
-        groupe.id_template = template.id;
-        groupe.variations = [];
-        for (let v of template.variations) {
-            const variation = new App.Models.Variation();
-            variation.nom = v.nom;
-            variation.id_variation_template = v.id;
-            groupe.variations.push(variation);
-        }
         let el = new VariationTag();
         el.groupe = groupe;
         el.onDelete.add(this.onChildDelete);
@@ -19495,7 +19731,6 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
         this.variations.push(groupe);
     }
     postCreation() {
-        this.render();
     }
 }
 VariationTags.Namespace=`Inventaire`;

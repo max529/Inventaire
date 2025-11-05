@@ -37,24 +37,6 @@
 				margin-top: 8px;
 			}
 
-			.variations {
-				display: flex;
-				flex-grow: 1;
-				gap: 6px;
-				margin-bottom: 12px;
-				margin-top: 12px;
-
-				.tag {
-					align-items: center;
-					background-color: var(--color-tag);
-					border-radius: 50px;
-					display: flex;
-					font-size: var(--font-size-sm);
-					justify-content: center;
-					padding: 4px 8px;
-				}
-			}
-
 			.visible {
 				align-items: center;
 				display: flex;

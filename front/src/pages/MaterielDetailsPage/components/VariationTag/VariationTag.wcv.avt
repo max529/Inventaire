@@ -1,4 +1,5 @@
 <av-tag color="accent">
     <span @element="componentEl"></span>
+    <mi-icon icon="edit" class="edit" @press="triggerUpdate"></mi-icon>
     <mi-icon icon="delete" @press="triggerDelete"></mi-icon>
 </av-tag>

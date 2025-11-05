@@ -1,0 +1,46 @@
+import { FormElement } from "Aventus@UI:Aventus.Form.package.avt";
+import { PressManager } from "Aventus@Main:Aventus.package.avt";
+
+export class CheckboxTag extends FormElement<boolean> implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+    @Property((target: CheckboxTag) => {
+        target.value = target.checked;
+    })
+    public checked!: boolean;
+
+    //#endregion
+
+
+    //#region variables
+
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+    protected override onValueChange(value: boolean | undefined): void {
+        super.onValueChange(value);
+        this.checked = this.value ?? false;
+    }
+    protected override postCreation(): void {
+        super.postCreation();
+        new PressManager({
+            element: this,
+            onPress: () => {
+                this.checked = !this.checked;
+            }
+        });
+    }
+    //#endregion
+
+}

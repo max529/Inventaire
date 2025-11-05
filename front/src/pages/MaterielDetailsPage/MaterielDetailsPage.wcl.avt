@@ -20,6 +20,9 @@ import type { MaterielVariation } from "../../generated/app/Models/MaterielVaria
 import { MaterielVariationResource } from "../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 import type { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
 import { MaterielDuplicateController } from "../../generated/app/Http/Controllers/Materiel/Duplicate/Controller.lib.avt";
+import { VariationGroupeResource } from "../../generated/app/Http/Controllers/Materiel/VariationGroupeResource.lib.avt";
+import { VariationGroupe } from "../../generated/app/Models/VariationGroupe.lib.avt";
+import { Variation } from "../../generated/app/Models/Variation.lib.avt";
 
 
 export class MaterielDetailsPage extends Page implements Aventus.DefaultComponent {
@@ -99,12 +102,41 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 return "/materiel";
             }
             this.item = item;
-            this.form.item = ram.toRequest(item);
+
+
+            this.form.item = this.itemToRequest(item);
             this.objName = this.form.item.nom;
+
 
             await this.loadInventaire(id);
         }
         return true;
+    }
+
+    private itemToRequest(item: MaterielResource) {
+        const ram = MaterielRAM.getInstance();
+        const itemForm = ram.toRequest(item);
+        for(let i = 0; i < itemForm.variations_groupes.length; i++) {
+            const groupe = itemForm.variations_groupes[i];
+            if(groupe instanceof VariationGroupeResource) {
+                const newGroupe = new VariationGroupe();
+                newGroupe.id = groupe.id;
+                newGroupe.id_template = groupe.id_template;
+                newGroupe.nom = groupe.nom;
+                newGroupe.variations = [];
+                for(let v of groupe.variations) {
+                    const variation = new Variation();
+                    variation.id = v.id;
+                    variation.id_groupe = newGroupe.id;
+                    variation.id_variation_template = v.id_variation_template;
+                    variation.nom = v.nom;
+                    newGroupe.variations.push(variation);
+                }
+
+                itemForm.variations_groupes.splice(i, 1, groupe);
+            }
+        }
+        return itemForm;
     }
 
     protected async loadInventaire(id: number) {
@@ -197,9 +229,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 this.router?.navigate('/materiel/' + result.result.id);
             }
             else {
-                const ram = MaterielRAM.getInstance();
                 this.item = result.result;
-                const request = ram.toRequest(result.result);
+                const request = this.itemToRequest(result.result);
                 this.form.item = request;
                 this.objName = this.form.item.nom;
                 await this.loadInventaire(this.item.id);

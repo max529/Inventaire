@@ -1,9 +1,14 @@
+import { CheckboxTag } from "../../../../components/form/CheckboxTag/CheckboxTag.wcl.avt";
 import type { Input } from "../../../../components/form/Input/Input.wcl.avt";
 import { Modal, type ModalOptions } from "../../../../components/interaction/Modal/Modal.wcl.avt";
+import type { VariationGroupeResource } from "../../../../generated/app/Http/Controllers/Materiel/VariationGroupeResource.lib.avt";
 import type { VariationGroupeTemplateResource } from "../../../../generated/app/Http/Controllers/VariationGroupeTemplate/VariationGroupeTemplateResource.lib.avt";
+import { Variation } from "../../../../generated/app/Models/Variation.lib.avt";
+import { VariationGroupe } from "../../../../generated/app/Models/VariationGroupe.lib.avt";
+import { VariationGroupeTemplateRAM } from "../../../../ram/VariationGroupeTemplate.ram.avt";
 import type { VariationGroupeTemplateSelect } from "../VariationGroupeTemplateSelect/VariationGroupeTemplateSelect.wcl.avt";
 
-export class ModalTag extends Modal<VariationGroupeTemplateResource> implements Aventus.DefaultComponent {
+export class ModalTag extends Modal<VariationGroupe> implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -16,11 +21,23 @@ export class ModalTag extends Modal<VariationGroupeTemplateResource> implements 
 
 
     //#region variables
-    @Watch()
-    public resource?: VariationGroupeTemplateResource;
+    @Signal((target: ModalTag) => {
+        target.renderList();
+    })
+    private resource?: VariationGroupeTemplateResource;
+
+    @Signal((target: ModalTag) => {
+        target.setValue();
+    })
+    public variationGroupe?: VariationGroupe;
+
+
 
     @ViewElement()
     protected inputEl!: VariationGroupeTemplateSelect;
+    @ViewElement()
+    protected tagContainer!: HTMLDivElement;
+
 
     //#endregion
 
@@ -34,22 +51,76 @@ export class ModalTag extends Modal<VariationGroupeTemplateResource> implements 
     /**
      * @inheritdoc
      */
-    public override configure(): ModalOptions<VariationGroupeTemplateResource> {
+    public override configure(): ModalOptions<VariationGroupe> {
         return {
             title: "Edition de variation",
         };
     }
 
+    protected async setValue() {
+        if(!this.variationGroupe?.id_template) {
+            this.resource = undefined;
+        }
+        else {
+            const result = await VariationGroupeTemplateRAM.getInstance().getById(this.variationGroupe.id_template);
+            this.resource = result;
+        }
+    }
+
+    protected renderList() {
+        this.tagContainer.innerHTML = "";
+        if(this.resource) {
+            for(let variation of this.resource.variations) {
+                const tag = new CheckboxTag();
+                tag.innerHTML = variation.nom;
+                tag.setAttribute("id_variation_template", variation.id + '');
+                if(this.variationGroupe?.id) {
+                    tag.checked = this.variationGroupe ? this.variationGroupe.variations.some(p => p.id_variation_template == variation.id) : false;
+                }
+                else {
+                    tag.checked = true;
+                }
+                this.tagContainer.appendChild(tag);
+            }
+        }
+    }
 
     /**
      * 
      */
     protected save() {
         if(!this.resource) {
-			this.inputEl.errors = ["Il faut une variation"];
-			return;
-		}
-		this.resolve(this.resource);
+            this.inputEl.errors = ["Il faut une variation"];
+            return;
+        }
+
+        const groupe = this.variationGroupe ?? new VariationGroupe();
+        groupe.nom = this.resource.nom;
+        groupe.id_template = this.resource.id;
+        groupe.variations = groupe.variations ?? [];
+
+        let children = Array.from(this.tagContainer.children);
+        for(let child of children) {
+            if(child instanceof CheckboxTag) {
+                let id = Number(child.getAttribute('id_variation_template'));
+                if(child.checked) {
+                    if(!groupe.variations.find(p => p.id_variation_template == id)) {
+                        const variation = new Variation();
+                        variation.nom = child.innerHTML;
+                        variation.id_variation_template = id;
+                        groupe.variations.push(variation);
+                    }
+                }
+                else {
+                    const index = groupe.variations.findIndex(p => p.id_variation_template == id);
+                    if(index != -1) {
+                        groupe.variations.splice(index, 1);
+                    }
+                }
+            }
+        }
+
+        this.resolve(groupe);
     }
 
 

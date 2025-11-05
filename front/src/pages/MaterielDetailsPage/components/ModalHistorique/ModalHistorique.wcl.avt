@@ -90,7 +90,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
     protected getTxt(historique: HistoriqueInfo) {
         let txt = "";
         if(historique.type == "achat") {
-            txt = "<div class=\"info\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+            txt = "<div class=\"action\">Achat de <span class=\"qty\">" + historique.quantite + "</span> vers ";
             if(historique.equipe_entree == this.equipe.nom) {
                 txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
             }
@@ -99,8 +99,8 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
             }
             txt += "</div>";
         }
-        else  if(historique.type == "perte") {
-            txt = "<div class=\"info\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
+        else if(historique.type == "perte") {
+            txt = "<div class=\"action\">Perte de <span class=\"qty\">" + historique.quantite + "</span> vers ";
             if(historique.equipe_entree == this.equipe.nom) {
                 txt += "<span class=\"entree current\">" + historique.equipe_entree + "</span>";
             }
@@ -111,7 +111,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
         }
         else {
             if(!historique.equipe_sortie) return "";
-            txt = "<div class=\"info\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
+            txt = "<div class=\"action\">Transfert de <span class=\"qty\">" + historique.quantite + "</span> depuis ";
             if(historique.equipe_sortie == this.equipe.nom) {
                 txt += "<span class=\"sortie current\">" + historique.equipe_sortie + "</span> vers ";
             }
@@ -127,6 +127,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
             }
             txt += "</div>";
         }
+        txt += "<div class=\"comment\">" + historique.commentaire + "</div>";
         txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
         return txt;
     }

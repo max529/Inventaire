@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $quantite
  * @property DateTime $date
  * @property string $par
+ * @property string $commentaire
  * 
  * @property Equipe $equipe_sortie
  * @property Equipe $equipe_entree
@@ -28,6 +29,7 @@ class Mouvement extends AventusModel
         "quantite",
         "date",
         "par",
+        "commentaire"
     ];
 
     protected $casts = [

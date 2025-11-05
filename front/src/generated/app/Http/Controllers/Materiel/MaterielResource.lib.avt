@@ -1,5 +1,5 @@
 import { MaterielVariationResource } from './MaterielVariationResource.lib.avt';
-import { VariationGroupe } from '../../../Models/VariationGroupe.lib.avt';
+import { VariationGroupeResource } from './VariationGroupeResource.lib.avt';
 import { MaterielEquipeResource } from './MaterielEquipeResource.lib.avt';
 import { MaterielImage } from '../../../Models/MaterielImage.lib.avt';
 
@@ -9,7 +9,7 @@ namespace App.Http.Controllers.Materiel {
 	export class MaterielResource extends Aventus.Data  {
 		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.MaterielResource"; }
 		public variations!: MaterielVariationResource[];
-		public variations_groupes!: VariationGroupe[];
+		public variations_groupes!: VariationGroupeResource[];
 		public equipes!: MaterielEquipeResource[];
 		public id!: number;
 		public nom!: string;

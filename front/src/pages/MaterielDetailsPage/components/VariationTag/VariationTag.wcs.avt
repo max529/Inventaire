@@ -8,6 +8,7 @@
 			min-width: 5px;
 		}
 
+		
 		mi-icon {
 			color: var(--color-error);
 			cursor: pointer;
@@ -16,7 +17,7 @@
 		}
 
 		mi-icon.edit {
-			color: var(--color-neutral);
+			color: var(--color-primary);
 		}
 	}
 

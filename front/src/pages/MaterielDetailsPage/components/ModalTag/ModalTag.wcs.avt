@@ -3,6 +3,13 @@
 		font-size: var(--font-size-md);
 		margin-bottom: 16px;
 	}
+	.tag-container {
+		margin-top: 16px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
     .footer {
 		display: flex;
 		justify-content: flex-end;

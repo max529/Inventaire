@@ -7,6 +7,7 @@
     </div>
     <av-equipe-select label="Entrée" @bind="this.equipeEntree" searchable></av-equipe-select>
     <av-input type="number" label="Quantité" @bind="this.nb" @element="inputEl" @focus="select"></av-input>
+    <av-input type="text" label="Commentaire" @bind="this.comment"></av-input>
 </div>
 
 <div class="footer">

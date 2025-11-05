@@ -5,11 +5,6 @@
         </div>
         <div class="info">
             <div class="title">{{ this.item.nom }}</div>
-            <div class="variations">
-                for(let variation of this.item.variations_groupes) { 
-                    <av-tag color="accent">{{ variation.nom }}</av-tag>
-                }
-            </div>
             <div class="visible">
                 <div class="visible-label">Visible pour :</div>
                 if(this.item.tout_monde) {

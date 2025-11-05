@@ -3,7 +3,9 @@ namespace App.Http.Controllers.Materiel {
 	@Convertible()
 	export class VariationResource extends Aventus.Data  {
 		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.VariationResource"; }
+		public id!: number;
 		public nom!: string;
+		public id_variation_template!: number;
 	}
 
 }

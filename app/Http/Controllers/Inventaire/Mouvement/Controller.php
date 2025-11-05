@@ -61,6 +61,7 @@ class Controller
         $mouvement->quantite = $request->quantite;
         $mouvement->date = $now;
         $mouvement->par = $by;
+        $mouvement->commentaire = $request->commentaire;
         $mouvement->save();
 
         return [$inventaireSortie, $inventaireEntree];

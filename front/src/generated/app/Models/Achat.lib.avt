@@ -12,6 +12,7 @@ namespace App.Models {
 		public quantite!: number;
 		public date!: Date;
 		public par!: string;
+		public commentaire!: string;
 		public equipe!: Equipe;
 		public materiel!: MaterielVariation;
 	}

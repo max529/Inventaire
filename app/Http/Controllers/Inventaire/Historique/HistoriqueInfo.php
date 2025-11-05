@@ -19,6 +19,7 @@ class HistoriqueInfo
     public string $equipe_entree;
     public ?string $equipe_sortie;
     public float $quantite;
+    public string $commentaire;
 
     public function __construct() {}
 }

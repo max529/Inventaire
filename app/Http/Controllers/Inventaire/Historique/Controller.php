@@ -15,7 +15,7 @@ class Controller
         $limit = 20;
 
         $results = DB::select("
-            SELECT 'achat' AS type, id_materiel_variation, par, date, equipes.nom AS equipe_entree, NULL AS equipe_sortie, quantite
+            SELECT 'achat' AS type, id_materiel_variation, par, date, equipes.nom AS equipe_entree, NULL AS equipe_sortie, quantite, commentaire
             FROM achats
             inner join equipes on equipes.id = achats.id_equipe
             WHERE id_materiel_variation = :id_materiel_variation1 
@@ -23,7 +23,7 @@ class Controller
 
             UNION
 
-            SELECT 'perte' AS type, id_materiel_variation, par, date, equipes.nom AS equipe_entree, NULL AS equipe_sortie, quantite
+            SELECT 'perte' AS type, id_materiel_variation, par, date, equipes.nom AS equipe_entree, NULL AS equipe_sortie, quantite, commentaire
             FROM pertes
             inner join equipes on equipes.id = pertes.id_equipe
             WHERE id_materiel_variation = :id_materiel_variation2 
@@ -31,7 +31,7 @@ class Controller
 
             UNION
 
-            SELECT 'mouvement' AS type, id_materiel_variation, par, date, equipes1.nom AS equipe_entree, equipes2.nom AS equipe_sortie, quantite
+            SELECT 'mouvement' AS type, id_materiel_variation, par, date, equipes1.nom AS equipe_entree, equipes2.nom AS equipe_sortie, quantite, commentaire
             FROM mouvements
             inner join equipes equipes1 on equipes1.id = mouvements.id_equipe_entree
             inner join equipes equipes2 on equipes2.id = mouvements.id_equipe_sortie

@@ -1,6 +1,8 @@
 import { Callback } from "Aventus@Main:Aventus.package.avt";
 import { Confirm } from "../../../../components/interaction/Confirm/Confirm.wcl.avt";
 import type { VariationGroupe } from "../../../../generated/app/Models/VariationGroupe.lib.avt";
+import { ModalTag } from "../ModalTag/ModalTag.wcl.avt";
+import type { VariationGroupeResource } from "../../../../generated/app/Http/Controllers/Materiel/VariationGroupeResource.lib.avt";
 
 export class VariationTag extends Aventus.WebComponent implements Aventus.DefaultComponent {
 
@@ -44,9 +46,20 @@ export class VariationTag extends Aventus.WebComponent implements Aventus.Defaul
         }
     }
 
+    /**
+     * 
+     */
+    protected async triggerUpdate() {
+        const p = new ModalTag();
+        p.variationGroupe = this.groupe;
+        const template = await p.show();
+        if(template === null) return;
+        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
+    }
+
     protected override postCreation(): void {
         super.postCreation();
-        this.componentEl.innerText = this.groupe.nom;
+        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
     }
     //#endregion
 

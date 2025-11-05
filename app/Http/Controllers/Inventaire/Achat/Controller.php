@@ -38,9 +38,10 @@ class Controller
         $achat = new Achat();
         $achat->id_materiel_variation = $inventaire->id_materiel_variation;
         $achat->id_equipe = $inventaire->id_equipe;
-        $achat->quantite = $inventaire->quantite;
+        $achat->quantite = $request->quantite;
         $achat->date = $now;
         $achat->par = $by;
+        $achat->commentaire = $request->commentaire;
         $achat->save();
 
         return $inventaire;

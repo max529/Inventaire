@@ -1,0 +1,14 @@
+import { VariationResource } from './VariationResource.lib.avt';
+
+namespace App.Http.Controllers.Materiel {
+
+	@Convertible()
+	export class VariationGroupeResource extends Aventus.Data  {
+		public static override get Fullname(): string { return "App.Http.Controllers.Materiel.VariationGroupeResource"; }
+		public variations!: VariationResource[];
+		public id!: number;
+		public nom!: string;
+		public id_template!: number;
+	}
+
+}

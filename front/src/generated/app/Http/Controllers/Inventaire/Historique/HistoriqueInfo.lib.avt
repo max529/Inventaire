@@ -10,6 +10,7 @@ namespace App.Http.Controllers.Inventaire.Historique {
 		public equipe_entree!: string;
 		public equipe_sortie?: string = undefined;
 		public quantite!: number;
+		public commentaire!: string;
 	}
 
 }

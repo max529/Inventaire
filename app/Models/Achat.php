@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $quantite
  * @property DateTime $date
  * @property string $par
+ * @property string $commentaire
  * 
  * @property Equipe $equipe
  * @property MaterielVariation $materiel
@@ -26,6 +27,7 @@ class Achat extends AventusModel
         "quantite",
         "date",
         "par",
+        "commentaire"
     ];
 
     protected $casts = [

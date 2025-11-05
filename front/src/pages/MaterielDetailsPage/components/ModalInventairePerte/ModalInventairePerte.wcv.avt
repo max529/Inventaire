@@ -2,6 +2,7 @@
 
 <div class="form">
     <av-input type="number" label="Quantité" @bind="this.nb" @element="inputEl" @focus="select"></av-input>
+    <av-input type="text" label="Commentaire" @bind="this.comment"></av-input>
 </div>
 
 <div class="footer">

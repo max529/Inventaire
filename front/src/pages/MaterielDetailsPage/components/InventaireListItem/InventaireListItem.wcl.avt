@@ -20,11 +20,7 @@ export class InventaireListItem extends Aventus.WebComponent implements Aventus.
 
     //#region variables
     @Injectable()
-    @Watch((target: InventaireListItem, action: Aventus.WatchAction, path: string, value: any) => {
-        if(target.inventaire.quantite == 0) {
-            target.style.display = "none";
-        }
-    })
+    @Watch()
     public inventaire!: Inventaire;
     //#endregion
 
@@ -35,6 +31,14 @@ export class InventaireListItem extends Aventus.WebComponent implements Aventus.
 
 
     //#region methods
+    protected defaultHide() {
+        const frame = this.findParentByType(MaterielDetailsPage);
+        if(frame && !frame.voir_vide) {
+            if(this.inventaire.quantite == 0) {
+                this.style.display = "none";
+            }
+        }
+    }
     protected getLastUpdate() {
         if(this.inventaire.date) {
             return this.inventaire.par + ", le " + this.inventaire.date.toLocaleDateString(undefined, {
@@ -107,6 +111,9 @@ export class InventaireListItem extends Aventus.WebComponent implements Aventus.
         return names.join(" ");
     }
 
+    protected override postCreation(): void {
+        this.defaultHide();
+    }
     //#endregion
 
 }

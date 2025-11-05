@@ -20,11 +20,7 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
 
     //#region variables
     @Injectable()
-    @Watch((target: InventaireEquipeListItem, action: Aventus.WatchAction, path: string, value: any) => {
-        if(target.inventaire.quantite == 0) {
-            target.style.display = "none";
-        }
-    })
+    @Watch()
     public inventaire!: Inventaire;
 
     @Injectable()
@@ -115,6 +111,18 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
         return names.join(" ");
     }
 
+    protected defaultHide() {
+        const frame = this.findParentByType(EquipeDetailsPage);
+        if(frame && !frame.voirVide) {
+            if(this.inventaire.quantite == 0) {
+                this.style.display = "none";
+            }
+        }
+    }
+
+    protected override postCreation(): void {
+        this.defaultHide();
+    }
     //#endregion
 
 }

@@ -20,6 +20,9 @@ export class VariationTags extends Aventus.WebComponent implements Aventus.Defau
     @ViewElement()
     protected listEl!: HTMLDivElement;
 
+    @Signal((target: VariationTags) => {
+        target.render();
+    })
     public variations: VariationGroupe[] = [];
     //#endregion
 
@@ -48,20 +51,9 @@ export class VariationTags extends Aventus.WebComponent implements Aventus.Defau
     }
     protected async addVariation() {
         const p = new ModalTag();
-        const template = await p.show();
-        if(template === null) return;
+        const groupe = await p.show();
+        if(groupe === null) return;
 
-
-        const groupe = new VariationGroupe();
-        groupe.nom = template.nom;
-        groupe.id_template = template.id;
-        groupe.variations = [];
-        for(let v of template.variations) {
-            const variation = new Variation();
-            variation.nom = v.nom;
-            variation.id_variation_template = v.id;
-            groupe.variations.push(variation);
-        }
         let el = new VariationTag();
         el.groupe = groupe;
         el.onDelete.add(this.onChildDelete);
@@ -70,7 +62,7 @@ export class VariationTags extends Aventus.WebComponent implements Aventus.Defau
     }
 
     protected override postCreation(): void {
-        this.render();
+
     }
     //#endregion
 

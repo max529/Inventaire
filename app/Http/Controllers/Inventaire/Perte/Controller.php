@@ -31,13 +31,14 @@ class Controller
         ]);
 
 
-        $achat = new Perte();
-        $achat->id_materiel_variation = $inventaire->id_materiel_variation;
-        $achat->id_equipe = $inventaire->id_equipe;
-        $achat->quantite = $inventaire->quantite;
-        $achat->date = $now;
-        $achat->par = $by;
-        $achat->save();
+        $perte = new Perte();
+        $perte->id_materiel_variation = $inventaire->id_materiel_variation;
+        $perte->id_equipe = $inventaire->id_equipe;
+        $perte->quantite = $request->quantite;
+        $perte->date = $now;
+        $perte->par = $by;
+        $perte->commentaire = $request->commentaire;
+        $perte->save();
 
         return $inventaire;
     }
