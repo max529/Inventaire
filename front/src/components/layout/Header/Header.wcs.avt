@@ -137,6 +137,25 @@
 					width: 100%;
 				}
 
+				.sub-menu {
+					padding: 0;
+					span {
+						display: none;
+					}
+
+					.sub-menu-items {
+						display: flex;
+						position: relative;
+						box-shadow: none;
+						top: auto;
+						left: auto;
+
+						.item {
+							height: fit-content;
+						}
+					}
+				}
+
 				.logout {
 					justify-content: center;
 					margin-top: 10px;
