@@ -13,5 +13,5 @@ class Request extends AventusRequest
     public int $id_materiel_variation;
     public int $id_equipe_entree;
     public int $id_equipe_sortie;
-    public string $commentaire;
+    public ?string $commentaire = "";
 }
