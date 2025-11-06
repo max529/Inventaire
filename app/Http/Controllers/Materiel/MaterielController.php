@@ -42,7 +42,7 @@ class MaterielController extends ModelController
 
     protected function indexAction(): array|Collection|SupportCollection
     {
-        return $this->defineModel()::with(['variations.groups.variation', 'variations.materiel'])->get();
+        return $this->defineModel()::with(['variations.groups.variation', 'variations.materiel', 'variations.inventaires.equipe'])->get();
     }
 
     protected function storeAction($item): void

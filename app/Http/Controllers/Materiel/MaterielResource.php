@@ -23,6 +23,7 @@ class MaterielResource extends AventusModelResource
     public array $variations_groupes;
     public bool $tout_monde;
     public array $equipes;
+    public float $stock;
 
     protected function bind($item): void
     {
@@ -33,5 +34,6 @@ class MaterielResource extends AventusModelResource
         $this->variations_groupes = VariationGroupeResource::collection($item->variations_groupes);
         $this->tout_monde = $item->tout_monde;
         $this->equipes = MaterielEquipeResource::collection($item->equipes);
+        $this->stock = $item->total_stock_loaded();
     }
 }

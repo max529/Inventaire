@@ -12688,7 +12688,9 @@ const PageFull = class PageFull extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="content">    <slot></slot></div>` }
+        blocks: { 'default':`<div class="content">
+    <slot></slot>
+</div>` }
     });
 }
     getClassName() {
@@ -12717,7 +12719,11 @@ const Page = class Page extends Aventus.Navigation.Page {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>    <div class="content">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable class="page-scroll" floating_scroll>
+    <div class="content">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -12817,44 +12823,7 @@ const PwaPromptIos = class PwaPromptIos extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0">
-</div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">
-    <div class="pwaPromptHeader iOSPWA-header">
-        <p class="pwaPromptTitle iOSPWA-title">
-            Ajouter à la page d'accueil
-        </p>
-        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">
-            Fermer
-        </button>
-    </div>
-    <div class="pwaPromptBody iOSPWA-body">
-        <div class="pwaPromptDescription iOSPWA-description">
-            <p class="pwaPromptCopy iOSPWA-description-copy">
-                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran
-            </p>
-        </div>
-    </div>
-    <div class="pwaPromptInstruction iOSPWA-steps">
-        <div class="pwaPromptInstructionStep iOSPWA-step1">
-            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">
-                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>
-                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>
-            </svg>
-            <p class="pwaPromptCopy bold iOSPWA-step1-copy">
-                1) Appuyez sur le bouton "Partager" dans la barre de menu.
-            </p>
-        </div>
-        <div class="pwaPromptInstructionStep iOSPWA-step2">
-            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">
-                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>
-                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>
-            </svg>
-            <p class="pwaPromptCopy bold iOSPWA-step2-copy">
-                2) Appuyez sur "Ajouter à l'écran d'accueil".
-            </p>
-        </div>
-    </div>
-</div>` }
+        blocks: { 'default':`<div aria-label="Close" role="button" class="pwaPromptOverlay modern iOSPWA-overlay" _id="pwapromptios_0"></div><div class="pwaPrompt iOSPWA-container modern" aria-describedby="description" aria-labelledby="homescreen" role="dialog" _id="pwapromptios_1">    <div class="pwaPromptHeader iOSPWA-header">        <p class="pwaPromptTitle iOSPWA-title">            Ajouter à la page d'accueil        </p>        <button class="pwaPromptCancel iOSPWA-cancel" _id="pwapromptios_2">            Fermer        </button>    </div>    <div class="pwaPromptBody iOSPWA-body">        <div class="pwaPromptDescription iOSPWA-description">            <p class="pwaPromptCopy iOSPWA-description-copy">                Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en plein écran            </p>        </div>    </div>    <div class="pwaPromptInstruction iOSPWA-steps">        <div class="pwaPromptInstructionStep iOSPWA-step1">            <svg class="pwaPromptShareIcon iOSPWA-step1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 670">                <path d="M255 12c4-4 10-8 16-8s12 3 16 8l94 89c3 4 6 7 8 12 2 6 0 14-5 19-7 8-20 9-28 2l-7-7-57-60 2 54v276c0 12-10 22-22 22-12 1-24-10-23-22V110l1-43-60 65c-5 5-13 8-21 6a19 19 0 0 1-16-17c-1-7 2-13 7-18l95-91z"></path>                <path d="M43 207c16-17 40-23 63-23h83v46h-79c-12 0-25 3-33 13-8 9-10 21-10 33v260c0 13 0 27 6 38 5 12 18 18 30 19l14 1h302c14 0 28 0 40-8 11-7 16-21 16-34V276c0-11-2-24-9-33-8-10-22-13-34-13h-78v-46h75c13 0 25 1 37 4 16 4 31 13 41 27 11 17 14 37 14 57v280c0 20-3 41-15 58a71 71 0 0 1-45 27c-11 2-23 3-34 3H109c-19-1-40-4-56-15-14-9-23-23-27-38-4-12-5-25-5-38V270c1-22 6-47 22-63z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step1-copy">                1) Appuyez sur le bouton "Partager" dans la barre de menu.            </p>        </div>        <div class="pwaPromptInstructionStep iOSPWA-step2">            <svg class="pwaPromptHomeIcon iOSPWA-step2-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 578 584">                <path d="M101 35l19-1h333c12 0 23 0 35 3 17 3 34 12 44 27 13 16 16 38 16 58v329c0 19 0 39-8 57a65 65 0 0 1-37 37c-18 7-38 7-57 7H130c-21 1-44 0-63-10-14-7-25-20-30-34-6-15-8-30-8-45V121c1-21 5-44 19-61 13-16 33-23 53-25m7 46c-10 1-19 6-24 14-7 8-9 20-9 31v334c0 12 2 25 10 34 9 10 23 12 35 12h336c14 1 30-3 38-15 6-9 8-20 8-31V125c0-12-2-24-10-33-9-9-22-12-35-12H121l-13 1z"></path>                <path d="M271 161c9-11 31-10 38 4 3 5 3 11 3 17v87h88c7 0 16 1 21 7 6 6 7 14 6 22a21 21 0 0 1-10 14c-5 4-11 5-17 5h-88v82c0 7-1 15-6 20-10 10-29 10-37-2-3-6-4-13-4-19v-81h-87c-8-1-17-3-23-9-5-6-6-15-4-22a21 21 0 0 1 11-14c6-3 13-3 19-3h84v-88c0-7 1-14 6-20z"></path>            </svg>            <p class="pwaPromptCopy bold iOSPWA-step2-copy">                2) Appuyez sur "Ajouter à l'écran d'accueil".            </p>        </div>    </div></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -12941,7 +12910,10 @@ const Confirm = class Confirm extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">    <av-button _id="confirm_2"></av-button>    <av-button color="primary" _id="confirm_3"></av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="confirm_0"></div><div class="content" _id="confirm_1"></div><div class="footer">
+    <av-button _id="confirm_2"></av-button>
+    <av-button color="primary" _id="confirm_3"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13134,7 +13106,15 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">    <div class="preview" _id="inputimage_1">        <av-img _id="inputimage_2"></av-img>        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>    </div>    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" /></div><div class="errors">    <template _id="inputimage_5"></template></div>` }
+        blocks: { 'default':`<label for="input" _id="inputimage_0"></label><div class="input">
+    <div class="preview" _id="inputimage_1">
+        <av-img _id="inputimage_2"></av-img>
+        <mi-icon icon="close" class="remove" _id="inputimage_3"></mi-icon>
+    </div>
+    <input id="input" type="file" style="display:none" accept="image/png, image/gif, image/jpeg, image/webp, .svg" _id="inputimage_4" />
+</div><div class="errors">
+    <template _id="inputimage_5"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13179,10 +13159,14 @@ const InputImage = class InputImage extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.deleteFile(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`        <template _id="inputimage_6"></template>    `);this.__getStatic().__template.addLoop({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+        <template _id="inputimage_6"></template>
+    `);this.__getStatic().__template.addLoop({
                     anchorId: 'inputimage_5',
                     template: templ0,
-                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`            <div _id="inputimage_7"></div>        `);templ1.setActions({
+                simple:{data: "this.errors",item:"error"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+            <div _id="inputimage_7"></div>
+        `);templ1.setActions({
   "content": {
     "inputimage_7°@HTML": {
       "fct": (c) => `${c.print(c.comp.__20fb5d8b19c82e031f4b31c5973774bemethod3(c.data.error))}`,
@@ -13376,7 +13360,16 @@ const CheckboxTag = class CheckboxTag extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-tag>    <div class="square">        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">            <polyline fill="none" points="3.7 14.3 9.6 19 20.3 5" stroke-linecap="round" stroke-linejoin="round" class="tick"></polyline>        </svg>    </div>    <span>        <slot></slot>    </span></av-tag>` }
+        blocks: { 'default':`<av-tag>
+    <div class="square">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polyline fill="none" points="3.7 14.3 9.6 19 20.3 5" stroke-linecap="round" stroke-linejoin="round" class="tick"></polyline>
+        </svg>
+    </div>
+    <span>
+        <slot></slot>
+    </span>
+</av-tag>` }
     });
 }
     getClassName() {
@@ -13465,7 +13458,23 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="toast-content">    <div class="toast-flex">        <div class="toast-icon-wrapper">            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>        </div>        <div class="toast-message-wrapper">            <template _id="toast_1"></template>            <template _id="toast_3"></template>        </div>        <div class="toast-close-wrapper">            <button class="toast-close-button" _id="toast_5">                <span class="sr-only">Close</span>                <mi-icon icon="close" class="toast-close-icon"></mi-icon>            </button>        </div>    </div></div>` }
+        blocks: { 'default':`<div class="toast-content">
+    <div class="toast-flex">
+        <div class="toast-icon-wrapper">
+            <mi-icon class="toast-icon" aria-hidden="true" _id="toast_0"></mi-icon>
+        </div>
+        <div class="toast-message-wrapper">
+            <template _id="toast_1"></template>
+            <template _id="toast_3"></template>
+        </div>
+        <div class="toast-close-wrapper">
+            <button class="toast-close-button" _id="toast_5">
+                <span class="sr-only">Close</span>
+                <mi-icon icon="close" class="toast-close-icon"></mi-icon>
+            </button>
+        </div>
+    </div>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13482,7 +13491,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
       "fct": (e, c) => c.comp.close(e)
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <p class="toast-title" _id="toast_2"></p>            `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+                <p class="toast-title" _id="toast_2"></p>
+            `);templ0.setActions({
   "content": {
     "toast_2°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method3())}`,
@@ -13495,7 +13506,9 @@ const Toast = class Toast extends Aventus.Toast.ToastElement {
                     condition: (c) => c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method0(),
                     template: templ0
                 }]
-            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`                <p class="toast-message" _id="toast_4"></p>            `);templ1.setActions({
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                <p class="toast-message" _id="toast_4"></p>
+            `);templ1.setActions({
   "content": {
     "toast_4°@HTML": {
       "fct": (c) => `${c.print(c.comp.__8b8b64fb001ad828fd9cd08e5018dbd9method4())}`,
@@ -13620,7 +13633,13 @@ const Input = class Input extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'before':`<slot name="before"></slot>`,'after':`<slot name="after"></slot>` }, 
-        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">    <slot name="before"></slot>    <input _id="input_1" />    <slot name="after"></slot></div><div class="errors">    <template _id="input_2"></template></div>` }
+        blocks: { 'default':`<label class="label" _id="input_0"></label><div class="input">
+    <slot name="before"></slot>
+    <input _id="input_1" />
+    <slot name="after"></slot>
+</div><div class="errors">
+    <template _id="input_2"></template>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -13681,7 +13700,9 @@ const Input = class Input extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.focusInput(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="input_3"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="input_3"></div>
+    `);templ0.setActions({
   "content": {
     "input_3°@HTML": {
       "fct": (c) => `${c.print(c.comp.__7d3ca2aeff9f73a58c356d3051050ae6method5(c.data.error))}`,
@@ -13758,7 +13779,9 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<slot></slot><div class="loader-mask">    <div class="loader"></div></div>` }
+        blocks: { 'default':`<slot></slot><div class="loader-mask">
+    <div class="loader"></div>
+</div>` }
     });
 }
     getClassName() {
@@ -14048,7 +14071,9 @@ const IconAction = class IconAction extends MaterialIcon.Icon {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot _id="iconaction_1"></slot>` }, 
-        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">    <slot _id="iconaction_1"></slot></div>` }
+        blocks: { 'default':`<div class="icon" _id="iconaction_0"></div><div class="hidden">
+    <slot _id="iconaction_1"></slot>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14125,7 +14150,11 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>    <div class="container">        <slot></slot>    </div></av-scrollable>` }
+        blocks: { 'default':`<av-scrollable floating_scroll>
+    <div class="container">
+        <slot></slot>
+    </div>
+</av-scrollable>` }
     });
 }
     getClassName() {
@@ -14235,8 +14264,21 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        slots: { 'prepend':`<slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">
+    <slot name="prepend">
+        <av-img class="icon" _id="genericselect_2"></av-img>
+    </slot>
+    <input id="input" autocomplete="off" _id="genericselect_3" />
+    <slot name="append"></slot>
+    <av-img src="/img/angle-left.svg" class="caret"></av-img>
+</div><div class="errors">
+    <template _id="genericselect_4"></template>
+</div><div class="hidden">
+    <slot></slot>
+</div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14291,7 +14333,9 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+        <div _id="genericselect_5"></div>
+    `);templ0.setActions({
   "content": {
     "genericselect_5°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
@@ -14843,7 +14887,9 @@ const Alert = class Alert extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">    <av-button _id="alert_1"></av-button></div>` }
+        blocks: { 'default':`<div class="content" _id="alert_0"></div><div class="footer">
+    <av-button _id="alert_1"></av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15033,13 +15079,7 @@ const PwaPromptInstall = class PwaPromptInstall extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">
-    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en
-        plein écran</p>
-</div><div class="footer">
-    <av-button _id="pwapromptinstall_1">Annuler</av-button>
-    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button>
-</div>` }
+        blocks: { 'default':`<div class="title" _id="pwapromptinstall_0"></div><div class="content">    <p>Ce site web est doté d'une fonctionnalité d'application. Ajoutez-le à votre écran d'accueil pour l'utiliser en        plein écran</p></div><div class="footer">    <av-button _id="pwapromptinstall_1">Annuler</av-button>    <av-button color="primary" _id="pwapromptinstall_2">Installer</av-button></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -15560,7 +15600,12 @@ const ModalEquipe = class ModalEquipe extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select></div><div class="footer">    <av-button _id="modalequipe_2">Annuler</av-button>    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalequipe_0"></div><div class="content">
+    <av-equipe-select label="Choix de l'équipe" searchable _id="modalequipe_1"></av-equipe-select>
+</div><div class="footer">
+    <av-button _id="modalequipe_2">Annuler</av-button>
+    <av-button color="primary" _id="modalequipe_3">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16020,7 +16065,13 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireachat_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireachat_1"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventaireachat_2"></av-input></div><div class="footer">    <av-button _id="modalinventaireachat_3">Annuler</av-button>    <av-button color="primary" _id="modalinventaireachat_4">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireachat_0"></div><div class="form">
+    <av-input type="number" label="Quantité" _id="modalinventaireachat_1"></av-input>
+    <av-input type="text" label="Commentaire" _id="modalinventaireachat_2"></av-input>
+</div><div class="footer">
+    <av-button _id="modalinventaireachat_3">Annuler</av-button>
+    <av-button color="primary" _id="modalinventaireachat_4">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16458,7 +16509,18 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventairemouvement_0"></div><div class="form">    <av-equipe-select label="Sortie" searchable _id="modalinventairemouvement_1"></av-equipe-select>    <div class="btn">        <av-icon-action icon="swap_vert" _id="modalinventairemouvement_2"></av-icon-action>    </div>    <av-equipe-select label="Entrée" searchable _id="modalinventairemouvement_3"></av-equipe-select>    <av-input type="number" label="Quantité" _id="modalinventairemouvement_4"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventairemouvement_5"></av-input></div><div class="footer">    <av-button _id="modalinventairemouvement_6">Annuler</av-button>    <av-button color="primary" _id="modalinventairemouvement_7">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventairemouvement_0"></div><div class="form">
+    <av-equipe-select label="Sortie" searchable _id="modalinventairemouvement_1"></av-equipe-select>
+    <div class="btn">
+        <av-icon-action icon="swap_vert" _id="modalinventairemouvement_2"></av-icon-action>
+    </div>
+    <av-equipe-select label="Entrée" searchable _id="modalinventairemouvement_3"></av-equipe-select>
+    <av-input type="number" label="Quantité" _id="modalinventairemouvement_4"></av-input>
+    <av-input type="text" label="Commentaire" _id="modalinventairemouvement_5"></av-input>
+</div><div class="footer">
+    <av-button _id="modalinventairemouvement_6">Annuler</av-button>
+    <av-button color="primary" _id="modalinventairemouvement_7">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -16718,7 +16780,13 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modalinventaireperte_0"></div><div class="form">    <av-input type="number" label="Quantité" _id="modalinventaireperte_1"></av-input>    <av-input type="text" label="Commentaire" _id="modalinventaireperte_2"></av-input></div><div class="footer">    <av-button _id="modalinventaireperte_3">Annuler</av-button>    <av-button color="primary" _id="modalinventaireperte_4">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modalinventaireperte_0"></div><div class="form">
+    <av-input type="number" label="Quantité" _id="modalinventaireperte_1"></av-input>
+    <av-input type="text" label="Commentaire" _id="modalinventaireperte_2"></av-input>
+</div><div class="footer">
+    <av-button _id="modalinventaireperte_3">Annuler</av-button>
+    <av-button color="primary" _id="modalinventaireperte_4">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17376,7 +17444,19 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des équipes</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>
+            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="equipespage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17967,7 +18047,19 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste du matériel</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>
+            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <av-row class="list" _id="materielpage_2">
+        </av-row>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18709,7 +18801,10 @@ const UserItem = class UserItem extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action></div>` }
+        blocks: { 'default':`<div class="name" _id="useritem_0"></div><div class="actions">
+    <av-icon-action color="neutral" icon="edit" _id="useritem_1">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" _id="useritem_2">Suppression</av-icon-action>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18779,7 +18874,19 @@ const UsersPage = class UsersPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des utilisateurs</div>        <div class="actions">            <av-input placeholder="Recherche" _id="userspage_0"></av-input>            <av-button color="primary" _id="userspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="userspage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des utilisateurs</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="userspage_0"></av-input>
+            <av-button color="primary" _id="userspage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="userspage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18915,7 +19022,21 @@ const VariationGroupeTemplateEditModal = class VariationGroupeTemplateEditModal 
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>    <av-col size="12" use_container="false">        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>    </av-col></av-row><div class="list">    <div class="label">Liste des variations</div>    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">    </av-flex-scroll>    <div class="add-cont">        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>    </div></div><div class="actions">    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="variationgroupetemplateeditmodal_0"></div><av-row>
+    <av-col size="12" use_container="false">
+        <av-input label="Titre" _id="variationgroupetemplateeditmodal_1"></av-input>
+    </av-col>
+</av-row><div class="list">
+    <div class="label">Liste des variations</div>
+    <av-flex-scroll floating_scroll auto_hide _id="variationgroupetemplateeditmodal_2">
+    </av-flex-scroll>
+    <div class="add-cont">
+        <mi-icon class="add" icon="add" _id="variationgroupetemplateeditmodal_3"></mi-icon>
+    </div>
+</div><div class="actions">
+    <av-button _id="variationgroupetemplateeditmodal_4">Annuler</av-button>
+    <av-button color="primary" _id="variationgroupetemplateeditmodal_5">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19059,7 +19180,10 @@ const VariationGroupeItem = class VariationGroupeItem extends Aventus.WebCompone
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action></div>` }
+        blocks: { 'default':`<div class="name" _id="variationgroupeitem_0"></div><div class="actions">
+    <av-icon-action color="neutral" icon="edit" _id="variationgroupeitem_1">Edition</av-icon-action>
+    <av-icon-action color="error" icon="delete" _id="variationgroupeitem_2">Suppression</av-icon-action>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19126,7 +19250,19 @@ const VariationsPage = class VariationsPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des variations</div>        <div class="actions">            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="variationspage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">
+    <div class="header">
+        <div class="title">Liste des variations</div>
+        <div class="actions">
+            <av-input placeholder="Recherche" _id="variationspage_0"></av-input>
+            <av-button color="primary" _id="variationspage_1">Ajouter</av-button>
+        </div>
+    </div>
+    <av-scrollable class="body" floating_scroll auto_hide>
+        <div class="list" _id="variationspage_2">
+        </div>
+    </av-scrollable>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19252,7 +19388,9 @@ const Main = class Main extends Aventus.Navigation.Router {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'before':`    <av-header></av-header>` }
+        blocks: { 'before':`
+    <av-header></av-header>
+` }
     });
 }
     getClassName() {
@@ -19371,7 +19509,8 @@ const EquipeTags = class EquipeTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="equipetags_0"></div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="equipetags_0">
+</div><av-icon-action class="more" icon="add" _id="equipetags_1">Ajouter une équipe</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19458,7 +19597,14 @@ const ModalTag = class ModalTag extends Modal {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select>    <div class="tag-container" _id="modaltag_2">    </div></div><div class="footer">    <av-button _id="modaltag_3">Annuler</av-button>    <av-button color="primary" _id="modaltag_4">Enregistrer</av-button></div>` }
+        blocks: { 'default':`<div class="title" _id="modaltag_0"></div><div class="content">
+    <av-variation-groupe-template-select label="Choix de la variation" _id="modaltag_1"></av-variation-groupe-template-select>
+    <div class="tag-container" _id="modaltag_2">
+    </div>
+</div><div class="footer">
+    <av-button _id="modaltag_3">Annuler</av-button>
+    <av-button color="primary" _id="modaltag_4">Enregistrer</av-button>
+</div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19604,7 +19750,11 @@ const VariationTag = class VariationTag extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtag_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>    <mi-icon icon="delete" _id="variationtag_2"></mi-icon></av-tag>` }
+        blocks: { 'default':`<av-tag color="accent">
+    <span _id="variationtag_0"></span>
+    <mi-icon icon="edit" class="edit" _id="variationtag_1"></mi-icon>
+    <mi-icon icon="delete" _id="variationtag_2"></mi-icon>
+</av-tag>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -19680,7 +19830,8 @@ const VariationTags = class VariationTags extends Aventus.WebComponent {
     }
     __getHtml() {
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="list" _id="variationtags_0"></div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
+        blocks: { 'default':`<div class="list" _id="variationtags_0">
+</div><av-icon-action class="more" icon="add" _id="variationtags_1">Ajouter une variation</av-icon-action>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
