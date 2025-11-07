@@ -22,10 +22,17 @@
 	transition: 0.2s ease-in-out grid-template-rows;
 	z-index: 800;
 
-	av-scrollable {
-		.container {
-			display: flex;
-			flex-direction: column;
+	.wrapper {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+
+		av-flex-scroll {
+			.container {
+				display: flex;
+				flex-direction: column;
+			}
 		}
 	}
 }

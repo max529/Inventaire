@@ -126,6 +126,9 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
     protected showOptions() {
         if(!this.open) {
             this.removeErrors();
+            if(this.searchable) {
+                this.inputEl.focus();
+            }
             this.optionsContainer.show();
         }
         if(!this.searchable) {

@@ -30,6 +30,7 @@
 			flex-grow: 1;
 			padding: 16px;
 			padding-top: 0;
+			position: relative;
 
 			.title {
 				flex-shrink: 0;
@@ -43,6 +44,7 @@
 				flex-shrink: 0;
 				min-height: 30px;
 				flex-wrap: wrap;
+				padding-right: 20px;
 
 				.visible-label {
 					width: 100%;
@@ -73,6 +75,12 @@
 						padding: 4px 8px;
 					}
 				}
+			}
+
+			.info-icon {
+				position: absolute;
+				bottom: 10px;
+				right: 10px;
 			}
 		}
 

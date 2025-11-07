@@ -118,8 +118,9 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
         }
     }
 
+
     @BindThis()
-    protected onMouseEnter() {
+    public show() {
         this.calculatePosition();
         let delay = this.delay == 0 ? 50 : this.delay;
         if(this.use_absolute) {
@@ -144,8 +145,9 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
         }
     }
 
+
     @BindThis()
-    protected onMouseLeave() {
+    protected hide() {
         this.visible = false;
         if(this.use_absolute) {
             if(!this.timeoutEnter) {
@@ -163,6 +165,9 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
 
     @BindThis()
     protected onTransitionEnd() {
+        if(this.visible) {
+            this.style.pointerEvents = "all";
+        }
         if(!this.use_absolute || this.visible) return;
 
         if(this.parent && !this.isDestroyed)
@@ -171,42 +176,15 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
             this.remove();
     }
 
-    protected onLongPress() {
-        this.calculatePosition();
-        if(this.use_absolute) {
-            document.body.appendChild(this);
-            this.timeoutEnter = false;
-            this.timeout = setTimeout(() => {
-                this.timeoutEnter = true;
-                this.visible = true;
-            }, 50);
-        }
-        else {
-            this.visible = true;
-        }
-    }
 
 
     protected registerAction() {
         if(!this.parentEv) return;
 
-        // if(Platform.device != "pc") {
-        //     this.pressManager = new Aventus.PressManager({
-        //         element: this.parentEv,
-        //         onLongPress: () => {
-        //             this.onLongPress();
-        //         },
-        //         onPressEnd: () => {
-        //             this.onMouseLeave();
-        //         },
-        //         delayLongPress: this.delay_touch
-        //     });
-        // }
-        // else {
-        this.parentEv.addEventListener("mouseenter", this.onMouseEnter);
-        this.parentEv.addEventListener("mouseleave", this.onMouseLeave);
-        this.parentEv.addEventListener("click", this.onMouseLeave);
-        // }
+        this.parentEv.addEventListener("mouseenter", this.show);
+        this.parentEv.addEventListener("mouseleave", this.hide);
+        this.parentEv.addEventListener("click", this.hide);
+        this.addEventListener("click", this.hide);
         this.addEventListener("transitionend", this.onTransitionEnd);
     }
     protected override postCreation(): void {
@@ -225,9 +203,9 @@ export class Tooltip extends Aventus.WebComponent implements Aventus.DefaultComp
         this.isDestroyed = true;
         super.postDestruction();
         if(!this.parentEv) return;
-        this.parentEv.removeEventListener("mouseenter", this.onMouseEnter);
-        this.parentEv.removeEventListener("mouseleave", this.onMouseLeave);
-        this.parentEv.removeEventListener("click", this.onMouseLeave);
+        this.parentEv.removeEventListener("mouseenter", this.show);
+        this.parentEv.removeEventListener("mouseleave", this.hide);
+        this.parentEv.removeEventListener("click", this.hide);
     }
     //#endregion
 

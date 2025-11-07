@@ -5,6 +5,7 @@
         </div>
         <div class="info">
             <div class="title">{{ this.item.nom }}</div>
+            <div class="qty">Stock : {{ this.item.stock }}</div>
             <div class="visible">
                 <div class="visible-label">Visible pour :</div>
                 if(this.item.tout_monde) {
@@ -18,6 +19,13 @@
                     </div>
                 }
             </div>
+            if(this.item.variations_groupes.length > 0) {
+                <div class="info-icon">
+                    <av-tooltip-variation use_absolute :groupes="this.item.variations_groupes"></av-tooltip-variation>
+                    <mi-icon icon="info" @press="denyClick"></mi-icon>
+                </div>
+            }
+
         </div>
     </av-link>
 </av-col>

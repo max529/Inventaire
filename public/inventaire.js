@@ -37,6 +37,12 @@ const _ = {};
 
 
 let _n;
+let DragElementXYType= [SVGGElement, SVGRectElement, SVGEllipseElement, SVGTextElement];
+__as1(_, 'DragElementXYType', DragElementXYType);
+
+let DragElementLeftTopType= [HTMLElement, SVGSVGElement];
+__as1(_, 'DragElementLeftTopType', DragElementLeftTopType);
+
 var HttpErrorCode;
 (function (HttpErrorCode) {
     HttpErrorCode[HttpErrorCode["unknow"] = 0] = "unknow";
@@ -116,12 +122,6 @@ let ActionGuard=class ActionGuard {
 }
 ActionGuard.Namespace=`Aventus`;
 __as1(_, 'ActionGuard', ActionGuard);
-
-let DragElementXYType= [SVGGElement, SVGRectElement, SVGEllipseElement, SVGTextElement];
-__as1(_, 'DragElementXYType', DragElementXYType);
-
-let DragElementLeftTopType= [HTMLElement, SVGSVGElement];
-__as1(_, 'DragElementLeftTopType', DragElementLeftTopType);
 
 let sleep=function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -5541,665 +5541,6 @@ let ResizeObserver=class ResizeObserver {
 ResizeObserver.Namespace=`Aventus`;
 __as1(_, 'ResizeObserver', ResizeObserver);
 
-let Animation=class Animation {
-    /**
-     * Default FPS for all Animation if not set inside options
-     */
-    static FPS_DEFAULT = 60;
-    options;
-    nextFrame = 0;
-    fpsInterval;
-    continueAnimation = false;
-    frame_id = 0;
-    constructor(options) {
-        if (!options.animate) {
-            options.animate = () => { };
-        }
-        if (!options.stopped) {
-            options.stopped = () => { };
-        }
-        if (!options.fps) {
-            options.fps = Animation.FPS_DEFAULT;
-        }
-        this.options = options;
-        this.fpsInterval = 1000 / options.fps;
-    }
-    animate() {
-        let now = window.performance.now();
-        let elapsed = now - this.nextFrame;
-        if (elapsed <= this.fpsInterval) {
-            this.frame_id = requestAnimationFrame(() => this.animate());
-            return;
-        }
-        this.nextFrame = now - (elapsed % this.fpsInterval);
-        setTimeout(() => {
-            this.options.animate();
-        }, 0);
-        if (this.continueAnimation) {
-            this.frame_id = requestAnimationFrame(() => this.animate());
-        }
-        else {
-            this.options.stopped();
-        }
-    }
-    /**
-     * Start the of animation
-     */
-    start() {
-        if (this.continueAnimation == false) {
-            this.continueAnimation = true;
-            this.nextFrame = window.performance.now();
-            this.animate();
-        }
-    }
-    /**
-     * Stop the animation
-     */
-    stop() {
-        this.continueAnimation = false;
-    }
-    /**
-     * Stop the animation
-     */
-    immediateStop() {
-        cancelAnimationFrame(this.frame_id);
-        this.continueAnimation = false;
-        this.options.stopped();
-    }
-    /**
-     * Get the FPS
-     */
-    getFPS() {
-        return this.options.fps;
-    }
-    /**
-     * Set the FPS
-     */
-    setFPS(fps) {
-        this.options.fps = fps;
-        this.fpsInterval = 1000 / this.options.fps;
-    }
-    /**
-     * Get the animation status (true if animation is running)
-     */
-    isStarted() {
-        return this.continueAnimation;
-    }
-}
-Animation.Namespace=`Aventus`;
-__as1(_, 'Animation', Animation);
-
-let DragAndDrop=class DragAndDrop {
-    /**
-     * Default offset before drag element
-     */
-    static defaultOffsetDrag = 20;
-    pressManager;
-    options;
-    startCursorPosition = { x: 0, y: 0 };
-    startElementPosition = { x: 0, y: 0 };
-    isEnable = true;
-    draggableElement;
-    constructor(options) {
-        this.options = this.getDefaultOptions(options.element);
-        this.mergeProperties(options);
-        this.mergeFunctions(options);
-        this.options.elementTrigger.style.touchAction = 'none';
-        this.pressManager = new PressManager({
-            element: this.options.elementTrigger,
-            onPressStart: this.onPressStart.bind(this),
-            onPressEnd: this.onPressEnd.bind(this),
-            onDragStart: this.onDragStart.bind(this),
-            onDrag: this.onDrag.bind(this),
-            onDragEnd: this.onDragEnd.bind(this),
-            offsetDrag: this.options.offsetDrag,
-            dragDirection: this.options.dragDirection,
-            stopPropagation: this.options.stopPropagation
-        });
-    }
-    getDefaultOptions(element) {
-        return {
-            applyDrag: true,
-            element: element,
-            elementTrigger: element,
-            offsetDrag: DragAndDrop.defaultOffsetDrag,
-            dragDirection: 'XY',
-            shadow: {
-                enable: false,
-                container: document.body,
-                removeOnStop: true,
-                transform: () => { },
-                delete: (el) => {
-                    el.remove();
-                }
-            },
-            strict: false,
-            targets: [],
-            usePercent: false,
-            stopPropagation: true,
-            useMouseFinalPosition: false,
-            useTransform: false,
-            isDragEnable: () => true,
-            getZoom: () => 1,
-            getOffsetX: () => 0,
-            getOffsetY: () => 0,
-            onPointerDown: (e) => { },
-            onPointerUp: (e) => { },
-            onStart: (e) => { },
-            onMove: (e) => { },
-            onStop: (e) => { },
-            onDrop: (element, targets) => { },
-            correctPosition: (position) => position
-        };
-    }
-    mergeProperties(options) {
-        if (options.element === void 0) {
-            throw "You must define the element for the drag&drop";
-        }
-        this.options.element = options.element;
-        if (options.elementTrigger === void 0) {
-            this.options.elementTrigger = this.options.element;
-        }
-        else {
-            this.options.elementTrigger = options.elementTrigger;
-        }
-        this.defaultMerge(options, "applyDrag");
-        this.defaultMerge(options, "offsetDrag");
-        this.defaultMerge(options, "dragDirection");
-        this.defaultMerge(options, "strict");
-        this.defaultMerge(options, "targets");
-        this.defaultMerge(options, "usePercent");
-        this.defaultMerge(options, "stopPropagation");
-        this.defaultMerge(options, "useMouseFinalPosition");
-        this.defaultMerge(options, "useTransform");
-        if (options.shadow !== void 0) {
-            this.options.shadow.enable = options.shadow.enable;
-            if (options.shadow.container !== void 0) {
-                this.options.shadow.container = options.shadow.container;
-            }
-            else {
-                this.options.shadow.container = document.body;
-            }
-            if (options.shadow.removeOnStop !== void 0) {
-                this.options.shadow.removeOnStop = options.shadow.removeOnStop;
-            }
-            if (options.shadow.transform !== void 0) {
-                this.options.shadow.transform = options.shadow.transform;
-            }
-            if (options.shadow.delete !== void 0) {
-                this.options.shadow.delete = options.shadow.delete;
-            }
-        }
-    }
-    mergeFunctions(options) {
-        this.defaultMerge(options, "isDragEnable");
-        this.defaultMerge(options, "getZoom");
-        this.defaultMerge(options, "getOffsetX");
-        this.defaultMerge(options, "getOffsetY");
-        this.defaultMerge(options, "onPointerDown");
-        this.defaultMerge(options, "onPointerUp");
-        this.defaultMerge(options, "onStart");
-        this.defaultMerge(options, "onMove");
-        this.defaultMerge(options, "onStop");
-        this.defaultMerge(options, "onDrop");
-        this.defaultMerge(options, "correctPosition");
-    }
-    defaultMerge(options, name) {
-        if (options[name] !== void 0) {
-            this.options[name] = options[name];
-        }
-    }
-    positionShadowRelativeToElement = { x: 0, y: 0 };
-    onPressStart(e) {
-        this.options.onPointerDown(e);
-    }
-    onPressEnd(e) {
-        this.options.onPointerUp(e);
-    }
-    onDragStart(e) {
-        this.isEnable = this.options.isDragEnable();
-        if (!this.isEnable) {
-            return false;
-        }
-        let draggableElement = this.options.element;
-        this.startCursorPosition = {
-            x: e.pageX,
-            y: e.pageY
-        };
-        this.startElementPosition = this.getBoundingBoxRelative(draggableElement);
-        if (this.options.shadow.enable) {
-            draggableElement = this.options.element.cloneNode(true);
-            let elBox = this.options.element.getBoundingClientRect();
-            let containerBox = this.options.shadow.container.getBoundingClientRect();
-            this.positionShadowRelativeToElement = {
-                x: elBox.x - containerBox.x,
-                y: elBox.y - containerBox.y
-            };
-            if (this.options.applyDrag) {
-                draggableElement.style.position = "absolute";
-                draggableElement.style.top = this.positionShadowRelativeToElement.y + this.options.getOffsetY() + 'px';
-                draggableElement.style.left = this.positionShadowRelativeToElement.x + this.options.getOffsetX() + 'px';
-                this.options.shadow.transform(draggableElement);
-                this.options.shadow.container.appendChild(draggableElement);
-            }
-        }
-        this.draggableElement = draggableElement;
-        const result = this.options.onStart(e);
-        if (result !== false) {
-            document.body.style.userSelect = 'none';
-            if (window.getSelection) {
-                window.getSelection()?.removeAllRanges();
-            }
-        }
-        return result;
-    }
-    onDrag(e) {
-        if (!this.isEnable) {
-            return;
-        }
-        let zoom = this.options.getZoom();
-        let diff = {
-            x: 0,
-            y: 0
-        };
-        if (this.options.shadow.enable) {
-            diff = {
-                x: (e.pageX - this.startCursorPosition.x) + this.positionShadowRelativeToElement.x + this.options.getOffsetX(),
-                y: (e.pageY - this.startCursorPosition.y) + this.positionShadowRelativeToElement.y + this.options.getOffsetY(),
-            };
-        }
-        else {
-            diff = {
-                x: (e.pageX - this.startCursorPosition.x) / zoom + this.startElementPosition.x + this.options.getOffsetX(),
-                y: (e.pageY - this.startCursorPosition.y) / zoom + this.startElementPosition.y + this.options.getOffsetY()
-            };
-        }
-        let newPos = this.setPosition(diff);
-        this.options.onMove(e, newPos);
-    }
-    onDragEnd(e) {
-        if (!this.isEnable) {
-            return;
-        }
-        document.body.style.userSelect = '';
-        let targets = this.options.useMouseFinalPosition ? this.getMatchingTargetsWithMousePosition({
-            x: e.clientX,
-            y: e.clientY
-        }) : this.getMatchingTargets();
-        let draggableElement = this.draggableElement;
-        if (this.options.shadow.enable && this.options.shadow.removeOnStop) {
-            this.options.shadow.delete(draggableElement);
-        }
-        if (targets.length > 0) {
-            this.options.onDrop(this.options.element, targets);
-        }
-        this.options.onStop(e);
-    }
-    setPosition(position) {
-        let draggableElement = this.draggableElement;
-        if (this.options.usePercent) {
-            let elementParent = this.getOffsetParent(draggableElement);
-            if (elementParent instanceof HTMLElement) {
-                let percentPosition = {
-                    x: (position.x / elementParent.offsetWidth) * 100,
-                    y: (position.y / elementParent.offsetHeight) * 100
-                };
-                percentPosition = this.options.correctPosition(percentPosition);
-                if (this.options.applyDrag) {
-                    draggableElement.style.left = percentPosition.x + '%';
-                    draggableElement.style.top = percentPosition.y + '%';
-                }
-                return percentPosition;
-            }
-            else {
-                console.error("Can't find parent. Contact an admin", draggableElement);
-            }
-        }
-        else {
-            position = this.options.correctPosition(position);
-            if (this.options.applyDrag) {
-                if (this.isLeftTopElement(draggableElement)) {
-                    draggableElement.style.left = position.x + 'px';
-                    draggableElement.style.top = position.y + 'px';
-                }
-                else {
-                    if (this.options.useTransform) {
-                        draggableElement.setAttribute("transform", `translate(${position.x},${position.y})`);
-                    }
-                    else {
-                        draggableElement.style.left = position.x + 'px';
-                        draggableElement.style.top = position.y + 'px';
-                    }
-                }
-            }
-        }
-        return position;
-    }
-    getTargets() {
-        if (typeof this.options.targets == "function") {
-            return this.options.targets();
-        }
-        else {
-            return this.options.targets;
-        }
-    }
-    /**
-     * Get targets within the current element position is matching
-     */
-    getMatchingTargets() {
-        let draggableElement = this.draggableElement;
-        let matchingTargets = [];
-        let srcTargets = this.getTargets();
-        for (let target of srcTargets) {
-            let elementCoordinates = this.getBoundingBoxAbsolute(draggableElement);
-            let targetCoordinates = this.getBoundingBoxAbsolute(target);
-            let offsetX = this.options.getOffsetX();
-            let offsetY = this.options.getOffsetY();
-            let zoom = this.options.getZoom();
-            targetCoordinates.x += offsetX;
-            targetCoordinates.y += offsetY;
-            targetCoordinates.width *= zoom;
-            targetCoordinates.height *= zoom;
-            if (this.options.strict) {
-                if ((elementCoordinates.x >= targetCoordinates.x && elementCoordinates.x + elementCoordinates.width <= targetCoordinates.x + targetCoordinates.width) &&
-                    (elementCoordinates.y >= targetCoordinates.y && elementCoordinates.y + elementCoordinates.height <= targetCoordinates.y + targetCoordinates.height)) {
-                    matchingTargets.push(target);
-                }
-            }
-            else {
-                let elementLeft = elementCoordinates.x;
-                let elementRight = elementCoordinates.x + elementCoordinates.width;
-                let elementTop = elementCoordinates.y;
-                let elementBottom = elementCoordinates.y + elementCoordinates.height;
-                let targetLeft = targetCoordinates.x;
-                let targetRight = targetCoordinates.x + targetCoordinates.width;
-                let targetTop = targetCoordinates.y;
-                let targetBottom = targetCoordinates.y + targetCoordinates.height;
-                if (!(elementRight < targetLeft ||
-                    elementLeft > targetRight ||
-                    elementBottom < targetTop ||
-                    elementTop > targetBottom)) {
-                    matchingTargets.push(target);
-                }
-            }
-        }
-        return matchingTargets;
-    }
-    /**
-     * This function will return the targets that are matching with the mouse position
-     * @param mouse The mouse position
-     */
-    getMatchingTargetsWithMousePosition(mouse) {
-        let matchingTargets = [];
-        if (this.options.shadow.enable == false || this.options.shadow.container == null) {
-            console.warn("DragAndDrop : To use useMouseFinalPosition=true, you must enable shadow and set a container");
-            return matchingTargets;
-        }
-        const container = this.options.shadow.container;
-        let xCorrected = mouse.x - container.getBoundingClientRect().left;
-        let yCorrected = mouse.y - container.getBoundingClientRect().top;
-        for (let target of this.getTargets()) {
-            if (this.isLeftTopElement(target)) {
-                if (this.matchPosition(target, { x: mouse.x, y: mouse.y })) {
-                    matchingTargets.push(target);
-                }
-            }
-            else {
-                if (this.matchPosition(target, { x: xCorrected, y: yCorrected })) {
-                    matchingTargets.push(target);
-                }
-            }
-        }
-        return matchingTargets;
-    }
-    matchPosition(element, point) {
-        let elementCoordinates = this.getBoundingBoxAbsolute(element);
-        if (point.x >= elementCoordinates.x &&
-            point.x <= elementCoordinates.x + elementCoordinates.width &&
-            point.y >= elementCoordinates.y &&
-            point.y <= elementCoordinates.y + elementCoordinates.height) {
-            return true;
-        }
-        return false;
-    }
-    /**
-     * Get element currently dragging
-     */
-    getElementDrag() {
-        return this.options.element;
-    }
-    /**
-     * Set targets where to drop
-     */
-    setTargets(targets) {
-        this.options.targets = targets;
-    }
-    /**
-     * Set targets where to drop
-     */
-    setTargetsFct(targets) {
-        this.options.targets = targets;
-    }
-    /**
-     * Destroy the current drag&drop instance
-     */
-    destroy() {
-        this.pressManager.destroy();
-    }
-    isLeftTopElement(element) {
-        for (let Type of DragElementLeftTopType) {
-            if (element instanceof Type) {
-                return true;
-            }
-        }
-        return false;
-    }
-    isXYElement(element) {
-        for (let Type of DragElementXYType) {
-            if (element instanceof Type) {
-                return true;
-            }
-        }
-        return false;
-    }
-    getCoordinateFromAttribute(element) {
-        if (this.options.useTransform) {
-            const transform = element.getAttribute("transform");
-            const tvalue = transform?.match(/translate\(([^,]+),([^,]+)\)/);
-            const x = tvalue ? parseFloat(tvalue[1]) : 0;
-            const y = tvalue ? parseFloat(tvalue[2]) : 0;
-            return {
-                x: x,
-                y: y
-            };
-        }
-        return {
-            x: parseFloat(element.getAttribute("x")),
-            y: parseFloat(element.getAttribute("y"))
-        };
-    }
-    XYElementToRelativeBox(element) {
-        let coordinates = this.getCoordinateFromAttribute(element);
-        const width = parseFloat(element.getAttribute("width"));
-        const height = parseFloat(element.getAttribute("height"));
-        return {
-            x: coordinates.x,
-            y: coordinates.y,
-            width: width,
-            height: height,
-            bottom: coordinates.y + height,
-            right: coordinates.x + width,
-            top: coordinates.y,
-            left: coordinates.x,
-            toJSON() {
-                return JSON.stringify(this);
-            }
-        };
-    }
-    XYElementToAbsoluteBox(element) {
-        let coordinates = this.getCoordinateFromAttribute(element);
-        const parent = this.getOffsetParent(element);
-        if (parent) {
-            const box = parent.getBoundingClientRect();
-            coordinates = {
-                x: coordinates.x + box.x,
-                y: coordinates.y + box.y
-            };
-        }
-        const width = parseFloat(element.getAttribute("width"));
-        const height = parseFloat(element.getAttribute("height"));
-        return {
-            x: coordinates.x,
-            y: coordinates.y,
-            width: width,
-            height: height,
-            bottom: coordinates.y + height,
-            right: coordinates.x + width,
-            top: coordinates.y,
-            left: coordinates.x,
-            toJSON() {
-                return JSON.stringify(this);
-            }
-        };
-    }
-    getBoundingBoxAbsolute(element) {
-        if (this.isLeftTopElement(element)) {
-            if (element instanceof HTMLElement) {
-                const bounds = element.getBoundingClientRect();
-                return {
-                    x: bounds.x,
-                    y: bounds.y,
-                    width: bounds.width,
-                    height: bounds.height,
-                    bottom: bounds.bottom,
-                    right: bounds.right,
-                    top: bounds.top,
-                    left: bounds.left,
-                    toJSON() {
-                        return JSON.stringify(this);
-                    }
-                };
-            }
-        }
-        else if (this.isXYElement(element)) {
-            return this.XYElementToAbsoluteBox(element);
-        }
-        const parent = this.getOffsetParent(element);
-        if (parent instanceof HTMLElement) {
-            const rect = element.getBoundingClientRect();
-            const rectParent = parent.getBoundingClientRect();
-            const x = rect.left - rectParent.left;
-            const y = rect.top - rectParent.top;
-            return {
-                x: x,
-                y: y,
-                width: rect.width,
-                height: rect.height,
-                bottom: y + rect.height,
-                right: x + rect.width,
-                left: rect.left - rectParent.left,
-                top: rect.top - rectParent.top,
-                toJSON() {
-                    return JSON.stringify(this);
-                }
-            };
-        }
-        console.error("Element type not supported");
-        return {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            bottom: 0,
-            right: 0,
-            top: 0,
-            left: 0,
-            toJSON() {
-                return JSON.stringify(this);
-            }
-        };
-    }
-    getBoundingBoxRelative(element) {
-        if (this.isLeftTopElement(element)) {
-            if (element instanceof HTMLElement) {
-                return {
-                    x: element.offsetLeft,
-                    y: element.offsetTop,
-                    width: element.offsetWidth,
-                    height: element.offsetHeight,
-                    bottom: element.offsetTop + element.offsetHeight,
-                    right: element.offsetLeft + element.offsetWidth,
-                    top: element.offsetTop,
-                    left: element.offsetLeft,
-                    toJSON() {
-                        return JSON.stringify(this);
-                    }
-                };
-            }
-        }
-        else if (this.isXYElement(element)) {
-            return this.XYElementToRelativeBox(element);
-        }
-        const parent = this.getOffsetParent(element);
-        if (parent instanceof HTMLElement) {
-            const rect = element.getBoundingClientRect();
-            const rectParent = parent.getBoundingClientRect();
-            const x = rect.left - rectParent.left;
-            const y = rect.top - rectParent.top;
-            return {
-                x: x,
-                y: y,
-                width: rect.width,
-                height: rect.height,
-                bottom: y + rect.height,
-                right: x + rect.width,
-                left: rect.left - rectParent.left,
-                top: rect.top - rectParent.top,
-                toJSON() {
-                    return JSON.stringify(this);
-                }
-            };
-        }
-        console.error("Element type not supported");
-        return {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            bottom: 0,
-            right: 0,
-            top: 0,
-            left: 0,
-            toJSON() {
-                return JSON.stringify(this);
-            }
-        };
-    }
-    getOffsetParent(element) {
-        if (element instanceof HTMLElement) {
-            return element.offsetParent;
-        }
-        let current = element.parentNode;
-        while (current) {
-            if (current instanceof Element) {
-                const style = getComputedStyle(current);
-                if (style.position !== 'static') {
-                    return current;
-                }
-            }
-            if (current instanceof ShadowRoot) {
-                current = current.host;
-            }
-            else {
-                current = current.parentNode;
-            }
-        }
-        return null;
-    }
-}
-DragAndDrop.Namespace=`Aventus`;
-__as1(_, 'DragAndDrop', DragAndDrop);
-
 let RamError=class RamError extends GenericError {
 }
 RamError.Namespace=`Aventus`;
@@ -7438,6 +6779,665 @@ let HttpRoute=class HttpRoute {
 }
 HttpRoute.Namespace=`Aventus`;
 __as1(_, 'HttpRoute', HttpRoute);
+
+let Animation=class Animation {
+    /**
+     * Default FPS for all Animation if not set inside options
+     */
+    static FPS_DEFAULT = 60;
+    options;
+    nextFrame = 0;
+    fpsInterval;
+    continueAnimation = false;
+    frame_id = 0;
+    constructor(options) {
+        if (!options.animate) {
+            options.animate = () => { };
+        }
+        if (!options.stopped) {
+            options.stopped = () => { };
+        }
+        if (!options.fps) {
+            options.fps = Animation.FPS_DEFAULT;
+        }
+        this.options = options;
+        this.fpsInterval = 1000 / options.fps;
+    }
+    animate() {
+        let now = window.performance.now();
+        let elapsed = now - this.nextFrame;
+        if (elapsed <= this.fpsInterval) {
+            this.frame_id = requestAnimationFrame(() => this.animate());
+            return;
+        }
+        this.nextFrame = now - (elapsed % this.fpsInterval);
+        setTimeout(() => {
+            this.options.animate();
+        }, 0);
+        if (this.continueAnimation) {
+            this.frame_id = requestAnimationFrame(() => this.animate());
+        }
+        else {
+            this.options.stopped();
+        }
+    }
+    /**
+     * Start the of animation
+     */
+    start() {
+        if (this.continueAnimation == false) {
+            this.continueAnimation = true;
+            this.nextFrame = window.performance.now();
+            this.animate();
+        }
+    }
+    /**
+     * Stop the animation
+     */
+    stop() {
+        this.continueAnimation = false;
+    }
+    /**
+     * Stop the animation
+     */
+    immediateStop() {
+        cancelAnimationFrame(this.frame_id);
+        this.continueAnimation = false;
+        this.options.stopped();
+    }
+    /**
+     * Get the FPS
+     */
+    getFPS() {
+        return this.options.fps;
+    }
+    /**
+     * Set the FPS
+     */
+    setFPS(fps) {
+        this.options.fps = fps;
+        this.fpsInterval = 1000 / this.options.fps;
+    }
+    /**
+     * Get the animation status (true if animation is running)
+     */
+    isStarted() {
+        return this.continueAnimation;
+    }
+}
+Animation.Namespace=`Aventus`;
+__as1(_, 'Animation', Animation);
+
+let DragAndDrop=class DragAndDrop {
+    /**
+     * Default offset before drag element
+     */
+    static defaultOffsetDrag = 20;
+    pressManager;
+    options;
+    startCursorPosition = { x: 0, y: 0 };
+    startElementPosition = { x: 0, y: 0 };
+    isEnable = true;
+    draggableElement;
+    constructor(options) {
+        this.options = this.getDefaultOptions(options.element);
+        this.mergeProperties(options);
+        this.mergeFunctions(options);
+        this.options.elementTrigger.style.touchAction = 'none';
+        this.pressManager = new PressManager({
+            element: this.options.elementTrigger,
+            onPressStart: this.onPressStart.bind(this),
+            onPressEnd: this.onPressEnd.bind(this),
+            onDragStart: this.onDragStart.bind(this),
+            onDrag: this.onDrag.bind(this),
+            onDragEnd: this.onDragEnd.bind(this),
+            offsetDrag: this.options.offsetDrag,
+            dragDirection: this.options.dragDirection,
+            stopPropagation: this.options.stopPropagation
+        });
+    }
+    getDefaultOptions(element) {
+        return {
+            applyDrag: true,
+            element: element,
+            elementTrigger: element,
+            offsetDrag: DragAndDrop.defaultOffsetDrag,
+            dragDirection: 'XY',
+            shadow: {
+                enable: false,
+                container: document.body,
+                removeOnStop: true,
+                transform: () => { },
+                delete: (el) => {
+                    el.remove();
+                }
+            },
+            strict: false,
+            targets: [],
+            usePercent: false,
+            stopPropagation: true,
+            useMouseFinalPosition: false,
+            useTransform: false,
+            isDragEnable: () => true,
+            getZoom: () => 1,
+            getOffsetX: () => 0,
+            getOffsetY: () => 0,
+            onPointerDown: (e) => { },
+            onPointerUp: (e) => { },
+            onStart: (e) => { },
+            onMove: (e) => { },
+            onStop: (e) => { },
+            onDrop: (element, targets) => { },
+            correctPosition: (position) => position
+        };
+    }
+    mergeProperties(options) {
+        if (options.element === void 0) {
+            throw "You must define the element for the drag&drop";
+        }
+        this.options.element = options.element;
+        if (options.elementTrigger === void 0) {
+            this.options.elementTrigger = this.options.element;
+        }
+        else {
+            this.options.elementTrigger = options.elementTrigger;
+        }
+        this.defaultMerge(options, "applyDrag");
+        this.defaultMerge(options, "offsetDrag");
+        this.defaultMerge(options, "dragDirection");
+        this.defaultMerge(options, "strict");
+        this.defaultMerge(options, "targets");
+        this.defaultMerge(options, "usePercent");
+        this.defaultMerge(options, "stopPropagation");
+        this.defaultMerge(options, "useMouseFinalPosition");
+        this.defaultMerge(options, "useTransform");
+        if (options.shadow !== void 0) {
+            this.options.shadow.enable = options.shadow.enable;
+            if (options.shadow.container !== void 0) {
+                this.options.shadow.container = options.shadow.container;
+            }
+            else {
+                this.options.shadow.container = document.body;
+            }
+            if (options.shadow.removeOnStop !== void 0) {
+                this.options.shadow.removeOnStop = options.shadow.removeOnStop;
+            }
+            if (options.shadow.transform !== void 0) {
+                this.options.shadow.transform = options.shadow.transform;
+            }
+            if (options.shadow.delete !== void 0) {
+                this.options.shadow.delete = options.shadow.delete;
+            }
+        }
+    }
+    mergeFunctions(options) {
+        this.defaultMerge(options, "isDragEnable");
+        this.defaultMerge(options, "getZoom");
+        this.defaultMerge(options, "getOffsetX");
+        this.defaultMerge(options, "getOffsetY");
+        this.defaultMerge(options, "onPointerDown");
+        this.defaultMerge(options, "onPointerUp");
+        this.defaultMerge(options, "onStart");
+        this.defaultMerge(options, "onMove");
+        this.defaultMerge(options, "onStop");
+        this.defaultMerge(options, "onDrop");
+        this.defaultMerge(options, "correctPosition");
+    }
+    defaultMerge(options, name) {
+        if (options[name] !== void 0) {
+            this.options[name] = options[name];
+        }
+    }
+    positionShadowRelativeToElement = { x: 0, y: 0 };
+    onPressStart(e) {
+        this.options.onPointerDown(e);
+    }
+    onPressEnd(e) {
+        this.options.onPointerUp(e);
+    }
+    onDragStart(e) {
+        this.isEnable = this.options.isDragEnable();
+        if (!this.isEnable) {
+            return false;
+        }
+        let draggableElement = this.options.element;
+        this.startCursorPosition = {
+            x: e.pageX,
+            y: e.pageY
+        };
+        this.startElementPosition = this.getBoundingBoxRelative(draggableElement);
+        if (this.options.shadow.enable) {
+            draggableElement = this.options.element.cloneNode(true);
+            let elBox = this.options.element.getBoundingClientRect();
+            let containerBox = this.options.shadow.container.getBoundingClientRect();
+            this.positionShadowRelativeToElement = {
+                x: elBox.x - containerBox.x,
+                y: elBox.y - containerBox.y
+            };
+            if (this.options.applyDrag) {
+                draggableElement.style.position = "absolute";
+                draggableElement.style.top = this.positionShadowRelativeToElement.y + this.options.getOffsetY() + 'px';
+                draggableElement.style.left = this.positionShadowRelativeToElement.x + this.options.getOffsetX() + 'px';
+                this.options.shadow.transform(draggableElement);
+                this.options.shadow.container.appendChild(draggableElement);
+            }
+        }
+        this.draggableElement = draggableElement;
+        const result = this.options.onStart(e);
+        if (result !== false) {
+            document.body.style.userSelect = 'none';
+            if (window.getSelection) {
+                window.getSelection()?.removeAllRanges();
+            }
+        }
+        return result;
+    }
+    onDrag(e) {
+        if (!this.isEnable) {
+            return;
+        }
+        let zoom = this.options.getZoom();
+        let diff = {
+            x: 0,
+            y: 0
+        };
+        if (this.options.shadow.enable) {
+            diff = {
+                x: (e.pageX - this.startCursorPosition.x) + this.positionShadowRelativeToElement.x + this.options.getOffsetX(),
+                y: (e.pageY - this.startCursorPosition.y) + this.positionShadowRelativeToElement.y + this.options.getOffsetY(),
+            };
+        }
+        else {
+            diff = {
+                x: (e.pageX - this.startCursorPosition.x) / zoom + this.startElementPosition.x + this.options.getOffsetX(),
+                y: (e.pageY - this.startCursorPosition.y) / zoom + this.startElementPosition.y + this.options.getOffsetY()
+            };
+        }
+        let newPos = this.setPosition(diff);
+        this.options.onMove(e, newPos);
+    }
+    onDragEnd(e) {
+        if (!this.isEnable) {
+            return;
+        }
+        document.body.style.userSelect = '';
+        let targets = this.options.useMouseFinalPosition ? this.getMatchingTargetsWithMousePosition({
+            x: e.clientX,
+            y: e.clientY
+        }) : this.getMatchingTargets();
+        let draggableElement = this.draggableElement;
+        if (this.options.shadow.enable && this.options.shadow.removeOnStop) {
+            this.options.shadow.delete(draggableElement);
+        }
+        if (targets.length > 0) {
+            this.options.onDrop(this.options.element, targets);
+        }
+        this.options.onStop(e);
+    }
+    setPosition(position) {
+        let draggableElement = this.draggableElement;
+        if (this.options.usePercent) {
+            let elementParent = this.getOffsetParent(draggableElement);
+            if (elementParent instanceof HTMLElement) {
+                let percentPosition = {
+                    x: (position.x / elementParent.offsetWidth) * 100,
+                    y: (position.y / elementParent.offsetHeight) * 100
+                };
+                percentPosition = this.options.correctPosition(percentPosition);
+                if (this.options.applyDrag) {
+                    draggableElement.style.left = percentPosition.x + '%';
+                    draggableElement.style.top = percentPosition.y + '%';
+                }
+                return percentPosition;
+            }
+            else {
+                console.error("Can't find parent. Contact an admin", draggableElement);
+            }
+        }
+        else {
+            position = this.options.correctPosition(position);
+            if (this.options.applyDrag) {
+                if (this.isLeftTopElement(draggableElement)) {
+                    draggableElement.style.left = position.x + 'px';
+                    draggableElement.style.top = position.y + 'px';
+                }
+                else {
+                    if (this.options.useTransform) {
+                        draggableElement.setAttribute("transform", `translate(${position.x},${position.y})`);
+                    }
+                    else {
+                        draggableElement.style.left = position.x + 'px';
+                        draggableElement.style.top = position.y + 'px';
+                    }
+                }
+            }
+        }
+        return position;
+    }
+    getTargets() {
+        if (typeof this.options.targets == "function") {
+            return this.options.targets();
+        }
+        else {
+            return this.options.targets;
+        }
+    }
+    /**
+     * Get targets within the current element position is matching
+     */
+    getMatchingTargets() {
+        let draggableElement = this.draggableElement;
+        let matchingTargets = [];
+        let srcTargets = this.getTargets();
+        for (let target of srcTargets) {
+            let elementCoordinates = this.getBoundingBoxAbsolute(draggableElement);
+            let targetCoordinates = this.getBoundingBoxAbsolute(target);
+            let offsetX = this.options.getOffsetX();
+            let offsetY = this.options.getOffsetY();
+            let zoom = this.options.getZoom();
+            targetCoordinates.x += offsetX;
+            targetCoordinates.y += offsetY;
+            targetCoordinates.width *= zoom;
+            targetCoordinates.height *= zoom;
+            if (this.options.strict) {
+                if ((elementCoordinates.x >= targetCoordinates.x && elementCoordinates.x + elementCoordinates.width <= targetCoordinates.x + targetCoordinates.width) &&
+                    (elementCoordinates.y >= targetCoordinates.y && elementCoordinates.y + elementCoordinates.height <= targetCoordinates.y + targetCoordinates.height)) {
+                    matchingTargets.push(target);
+                }
+            }
+            else {
+                let elementLeft = elementCoordinates.x;
+                let elementRight = elementCoordinates.x + elementCoordinates.width;
+                let elementTop = elementCoordinates.y;
+                let elementBottom = elementCoordinates.y + elementCoordinates.height;
+                let targetLeft = targetCoordinates.x;
+                let targetRight = targetCoordinates.x + targetCoordinates.width;
+                let targetTop = targetCoordinates.y;
+                let targetBottom = targetCoordinates.y + targetCoordinates.height;
+                if (!(elementRight < targetLeft ||
+                    elementLeft > targetRight ||
+                    elementBottom < targetTop ||
+                    elementTop > targetBottom)) {
+                    matchingTargets.push(target);
+                }
+            }
+        }
+        return matchingTargets;
+    }
+    /**
+     * This function will return the targets that are matching with the mouse position
+     * @param mouse The mouse position
+     */
+    getMatchingTargetsWithMousePosition(mouse) {
+        let matchingTargets = [];
+        if (this.options.shadow.enable == false || this.options.shadow.container == null) {
+            console.warn("DragAndDrop : To use useMouseFinalPosition=true, you must enable shadow and set a container");
+            return matchingTargets;
+        }
+        const container = this.options.shadow.container;
+        let xCorrected = mouse.x - container.getBoundingClientRect().left;
+        let yCorrected = mouse.y - container.getBoundingClientRect().top;
+        for (let target of this.getTargets()) {
+            if (this.isLeftTopElement(target)) {
+                if (this.matchPosition(target, { x: mouse.x, y: mouse.y })) {
+                    matchingTargets.push(target);
+                }
+            }
+            else {
+                if (this.matchPosition(target, { x: xCorrected, y: yCorrected })) {
+                    matchingTargets.push(target);
+                }
+            }
+        }
+        return matchingTargets;
+    }
+    matchPosition(element, point) {
+        let elementCoordinates = this.getBoundingBoxAbsolute(element);
+        if (point.x >= elementCoordinates.x &&
+            point.x <= elementCoordinates.x + elementCoordinates.width &&
+            point.y >= elementCoordinates.y &&
+            point.y <= elementCoordinates.y + elementCoordinates.height) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Get element currently dragging
+     */
+    getElementDrag() {
+        return this.options.element;
+    }
+    /**
+     * Set targets where to drop
+     */
+    setTargets(targets) {
+        this.options.targets = targets;
+    }
+    /**
+     * Set targets where to drop
+     */
+    setTargetsFct(targets) {
+        this.options.targets = targets;
+    }
+    /**
+     * Destroy the current drag&drop instance
+     */
+    destroy() {
+        this.pressManager.destroy();
+    }
+    isLeftTopElement(element) {
+        for (let Type of DragElementLeftTopType) {
+            if (element instanceof Type) {
+                return true;
+            }
+        }
+        return false;
+    }
+    isXYElement(element) {
+        for (let Type of DragElementXYType) {
+            if (element instanceof Type) {
+                return true;
+            }
+        }
+        return false;
+    }
+    getCoordinateFromAttribute(element) {
+        if (this.options.useTransform) {
+            const transform = element.getAttribute("transform");
+            const tvalue = transform?.match(/translate\(([^,]+),([^,]+)\)/);
+            const x = tvalue ? parseFloat(tvalue[1]) : 0;
+            const y = tvalue ? parseFloat(tvalue[2]) : 0;
+            return {
+                x: x,
+                y: y
+            };
+        }
+        return {
+            x: parseFloat(element.getAttribute("x")),
+            y: parseFloat(element.getAttribute("y"))
+        };
+    }
+    XYElementToRelativeBox(element) {
+        let coordinates = this.getCoordinateFromAttribute(element);
+        const width = parseFloat(element.getAttribute("width"));
+        const height = parseFloat(element.getAttribute("height"));
+        return {
+            x: coordinates.x,
+            y: coordinates.y,
+            width: width,
+            height: height,
+            bottom: coordinates.y + height,
+            right: coordinates.x + width,
+            top: coordinates.y,
+            left: coordinates.x,
+            toJSON() {
+                return JSON.stringify(this);
+            }
+        };
+    }
+    XYElementToAbsoluteBox(element) {
+        let coordinates = this.getCoordinateFromAttribute(element);
+        const parent = this.getOffsetParent(element);
+        if (parent) {
+            const box = parent.getBoundingClientRect();
+            coordinates = {
+                x: coordinates.x + box.x,
+                y: coordinates.y + box.y
+            };
+        }
+        const width = parseFloat(element.getAttribute("width"));
+        const height = parseFloat(element.getAttribute("height"));
+        return {
+            x: coordinates.x,
+            y: coordinates.y,
+            width: width,
+            height: height,
+            bottom: coordinates.y + height,
+            right: coordinates.x + width,
+            top: coordinates.y,
+            left: coordinates.x,
+            toJSON() {
+                return JSON.stringify(this);
+            }
+        };
+    }
+    getBoundingBoxAbsolute(element) {
+        if (this.isLeftTopElement(element)) {
+            if (element instanceof HTMLElement) {
+                const bounds = element.getBoundingClientRect();
+                return {
+                    x: bounds.x,
+                    y: bounds.y,
+                    width: bounds.width,
+                    height: bounds.height,
+                    bottom: bounds.bottom,
+                    right: bounds.right,
+                    top: bounds.top,
+                    left: bounds.left,
+                    toJSON() {
+                        return JSON.stringify(this);
+                    }
+                };
+            }
+        }
+        else if (this.isXYElement(element)) {
+            return this.XYElementToAbsoluteBox(element);
+        }
+        const parent = this.getOffsetParent(element);
+        if (parent instanceof HTMLElement) {
+            const rect = element.getBoundingClientRect();
+            const rectParent = parent.getBoundingClientRect();
+            const x = rect.left - rectParent.left;
+            const y = rect.top - rectParent.top;
+            return {
+                x: x,
+                y: y,
+                width: rect.width,
+                height: rect.height,
+                bottom: y + rect.height,
+                right: x + rect.width,
+                left: rect.left - rectParent.left,
+                top: rect.top - rectParent.top,
+                toJSON() {
+                    return JSON.stringify(this);
+                }
+            };
+        }
+        console.error("Element type not supported");
+        return {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            bottom: 0,
+            right: 0,
+            top: 0,
+            left: 0,
+            toJSON() {
+                return JSON.stringify(this);
+            }
+        };
+    }
+    getBoundingBoxRelative(element) {
+        if (this.isLeftTopElement(element)) {
+            if (element instanceof HTMLElement) {
+                return {
+                    x: element.offsetLeft,
+                    y: element.offsetTop,
+                    width: element.offsetWidth,
+                    height: element.offsetHeight,
+                    bottom: element.offsetTop + element.offsetHeight,
+                    right: element.offsetLeft + element.offsetWidth,
+                    top: element.offsetTop,
+                    left: element.offsetLeft,
+                    toJSON() {
+                        return JSON.stringify(this);
+                    }
+                };
+            }
+        }
+        else if (this.isXYElement(element)) {
+            return this.XYElementToRelativeBox(element);
+        }
+        const parent = this.getOffsetParent(element);
+        if (parent instanceof HTMLElement) {
+            const rect = element.getBoundingClientRect();
+            const rectParent = parent.getBoundingClientRect();
+            const x = rect.left - rectParent.left;
+            const y = rect.top - rectParent.top;
+            return {
+                x: x,
+                y: y,
+                width: rect.width,
+                height: rect.height,
+                bottom: y + rect.height,
+                right: x + rect.width,
+                left: rect.left - rectParent.left,
+                top: rect.top - rectParent.top,
+                toJSON() {
+                    return JSON.stringify(this);
+                }
+            };
+        }
+        console.error("Element type not supported");
+        return {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            bottom: 0,
+            right: 0,
+            top: 0,
+            left: 0,
+            toJSON() {
+                return JSON.stringify(this);
+            }
+        };
+    }
+    getOffsetParent(element) {
+        if (element instanceof HTMLElement) {
+            return element.offsetParent;
+        }
+        let current = element.parentNode;
+        while (current) {
+            if (current instanceof Element) {
+                const style = getComputedStyle(current);
+                if (style.position !== 'static') {
+                    return current;
+                }
+            }
+            if (current instanceof ShadowRoot) {
+                current = current.host;
+            }
+            else {
+                current = current.parentNode;
+            }
+        }
+        return null;
+    }
+}
+DragAndDrop.Namespace=`Aventus`;
+__as1(_, 'DragAndDrop', DragAndDrop);
 
 
 for(let key in _) { Aventus[key] = _[key] }
@@ -8894,6 +8894,46 @@ Layout.Row.Tag=`av-row`;
 __as1(_.Layout, 'Row', Layout.Row);
 if(!window.customElements.get('av-row')){window.customElements.define('av-row', Layout.Row);Aventus.WebComponentInstance.registerDefinition(Layout.Row);}
 
+let Tracker=class Tracker {
+    velocityMultiplier = window.devicePixelRatio;
+    updateTime = Date.now();
+    delta = { x: 0, y: 0 };
+    velocity = { x: 0, y: 0 };
+    lastPosition = { x: 0, y: 0 };
+    constructor(touch) {
+        this.lastPosition = this.getPosition(touch);
+    }
+    update(touch) {
+        const { velocity, updateTime, lastPosition, } = this;
+        const now = Date.now();
+        const position = this.getPosition(touch);
+        const delta = {
+            x: -(position.x - lastPosition.x),
+            y: -(position.y - lastPosition.y),
+        };
+        const duration = (now - updateTime) || 16.7;
+        const vx = delta.x / duration * 16.7;
+        const vy = delta.y / duration * 16.7;
+        velocity.x = vx * this.velocityMultiplier;
+        velocity.y = vy * this.velocityMultiplier;
+        this.delta = delta;
+        this.updateTime = now;
+        this.lastPosition = position;
+    }
+    getPointerData(evt) {
+        return evt.touches ? evt.touches[evt.touches.length - 1] : evt;
+    }
+    getPosition(evt) {
+        const data = this.getPointerData(evt);
+        return {
+            x: data.clientX,
+            y: data.clientY,
+        };
+    }
+}
+Tracker.Namespace=`Aventus`;
+__as1(_, 'Tracker', Tracker);
+
 Toast.ToastElement = class ToastElement extends Aventus.WebComponent {
     get 'position'() { return this.getStringAttr('position') }
     set 'position'(val) { this.setStringAttr('position', val) }get 'delay'() { return this.getNumberAttr('delay') }
@@ -9018,46 +9058,6 @@ __as1(_.Toast, 'ToastElement', Toast.ToastElement);
     SpecialTouch[SpecialTouch["Enter"] = 17] = "Enter";
 })(Lib.SpecialTouch || (Lib.SpecialTouch = {}));
 __as1(_.Lib, 'SpecialTouch', Lib.SpecialTouch);
-
-let Tracker=class Tracker {
-    velocityMultiplier = window.devicePixelRatio;
-    updateTime = Date.now();
-    delta = { x: 0, y: 0 };
-    velocity = { x: 0, y: 0 };
-    lastPosition = { x: 0, y: 0 };
-    constructor(touch) {
-        this.lastPosition = this.getPosition(touch);
-    }
-    update(touch) {
-        const { velocity, updateTime, lastPosition, } = this;
-        const now = Date.now();
-        const position = this.getPosition(touch);
-        const delta = {
-            x: -(position.x - lastPosition.x),
-            y: -(position.y - lastPosition.y),
-        };
-        const duration = (now - updateTime) || 16.7;
-        const vx = delta.x / duration * 16.7;
-        const vy = delta.y / duration * 16.7;
-        velocity.x = vx * this.velocityMultiplier;
-        velocity.y = vy * this.velocityMultiplier;
-        this.delta = delta;
-        this.updateTime = now;
-        this.lastPosition = position;
-    }
-    getPointerData(evt) {
-        return evt.touches ? evt.touches[evt.touches.length - 1] : evt;
-    }
-    getPosition(evt) {
-        const data = this.getPointerData(evt);
-        return {
-            x: data.clientX,
-            y: data.clientY,
-        };
-    }
-}
-Tracker.Namespace=`Aventus`;
-__as1(_, 'Tracker', Tracker);
 
 const Img = class Img extends Aventus.WebComponent {
     static get observedAttributes() {return ["src", "mode"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
@@ -10480,6 +10480,354 @@ Form.ButtonElement = class ButtonElement extends Aventus.WebComponent {
 Form.ButtonElement.Namespace=`Aventus.Form`;
 __as1(_.Form, 'ButtonElement', Form.ButtonElement);
 
+let Process=class Process {
+    static handleErrors;
+    static configure(config) {
+        this.handleErrors = config.handleErrors;
+    }
+    static async execute(prom) {
+        const queryResult = await prom;
+        return await this.parseErrors(queryResult);
+    }
+    static async parseErrors(result) {
+        if (result.errors.length > 0) {
+            if (this.handleErrors) {
+                let msg = result.errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                this.handleErrors(msg, result.errors);
+            }
+            return undefined;
+        }
+        if (result instanceof Aventus.ResultWithError)
+            return result.result;
+        return undefined;
+    }
+}
+Process.Namespace=`Aventus`;
+__as1(_, 'Process', Process);
+
+Lib.ShortcutManager=class ShortcutManager {
+    static memory = {};
+    static autoPrevents = [];
+    static isInit = false;
+    static arrayKeys = [];
+    static options = new Map();
+    static replacingMemory = {};
+    static isTxt(touch) {
+        return touch.match(/[a-zA-Z0-9_\+\-]/g);
+    }
+    static getText(combinaison) {
+        let allTouches = [];
+        for (let touch of combinaison) {
+            let realTouch = "";
+            if (typeof touch == "number" && Lib.SpecialTouch[touch] !== undefined) {
+                realTouch = Lib.SpecialTouch[touch];
+            }
+            else if (this.isTxt(touch)) {
+                realTouch = touch;
+            }
+            else {
+                throw "I can't use " + touch + " to add a shortcut";
+            }
+            allTouches.push(realTouch);
+        }
+        allTouches.sort();
+        return allTouches.join("+");
+    }
+    static subscribe(combinaison, cb, options) {
+        if (!Array.isArray(combinaison)) {
+            combinaison = [combinaison];
+        }
+        let key = this.getText(combinaison);
+        if (options?.replaceTemp) {
+            if (Lib.ShortcutManager.memory[key]) {
+                if (!this.replacingMemory[key]) {
+                    this.replacingMemory[key] = [];
+                }
+                this.replacingMemory[key].push(Lib.ShortcutManager.memory[key]);
+                delete Lib.ShortcutManager.memory[key];
+            }
+        }
+        if (!Lib.ShortcutManager.memory[key]) {
+            Lib.ShortcutManager.memory[key] = [];
+        }
+        if (!Lib.ShortcutManager.memory[key].includes(cb)) {
+            Lib.ShortcutManager.memory[key].push(cb);
+            if (options) {
+                this.options.set(cb, options);
+            }
+        }
+        if (!Lib.ShortcutManager.isInit) {
+            Lib.ShortcutManager.init();
+        }
+    }
+    static unsubscribe(combinaison, cb) {
+        if (!Array.isArray(combinaison)) {
+            combinaison = [combinaison];
+        }
+        let key = this.getText(combinaison);
+        if (Lib.ShortcutManager.memory[key]) {
+            let index = Lib.ShortcutManager.memory[key].indexOf(cb);
+            if (index != -1) {
+                Lib.ShortcutManager.memory[key].splice(index, 1);
+                let options = this.options.get(cb);
+                if (options) {
+                    this.options.delete(cb);
+                }
+                if (Lib.ShortcutManager.memory[key].length == 0) {
+                    delete Lib.ShortcutManager.memory[key];
+                    if (options?.replaceTemp) {
+                        if (this.replacingMemory[key]) {
+                            if (this.replacingMemory[key].length > 0) {
+                                Lib.ShortcutManager.memory[key] = this.replacingMemory[key].pop();
+                                if (this.replacingMemory[key].length == 0) {
+                                    delete this.replacingMemory[key];
+                                }
+                            }
+                            else {
+                                delete this.replacingMemory[key];
+                            }
+                        }
+                    }
+                }
+                if (Object.keys(Lib.ShortcutManager.memory).length == 0 && Lib.ShortcutManager.isInit) {
+                    //ShortcutManager.uninit();
+                }
+            }
+        }
+    }
+    static async onKeyDown(e) {
+        if (e.ctrlKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Control];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (e.altKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Alt];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (e.shiftKey) {
+            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Shift];
+            if (!this.arrayKeys.includes(txt)) {
+                this.arrayKeys.push(txt);
+            }
+        }
+        if (this.isTxt(e.key) && !this.arrayKeys.includes(e.key)) {
+            this.arrayKeys.push(e.key);
+        }
+        else if (Lib.SpecialTouch[e.key] !== undefined && !this.arrayKeys.includes(e.key)) {
+            this.arrayKeys.push(e.key);
+        }
+        this.arrayKeys.sort();
+        let key = this.arrayKeys.join("+");
+        if (Lib.ShortcutManager.memory[key]) {
+            let preventDefault = true;
+            for (let cb of Lib.ShortcutManager.memory[key]) {
+                let options = this.options.get(cb);
+                if (options && options.preventDefault === false) {
+                    preventDefault = false;
+                }
+            }
+            this.arrayKeys = [];
+            for (let cb of Lib.ShortcutManager.memory[key]) {
+                const result = await cb();
+                if (result === false) {
+                    preventDefault = result;
+                }
+            }
+            if (preventDefault) {
+                e.preventDefault();
+            }
+        }
+        else if (Lib.ShortcutManager.autoPrevents.includes(key)) {
+            e.preventDefault();
+        }
+    }
+    static onKeyUp(e) {
+        let index = this.arrayKeys.indexOf(e.key);
+        if (index != -1) {
+            this.arrayKeys.splice(index, 1);
+        }
+    }
+    static init() {
+        if (Lib.ShortcutManager.isInit)
+            return;
+        Lib.ShortcutManager.isInit = true;
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+        Lib.ShortcutManager.autoPrevents = [
+            this.getText([Lib.SpecialTouch.Control, "s"]),
+            this.getText([Lib.SpecialTouch.Control, "p"]),
+            this.getText([Lib.SpecialTouch.Control, "l"]),
+            this.getText([Lib.SpecialTouch.Control, "k"]),
+            this.getText([Lib.SpecialTouch.Control, "j"]),
+            this.getText([Lib.SpecialTouch.Control, "h"]),
+            this.getText([Lib.SpecialTouch.Control, "g"]),
+            this.getText([Lib.SpecialTouch.Control, "f"]),
+            this.getText([Lib.SpecialTouch.Control, "d"]),
+            this.getText([Lib.SpecialTouch.Control, "o"]),
+            this.getText([Lib.SpecialTouch.Control, "u"]),
+            this.getText([Lib.SpecialTouch.Control, "e"]),
+        ];
+        window.addEventListener("blur", () => {
+            this.arrayKeys = [];
+        });
+        document.body.addEventListener("keydown", this.onKeyDown);
+        document.body.addEventListener("keyup", this.onKeyUp);
+    }
+    static setAutoPrevents(combinaisons) {
+        if (!Lib.ShortcutManager.isInit) {
+            this.init();
+        }
+        Lib.ShortcutManager.autoPrevents = [];
+        for (let combinaison of combinaisons) {
+            Lib.ShortcutManager.autoPrevents.push(this.getText(combinaison));
+        }
+    }
+    static uninit() {
+        document.body.removeEventListener("keydown", this.onKeyDown);
+        document.body.removeEventListener("keyup", this.onKeyUp);
+        this.arrayKeys = [];
+        Lib.ShortcutManager.isInit = false;
+    }
+}
+Lib.ShortcutManager.Namespace=`Aventus.Lib`;
+__as1(_.Lib, 'ShortcutManager', Lib.ShortcutManager);
+
+Modal.ModalElement = class ModalElement extends Aventus.WebComponent {
+    get 'options'() {
+						return this.__watch["options"];
+					}
+					set 'options'(val) {
+						this.__watch["options"] = val;
+					}    static defaultCloseWithEsc = true;
+    static defaultCloseWithClick = true;
+    static defaultRejectValue = null;
+    cb;
+    pressManagerClickClose;
+    pressManagerPrevent;
+    __registerWatchesActions() {
+    this.__addWatchesActions("options", ((target, action, path, value) => {
+    target.onOptionsChanged();
+}));    super.__registerWatchesActions();
+}
+    static __style = `:host{align-items:center;display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:#fff;padding:1.5rem;position:relative}`;
+    constructor() {
+        super();
+        this.options = this.configure();
+        if (this.options.closeWithClick === undefined)
+            this.options.closeWithClick = Modal.ModalElement.defaultCloseWithClick;
+        if (this.options.closeWithEsc === undefined)
+            this.options.closeWithEsc = Modal.ModalElement.defaultCloseWithEsc;
+        if (!Object.hasOwn(this.options, "rejectValue")) {
+            this.options.rejectValue = Modal.ModalElement.defaultRejectValue;
+        }
+        if (this.constructor == ModalElement) {
+            throw "can't instanciate an abstract class";
+        }
+        this.close = this.close.bind(this);
+        this.reject = this.reject.bind(this);
+        this.resolve = this.resolve.bind(this);
+    }
+    __getStatic() {
+        return ModalElement;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(ModalElement.__style);
+        return arrStyle;
+    }
+    __getHtml() {
+    this.__getStatic().__template.setHTML({
+        slots: { 'default':`<slot></slot>` }, 
+        blocks: { 'default':`<div class="modal" _id="modalelement_0">	<slot></slot></div>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+  "elements": [
+    {
+      "name": "modalEl",
+      "ids": [
+        "modalelement_0"
+      ]
+    }
+  ]
+}); }
+    getClassName() {
+        return "ModalElement";
+    }
+    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["options"] = undefined; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('options'); }
+    onOptionsChanged() { }
+    init(cb) {
+        this.cb = cb;
+        if (this.options.closeWithEsc) {
+            Lib.ShortcutManager.subscribe(Lib.SpecialTouch.Escape, this.reject, { replaceTemp: true });
+        }
+        if (this.options.closeWithClick) {
+            this.pressManagerClickClose = new Aventus.PressManager({
+                element: this,
+                onPress: () => {
+                    this.reject();
+                }
+            });
+            this.pressManagerPrevent = new Aventus.PressManager({
+                element: this.modalEl,
+                onPress: () => { }
+            });
+        }
+    }
+    show(element) {
+        return Modal.ModalElement._show(this, element);
+    }
+    close() {
+        Lib.ShortcutManager.unsubscribe(Lib.SpecialTouch.Escape, this.reject);
+        this.pressManagerClickClose?.destroy();
+        this.pressManagerPrevent?.destroy();
+        this.remove();
+    }
+    reject(no_close) {
+        if (this.cb) {
+            this.cb(this.options.rejectValue ?? null);
+        }
+        if (no_close !== true) {
+            this.close();
+        }
+    }
+    resolve(response, no_close) {
+        if (this.cb) {
+            this.cb(response);
+        }
+        if (no_close !== true) {
+            this.close();
+        }
+    }
+    static configure(options) {
+        if (options.closeWithClick !== undefined)
+            this.defaultCloseWithClick = options.closeWithClick;
+        if (options.closeWithEsc !== undefined)
+            this.defaultCloseWithEsc = options.closeWithEsc;
+        if (!Object.hasOwn(options, "rejectValue")) {
+            this.defaultRejectValue = options.rejectValue;
+        }
+    }
+    static _show(modal, element) {
+        return new Promise((resolve) => {
+            modal.init((response) => {
+                resolve(response);
+            });
+            if (!element) {
+                element = document.body;
+            }
+            element.appendChild(modal);
+        });
+    }
+}
+Modal.ModalElement.Namespace=`Aventus.Modal`;
+__as1(_.Modal, 'ModalElement', Modal.ModalElement);
+
 let TouchRecord=class TouchRecord {
     _activeTouchID;
     _touchList = {};
@@ -11498,354 +11846,6 @@ Layout.Scrollable.Tag=`av-scrollable`;
 __as1(_.Layout, 'Scrollable', Layout.Scrollable);
 if(!window.customElements.get('av-scrollable')){window.customElements.define('av-scrollable', Layout.Scrollable);Aventus.WebComponentInstance.registerDefinition(Layout.Scrollable);}
 
-let Process=class Process {
-    static handleErrors;
-    static configure(config) {
-        this.handleErrors = config.handleErrors;
-    }
-    static async execute(prom) {
-        const queryResult = await prom;
-        return await this.parseErrors(queryResult);
-    }
-    static async parseErrors(result) {
-        if (result.errors.length > 0) {
-            if (this.handleErrors) {
-                let msg = result.errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
-                this.handleErrors(msg, result.errors);
-            }
-            return undefined;
-        }
-        if (result instanceof Aventus.ResultWithError)
-            return result.result;
-        return undefined;
-    }
-}
-Process.Namespace=`Aventus`;
-__as1(_, 'Process', Process);
-
-Lib.ShortcutManager=class ShortcutManager {
-    static memory = {};
-    static autoPrevents = [];
-    static isInit = false;
-    static arrayKeys = [];
-    static options = new Map();
-    static replacingMemory = {};
-    static isTxt(touch) {
-        return touch.match(/[a-zA-Z0-9_\+\-]/g);
-    }
-    static getText(combinaison) {
-        let allTouches = [];
-        for (let touch of combinaison) {
-            let realTouch = "";
-            if (typeof touch == "number" && Lib.SpecialTouch[touch] !== undefined) {
-                realTouch = Lib.SpecialTouch[touch];
-            }
-            else if (this.isTxt(touch)) {
-                realTouch = touch;
-            }
-            else {
-                throw "I can't use " + touch + " to add a shortcut";
-            }
-            allTouches.push(realTouch);
-        }
-        allTouches.sort();
-        return allTouches.join("+");
-    }
-    static subscribe(combinaison, cb, options) {
-        if (!Array.isArray(combinaison)) {
-            combinaison = [combinaison];
-        }
-        let key = this.getText(combinaison);
-        if (options?.replaceTemp) {
-            if (Lib.ShortcutManager.memory[key]) {
-                if (!this.replacingMemory[key]) {
-                    this.replacingMemory[key] = [];
-                }
-                this.replacingMemory[key].push(Lib.ShortcutManager.memory[key]);
-                delete Lib.ShortcutManager.memory[key];
-            }
-        }
-        if (!Lib.ShortcutManager.memory[key]) {
-            Lib.ShortcutManager.memory[key] = [];
-        }
-        if (!Lib.ShortcutManager.memory[key].includes(cb)) {
-            Lib.ShortcutManager.memory[key].push(cb);
-            if (options) {
-                this.options.set(cb, options);
-            }
-        }
-        if (!Lib.ShortcutManager.isInit) {
-            Lib.ShortcutManager.init();
-        }
-    }
-    static unsubscribe(combinaison, cb) {
-        if (!Array.isArray(combinaison)) {
-            combinaison = [combinaison];
-        }
-        let key = this.getText(combinaison);
-        if (Lib.ShortcutManager.memory[key]) {
-            let index = Lib.ShortcutManager.memory[key].indexOf(cb);
-            if (index != -1) {
-                Lib.ShortcutManager.memory[key].splice(index, 1);
-                let options = this.options.get(cb);
-                if (options) {
-                    this.options.delete(cb);
-                }
-                if (Lib.ShortcutManager.memory[key].length == 0) {
-                    delete Lib.ShortcutManager.memory[key];
-                    if (options?.replaceTemp) {
-                        if (this.replacingMemory[key]) {
-                            if (this.replacingMemory[key].length > 0) {
-                                Lib.ShortcutManager.memory[key] = this.replacingMemory[key].pop();
-                                if (this.replacingMemory[key].length == 0) {
-                                    delete this.replacingMemory[key];
-                                }
-                            }
-                            else {
-                                delete this.replacingMemory[key];
-                            }
-                        }
-                    }
-                }
-                if (Object.keys(Lib.ShortcutManager.memory).length == 0 && Lib.ShortcutManager.isInit) {
-                    //ShortcutManager.uninit();
-                }
-            }
-        }
-    }
-    static async onKeyDown(e) {
-        if (e.ctrlKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Control];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (e.altKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Alt];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (e.shiftKey) {
-            let txt = Lib.SpecialTouch[Lib.SpecialTouch.Shift];
-            if (!this.arrayKeys.includes(txt)) {
-                this.arrayKeys.push(txt);
-            }
-        }
-        if (this.isTxt(e.key) && !this.arrayKeys.includes(e.key)) {
-            this.arrayKeys.push(e.key);
-        }
-        else if (Lib.SpecialTouch[e.key] !== undefined && !this.arrayKeys.includes(e.key)) {
-            this.arrayKeys.push(e.key);
-        }
-        this.arrayKeys.sort();
-        let key = this.arrayKeys.join("+");
-        if (Lib.ShortcutManager.memory[key]) {
-            let preventDefault = true;
-            for (let cb of Lib.ShortcutManager.memory[key]) {
-                let options = this.options.get(cb);
-                if (options && options.preventDefault === false) {
-                    preventDefault = false;
-                }
-            }
-            this.arrayKeys = [];
-            for (let cb of Lib.ShortcutManager.memory[key]) {
-                const result = await cb();
-                if (result === false) {
-                    preventDefault = result;
-                }
-            }
-            if (preventDefault) {
-                e.preventDefault();
-            }
-        }
-        else if (Lib.ShortcutManager.autoPrevents.includes(key)) {
-            e.preventDefault();
-        }
-    }
-    static onKeyUp(e) {
-        let index = this.arrayKeys.indexOf(e.key);
-        if (index != -1) {
-            this.arrayKeys.splice(index, 1);
-        }
-    }
-    static init() {
-        if (Lib.ShortcutManager.isInit)
-            return;
-        Lib.ShortcutManager.isInit = true;
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-        Lib.ShortcutManager.autoPrevents = [
-            this.getText([Lib.SpecialTouch.Control, "s"]),
-            this.getText([Lib.SpecialTouch.Control, "p"]),
-            this.getText([Lib.SpecialTouch.Control, "l"]),
-            this.getText([Lib.SpecialTouch.Control, "k"]),
-            this.getText([Lib.SpecialTouch.Control, "j"]),
-            this.getText([Lib.SpecialTouch.Control, "h"]),
-            this.getText([Lib.SpecialTouch.Control, "g"]),
-            this.getText([Lib.SpecialTouch.Control, "f"]),
-            this.getText([Lib.SpecialTouch.Control, "d"]),
-            this.getText([Lib.SpecialTouch.Control, "o"]),
-            this.getText([Lib.SpecialTouch.Control, "u"]),
-            this.getText([Lib.SpecialTouch.Control, "e"]),
-        ];
-        window.addEventListener("blur", () => {
-            this.arrayKeys = [];
-        });
-        document.body.addEventListener("keydown", this.onKeyDown);
-        document.body.addEventListener("keyup", this.onKeyUp);
-    }
-    static setAutoPrevents(combinaisons) {
-        if (!Lib.ShortcutManager.isInit) {
-            this.init();
-        }
-        Lib.ShortcutManager.autoPrevents = [];
-        for (let combinaison of combinaisons) {
-            Lib.ShortcutManager.autoPrevents.push(this.getText(combinaison));
-        }
-    }
-    static uninit() {
-        document.body.removeEventListener("keydown", this.onKeyDown);
-        document.body.removeEventListener("keyup", this.onKeyUp);
-        this.arrayKeys = [];
-        Lib.ShortcutManager.isInit = false;
-    }
-}
-Lib.ShortcutManager.Namespace=`Aventus.Lib`;
-__as1(_.Lib, 'ShortcutManager', Lib.ShortcutManager);
-
-Modal.ModalElement = class ModalElement extends Aventus.WebComponent {
-    get 'options'() {
-						return this.__watch["options"];
-					}
-					set 'options'(val) {
-						this.__watch["options"] = val;
-					}    static defaultCloseWithEsc = true;
-    static defaultCloseWithClick = true;
-    static defaultRejectValue = null;
-    cb;
-    pressManagerClickClose;
-    pressManagerPrevent;
-    __registerWatchesActions() {
-    this.__addWatchesActions("options", ((target, action, path, value) => {
-    target.onOptionsChanged();
-}));    super.__registerWatchesActions();
-}
-    static __style = `:host{align-items:center;display:flex;inset:0;justify-content:center;position:fixed;z-index:60}:host .modal{background-color:#fff;padding:1.5rem;position:relative}`;
-    constructor() {
-        super();
-        this.options = this.configure();
-        if (this.options.closeWithClick === undefined)
-            this.options.closeWithClick = Modal.ModalElement.defaultCloseWithClick;
-        if (this.options.closeWithEsc === undefined)
-            this.options.closeWithEsc = Modal.ModalElement.defaultCloseWithEsc;
-        if (!Object.hasOwn(this.options, "rejectValue")) {
-            this.options.rejectValue = Modal.ModalElement.defaultRejectValue;
-        }
-        if (this.constructor == ModalElement) {
-            throw "can't instanciate an abstract class";
-        }
-        this.close = this.close.bind(this);
-        this.reject = this.reject.bind(this);
-        this.resolve = this.resolve.bind(this);
-    }
-    __getStatic() {
-        return ModalElement;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(ModalElement.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<div class="modal" _id="modalelement_0">	<slot></slot></div>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "modalEl",
-      "ids": [
-        "modalelement_0"
-      ]
-    }
-  ]
-}); }
-    getClassName() {
-        return "ModalElement";
-    }
-    __defaultValuesWatch(w) { super.__defaultValuesWatch(w); w["options"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('options'); }
-    onOptionsChanged() { }
-    init(cb) {
-        this.cb = cb;
-        if (this.options.closeWithEsc) {
-            Lib.ShortcutManager.subscribe(Lib.SpecialTouch.Escape, this.reject, { replaceTemp: true });
-        }
-        if (this.options.closeWithClick) {
-            this.pressManagerClickClose = new Aventus.PressManager({
-                element: this,
-                onPress: () => {
-                    this.reject();
-                }
-            });
-            this.pressManagerPrevent = new Aventus.PressManager({
-                element: this.modalEl,
-                onPress: () => { }
-            });
-        }
-    }
-    show(element) {
-        return Modal.ModalElement._show(this, element);
-    }
-    close() {
-        Lib.ShortcutManager.unsubscribe(Lib.SpecialTouch.Escape, this.reject);
-        this.pressManagerClickClose?.destroy();
-        this.pressManagerPrevent?.destroy();
-        this.remove();
-    }
-    reject(no_close) {
-        if (this.cb) {
-            this.cb(this.options.rejectValue ?? null);
-        }
-        if (no_close !== true) {
-            this.close();
-        }
-    }
-    resolve(response, no_close) {
-        if (this.cb) {
-            this.cb(response);
-        }
-        if (no_close !== true) {
-            this.close();
-        }
-    }
-    static configure(options) {
-        if (options.closeWithClick !== undefined)
-            this.defaultCloseWithClick = options.closeWithClick;
-        if (options.closeWithEsc !== undefined)
-            this.defaultCloseWithEsc = options.closeWithEsc;
-        if (!Object.hasOwn(options, "rejectValue")) {
-            this.defaultRejectValue = options.rejectValue;
-        }
-    }
-    static _show(modal, element) {
-        return new Promise((resolve) => {
-            modal.init((response) => {
-                resolve(response);
-            });
-            if (!element) {
-                element = document.body;
-            }
-            element.appendChild(modal);
-        });
-    }
-}
-Modal.ModalElement.Namespace=`Aventus.Modal`;
-__as1(_.Modal, 'ModalElement', Modal.ModalElement);
-
 Navigation.Router = class Router extends Aventus.WebComponent {
     static page404 = _.Navigation.Default404;
     static destroyPage = false;
@@ -12391,7 +12391,7 @@ App.Http.Controllers.Inventaire.Perte.Request=class Request {
     quantite;
     id_materiel_variation;
     id_equipe;
-    commentaire;
+    commentaire = "";
 }
 App.Http.Controllers.Inventaire.Perte.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Perte`;
 __as1(_.App.Http.Controllers.Inventaire.Perte, 'Request', App.Http.Controllers.Inventaire.Perte.Request);
@@ -12401,7 +12401,7 @@ App.Http.Controllers.Inventaire.Mouvement.Request=class Request {
     id_materiel_variation;
     id_equipe_entree;
     id_equipe_sortie;
-    commentaire;
+    commentaire = "";
 }
 App.Http.Controllers.Inventaire.Mouvement.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Mouvement`;
 __as1(_.App.Http.Controllers.Inventaire.Mouvement, 'Request', App.Http.Controllers.Inventaire.Mouvement.Request);
@@ -12458,7 +12458,7 @@ App.Http.Controllers.Inventaire.Achat.Request=class Request {
     quantite;
     id_materiel_variation;
     id_equipe;
-    commentaire;
+    commentaire = "";
 }
 App.Http.Controllers.Inventaire.Achat.Request.Namespace=`Inventaire.App.Http.Controllers.Inventaire.Achat`;
 __as1(_.App.Http.Controllers.Inventaire.Achat, 'Request', App.Http.Controllers.Inventaire.Achat.Request);
@@ -13842,8 +13842,8 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
     static __style = `:host{--local-tooltip-from-y: 0;--local-tooltip-from-x: 0;--local-tooltip-to-y: 0;--local-tooltip-to-x: 0;--local-offset-carret-x: 0px;--local-offset-carret-y: 0px;--_tooltip-elevation: var(--tooltip-elevation, var(--elevation-4))}:host{border-radius:var(--radius-box);box-shadow:var(--elevation-4);opacity:0;padding:5px 15px;pointer-events:none;position:absolute;transition:.5s opacity var(--bezier),.5s visibility var(--bezier),.5s top var(--bezier),.5s bottom var(--bezier),.5s right var(--bezier),.5s left var(--bezier),.5s transform var(--bezier);visibility:hidden;width:max-content;z-index:1}:host::after{content:"";position:absolute}:host([no_caret])::after{display:none}:host([visible]){opacity:1;visibility:visible}:host([position=bottom]){transform:translateX(-50%)}:host([position=bottom])::after{border-bottom:9px solid var(--_tooltip-background-color);border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);left:calc(50% + var(--local-offset-carret-x));top:-8px;transform:translateX(-50%)}:host([use_absolute][position=bottom]){left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=bottom]){top:var(--local-tooltip-to-y)}:host([position=bottom]:not([use_absolute])){bottom:0px;left:50%;transform:translateX(-50%) translateY(calc(100% - 10px))}:host([position=bottom][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(100% + 10px))}:host([no_caret][use_absolute][position=bottom]){top:calc(var(--local-tooltip-from-y) - 8px)}:host([no_caret][use_absolute][visible][position=bottom]){top:calc(var(--local-tooltip-to-y) - 8px)}:host([position=top]){transform:translateX(-50%)}:host([position=top])::after{border-left:6px solid rgba(0,0,0,0);border-right:6px solid rgba(0,0,0,0);border-top:9px solid var(--_tooltip-background-color);bottom:-8px;left:calc(50% + var(--local-offset-carret-x));transform:translateX(-50%)}:host([use_absolute][position=top]){bottom:var(--local-tooltip-from-y);left:var(--local-tooltip-from-x);max-height:calc(100% - var(--local-tooltip-to-y) - 10px)}:host([use_absolute][visible][position=top]){bottom:var(--local-tooltip-to-y)}:host([position=top]:not([use_absolute])){left:50%;top:0px;transform:translateX(-50%) translateY(calc(-100% + 10px))}:host([position=top][visible]:not([use_absolute])){transform:translateX(-50%) translateY(calc(-100% - 10px))}:host([no_caret][use_absolute][position=top]){bottom:calc(var(--local-tooltip-from-y) - 6px)}:host([no_caret][use_absolute][visible][position=top]){bottom:calc(var(--local-tooltip-to-y) - 6px)}:host([position=right]){transform:translateY(-50%)}:host([position=right])::after{border-bottom:6px solid rgba(0,0,0,0);border-right:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);left:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=right]){left:var(--local-tooltip-from-x);max-width:calc(100% - var(--local-tooltip-to-x) - 10px);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=right]){left:var(--local-tooltip-to-x)}:host([position=right]:not([use_absolute])){right:0;top:50%;transform:translateX(calc(100% - 10px)) translateY(-50%)}:host([visible][position=right]:not([use_absolute])){transform:translateX(calc(100% + 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=right]){left:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=right]){left:calc(var(--local-tooltip-to-x) - 6px)}:host([position=left]){right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y);transform:translateY(-50%)}:host([position=left])::after{border-bottom:6px solid rgba(0,0,0,0);border-left:9px solid var(--_tooltip-background-color);border-top:6px solid rgba(0,0,0,0);right:-8px;top:calc(50% + var(--local-offset-carret-y));transform:translateY(-50%)}:host([use_absolute][position=left]){max-width:calc(100% - var(--local-tooltip-to-x) - 10px);right:var(--local-tooltip-from-x);top:var(--local-tooltip-from-y)}:host([use_absolute][visible][position=left]){right:var(--local-tooltip-to-x)}:host([position=left]:not([use_absolute])){left:0;top:50%;transform:translateX(calc(-100% + 10px)) translateY(-50%)}:host([visible][position=left]:not([use_absolute])){transform:translateX(calc(-100% - 10px)) translateY(-50%)}:host([no_caret][use_absolute][position=left]){right:calc(var(--local-tooltip-from-x) - 6px)}:host([no_caret][use_absolute][visible][position=left]){right:calc(var(--local-tooltip-to-x) - 6px)}:host([color=neutral]){--_tooltip-background-color: var(--color-neutral);--_tooltip-color: var(--color-neutral-content)}:host([color=primary]){--_tooltip-background-color: var(--color-primary);--_tooltip-color: var(--color-primary-content)}:host([color=secondary]){--_tooltip-background-color: var(--color-secondary);--_tooltip-color: var(--color-secondary-content)}:host([color=accent]){--_tooltip-background-color: var(--color-accent);--_tooltip-color: var(--color-accent-content)}:host([color=info]){--_tooltip-background-color: var(--color-info);--_tooltip-color: var(--color-info-content)}:host([color=success]){--_tooltip-background-color: var(--color-success);--_tooltip-color: var(--color-success-content)}:host([color=warning]){--_tooltip-background-color: var(--color-warning);--_tooltip-color: var(--color-warning-content)}:host([color=error]){--_tooltip-background-color: var(--color-error);--_tooltip-color: var(--color-error-content)}`;
     constructor() {
         super();
-        this.onMouseEnter = this.onMouseEnter.bind(this);
-        this.onMouseLeave = this.onMouseLeave.bind(this);
+        this.show = this.show.bind(this);
+        this.hide = this.hide.bind(this);
         this.onTransitionEnd = this.onTransitionEnd.bind(this);
     }
     __getStatic() {
@@ -13929,7 +13929,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
             this.style.setProperty("--local-tooltip-to-y", center.y + 'px');
         }
     }
-    onMouseEnter() {
+    show() {
         this.calculatePosition();
         let delay = this.delay == 0 ? 50 : this.delay;
         if (this.use_absolute) {
@@ -13953,7 +13953,7 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
             }
         }
     }
-    onMouseLeave() {
+    hide() {
         this.visible = false;
         if (this.use_absolute) {
             if (!this.timeoutEnter) {
@@ -13969,6 +13969,9 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
         }
     }
     onTransitionEnd() {
+        if (this.visible) {
+            this.style.pointerEvents = "all";
+        }
         if (!this.use_absolute || this.visible)
             return;
         if (this.parent && !this.isDestroyed)
@@ -13976,40 +13979,13 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
         else
             this.remove();
     }
-    onLongPress() {
-        this.calculatePosition();
-        if (this.use_absolute) {
-            document.body.appendChild(this);
-            this.timeoutEnter = false;
-            this.timeout = setTimeout(() => {
-                this.timeoutEnter = true;
-                this.visible = true;
-            }, 50);
-        }
-        else {
-            this.visible = true;
-        }
-    }
     registerAction() {
         if (!this.parentEv)
             return;
-        // if(Platform.device != "pc") {
-        //     this.pressManager = new Aventus.PressManager({
-        //         element: this.parentEv,
-        //         onLongPress: () => {
-        //             this.onLongPress();
-        //         },
-        //         onPressEnd: () => {
-        //             this.onMouseLeave();
-        //         },
-        //         delayLongPress: this.delay_touch
-        //     });
-        // }
-        // else {
-        this.parentEv.addEventListener("mouseenter", this.onMouseEnter);
-        this.parentEv.addEventListener("mouseleave", this.onMouseLeave);
-        this.parentEv.addEventListener("click", this.onMouseLeave);
-        // }
+        this.parentEv.addEventListener("mouseenter", this.show);
+        this.parentEv.addEventListener("mouseleave", this.hide);
+        this.parentEv.addEventListener("click", this.hide);
+        this.addEventListener("click", this.hide);
         this.addEventListener("transitionend", this.onTransitionEnd);
     }
     postCreation() {
@@ -14028,9 +14004,9 @@ const Tooltip = class Tooltip extends Aventus.WebComponent {
         super.postDestruction();
         if (!this.parentEv)
             return;
-        this.parentEv.removeEventListener("mouseenter", this.onMouseEnter);
-        this.parentEv.removeEventListener("mouseleave", this.onMouseLeave);
-        this.parentEv.removeEventListener("click", this.onMouseLeave);
+        this.parentEv.removeEventListener("mouseenter", this.show);
+        this.parentEv.removeEventListener("mouseleave", this.hide);
+        this.parentEv.removeEventListener("click", this.hide);
     }
 }
 Tooltip.Namespace=`Inventaire`;
@@ -14138,7 +14114,7 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     onOpen = new Aventus.Callback();
     isAnimating = false;
     firstOpen = true;
-    static __style = `:host{--_options-container-background: var(--options-container-background, var(--form-element-background, white));--_options-container-border-radius: var(--options-container-border-radius, var(--form-element-border-radius, 0));--_options-container-box-shadow: var(--options-container-box-shadow, var(--elevation-2))}:host{background-color:var(--color-base-100);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 2px calc(var(--depth)*3px) -2px rgba(0,0,0,.2);box-shadow:0 20px 25px -5px rgb(0, 0, 0, calc(var(--depth) * 0.1)),0 8px 10px -6px rgb(0, 0, 0, calc(var(--depth) * 0.1));color:var(--color-base-content);display:grid;grid-template-rows:0fr;left:0;max-height:min(24rem,70dvh);overflow:hidden;padding:.5rem;position:absolute;top:0;transition:.2s ease-in-out grid-template-rows;z-index:800}:host av-scrollable .container{display:flex;flex-direction:column}:host([open]){grid-template-rows:1fr}`;
+    static __style = `:host{--_options-container-background: var(--options-container-background, var(--form-element-background, white));--_options-container-border-radius: var(--options-container-border-radius, var(--form-element-border-radius, 0));--_options-container-box-shadow: var(--options-container-box-shadow, var(--elevation-2))}:host{background-color:var(--color-base-100);border:var(--border) solid var(--color-base-200);border-radius:var(--radius-box);box-shadow:0 2px calc(var(--depth)*3px) -2px rgba(0,0,0,.2);box-shadow:0 20px 25px -5px rgb(0, 0, 0, calc(var(--depth) * 0.1)),0 8px 10px -6px rgb(0, 0, 0, calc(var(--depth) * 0.1));color:var(--color-base-content);display:grid;grid-template-rows:0fr;left:0;max-height:min(24rem,70dvh);overflow:hidden;padding:.5rem;position:absolute;top:0;transition:.2s ease-in-out grid-template-rows;z-index:800}:host .wrapper{display:flex;flex-direction:column;height:100%;overflow:hidden}:host .wrapper av-flex-scroll .container{display:flex;flex-direction:column}:host([open]){grid-template-rows:1fr}`;
     __getStatic() {
         return OptionsContainer;
     }
@@ -14150,11 +14126,13 @@ const OptionsContainer = class OptionsContainer extends Aventus.WebComponent {
     __getHtml() {
     this.__getStatic().__template.setHTML({
         slots: { 'default':`<slot></slot>` }, 
-        blocks: { 'default':`<av-scrollable floating_scroll>
-    <div class="container">
-        <slot></slot>
-    </div>
-</av-scrollable>` }
+        blocks: { 'default':`<div class="wrapper">
+    <av-flex-scroll floating_scroll>
+        <div class="container">
+            <slot></slot>
+        </div>
+    </av-flex-scroll>
+</div>` }
     });
 }
     getClassName() {
@@ -14402,6 +14380,9 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     showOptions() {
         if (!this.open) {
             this.removeErrors();
+            if (this.searchable) {
+                this.inputEl.focus();
+            }
             this.optionsContainer.show();
         }
         if (!this.searchable) {
@@ -14987,6 +14968,92 @@ let Platform=class Platform {
 }
 Platform.Namespace=`Inventaire`;
 __as1(_, 'Platform', Platform);
+
+const TooltipVariation = class TooltipVariation extends Tooltip {
+    get 'groupes'() {
+						return this.__signals["groupes"].value;
+					}
+					set 'groupes'(val) {
+						this.__signals["groupes"].value = val;
+					}    __registerSignalsActions() { this.__signals["groupes"] = null; super.__registerSignalsActions();  }
+    static __style = `:host{background-color:var(--color-base-100);min-width:150px;overflow:hidden;padding:15px;z-index:100;display:flex;flex-direction:column}:host .groupe{font-size:16px;margin-bottom:5px}:host ul{margin:0;margin-left:15px;padding:0}:host .variation{font-size:14px;margin-left:4px}:host .groupe:not(:first-child){margin-top:15px}`;
+    constructor() {
+        super();
+        this.onTransitionEnd = this.onTransitionEnd.bind(this);
+    }
+    __getStatic() {
+        return TooltipVariation;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(TooltipVariation.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-flex-scroll><template _id="tooltipvariation_0"></template></av-flex-scroll>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();const templ0 = new Aventus.Template(this);templ0.setTemplate(`     <div class="groupe" _id="tooltipvariation_1"></div>    <ul>        <template _id="tooltipvariation_2"></template>    </ul>`);templ0.setActions({
+  "content": {
+    "tooltipvariation_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method2(c.data.group))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'tooltipvariation_0',
+                    template: templ0,
+                simple:{data: "this.groupes",item:"group"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(`             <li class="variation" _id="tooltipvariation_3"></li>        `);templ1.setActions({
+  "content": {
+    "tooltipvariation_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method3(c.data.variation))}`,
+      "once": true
+    }
+  }
+});templ0.addLoop({
+                    anchorId: 'tooltipvariation_2',
+                    template: templ1,
+                simple:{data: "group.variations",item:"variation"}}); }
+    getClassName() {
+        return "TooltipVariation";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["groupes"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('groupes'); }
+    onTransitionEnd() {
+        if (this.visible) {
+            this.focus();
+        }
+        super.onTransitionEnd();
+    }
+    registerAction() {
+        if (!this.parentEv)
+            return;
+        if (Platform.device == "pc") {
+            this.parentEv.addEventListener("mouseenter", this.show);
+            this.parentEv.addEventListener("mouseleave", this.hide);
+            this.parentEv.addEventListener("click", this.hide);
+            this.addEventListener("click", this.hide);
+        }
+        else {
+            this.setAttribute("tabindex", "-1");
+            this.parentEv.addEventListener("click", this.show);
+            this.addEventListener("click", this.hide);
+            this.addEventListener("blur", this.hide);
+        }
+        this.addEventListener("transitionend", this.onTransitionEnd);
+    }
+    __2a2b573a4da10a6575b99ff39dc7c534method2(group) {
+        return group.nom;
+    }
+    __2a2b573a4da10a6575b99ff39dc7c534method3(variation) {
+        return variation.nom;
+    }
+}
+TooltipVariation.Namespace=`Inventaire`;
+TooltipVariation.Tag=`av-tooltip-variation`;
+__as1(_, 'TooltipVariation', TooltipVariation);
+if(!window.customElements.get('av-tooltip-variation')){window.customElements.define('av-tooltip-variation', TooltipVariation);Aventus.WebComponentInstance.registerDefinition(TooltipVariation);}
 
 let PWA=class PWA {
     static get isAvailable() {
@@ -15752,9 +15819,10 @@ App.Http.Controllers.Materiel.MaterielResource=class MaterielResource extends Av
     nom;
     image = new _.App.Models.MaterielImage();
     tout_monde;
+    stock;
 }
 App.Http.Controllers.Materiel.MaterielResource.Namespace=`Inventaire.App.Http.Controllers.Materiel`;
-App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Http.Controllers.Materiel.VariationGroupeResource[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean"};
+App.Http.Controllers.Materiel.MaterielResource.$schema={...(Aventus.Data?.$schema ?? {}), "variations":"Inventaire.App.Http.Controllers.Materiel.MaterielVariationResource[]","variations_groupes":"Inventaire.App.Http.Controllers.Materiel.VariationGroupeResource[]","equipes":"Inventaire.App.Http.Controllers.Materiel.MaterielEquipeResource[]","id":"number","nom":"string","image":"Inventaire.App.Models.MaterielImage","tout_monde":"boolean","stock":"number"};
 Aventus.Converter.register(App.Http.Controllers.Materiel.MaterielResource.Fullname, App.Http.Controllers.Materiel.MaterielResource);
 __as1(_.App.Http.Controllers.Materiel, 'MaterielResource', App.Http.Controllers.Materiel.MaterielResource);
 
@@ -15776,7 +15844,7 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __registerSignalsActions() { this.__signals["item"] = null; super.__registerSignalsActions(); this.__addSignalActions("item", ((target) => {
     target.loadEquipes();
 })); }
-    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;justify-content:stretch;overflow:hidden}:host av-col .img{max-height:250px;width:100%;flex-shrink:0}:host av-col .img av-img{aspect-ratio:1;max-height:250px;width:100%}:host av-col .info{background-color:rgba(0,0,0,0);display:flex;flex-direction:column;flex-grow:1;padding:16px;padding-top:0}:host av-col .info .title{flex-shrink:0;font-size:var(--font-size-md);margin-top:8px}:host av-col .info .visible{align-items:center;display:flex;flex-shrink:0;min-height:30px;flex-wrap:wrap}:host av-col .info .visible .visible-label{width:100%}:host av-col .info .visible .everybody{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:3px}:host av-col .info .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .info .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
+    static __style = `:host{display:contents}:host av-col{background-color:var(--color-base-100);border:1px solid var(--color-base-300);border-radius:var(--radius-box);box-shadow:var(--elevation-2);display:flex;flex-direction:column;justify-content:stretch;overflow:hidden}:host av-col .img{max-height:250px;width:100%;flex-shrink:0}:host av-col .img av-img{aspect-ratio:1;max-height:250px;width:100%}:host av-col .info{background-color:rgba(0,0,0,0);display:flex;flex-direction:column;flex-grow:1;padding:16px;padding-top:0;position:relative}:host av-col .info .title{flex-shrink:0;font-size:var(--font-size-md);margin-top:8px}:host av-col .info .visible{align-items:center;display:flex;flex-shrink:0;min-height:30px;flex-wrap:wrap;padding-right:20px}:host av-col .info .visible .visible-label{width:100%}:host av-col .info .visible .everybody{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:3px}:host av-col .info .visible .visible-for{display:flex;font-size:var(--font-size-sm);gap:6px;margin-left:6px;margin-top:6px}:host av-col .info .visible .visible-for div{align-items:center;background-color:var(--color-tag);border-radius:50px;display:flex;font-size:var(--font-size-sm);justify-content:center;padding:4px 8px}:host av-col .info .info-icon{position:absolute;bottom:10px;right:10px}:host(:hover){box-shadow:var(--elevation-2)}:host(:not([visible])){display:none}`;
     __getStatic() {
         return MaterielCard;
     }
@@ -15794,10 +15862,12 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         </div>
         <div class="info">
             <div class="title" _id="materielcard_2"></div>
+            <div class="qty" _id="materielcard_3"></div>
             <div class="visible">
                 <div class="visible-label">Visible pour :</div>
-                <template _id="materielcard_3"></template>
+                <template _id="materielcard_4"></template>
             </div>
+            <template _id="materielcard_7"></template>
         </div>
     </av-link>
 </av-col>` }
@@ -15806,15 +15876,19 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materielcard_0°to": {
-      "fct": (c) => `/materiel/${c.print(c.comp.__98d262679bf6afafa524060227ae1154method2())}`,
+      "fct": (c) => `/materiel/${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
       "once": true
     },
     "materielcard_1°src": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method3())}`,
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
       "once": true
     },
     "materielcard_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method4())}`,
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5())}`,
+      "once": true
+    },
+    "materielcard_3°@HTML": {
+      "fct": (c) => `Stock : ${c.print(c.comp.__98d262679bf6afafa524060227ae1154method6())}`,
       "once": true
     }
   }
@@ -15822,28 +15896,54 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
                     <div class="everybody">Tout le monde</div>
                 `);const templ1 = new Aventus.Template(this);templ1.setTemplate(`
                     <div class="visible-for">
-                        <template _id="materielcard_4"></template>
+                        <template _id="materielcard_5"></template>
                     </div>
                 `);const templ2 = new Aventus.Template(this);templ2.setTemplate(` 
-                            <av-tag color="accent" _id="materielcard_5"></av-tag>
+                            <av-tag color="accent" _id="materielcard_6"></av-tag>
                         `);templ2.setActions({
   "content": {
-    "materielcard_5°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method5(c.data.equipe))}`,
+    "materielcard_6°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__98d262679bf6afafa524060227ae1154method7(c.data.equipe))}`,
       "once": true
     }
   }
 });templ1.addLoop({
-                    anchorId: 'materielcard_4',
+                    anchorId: 'materielcard_5',
                     template: templ2,
                 simple:{data: "this.equipes",item:"equipe"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materielcard_3',
+                    anchorId: 'materielcard_4',
                     parts: [{once: true,
                     condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method0(),
                     template: templ0
                 },{once: true,
                     condition: (c) => true,
                     template: templ1
+                }]
+            });const templ3 = new Aventus.Template(this);templ3.setTemplate(`
+                <div class="info-icon">
+                    <av-tooltip-variation use_absolute _id="materielcard_8"></av-tooltip-variation>
+                    <mi-icon icon="info" _id="materielcard_9"></mi-icon>
+                </div>
+            `);templ3.setActions({
+  "injection": [
+    {
+      "id": "materielcard_8",
+      "injectionName": "groupes",
+      "inject": (c) => c.comp.__98d262679bf6afafa524060227ae1154method8(),
+      "once": true
+    }
+  ],
+  "pressEvents": [
+    {
+      "id": "materielcard_9",
+      "onPress": (e, pressInstance, c) => { c.comp.denyClick(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materielcard_7',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__98d262679bf6afafa524060227ae1154method2(),
+                    template: templ3
                 }]
             }); }
     getClassName() {
@@ -15854,6 +15954,8 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
     __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["item"] = undefined; }
     __upgradeAttributes() { super.__upgradeAttributes(); this.__upgradeProperty('visible');this.__correctGetter('item');this.__correctGetter('equipes'); }
     __listBoolProps() { return ["visible"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    denyClick() {
+    }
     async loadEquipes() {
         const equipeIds = this.item.equipes.map(p => p.id_equipe);
         this.equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
@@ -15864,20 +15966,29 @@ const MaterielCard = class MaterielCard extends Aventus.WebComponent {
         }
         return "/img/default_img.svg";
     }
-    __98d262679bf6afafa524060227ae1154method2() {
+    __98d262679bf6afafa524060227ae1154method3() {
         return this.item.id;
     }
-    __98d262679bf6afafa524060227ae1154method3() {
+    __98d262679bf6afafa524060227ae1154method4() {
         return this.getSrc();
     }
-    __98d262679bf6afafa524060227ae1154method4() {
+    __98d262679bf6afafa524060227ae1154method5() {
         return this.item.nom;
     }
-    __98d262679bf6afafa524060227ae1154method5(equipe) {
+    __98d262679bf6afafa524060227ae1154method6() {
+        return this.item.stock;
+    }
+    __98d262679bf6afafa524060227ae1154method7(equipe) {
         return equipe.nom;
     }
     __98d262679bf6afafa524060227ae1154method0() {
         return this.item.tout_monde;
+    }
+    __98d262679bf6afafa524060227ae1154method2() {
+        return this.item.variations_groupes.length > 0;
+    }
+    __98d262679bf6afafa524060227ae1154method8() {
+        return this.item.variations_groupes;
     }
 }
 MaterielCard.Namespace=`Inventaire`;

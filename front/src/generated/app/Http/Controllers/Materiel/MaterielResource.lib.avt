@@ -15,6 +15,7 @@ namespace App.Http.Controllers.Materiel {
 		public nom!: string;
 		public image: MaterielImage = new MaterielImage();
 		public tout_monde!: boolean;
+		public stock!: number;
 	}
 
 }

@@ -30,4 +30,9 @@ class MaterielVariation extends AventusModel
     {
         return $this->hasMany(MaterielVariationGroupe::class, "id_materiel_variation");
     }
+
+    public function inventaires(): HasMany
+    {
+        return $this->hasMany(Inventaire::class, "id_materiel_variation");
+    }
 }

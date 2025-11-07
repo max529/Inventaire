@@ -1,0 +1,10 @@
+<av-flex-scroll>
+for(let group of this.groupes) { 
+    <div class="groupe">{{ group.nom }}</div>
+    <ul>
+        for(let variation of group.variations) { 
+            <li class="variation">{{ variation.nom }}</li>
+        }
+    </ul>
+}
+</av-flex-scroll>

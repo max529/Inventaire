@@ -5,7 +5,7 @@ namespace App.Http.Controllers.Inventaire.Mouvement {
 		public id_materiel_variation!: number;
 		public id_equipe_entree!: number;
 		public id_equipe_sortie!: number;
-		public commentaire!: string;
+		public commentaire?: string = "";
 	}
 
 }

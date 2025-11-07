@@ -1,0 +1,56 @@
+import { Tooltip } from "../../../../components/display/Tooltip/Tooltip.wcl.avt";
+import type { VariationGroupeResource } from "../../../../generated/app/Http/Controllers/Materiel/VariationGroupeResource.lib.avt";
+import { Platform } from "../../../../lib/Platform.lib.avt";
+
+export class TooltipVariation extends Tooltip implements Aventus.DefaultComponent {
+
+    //#region static
+
+    //#endregion
+
+
+    //#region props
+
+    //#endregion
+
+
+    //#region variables
+    @Signal()
+    public groupes: VariationGroupeResource[] = [];
+    //#endregion
+
+
+    //#region constructor
+
+    //#endregion
+
+
+    //#region methods
+
+    @BindThis()
+    protected override onTransitionEnd() {
+        if(this.visible) {
+            this.focus();
+        }
+        super.onTransitionEnd();
+    }
+
+    protected override registerAction() {
+        if(!this.parentEv) return;
+        if(Platform.device == "pc") {
+            this.parentEv.addEventListener("mouseenter", this.show);
+            this.parentEv.addEventListener("mouseleave", this.hide);
+            this.parentEv.addEventListener("click", this.hide);
+            this.addEventListener("click", this.hide);
+        }
+        else {
+            this.setAttribute("tabindex", "-1");
+            this.parentEv.addEventListener("click", this.show);
+            this.addEventListener("click", this.hide);
+            this.addEventListener("blur", this.hide);
+        }
+        this.addEventListener("transitionend", this.onTransitionEnd);
+    }
+    //#endregion
+
+}

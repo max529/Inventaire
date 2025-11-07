@@ -1,0 +1,29 @@
+:host {
+	background-color: var(--color-base-100);
+	min-width: 150px;
+	overflow: hidden;
+	padding: 15px;
+	z-index: 100;
+	display: flex;
+	flex-direction: column;
+
+	.groupe {
+		font-size: 16px;
+		margin-bottom: 5px;
+	}
+
+	ul {
+		margin: 0;
+		margin-left: 15px;
+		padding: 0;
+	}
+
+	.variation {
+		font-size: 14px;
+		margin-left: 4px;
+	}
+
+	.groupe:not(:first-child) {
+		margin-top: 15px;
+	}
+}

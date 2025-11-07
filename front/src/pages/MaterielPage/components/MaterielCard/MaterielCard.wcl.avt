@@ -31,6 +31,12 @@ export class MaterielCard extends Aventus.WebComponent implements Aventus.Defaul
 
 
     //#region methods
+
+    /**
+     * 
+     */
+    protected denyClick() {
+    }
     protected async loadEquipes() {
         const equipeIds = this.item.equipes.map(p => p.id_equipe);
         this.equipes = (await EquipeRAM.getInstance().getByIds(equipeIds));
