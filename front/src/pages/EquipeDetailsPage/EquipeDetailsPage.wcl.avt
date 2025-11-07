@@ -14,6 +14,8 @@ import { StringTools } from "../../lib/StringTools.lib.avt";
 import { Page } from "../../components/layout/Page/Page.wcl.avt";
 import type { MaterielVariationResource } from "../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 import type { Inventaire } from "../../generated/app/Models/Inventaire.lib.avt";
+import { MaterielGetInventaireController } from "../../generated/app/Http/Controllers/Materiel/GetInventaire/Controller.lib.avt";
+import { MaterielRAM } from "../../ram/Materiel.ram.avt";
 
 export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent {
 
@@ -165,7 +167,7 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
         }
     }
 
-    public updateInventaire(inventaire: Inventaire) {
+    public async updateInventaire(inventaire: Inventaire) {
         let needSearch = false;
         for(let inv of this.inventaires) {
             if(inv.materiel.id == inventaire.id_materiel_variation) {
@@ -175,6 +177,20 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
                 inv.quantite = inventaire.quantite;
                 inv.id = inventaire.id;
                 break;
+            }
+        }
+
+        const equipe = await EquipeRAM.getInstance().getById(inventaire.id_equipe);
+        if(equipe?.stock) {
+            const materiels = await MaterielRAM.getInstance().getList();
+            const materiel = materiels.find(p => p.variations.find(x => x.id == inventaire.id_materiel_variation));
+            if(materiel) {
+                const materielInv = await Process.execute(new MaterielGetInventaireController().request({ id_materiel: materiel.id }));
+                if(materielInv) {
+                    let totStock = materielInv.filter(p => p.equipe.stock).reduce((tot, inventaire) => tot + inventaire.quantite, 0);
+                    materiel.stock = totStock;
+                }
+
             }
         }
 

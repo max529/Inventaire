@@ -54,12 +54,12 @@ export class VariationTag extends Aventus.WebComponent implements Aventus.Defaul
         p.variationGroupe = this.groupe;
         const template = await p.show();
         if(template === null) return;
-        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
+        this.componentEl.innerText = this.groupe.nom + ' : ' + this.groupe.variations.map(p => p.nom).join(", ") + '';
     }
 
     protected override postCreation(): void {
         super.postCreation();
-        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
+        this.componentEl.innerText = this.groupe.nom + ' : ' + this.groupe.variations.map(p => p.nom).join(", ") + '';
     }
     //#endregion
 

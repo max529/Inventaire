@@ -206,6 +206,11 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
             }
         }
 
+        if(this.item) {
+            let totStock = this.inventaires.filter(p => p.equipe.stock).reduce((tot, inventaire) => tot + inventaire.quantite, 0);
+            this.item.stock = totStock;
+        }
+
         if(needSearch) {
             this.search();
         }
