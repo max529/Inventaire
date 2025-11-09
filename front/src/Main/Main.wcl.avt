@@ -68,9 +68,17 @@ export class Main extends Router implements Aventus.DefaultComponent {
         });
     }
 
+    private preventScroll() {
+        document.body.addEventListener("scroll", (e) => {
+            document.body.scrollTop = 0;
+            document.body.scrollLeft = 0;
+        });
+    }
+
     protected override postCreation(): void {
         super.postCreation();
         Main.instance = this;
+        this.preventScroll();
         ToastManager.configure({
             defaultDelay: 5000,
             defaultPosition: "top right",

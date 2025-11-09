@@ -14218,7 +14218,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret"></av-img></div><div class="errors">    <template _id="genericselect_4"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_6"></av-options-container>` }
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret" _id="genericselect_4"></av-img></div><div class="errors">    <template _id="genericselect_5"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_7"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14232,7 +14232,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     {
       "name": "optionsContainer",
       "ids": [
-        "genericselect_6"
+        "genericselect_7"
       ]
     }
   ],
@@ -14258,7 +14258,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     },
     {
       "eventName": "onOpen",
-      "id": "genericselect_6",
+      "id": "genericselect_7",
       "fct": (c, ...args) => c.comp.syncCaret.apply(c.comp, ...args),
       "isCallback": true
     }
@@ -14271,17 +14271,21 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     {
       "id": "genericselect_1",
       "onPress": (e, pressInstance, c) => { c.comp.showOptions(e, pressInstance); }
+    },
+    {
+      "id": "genericselect_4",
+      "onPress": (e, pressInstance, c) => { c.comp.toggleOptions(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_5"></div>    `);templ0.setActions({
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`         <div _id="genericselect_6"></div>    `);templ0.setActions({
   "content": {
-    "genericselect_5°@HTML": {
+    "genericselect_6°@HTML": {
       "fct": (c) => `${c.print(c.comp.__355bb3ba36f1d9f73b205609b2c794f0method4(c.data.error))}`,
       "once": true
     }
   }
 });this.__getStatic().__template.addLoop({
-                    anchorId: 'genericselect_4',
+                    anchorId: 'genericselect_5',
                     template: templ0,
                 simple:{data: "this.errors",item:"error"}}); }
     getClassName() {
@@ -14337,12 +14341,20 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
             }
         }
     }
+    toggleOptions() {
+        if (!this.open) {
+            this.showOptions();
+        }
+        else {
+            this.optionsContainer.hide();
+        }
+    }
     showOptions() {
         if (!this.open) {
             this.removeErrors();
-            if (this.searchable) {
-                this.inputEl.focus();
-            }
+            // if(this.searchable) {
+            //     this.inputEl.focus();
+            // }
             this.optionsContainer.show();
         }
         if (!this.searchable) {
@@ -14370,11 +14382,11 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     manageFocus() {
         let blurTimeout = 0;
         ;
-        let blur = () => {
-            blurTimeout = setTimeout(() => {
-                this.optionsContainer.hide();
-            }, 50);
-        };
+        // let blur = () => {
+        //     blurTimeout = setTimeout(() => {
+        //         this.optionsContainer.hide();
+        //     }, 50);
+        // };
         this.inputEl.addEventListener("blur", () => {
             blur();
         });
@@ -19422,9 +19434,16 @@ const Main = class Main extends Aventus.Navigation.Router {
             }
         });
     }
+    preventScroll() {
+        document.body.addEventListener("scroll", (e) => {
+            document.body.scrollTop = 0;
+            document.body.scrollLeft = 0;
+        });
+    }
     postCreation() {
         super.postCreation();
         Main.instance = this;
+        this.preventScroll();
         Aventus.Toast.ToastManager.configure({
             defaultDelay: 5000,
             defaultPosition: "top right",
@@ -19729,72 +19748,6 @@ ModalTag.Namespace=`Inventaire`;
 ModalTag.Tag=`av-modal-tag`;
 __as1(_, 'ModalTag', ModalTag);
 if(!window.customElements.get('av-modal-tag')){window.customElements.define('av-modal-tag', ModalTag);Aventus.WebComponentInstance.registerDefinition(ModalTag);}
-
-const VariationTagValeur = class VariationTagValeur extends Aventus.WebComponent {
-    groupe;
-    onDelete = new Aventus.Callback();
-    static __style = `:host av-tag{padding-left:12px}:host av-tag span{display:block;height:100%;min-width:5px}:host av-tag mi-icon{color:var(--color-error);cursor:pointer;font-size:16px;margin-left:6px}:host av-tag mi-icon.edit{color:var(--color-primary)}`;
-    __getStatic() {
-        return VariationTagValeur;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(VariationTagValeur.__style);
-        return arrStyle;
-    }
-    __getHtml() {
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-tag color="accent">    <span _id="variationtagvaleur_0"></span>    <mi-icon icon="edit" class="edit" _id="variationtagvaleur_1"></mi-icon>    <mi-icon icon="delete" _id="variationtagvaleur_2"></mi-icon></av-tag>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
-  "elements": [
-    {
-      "name": "componentEl",
-      "ids": [
-        "variationtagvaleur_0"
-      ]
-    }
-  ],
-  "pressEvents": [
-    {
-      "id": "variationtagvaleur_1",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerUpdate(e, pressInstance); }
-    },
-    {
-      "id": "variationtagvaleur_2",
-      "onPress": (e, pressInstance, c) => { c.comp.triggerDelete(e, pressInstance); }
-    }
-  ]
-}); }
-    getClassName() {
-        return "VariationTagValeur";
-    }
-    async triggerDelete() {
-        const result = await Confirm.open({
-            title: "Êtes-vous sûr de vouloir supprimer la variation " + this.groupe.nom + "?"
-        });
-        if (result) {
-            this.onDelete.trigger(this);
-        }
-    }
-    async triggerUpdate() {
-        const p = new ModalTag();
-        p.variationGroupe = this.groupe;
-        const template = await p.show();
-        if (template === null)
-            return;
-        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
-    }
-    postCreation() {
-        super.postCreation();
-        this.componentEl.innerText = this.groupe.nom + '(' + this.groupe.variations.length + ')';
-    }
-}
-VariationTagValeur.Namespace=`Inventaire`;
-VariationTagValeur.Tag=`av-variation-tag-valeur`;
-__as1(_, 'VariationTagValeur', VariationTagValeur);
-if(!window.customElements.get('av-variation-tag-valeur')){window.customElements.define('av-variation-tag-valeur', VariationTagValeur);Aventus.WebComponentInstance.registerDefinition(VariationTagValeur);}
 
 const VariationTag = class VariationTag extends Aventus.WebComponent {
     groupe;

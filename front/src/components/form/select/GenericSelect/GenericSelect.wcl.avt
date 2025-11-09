@@ -120,15 +120,27 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
         }
     }
 
+
     /**
      * 
      */
+    protected toggleOptions() {
+        if(!this.open) {
+            this.showOptions();
+        }
+        else {
+            this.optionsContainer.hide();
+        }
+    }
+    /**
+    * 
+    */
     protected showOptions() {
         if(!this.open) {
             this.removeErrors();
-            if(this.searchable) {
-                this.inputEl.focus();
-            }
+            // if(this.searchable) {
+            //     this.inputEl.focus();
+            // }
             this.optionsContainer.show();
         }
         if(!this.searchable) {
@@ -165,11 +177,11 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
 
     protected manageFocus() {
         let blurTimeout: number = 0;;
-        let blur = () => {
-            blurTimeout = setTimeout(() => {
-                this.optionsContainer.hide();
-            }, 50);
-        };
+        // let blur = () => {
+        //     blurTimeout = setTimeout(() => {
+        //         this.optionsContainer.hide();
+        //     }, 50);
+        // };
         this.inputEl.addEventListener("blur", () => {
             blur();
         });
@@ -198,7 +210,7 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
         this.loadElementsFromSlot();
         this.optionsInited = true;
         this.onInternalValueChanged();
-        this.shadowRoot.removeChild(this.optionsContainer)
+        this.shadowRoot.removeChild(this.optionsContainer);
     }
     //#endregion
 
