@@ -1,6 +1,7 @@
 import { FormElement } from "Aventus@UI:Aventus.Form.package.avt";
 import { GenericOption } from "./GenericOption/GenericOption.wcl.avt";
 import type { OptionsContainer } from "./OptionsContainer/OptionsContainer.wcl.avt";
+import { Platform } from "../../../../lib/Platform.lib.avt";
 
 export type ExtractTypeOption<X extends GenericOption<U>, U> = X extends GenericOption<infer U> ? U : never;
 
@@ -94,7 +95,7 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
         this.selectedOption = option;
         this.value = option.value;
         this.displayValue = this.itemToText(option);
-        this.hideOptions();
+        this.blurOptions();
         this.onChange.trigger(this.value);
         this.filter();
         if(this.form) {
@@ -132,25 +133,30 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
             this.optionsContainer.hide();
         }
     }
+    
     /**
     * 
     */
     protected showOptions() {
         if(!this.open) {
             this.removeErrors();
-            // if(this.searchable) {
-            //     this.inputEl.focus();
-            // }
+            if(this.searchable) {
+                this.inputEl.focus();
+            }
             this.optionsContainer.show();
         }
-        if(!this.searchable) {
+        if(!this.searchable && Platform.device == "pc") {
             setTimeout(() => {
                 this.optionsContainer.focus({ preventScroll: true });
             }, 100);
         }
     }
 
-    protected hideOptions() {
+    public hideOptions() {
+        this.optionsContainer.hide();
+    }
+
+    protected blurOptions() {
         setTimeout(() => {
             this.optionsContainer.blur();
         }, 50);
@@ -176,25 +182,28 @@ export abstract class GenericSelect<T extends GenericOption<U>, U = ExtractTypeO
     }
 
     protected manageFocus() {
-        let blurTimeout: number = 0;;
-        // let blur = () => {
-        //     blurTimeout = setTimeout(() => {
-        //         this.optionsContainer.hide();
-        //     }, 50);
-        // };
-        this.inputEl.addEventListener("blur", () => {
-            blur();
-        });
-        this.optionsContainer.addEventListener("blur", () => {
-            blur();
-        });
+        let blurTimeout: number = 0;
         this.inputEl.addEventListener("focus", () => {
             clearTimeout(blurTimeout);
             this.inputEl.select();
         });
-        this.optionsContainer.addEventListener("focus", () => {
-            clearTimeout(blurTimeout);
-        });
+        if(Platform.device == "pc") {
+            let blur = () => {
+                blurTimeout = setTimeout(() => {
+                    this.optionsContainer.hide();
+                }, 50);
+            };
+            this.inputEl.addEventListener("blur", () => {
+                blur();
+            });
+            this.optionsContainer.addEventListener("blur", () => {
+                blur();
+            });
+
+            this.optionsContainer.addEventListener("focus", () => {
+                clearTimeout(blurTimeout);
+            });
+        }
     }
 
 

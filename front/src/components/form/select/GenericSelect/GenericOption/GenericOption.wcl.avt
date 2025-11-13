@@ -40,6 +40,7 @@ export class GenericOption<T> extends Aventus.WebComponent implements Aventus.De
             element: this,
             onPress: () => {
                 this.select.setValueFromOption(this);
+                this.select.hideOptions()
             }
         });
     }

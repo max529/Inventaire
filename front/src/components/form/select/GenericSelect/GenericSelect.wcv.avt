@@ -5,7 +5,9 @@
     </slot>
     <input id="input" @element="inputEl" placeholder="{{ this.placeholder }}" @input="filter" autocomplete="off" />
     <slot name="append"></slot>
-    <av-img src="/img/angle-left.svg" class="caret" @press="toggleOptions"></av-img>
+    <div class="caret">
+        <av-img src="/img/angle-left.svg" class="caret" @press="toggleOptions"></av-img>
+    </div>
 </div>
 <div class="errors">
     for(let error of this.errors) { 

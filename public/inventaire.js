@@ -14165,6 +14165,148 @@ OptionsContainer.Tag=`av-options-container`;
 __as1(_, 'OptionsContainer', OptionsContainer);
 if(!window.customElements.get('av-options-container')){window.customElements.define('av-options-container', OptionsContainer);Aventus.WebComponentInstance.registerDefinition(OptionsContainer);}
 
+let Platform=class Platform {
+    static onScreenChange = new Aventus.Callback();
+    static init() {
+        let currentDevice = this.device;
+        let screenObserver = new Aventus.ResizeObserver(() => {
+            let newDevice = this.device;
+            if (currentDevice != newDevice) {
+                currentDevice = newDevice;
+                this.onScreenChange.trigger(newDevice);
+            }
+        });
+        screenObserver.observe(document.body);
+    }
+    static onScreenChangeAndRun(cb) {
+        this.onScreenChange.add(cb);
+        cb(this.device);
+    }
+    static get device() {
+        if (document.body.offsetWidth > 1224) {
+            return "pc";
+        }
+        else if (document.body.offsetWidth > 768) {
+            return "tablet";
+        }
+        return "mobile";
+    }
+    static get isStandalone() {
+        if ("standalone" in window.navigator && window.navigator.standalone) {
+            return true;
+        }
+        else if (window.matchMedia('(display-mode: standalone)').matches) {
+            return true;
+        }
+        return false;
+    }
+    static get isiOS() {
+        let test1 = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        let test2 = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+        return test1 || test2;
+    }
+    static getRatio(element) {
+        return element.offsetWidth + " / " + element.offsetHeight;
+    }
+}
+Platform.Namespace=`Inventaire`;
+__as1(_, 'Platform', Platform);
+
+const TooltipVariation = class TooltipVariation extends Tooltip {
+    get 'groupes'() {
+						return this.__signals["groupes"].value;
+					}
+					set 'groupes'(val) {
+						this.__signals["groupes"].value = val;
+					}    __registerSignalsActions() { this.__signals["groupes"] = null; super.__registerSignalsActions();  }
+    static __style = `:host{background-color:var(--color-base-100);min-width:150px;overflow:hidden;padding:15px;z-index:100;display:flex;flex-direction:column}:host .groupe{font-size:16px;margin-bottom:5px}:host ul{margin:0;margin-left:15px;padding:0}:host .variation{font-size:14px;margin-left:4px}:host .groupe:not(:first-child){margin-top:15px}`;
+    constructor() {
+        super();
+        this.onTransitionEnd = this.onTransitionEnd.bind(this);
+    }
+    __getStatic() {
+        return TooltipVariation;
+    }
+    __getStyle() {
+        let arrStyle = super.__getStyle();
+        arrStyle.push(TooltipVariation.__style);
+        return arrStyle;
+    }
+    __getHtml() {super.__getHtml();
+    this.__getStatic().__template.setHTML({
+        blocks: { 'default':`<av-flex-scroll>
+<template _id="tooltipvariation_0"></template>
+</av-flex-scroll>` }
+    });
+}
+    __registerTemplateAction() { super.__registerTemplateAction();const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
+    <div class="groupe" _id="tooltipvariation_1"></div>
+    <ul>
+        <template _id="tooltipvariation_2"></template>
+    </ul>
+`);templ0.setActions({
+  "content": {
+    "tooltipvariation_1°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method2(c.data.group))}`,
+      "once": true
+    }
+  }
+});this.__getStatic().__template.addLoop({
+                    anchorId: 'tooltipvariation_0',
+                    template: templ0,
+                simple:{data: "this.groupes",item:"group"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(` 
+            <li class="variation" _id="tooltipvariation_3"></li>
+        `);templ1.setActions({
+  "content": {
+    "tooltipvariation_3°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method3(c.data.variation))}`,
+      "once": true
+    }
+  }
+});templ0.addLoop({
+                    anchorId: 'tooltipvariation_2',
+                    template: templ1,
+                simple:{data: "group.variations",item:"variation"}}); }
+    getClassName() {
+        return "TooltipVariation";
+    }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["groupes"] = []; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('groupes'); }
+    onTransitionEnd() {
+        if (this.visible) {
+            this.focus();
+        }
+        super.onTransitionEnd();
+    }
+    registerAction() {
+        if (!this.parentEv)
+            return;
+        if (Platform.device == "pc") {
+            this.parentEv.addEventListener("mouseenter", this.show);
+            this.parentEv.addEventListener("mouseleave", this.hide);
+            this.parentEv.addEventListener("click", this.hide);
+            this.addEventListener("click", this.hide);
+        }
+        else {
+            this.setAttribute("tabindex", "-1");
+            this.parentEv.addEventListener("click", this.show);
+            this.addEventListener("click", this.hide);
+            this.addEventListener("blur", this.hide);
+        }
+        this.addEventListener("transitionend", this.onTransitionEnd);
+    }
+    __2a2b573a4da10a6575b99ff39dc7c534method2(group) {
+        return group.nom;
+    }
+    __2a2b573a4da10a6575b99ff39dc7c534method3(variation) {
+        return variation.nom;
+    }
+}
+TooltipVariation.Namespace=`Inventaire`;
+TooltipVariation.Tag=`av-tooltip-variation`;
+__as1(_, 'TooltipVariation', TooltipVariation);
+if(!window.customElements.get('av-tooltip-variation')){window.customElements.define('av-tooltip-variation', TooltipVariation);Aventus.WebComponentInstance.registerDefinition(TooltipVariation);}
+
 const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     static get observedAttributes() {return ["label", "placeholder", "icon", "searchable"].concat(super.observedAttributes).filter((v, i, a) => a.indexOf(v) === i);}
     get 'open'() { return this.getBoolAttr('open') }
@@ -14200,7 +14342,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         target.inputEl.setAttribute("disabled", "disabled");
     }
 })); }
-    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input av-img.caret{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
+    static __style = `:host{--input-color: color-mix(in srgb, var(--color-base-content)20%, #0000);color:var(--color-base-content);min-width:100px;width:100%;width:100%}:host label{cursor:pointer;display:block;font-size:calc(var(--font-size)*.85);margin-bottom:6px}:host .input{align-items:center;background-color:var(--color-base-100);border:1px solid var(--input-color);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));box-shadow:0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), rgba(0, 0, 0, 0)) inset,0 -1px oklch(100% 0 0/calc(var(--depth) * 0.1)) inset;cursor:pointer;display:flex;padding:0 8px;width:100%}:host .input .icon{display:none;height:calc(var(--font-size)*.95);margin-right:10px}:host .input .caret{align-items:center;display:flex;height:33px;justify-content:center;width:30px}:host .input .caret av-img{--img-fill-color: var(--color-base-content);--img-stroke-width: 0;aspect-ratio:1;flex-grow:0;flex-shrink:0;height:calc(var(--font-size)*.95);transform:rotate(-90deg);transition:transform .5s ease-in-out}:host .input input{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:rgba(0,0,0,0);border:none;color:inherit;flex-grow:1;font-size:calc(var(--font-size)*.95);outline:none;outline-style:none;padding:8px 0}:host .input input:-webkit-autofill,:host .input input:-webkit-autofill:hover,:host .input input:-webkit-autofill:focus,:host .input input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--color-base-100) inset !important;-webkit-text-fill-color:var(--color-base-content)}:host .input input::placeholder{color:color-mix(in srgb, var(--color-base-content) 20%, transparent)}:host .errors{color:var(--color-error);font-size:calc(var(--font-size)*.8);margin-top:6px}:host .hidden{display:none}:host(:not([label])) .label,:host([label=""]) .label{display:none}:host(:not([has_errors])) .errors{display:none}:host([disabled]) .input input{background-color:var(--color-base-200);border-color:var(--color-base-200);box-shadow:none;color:color-mix(in srgb, var(--color-base-content) 40%, transparent);cursor:not-allowed}:host([icon]:not([icon=""])) .input .icon{display:block}:host([open]) .input .caret av-img{transform:rotate(-270deg)}@supports(color: color-mix(in lab, red, red)){:host{--input-color: color-mix(in oklab, var(--color-base-content)20%, #0000)}:host .input input::placeholder{color:color-mix(in oklab, var(--color-base-content) 20%, transparent)}:host([disabled]) .input input{color:color-mix(in oklab, var(--color-base-content) 40%, transparent)}}:host([color=neutral]),:host([color=neutral]):focus,:host([color=neutral]):focus-within{--input-color: var(--color-neutral)}:host([color=primary]),:host([color=primary]):focus,:host([color=primary]):focus-within{--input-color: var(--color-primary)}:host([color=secondary]),:host([color=secondary]):focus,:host([color=secondary]):focus-within{--input-color: var(--color-secondary)}:host([color=accent]),:host([color=accent]):focus,:host([color=accent]):focus-within{--input-color: var(--color-accent)}:host([color=info]),:host([color=info]):focus,:host([color=info]):focus-within{--input-color: var(--color-info)}:host([color=success]),:host([color=success]):focus,:host([color=success]):focus-within{--input-color: var(--color-success)}:host([color=warning]),:host([color=warning]):focus,:host([color=warning]):focus-within{--input-color: var(--color-warning)}:host([color=error]),:host([color=error]):focus,:host([color=error]):focus-within{--input-color: var(--color-error)}`;
     constructor() {
         super();
         if (this.constructor == GenericSelect) {
@@ -14218,7 +14360,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
         slots: { 'prepend':`<slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>`,'append':`<slot name="append"></slot>`,'default':`<slot></slot>` }, 
-        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <av-img src="/img/angle-left.svg" class="caret" _id="genericselect_4"></av-img></div><div class="errors">    <template _id="genericselect_5"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_7"></av-options-container>` }
+        blocks: { 'default':`<label for="input" _id="genericselect_0"></label><div class="input" _id="genericselect_1">    <slot name="prepend">        <av-img class="icon" _id="genericselect_2"></av-img>    </slot>    <input id="input" autocomplete="off" _id="genericselect_3" />    <slot name="append"></slot>    <div class="caret">        <av-img src="/img/angle-left.svg" class="caret" _id="genericselect_4"></av-img>    </div></div><div class="errors">    <template _id="genericselect_5"></template></div><div class="hidden">    <slot></slot></div><av-options-container class="options-container" _id="genericselect_7"></av-options-container>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -14321,7 +14463,7 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
         this.selectedOption = option;
         this.value = option.value;
         this.displayValue = this.itemToText(option);
-        this.hideOptions();
+        this.blurOptions();
         this.onChange.trigger(this.value);
         this.filter();
         if (this.form) {
@@ -14352,18 +14494,21 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     showOptions() {
         if (!this.open) {
             this.removeErrors();
-            // if(this.searchable) {
-            //     this.inputEl.focus();
-            // }
+            if (this.searchable) {
+                this.inputEl.focus();
+            }
             this.optionsContainer.show();
         }
-        if (!this.searchable) {
+        if (!this.searchable && Platform.device == "pc") {
             setTimeout(() => {
                 this.optionsContainer.focus({ preventScroll: true });
             }, 100);
         }
     }
     hideOptions() {
+        this.optionsContainer.hide();
+    }
+    blurOptions() {
         setTimeout(() => {
             this.optionsContainer.blur();
         }, 50);
@@ -14381,25 +14526,26 @@ const GenericSelect = class GenericSelect extends Aventus.Form.FormElement {
     }
     manageFocus() {
         let blurTimeout = 0;
-        ;
-        // let blur = () => {
-        //     blurTimeout = setTimeout(() => {
-        //         this.optionsContainer.hide();
-        //     }, 50);
-        // };
-        this.inputEl.addEventListener("blur", () => {
-            blur();
-        });
-        this.optionsContainer.addEventListener("blur", () => {
-            blur();
-        });
         this.inputEl.addEventListener("focus", () => {
             clearTimeout(blurTimeout);
             this.inputEl.select();
         });
-        this.optionsContainer.addEventListener("focus", () => {
-            clearTimeout(blurTimeout);
-        });
+        if (Platform.device == "pc") {
+            let blur = () => {
+                blurTimeout = setTimeout(() => {
+                    this.optionsContainer.hide();
+                }, 50);
+            };
+            this.inputEl.addEventListener("blur", () => {
+                blur();
+            });
+            this.optionsContainer.addEventListener("blur", () => {
+                blur();
+            });
+            this.optionsContainer.addEventListener("focus", () => {
+                clearTimeout(blurTimeout);
+            });
+        }
     }
     postDestruction() {
         super.postDestruction();
@@ -14467,6 +14613,7 @@ const GenericOption = class GenericOption extends Aventus.WebComponent {
             element: this,
             onPress: () => {
                 this.select.setValueFromOption(this);
+                this.select.hideOptions();
             }
         });
     }
@@ -14891,148 +15038,6 @@ Alert.Namespace=`Inventaire`;
 Alert.Tag=`av-alert`;
 __as1(_, 'Alert', Alert);
 if(!window.customElements.get('av-alert')){window.customElements.define('av-alert', Alert);Aventus.WebComponentInstance.registerDefinition(Alert);}
-
-let Platform=class Platform {
-    static onScreenChange = new Aventus.Callback();
-    static init() {
-        let currentDevice = this.device;
-        let screenObserver = new Aventus.ResizeObserver(() => {
-            let newDevice = this.device;
-            if (currentDevice != newDevice) {
-                currentDevice = newDevice;
-                this.onScreenChange.trigger(newDevice);
-            }
-        });
-        screenObserver.observe(document.body);
-    }
-    static onScreenChangeAndRun(cb) {
-        this.onScreenChange.add(cb);
-        cb(this.device);
-    }
-    static get device() {
-        if (document.body.offsetWidth > 1224) {
-            return "pc";
-        }
-        else if (document.body.offsetWidth > 768) {
-            return "tablet";
-        }
-        return "mobile";
-    }
-    static get isStandalone() {
-        if ("standalone" in window.navigator && window.navigator.standalone) {
-            return true;
-        }
-        else if (window.matchMedia('(display-mode: standalone)').matches) {
-            return true;
-        }
-        return false;
-    }
-    static get isiOS() {
-        let test1 = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-        let test2 = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-        return test1 || test2;
-    }
-    static getRatio(element) {
-        return element.offsetWidth + " / " + element.offsetHeight;
-    }
-}
-Platform.Namespace=`Inventaire`;
-__as1(_, 'Platform', Platform);
-
-const TooltipVariation = class TooltipVariation extends Tooltip {
-    get 'groupes'() {
-						return this.__signals["groupes"].value;
-					}
-					set 'groupes'(val) {
-						this.__signals["groupes"].value = val;
-					}    __registerSignalsActions() { this.__signals["groupes"] = null; super.__registerSignalsActions();  }
-    static __style = `:host{background-color:var(--color-base-100);min-width:150px;overflow:hidden;padding:15px;z-index:100;display:flex;flex-direction:column}:host .groupe{font-size:16px;margin-bottom:5px}:host ul{margin:0;margin-left:15px;padding:0}:host .variation{font-size:14px;margin-left:4px}:host .groupe:not(:first-child){margin-top:15px}`;
-    constructor() {
-        super();
-        this.onTransitionEnd = this.onTransitionEnd.bind(this);
-    }
-    __getStatic() {
-        return TooltipVariation;
-    }
-    __getStyle() {
-        let arrStyle = super.__getStyle();
-        arrStyle.push(TooltipVariation.__style);
-        return arrStyle;
-    }
-    __getHtml() {super.__getHtml();
-    this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<av-flex-scroll>
-<template _id="tooltipvariation_0"></template>
-</av-flex-scroll>` }
-    });
-}
-    __registerTemplateAction() { super.__registerTemplateAction();const templ0 = new Aventus.Template(this);templ0.setTemplate(` 
-    <div class="groupe" _id="tooltipvariation_1"></div>
-    <ul>
-        <template _id="tooltipvariation_2"></template>
-    </ul>
-`);templ0.setActions({
-  "content": {
-    "tooltipvariation_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method2(c.data.group))}`,
-      "once": true
-    }
-  }
-});this.__getStatic().__template.addLoop({
-                    anchorId: 'tooltipvariation_0',
-                    template: templ0,
-                simple:{data: "this.groupes",item:"group"}});const templ1 = new Aventus.Template(this);templ1.setTemplate(` 
-            <li class="variation" _id="tooltipvariation_3"></li>
-        `);templ1.setActions({
-  "content": {
-    "tooltipvariation_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__2a2b573a4da10a6575b99ff39dc7c534method3(c.data.variation))}`,
-      "once": true
-    }
-  }
-});templ0.addLoop({
-                    anchorId: 'tooltipvariation_2',
-                    template: templ1,
-                simple:{data: "group.variations",item:"variation"}}); }
-    getClassName() {
-        return "TooltipVariation";
-    }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["groupes"] = []; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('groupes'); }
-    onTransitionEnd() {
-        if (this.visible) {
-            this.focus();
-        }
-        super.onTransitionEnd();
-    }
-    registerAction() {
-        if (!this.parentEv)
-            return;
-        if (Platform.device == "pc") {
-            this.parentEv.addEventListener("mouseenter", this.show);
-            this.parentEv.addEventListener("mouseleave", this.hide);
-            this.parentEv.addEventListener("click", this.hide);
-            this.addEventListener("click", this.hide);
-        }
-        else {
-            this.setAttribute("tabindex", "-1");
-            this.parentEv.addEventListener("click", this.show);
-            this.addEventListener("click", this.hide);
-            this.addEventListener("blur", this.hide);
-        }
-        this.addEventListener("transitionend", this.onTransitionEnd);
-    }
-    __2a2b573a4da10a6575b99ff39dc7c534method2(group) {
-        return group.nom;
-    }
-    __2a2b573a4da10a6575b99ff39dc7c534method3(variation) {
-        return variation.nom;
-    }
-}
-TooltipVariation.Namespace=`Inventaire`;
-TooltipVariation.Tag=`av-tooltip-variation`;
-__as1(_, 'TooltipVariation', TooltipVariation);
-if(!window.customElements.get('av-tooltip-variation')){window.customElements.define('av-tooltip-variation', TooltipVariation);Aventus.WebComponentInstance.registerDefinition(TooltipVariation);}
 
 let PWA=class PWA {
     static get isAvailable() {
