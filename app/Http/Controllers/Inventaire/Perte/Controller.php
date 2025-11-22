@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventaire\Perte;
 
+use App\Http\Middlewares\IsAdmin;
 use App\Http\Middlewares\Transaction;
 use App\Models\Achat;
 use App\Models\Inventaire;
@@ -14,6 +15,7 @@ use Exception;
 #[Rename("InventairePerteController")]
 class Controller
 {
+    #[IsAdmin]
     #[Transaction]
     public function request(Request $request): Inventaire
     {

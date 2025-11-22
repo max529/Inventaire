@@ -11,13 +11,15 @@
         <div class="logo-menu">Inventaire FC Vétroz</div>
         <av-link class="item" to="/" active_pattern="/equipes/*|/" @click="closeMenu">Equipe</av-link>
         <av-link class="item" to="/materiel" active_pattern="/materiel*" @click="closeMenu">Matériel</av-link>
-        <div class="item sub-menu" @click="closeMenu">
-            <span>Configuration</span>
-            <div class="sub-menu-items">
-                <av-link class="item" to="/utilisateurs" @click="closeMenu">Utilisateur</av-link>
-                <av-link class="item" to="/variations" @click="closeMenu">Variations</av-link>
+        if(isAdmin()) {
+            <div class="item sub-menu" @click="closeMenu">
+                <span>Configuration</span>
+                <div class="sub-menu-items">
+                    <av-link class="item" to="/utilisateurs" @click="closeMenu">Utilisateur</av-link>
+                    <av-link class="item" to="/variations" @click="closeMenu">Variations</av-link>
+                </div>
             </div>
-        </div>
+        }
         if(this.hasInstall) {
             <div class="item install" @press="installApp">Installer l'application</div>
         }

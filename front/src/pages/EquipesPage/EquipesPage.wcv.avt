@@ -3,7 +3,9 @@
         <div class="title">Liste des équipes</div>
         <div class="actions">
             <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
-            <av-button color="primary" @press="add">Ajouter</av-button>
+            if(isAdmin()) {
+                <av-button color="primary" @press="add">Ajouter</av-button>
+            }
         </div>
     </div>
     <av-scrollable class="body" floating_scroll auto_hide>

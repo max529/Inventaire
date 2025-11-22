@@ -10977,7 +10977,8 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
     set 'disable'(val) { this.setBoolAttr('disable', val) }get 'no_user_select'() { return this.getBoolAttr('no_user_select') }
     set 'no_user_select'(val) { this.setBoolAttr('no_user_select', val) }get 'mouse_drag'() { return this.getBoolAttr('mouse_drag') }
     set 'mouse_drag'(val) { this.setBoolAttr('mouse_drag', val) }get 'pinch'() { return this.getBoolAttr('pinch') }
-    set 'pinch'(val) { this.setBoolAttr('pinch', val) }    get 'zoom'() { return this.getNumberProp('zoom') }
+    set 'pinch'(val) { this.setBoolAttr('pinch', val) }get 'flex'() { return this.getBoolAttr('flex') }
+    set 'flex'(val) { this.setBoolAttr('flex', val) }    get 'zoom'() { return this.getNumberProp('zoom') }
     set 'zoom'(val) { this.setNumberAttr('zoom', val) }    observer;
     display = { x: 0, y: 0 };
     max = {
@@ -11063,7 +11064,7 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
     __registerPropertiesActions() { super.__registerPropertiesActions(); this.__addPropertyActions("zoom", ((target) => {
     target.changeZoom();
 })); }
-    static __style = `:host{--internal-scrollbar-container-color: var(--scrollbar-container-color, transparent);--internal-scrollbar-color: var(--scrollbar-color, #757575);--internal-scrollbar-active-color: var(--scrollbar-active-color, #858585);--internal-scroller-width: var(--scroller-width, 6px);--internal-scroller-top: var(--scroller-top, 3px);--internal-scroller-bottom: var(--scroller-bottom, 3px);--internal-scroller-right: var(--scroller-right, 3px);--internal-scroller-left: var(--scroller-left, 3px);--_scrollbar-content-padding: var(--scrollbar-content-padding, 0);--_scrollbar-container-display: var(--scrollbar-container-display, inline-block)}:host{display:block;height:100%;min-height:inherit;min-width:inherit;overflow:clip;position:relative;-webkit-user-drag:none;-khtml-user-drag:none;-moz-user-drag:none;-o-user-drag:none;width:100%}:host .scroll-main-container{display:block;height:100%;min-height:inherit;min-width:inherit;position:relative;width:100%}:host .scroll-main-container .content-zoom{display:block;height:100%;min-height:inherit;min-width:inherit;position:relative;transform-origin:0 0;width:100%;z-index:4}:host .scroll-main-container .content-zoom .content-hidder{display:block;height:100%;min-height:inherit;min-width:inherit;overflow:clip;position:relative;width:100%}:host .scroll-main-container .content-zoom .content-hidder .content-wrapper{display:var(--_scrollbar-container-display);height:100%;min-height:inherit;min-width:inherit;padding:var(--_scrollbar-content-padding);position:relative;width:100%}:host .scroll-main-container .scroller-wrapper .container-scroller{display:none;overflow:hidden;position:absolute;transition:transform .2s linear;z-index:5}:host .scroll-main-container .scroller-wrapper .container-scroller .shadow-scroller{background-color:var(--internal-scrollbar-container-color);border-radius:5px}:host .scroll-main-container .scroller-wrapper .container-scroller .shadow-scroller .scroller{background-color:var(--internal-scrollbar-color);border-radius:5px;cursor:pointer;position:absolute;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:none;z-index:5}:host .scroll-main-container .scroller-wrapper .container-scroller .scroller.active{background-color:var(--internal-scrollbar-active-color)}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical{height:calc(100% - var(--internal-scroller-bottom)*2 - var(--internal-scroller-width));padding-left:var(--internal-scroller-left);right:var(--internal-scroller-right);top:var(--internal-scroller-bottom);transform:0;width:calc(var(--internal-scroller-width) + var(--internal-scroller-left))}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical.hide{transform:translateX(calc(var(--internal-scroller-width) + var(--internal-scroller-left)))}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical .shadow-scroller{height:100%}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical .shadow-scroller .scroller{width:calc(100% - var(--internal-scroller-left))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal{bottom:var(--internal-scroller-bottom);height:calc(var(--internal-scroller-width) + var(--internal-scroller-top));left:var(--internal-scroller-right);padding-top:var(--internal-scroller-top);transform:0;width:calc(100% - var(--internal-scroller-right)*2 - var(--internal-scroller-width))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal.hide{transform:translateY(calc(var(--internal-scroller-width) + var(--internal-scroller-top)))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal .shadow-scroller{height:100%}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal .shadow-scroller .scroller{height:calc(100% - var(--internal-scroller-top))}:host([y_scroll]) .scroll-main-container .content-zoom .content-hidder .content-wrapper{height:auto}:host([x_scroll]) .scroll-main-container .content-zoom .content-hidder .content-wrapper{width:auto}:host([y_scroll_visible]) .scroll-main-container .scroller-wrapper .container-scroller.vertical{display:block}:host([x_scroll_visible]) .scroll-main-container .scroller-wrapper .container-scroller.horizontal{display:block}:host([no_user_select]) .content-wrapper *{user-select:none}:host([no_user_select]) ::slotted{user-select:none}`;
+    static __style = `:host{--internal-scrollbar-container-color: var(--scrollbar-container-color, transparent);--internal-scrollbar-color: var(--scrollbar-color, #757575);--internal-scrollbar-active-color: var(--scrollbar-active-color, #858585);--internal-scroller-width: var(--scroller-width, 6px);--internal-scroller-top: var(--scroller-top, 3px);--internal-scroller-bottom: var(--scroller-bottom, 3px);--internal-scroller-right: var(--scroller-right, 3px);--internal-scroller-left: var(--scroller-left, 3px);--_scrollbar-content-padding: var(--scrollbar-content-padding, 0);--_scrollbar-container-display: var(--scrollbar-container-display, inline-block)}:host{display:block;height:100%;min-height:inherit;min-width:inherit;overflow:clip;position:relative;-webkit-user-drag:none;-khtml-user-drag:none;-moz-user-drag:none;-o-user-drag:none;width:100%}:host .scroll-main-container{display:block;height:100%;min-height:inherit;min-width:inherit;position:relative;width:100%}:host .scroll-main-container .content-zoom{display:block;height:100%;min-height:inherit;min-width:inherit;position:relative;transform-origin:0 0;width:100%;z-index:4}:host .scroll-main-container .content-zoom .content-hidder{display:block;height:100%;min-height:inherit;min-width:inherit;overflow:clip;position:relative;width:100%}:host .scroll-main-container .content-zoom .content-hidder .content-wrapper{display:var(--_scrollbar-container-display);height:100%;min-height:inherit;min-width:inherit;padding:var(--_scrollbar-content-padding);position:relative;width:100%}:host .scroll-main-container .scroller-wrapper .container-scroller{display:none;overflow:hidden;position:absolute;transition:transform .2s linear;z-index:5}:host .scroll-main-container .scroller-wrapper .container-scroller .shadow-scroller{background-color:var(--internal-scrollbar-container-color);border-radius:5px}:host .scroll-main-container .scroller-wrapper .container-scroller .shadow-scroller .scroller{background-color:var(--internal-scrollbar-color);border-radius:5px;cursor:pointer;position:absolute;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:none;z-index:5}:host .scroll-main-container .scroller-wrapper .container-scroller .scroller.active{background-color:var(--internal-scrollbar-active-color)}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical{height:calc(100% - var(--internal-scroller-bottom)*2 - var(--internal-scroller-width));padding-left:var(--internal-scroller-left);right:var(--internal-scroller-right);top:var(--internal-scroller-bottom);transform:0;width:calc(var(--internal-scroller-width) + var(--internal-scroller-left))}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical.hide{transform:translateX(calc(var(--internal-scroller-width) + var(--internal-scroller-left)))}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical .shadow-scroller{height:100%}:host .scroll-main-container .scroller-wrapper .container-scroller.vertical .shadow-scroller .scroller{width:calc(100% - var(--internal-scroller-left))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal{bottom:var(--internal-scroller-bottom);height:calc(var(--internal-scroller-width) + var(--internal-scroller-top));left:var(--internal-scroller-right);padding-top:var(--internal-scroller-top);transform:0;width:calc(100% - var(--internal-scroller-right)*2 - var(--internal-scroller-width))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal.hide{transform:translateY(calc(var(--internal-scroller-width) + var(--internal-scroller-top)))}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal .shadow-scroller{height:100%}:host .scroll-main-container .scroller-wrapper .container-scroller.horizontal .shadow-scroller .scroller{height:calc(100% - var(--internal-scroller-top))}:host([y_scroll]) .scroll-main-container .content-zoom .content-hidder .content-wrapper{height:auto}:host([x_scroll]) .scroll-main-container .content-zoom .content-hidder .content-wrapper{width:auto}:host([y_scroll_visible]) .scroll-main-container .scroller-wrapper .container-scroller.vertical{display:block}:host([x_scroll_visible]) .scroll-main-container .scroller-wrapper .container-scroller.horizontal{display:block}:host([no_user_select]) .content-wrapper *{user-select:none}:host([no_user_select]) ::slotted{user-select:none}:host([flex]){display:flex;flex-direction:column;min-height:0}:host([flex]) .scroll-main-container{display:flex;flex-direction:column}:host([flex]) .scroll-main-container .content-zoom{display:flex;flex-direction:column}`;
     constructor() {
         super();
         this.renderAnimation = this.createAnimation();
@@ -11145,9 +11146,9 @@ Layout.Scrollable = class Scrollable extends Aventus.WebComponent {
     getClassName() {
         return "Scrollable";
     }
-    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('min_zoom')){ this['min_zoom'] = 1; }if(!this.hasAttribute('max_zoom')){ this['max_zoom'] = undefined; }if(!this.hasAttribute('y_scroll_visible')) { this.attributeChangedCallback('y_scroll_visible', false, false); }if(!this.hasAttribute('x_scroll_visible')) { this.attributeChangedCallback('x_scroll_visible', false, false); }if(!this.hasAttribute('floating_scroll')) { this.attributeChangedCallback('floating_scroll', false, false); }if(!this.hasAttribute('x_scroll')) { this.attributeChangedCallback('x_scroll', false, false); }if(!this.hasAttribute('y_scroll')) {this.setAttribute('y_scroll' ,'true'); }if(!this.hasAttribute('auto_hide')) { this.attributeChangedCallback('auto_hide', false, false); }if(!this.hasAttribute('break')){ this['break'] = 0.1; }if(!this.hasAttribute('disable')) { this.attributeChangedCallback('disable', false, false); }if(!this.hasAttribute('no_user_select')) { this.attributeChangedCallback('no_user_select', false, false); }if(!this.hasAttribute('mouse_drag')) { this.attributeChangedCallback('mouse_drag', false, false); }if(!this.hasAttribute('pinch')) { this.attributeChangedCallback('pinch', false, false); }if(!this.hasAttribute('zoom')){ this['zoom'] = 1; } }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('x');this.__correctGetter('y');this.__correctGetter('xMax');this.__correctGetter('yMax');this.__upgradeProperty('min_zoom');this.__upgradeProperty('max_zoom');this.__upgradeProperty('y_scroll_visible');this.__upgradeProperty('x_scroll_visible');this.__upgradeProperty('floating_scroll');this.__upgradeProperty('x_scroll');this.__upgradeProperty('y_scroll');this.__upgradeProperty('auto_hide');this.__upgradeProperty('break');this.__upgradeProperty('disable');this.__upgradeProperty('no_user_select');this.__upgradeProperty('mouse_drag');this.__upgradeProperty('pinch');this.__upgradeProperty('zoom'); }
-    __listBoolProps() { return ["y_scroll_visible","x_scroll_visible","floating_scroll","x_scroll","y_scroll","auto_hide","disable","no_user_select","mouse_drag","pinch"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
+    __defaultValues() { super.__defaultValues(); if(!this.hasAttribute('min_zoom')){ this['min_zoom'] = 1; }if(!this.hasAttribute('max_zoom')){ this['max_zoom'] = undefined; }if(!this.hasAttribute('y_scroll_visible')) { this.attributeChangedCallback('y_scroll_visible', false, false); }if(!this.hasAttribute('x_scroll_visible')) { this.attributeChangedCallback('x_scroll_visible', false, false); }if(!this.hasAttribute('floating_scroll')) { this.attributeChangedCallback('floating_scroll', false, false); }if(!this.hasAttribute('x_scroll')) { this.attributeChangedCallback('x_scroll', false, false); }if(!this.hasAttribute('y_scroll')) {this.setAttribute('y_scroll' ,'true'); }if(!this.hasAttribute('auto_hide')) { this.attributeChangedCallback('auto_hide', false, false); }if(!this.hasAttribute('break')){ this['break'] = 0.1; }if(!this.hasAttribute('disable')) { this.attributeChangedCallback('disable', false, false); }if(!this.hasAttribute('no_user_select')) { this.attributeChangedCallback('no_user_select', false, false); }if(!this.hasAttribute('mouse_drag')) { this.attributeChangedCallback('mouse_drag', false, false); }if(!this.hasAttribute('pinch')) { this.attributeChangedCallback('pinch', false, false); }if(!this.hasAttribute('flex')) { this.attributeChangedCallback('flex', false, false); }if(!this.hasAttribute('zoom')){ this['zoom'] = 1; } }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('x');this.__correctGetter('y');this.__correctGetter('xMax');this.__correctGetter('yMax');this.__upgradeProperty('min_zoom');this.__upgradeProperty('max_zoom');this.__upgradeProperty('y_scroll_visible');this.__upgradeProperty('x_scroll_visible');this.__upgradeProperty('floating_scroll');this.__upgradeProperty('x_scroll');this.__upgradeProperty('y_scroll');this.__upgradeProperty('auto_hide');this.__upgradeProperty('break');this.__upgradeProperty('disable');this.__upgradeProperty('no_user_select');this.__upgradeProperty('mouse_drag');this.__upgradeProperty('pinch');this.__upgradeProperty('flex');this.__upgradeProperty('zoom'); }
+    __listBoolProps() { return ["y_scroll_visible","x_scroll_visible","floating_scroll","x_scroll","y_scroll","auto_hide","disable","no_user_select","mouse_drag","pinch","flex"].concat(super.__listBoolProps()).filter((v, i, a) => a.indexOf(v) === i); }
     createAnimation() {
         return new Aventus.Animation({
             fps: 60,
@@ -12289,6 +12290,9 @@ let StringTools=class StringTools {
 StringTools.Namespace=`Inventaire`;
 __as1(_, 'StringTools', StringTools);
 
+function isAdmin() {
+    return window['id_role'] == 1;
+}
 let Colors= [
     'neutral',
     'primary',
@@ -15230,16 +15234,10 @@ const Header = class Header extends Aventus.WebComponent {
         <div class="logo-menu">Inventaire FC Vétroz</div>
         <av-link class="item" to="/" active_pattern="/equipes/*|/" _id="header_2">Equipe</av-link>
         <av-link class="item" to="/materiel" active_pattern="/materiel*" _id="header_3">Matériel</av-link>
-        <div class="item sub-menu" _id="header_4">
-            <span>Configuration</span>
-            <div class="sub-menu-items">
-                <av-link class="item" to="/utilisateurs" _id="header_5">Utilisateur</av-link>
-                <av-link class="item" to="/variations" _id="header_6">Variations</av-link>
-            </div>
-        </div>
-        <template _id="header_7"></template>
+        <template _id="header_4"></template>
+        <template _id="header_8"></template>
         <div class="item logout">
-            <mi-icon icon="power_settings_new" _id="header_9"></mi-icon>
+            <mi-icon icon="power_settings_new" _id="header_10"></mi-icon>
         </div>
     </div>
 </div>` }
@@ -15256,21 +15254,6 @@ const Header = class Header extends Aventus.WebComponent {
       "eventName": "click",
       "id": "header_3",
       "fct": (e, c) => c.comp.closeMenu(e)
-    },
-    {
-      "eventName": "click",
-      "id": "header_4",
-      "fct": (e, c) => c.comp.closeMenu(e)
-    },
-    {
-      "eventName": "click",
-      "id": "header_5",
-      "fct": (e, c) => c.comp.closeMenu(e)
-    },
-    {
-      "eventName": "click",
-      "id": "header_6",
-      "fct": (e, c) => c.comp.closeMenu(e)
     }
   ],
   "pressEvents": [
@@ -15283,24 +15266,56 @@ const Header = class Header extends Aventus.WebComponent {
       "onPress": (e, pressInstance, c) => { c.comp.closeMenu(e, pressInstance); }
     },
     {
-      "id": "header_9",
+      "id": "header_10",
       "onPress": (e, pressInstance, c) => { c.comp.logout(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-            <div class="item install" _id="header_8">Installer l'application</div>
+            <div class="item sub-menu" _id="header_5">
+                <span>Configuration</span>
+                <div class="sub-menu-items">
+                    <av-link class="item" to="/utilisateurs" _id="header_6">Utilisateur</av-link>
+                    <av-link class="item" to="/variations" _id="header_7">Variations</av-link>
+                </div>
+            </div>
         `);templ0.setActions({
+  "events": [
+    {
+      "eventName": "click",
+      "id": "header_5",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_6",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    },
+    {
+      "eventName": "click",
+      "id": "header_7",
+      "fct": (e, c) => c.comp.closeMenu(e)
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'header_4',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__8a18ff9f2f6d8c68ca20d6555a280111method0(),
+                    template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+            <div class="item install" _id="header_9">Installer l'application</div>
+        `);templ1.setActions({
   "pressEvents": [
     {
-      "id": "header_8",
+      "id": "header_9",
       "onPress": (e, pressInstance, c) => { c.comp.installApp(e, pressInstance); }
     }
   ]
 });this.__getStatic().__template.addIf({
-                    anchorId: 'header_7',
+                    anchorId: 'header_8',
                     parts: [{once: true,
-                    condition: (c) => c.comp.__8a18ff9f2f6d8c68ca20d6555a280111method0(),
-                    template: templ0
+                    condition: (c) => c.comp.__8a18ff9f2f6d8c68ca20d6555a280111method1(),
+                    template: templ1
                 }]
             }); }
     getClassName() {
@@ -15333,6 +15348,9 @@ const Header = class Header extends Aventus.WebComponent {
         });
     }
     __8a18ff9f2f6d8c68ca20d6555a280111method0() {
+        return isAdmin();
+    }
+    __8a18ff9f2f6d8c68ca20d6555a280111method1() {
         return this.hasInstall;
     }
 }
@@ -17049,49 +17067,41 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
         <div class="modification">
             <div class="actions">
                 <template _id="inventairelistitem_4"></template>
-                <av-icon-action color="warning" icon="compare_arrows" _id="inventairelistitem_6">Transfert</av-icon-action>
-                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_7">Historique</av-icon-action>
-                <av-icon-action color="error" icon="delete_forever" _id="inventairelistitem_8">Perte</av-icon-action>
-            </div>
+                <template _id="inventairelistitem_6"></template>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventairelistitem_8">Historique</av-icon-action>
+                <template _id="inventairelistitem_9"></template>
+            </div> 
         </div>
     </div>
-    <div class="last-update" _id="inventairelistitem_9"></div>
+    <div class="last-update" _id="inventairelistitem_11"></div>
 </div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "inventairelistitem_0°class": {
-      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod1())}`
+      "fct": (c) => `line ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}`
     },
     "inventairelistitem_1°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod2())}`,
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}`,
       "once": true
     },
     "inventairelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod3())}`,
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod5())}`,
       "once": true
     },
     "inventairelistitem_3°@HTML": {
-      "fct": (c) => `\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod4())}\n            `
+      "fct": (c) => `\n                ${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod6())}\n            `
     },
-    "inventairelistitem_9°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod5())}`,
+    "inventairelistitem_11°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a95c8f763743275e162a27eb63a3f98emethod7())}`,
       "once": true
     }
   },
   "pressEvents": [
     {
-      "id": "inventairelistitem_6",
-      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
-    },
-    {
-      "id": "inventairelistitem_7",
-      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
-    },
-    {
       "id": "inventairelistitem_8",
-      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
@@ -17108,6 +17118,36 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
                     parts: [{once: true,
                     condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod0(),
                     template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                    <av-icon-action color="warning" icon="compare_arrows" _id="inventairelistitem_7">Transfert</av-icon-action>
+                `);templ1.setActions({
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_7",
+      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventairelistitem_6',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod1(),
+                    template: templ1
+                }]
+            });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <av-icon-action color="error" icon="delete_forever" _id="inventairelistitem_10">Perte</av-icon-action>
+                `);templ2.setActions({
+  "pressEvents": [
+    {
+      "id": "inventairelistitem_10",
+      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventairelistitem_9',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a95c8f763743275e162a27eb63a3f98emethod2(),
+                    template: templ2
                 }]
             }); }
     getClassName() {
@@ -17184,23 +17224,29 @@ const InventaireListItem = class InventaireListItem extends Aventus.WebComponent
     postCreation() {
         this.defaultHide();
     }
-    __a95c8f763743275e162a27eb63a3f98emethod1() {
+    __a95c8f763743275e162a27eb63a3f98emethod3() {
         return this.inventaire.id > 0 ? 'exist' : '';
     }
-    __a95c8f763743275e162a27eb63a3f98emethod2() {
+    __a95c8f763743275e162a27eb63a3f98emethod4() {
         return this.inventaire.equipe.nom;
     }
-    __a95c8f763743275e162a27eb63a3f98emethod3() {
+    __a95c8f763743275e162a27eb63a3f98emethod5() {
         return this.getVariations();
     }
-    __a95c8f763743275e162a27eb63a3f98emethod4() {
+    __a95c8f763743275e162a27eb63a3f98emethod6() {
         return this.inventaire.quantite ?? '-';
     }
-    __a95c8f763743275e162a27eb63a3f98emethod5() {
+    __a95c8f763743275e162a27eb63a3f98emethod7() {
         return this.getLastUpdate();
     }
     __a95c8f763743275e162a27eb63a3f98emethod0() {
-        return this.inventaire.equipe.stock;
+        return this.inventaire.equipe.stock && isAdmin();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod1() {
+        return isAdmin();
+    }
+    __a95c8f763743275e162a27eb63a3f98emethod2() {
+        return isAdmin();
     }
 }
 InventaireListItem.Namespace=`Inventaire`;
@@ -17517,7 +17563,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <av-button color="primary" _id="equipespage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_2">        </div>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste des équipes</div>        <div class="actions">            <av-input placeholder="Recherche" _id="equipespage_0"></av-input>            <template _id="equipespage_1"></template>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <div class="list" _id="equipespage_3">        </div>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -17531,7 +17577,7 @@ const EquipesPage = class EquipesPage extends PageFull {
     {
       "name": "listEl",
       "ids": [
-        "equipespage_2"
+        "equipespage_3"
       ]
     }
   ],
@@ -17542,14 +17588,21 @@ const EquipesPage = class EquipesPage extends PageFull {
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
-  ],
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <av-button color="primary" _id="equipespage_2">Ajouter</av-button>            `);templ0.setActions({
   "pressEvents": [
     {
-      "id": "equipespage_1",
+      "id": "equipespage_2",
       "onPress": (e, pressInstance, c) => { c.comp.add(e, pressInstance); }
     }
   ]
-}); }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'equipespage_1',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__4d7c19ea6b0455338d8cb5b646de65dcmethod0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "EquipesPage";
     }
@@ -17630,6 +17683,9 @@ const EquipesPage = class EquipesPage extends PageFull {
         super.postCreation();
         this.bindData();
     }
+    __4d7c19ea6b0455338d8cb5b646de65dcmethod0() {
+        return isAdmin();
+    }
 }
 EquipesPage.Namespace=`Inventaire`;
 EquipesPage.Tag=`av-equipes-page`;
@@ -17675,53 +17731,45 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
         <div class="modification">
             <div class="actions">
                 <template _id="inventaireequipelistitem_5"></template>
-                <av-icon-action color="warning" icon="compare_arrows" _id="inventaireequipelistitem_7">Transfert</av-icon-action>
-                <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_8">Historique</av-icon-action>
-                <av-icon-action color="error" icon="delete_forever" _id="inventaireequipelistitem_9">Perte</av-icon-action>
+                <template _id="inventaireequipelistitem_7"></template>
+                <av-icon-action class="historique" color="info" icon="history" _id="inventaireequipelistitem_9">Historique</av-icon-action>
+                <template _id="inventaireequipelistitem_10"></template>
             </div>
         </div>
     </div>
-    <div class="last-update" _id="inventaireequipelistitem_10"></div>
+    <div class="last-update" _id="inventaireequipelistitem_12"></div>
 </div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "inventaireequipelistitem_0°class": {
-      "fct": (c) => `line ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1())}`
+      "fct": (c) => `line ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`
     },
     "inventaireequipelistitem_1°style": {
-      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2())});`,
+      "fct": (c) => `background-image: url(${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())});`,
       "once": true
     },
     "inventaireequipelistitem_2°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method3())}`,
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}`,
       "once": true
     },
     "inventaireequipelistitem_3°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method4())}`,
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method6())}`,
       "once": true
     },
     "inventaireequipelistitem_4°@HTML": {
-      "fct": (c) => `\n                ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method5())}\n            `
+      "fct": (c) => `\n                ${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method7())}\n            `
     },
-    "inventaireequipelistitem_10°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method6())}`,
+    "inventaireequipelistitem_12°@HTML": {
+      "fct": (c) => `${c.print(c.comp.__a2ec46d163f7617d318fc452e85fb3c8method8())}`,
       "once": true
     }
   },
   "pressEvents": [
     {
-      "id": "inventaireequipelistitem_7",
-      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
-    },
-    {
-      "id": "inventaireequipelistitem_8",
-      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
-    },
-    {
       "id": "inventaireequipelistitem_9",
-      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
+      "onPress": (e, pressInstance, c) => { c.comp.historique(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
@@ -17738,6 +17786,36 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
                     parts: [{once: true,
                     condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method0(),
                     template: templ0
+                }]
+            });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                    <av-icon-action color="warning" icon="compare_arrows" _id="inventaireequipelistitem_8">Transfert</av-icon-action>
+                `);templ1.setActions({
+  "pressEvents": [
+    {
+      "id": "inventaireequipelistitem_8",
+      "onPress": (e, pressInstance, c) => { c.comp.transfert(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventaireequipelistitem_7',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method1(),
+                    template: templ1
+                }]
+            });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
+                    <av-icon-action color="error" icon="delete_forever" _id="inventaireequipelistitem_11">Perte</av-icon-action>
+                `);templ2.setActions({
+  "pressEvents": [
+    {
+      "id": "inventaireequipelistitem_11",
+      "onPress": (e, pressInstance, c) => { c.comp.perte(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'inventaireequipelistitem_10',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__a2ec46d163f7617d318fc452e85fb3c8method2(),
+                    template: templ2
                 }]
             }); }
     getClassName() {
@@ -17820,26 +17898,32 @@ const InventaireEquipeListItem = class InventaireEquipeListItem extends Aventus.
     postCreation() {
         this.defaultHide();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+    __a2ec46d163f7617d318fc452e85fb3c8method3() {
         return this.inventaire.id > 0 ? 'exist' : '';
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+    __a2ec46d163f7617d318fc452e85fb3c8method4() {
         return this.getPicture();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method3() {
+    __a2ec46d163f7617d318fc452e85fb3c8method5() {
         return this.inventaire.materiel.nom;
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method4() {
+    __a2ec46d163f7617d318fc452e85fb3c8method6() {
         return this.getVariations();
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method5() {
+    __a2ec46d163f7617d318fc452e85fb3c8method7() {
         return this.inventaire.quantite ?? '-';
     }
-    __a2ec46d163f7617d318fc452e85fb3c8method6() {
+    __a2ec46d163f7617d318fc452e85fb3c8method8() {
         return this.getLastUpdate();
     }
     __a2ec46d163f7617d318fc452e85fb3c8method0() {
-        return this.equipe.stock;
+        return this.equipe.stock && isAdmin();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method1() {
+        return isAdmin();
+    }
+    __a2ec46d163f7617d318fc452e85fb3c8method2() {
+        return isAdmin();
     }
 }
 InventaireEquipeListItem.Namespace=`Inventaire`;
@@ -17881,90 +17965,101 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
         blocks: { 'default':`<div class="card">
     <div class="header">
         <div class="title" _id="equipedetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_1">Edition</av-icon-action>
-            <av-icon-action color="error" icon="delete" _id="equipedetailspage_2">Suppression</av-icon-action>
-        </div>
+        <template _id="equipedetailspage_1"></template>
     </div>
     <div class="body">
         <div class="title">
             <span>Liste de matériel</span>
             <div class="actions">
-                <av-icon-action _id="equipedetailspage_3"></av-icon-action>
-                <av-input placeholder="Recherche" _id="equipedetailspage_4"></av-input>
+                <av-icon-action _id="equipedetailspage_4"></av-icon-action>
+                <av-input placeholder="Recherche" _id="equipedetailspage_5"></av-input>
         </div>
         </div>
         <div class="list">
-            <template _id="equipedetailspage_5"></template>
+            <template _id="equipedetailspage_6"></template>
         </div>
     </div>
 </div>` }
     });
 }
-    get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="equipedetailspage_6"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="equipedetailspage_7"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "elements": [
     {
       "name": "searchEl",
       "ids": [
-        "equipedetailspage_4"
+        "equipedetailspage_5"
       ]
     }
   ],
   "content": {
     "equipedetailspage_0°@HTML": {
-      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method1())}`,
+      "fct": (c) => `Equipe : ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2())}`,
       "once": true
     },
-    "equipedetailspage_3°icon": {
-      "fct": (c) => `${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method2())}`
+    "equipedetailspage_4°icon": {
+      "fct": (c) => `${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3())}`
     },
-    "equipedetailspage_3°@HTML": {
-      "fct": (c) => `\n                    ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method3())}\n                `
+    "equipedetailspage_4°@HTML": {
+      "fct": (c) => `\n                    ${c.print(c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method4())}\n                `
     }
   },
   "events": [
     {
       "eventName": "onChange",
-      "id": "equipedetailspage_4",
+      "id": "equipedetailspage_5",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
   ],
   "pressEvents": [
     {
-      "id": "equipedetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
-    },
-    {
-      "id": "equipedetailspage_2",
-      "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
-    },
-    {
-      "id": "equipedetailspage_3",
+      "id": "equipedetailspage_4",
       "onPress": (e, pressInstance, c) => { c.comp.toggleVide(e, pressInstance); }
     }
   ]
-});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                <av-inventaire-equipe-list-item _id="equipedetailspage_6"></av-inventaire-equipe-list-item>
-            `);templ0.setActions({
+});const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                <av-inventaire-equipe-list-item _id="equipedetailspage_7"></av-inventaire-equipe-list-item>
+            `);templ1.setActions({
   "injection": [
     {
-      "id": "equipedetailspage_6",
+      "id": "equipedetailspage_7",
       "injectionName": "inventaire",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method4(c.data.inventaire),
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method5(c.data.inventaire),
       "once": true
     },
     {
-      "id": "equipedetailspage_6",
+      "id": "equipedetailspage_7",
       "injectionName": "equipe",
-      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method5(),
+      "inject": (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method6(),
       "once": true
     }
   ]
 });this.__getStatic().__template.addLoop({
-                    anchorId: 'equipedetailspage_5',
-                    template: templ0,
-                simple:{data: "this.inventaires",item:"inventaire"}}); }
+                    anchorId: 'equipedetailspage_6',
+                    template: templ1,
+                simple:{data: "this.inventaires",item:"inventaire"}});const templ0 = new Aventus.Template(this);templ0.setTemplate(`
+            <div class="actions">
+                <av-icon-action color="neutral" icon="edit" _id="equipedetailspage_2">Edition</av-icon-action>
+                <av-icon-action color="error" icon="delete" _id="equipedetailspage_3">Suppression</av-icon-action>
+            </div>
+        `);templ0.setActions({
+  "pressEvents": [
+    {
+      "id": "equipedetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.editItem(e, pressInstance); }
+    },
+    {
+      "id": "equipedetailspage_3",
+      "onPress": (e, pressInstance, c) => { c.comp.deleteItem(e, pressInstance); }
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'equipedetailspage_1',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__1235ef0c4a20ffaa552fd37f83cb4912method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "EquipeDetailsPage";
     }
@@ -18081,19 +18176,22 @@ const EquipeDetailsPage = class EquipeDetailsPage extends Page {
             this.search();
         }
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method1() {
+    __1235ef0c4a20ffaa552fd37f83cb4912method2() {
         return this.item.nom;
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method2() {
+    __1235ef0c4a20ffaa552fd37f83cb4912method3() {
         return this.voirVide ? 'visibility' : 'visibility_off';
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method3() {
+    __1235ef0c4a20ffaa552fd37f83cb4912method4() {
         return this.voirVide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides';
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method4(inventaire) {
+    __1235ef0c4a20ffaa552fd37f83cb4912method0() {
+        return isAdmin();
+    }
+    __1235ef0c4a20ffaa552fd37f83cb4912method5(inventaire) {
         return inventaire;
     }
-    __1235ef0c4a20ffaa552fd37f83cb4912method5() {
+    __1235ef0c4a20ffaa552fd37f83cb4912method6() {
         return this.item;
     }
 }
@@ -18120,7 +18218,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     }
     __getHtml() {super.__getHtml();
     this.__getStatic().__template.setHTML({
-        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <av-button color="primary" _id="materielpage_1">Ajouter</av-button>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_2">        </av-row>    </av-scrollable></div>` }
+        blocks: { 'default':`<div class="card">    <div class="header">        <div class="title">Liste du matériel</div>        <div class="actions">            <av-input placeholder="Recherche" _id="materielpage_0"></av-input>            <template _id="materielpage_1"></template>        </div>    </div>    <av-scrollable class="body" floating_scroll auto_hide>        <av-row class="list" _id="materielpage_3">        </av-row>    </av-scrollable></div>` }
     });
 }
     __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
@@ -18134,7 +18232,7 @@ const MaterielPage = class MaterielPage extends PageFull {
     {
       "name": "listEl",
       "ids": [
-        "materielpage_2"
+        "materielpage_3"
       ]
     }
   ],
@@ -18145,14 +18243,21 @@ const MaterielPage = class MaterielPage extends PageFull {
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
-  ],
+  ]
+});const templ0 = new Aventus.Template(this);templ0.setTemplate(`                <av-button color="primary" _id="materielpage_2">Ajouter</av-button>            `);templ0.setActions({
   "pressEvents": [
     {
-      "id": "materielpage_1",
+      "id": "materielpage_2",
       "onPress": (e, pressInstance, c) => { c.comp.add(e, pressInstance); }
     }
   ]
-}); }
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materielpage_1',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__1a17d2771d9a2a304d44c27b4301a9e2method0(),
+                    template: templ0
+                }]
+            }); }
     getClassName() {
         return "MaterielPage";
     }
@@ -18227,6 +18332,9 @@ const MaterielPage = class MaterielPage extends PageFull {
         super.postCreation();
         this.bindData();
     }
+    __1a17d2771d9a2a304d44c27b4301a9e2method0() {
+        return isAdmin();
+    }
 }
 MaterielPage.Namespace=`Inventaire`;
 MaterielPage.Tag=`av-materiel-page`;
@@ -18282,59 +18390,49 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
         blocks: { 'default':`<div class="card">
     <div class="header">
         <div class="title" _id="materieldetailspage_0"></div>
-        <div class="actions">
-            <av-icon-action color="info" icon="tab_duplicate" _id="materieldetailspage_1">Dupliquer</av-icon-action>
-            <av-icon-action color="error" icon="delete" _id="materieldetailspage_2">Supprimer</av-icon-action>
-            <av-icon-action color="success" icon="save" _id="materieldetailspage_3">Enregistrer</av-icon-action>
-        </div>
+        <template _id="materieldetailspage_1"></template>
     </div>
     <div class="body">
         <av-row>
             <av-col size="12" size_sm="6">
-                <av-input-image label="Image" _id="materieldetailspage_4"></av-input-image>
+                <av-input-image label="Image" _id="materieldetailspage_5"></av-input-image>
             </av-col>
             <av-col size="12" size_sm="6" class="contenu">
-                <av-input label="Nom du materiel" _id="materieldetailspage_5"></av-input>
+                <av-input label="Nom du materiel" _id="materieldetailspage_6"></av-input>
                 <div class="tags">
                     <div class="label">Variations</div>
-                    <av-variation-tags _id="materieldetailspage_6"></av-variation-tags>
+                    <av-variation-tags _id="materieldetailspage_7"></av-variation-tags>
                 </div>
                 <div class="tags">
                     <div class="label pour">
                         <span class="main-label">Pour :</span>
                         <div class="toggle">
-                            <span class="sub-label" _id="materieldetailspage_7">Equipe spécifique</span>
-                            <av-toggle _id="materieldetailspage_8"></av-toggle>
-                            <span class="sub-label" _id="materieldetailspage_9">Tout le monde</span>
+                            <span class="sub-label" _id="materieldetailspage_8">Equipe spécifique</span>
+                            <av-toggle _id="materieldetailspage_9"></av-toggle>
+                            <span class="sub-label" _id="materieldetailspage_10">Tout le monde</span>
                         </div>
                     </div>
-                    <template _id="materieldetailspage_10"></template>
+                    <template _id="materieldetailspage_11"></template>
                 </div>
             </av-col>
         </av-row>
     </div>
-    <av-loading _id="materieldetailspage_12"></av-loading>
-</div><template _id="materieldetailspage_13"></template>` }
+    <av-loading _id="materieldetailspage_13"></av-loading>
+</div><template _id="materieldetailspage_14"></template>` }
     });
 }
-    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_15"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_17"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
+    get searchEl () { return this.shadowRoot.querySelector('[_id="materieldetailspage_16"]'); }get listItems () { var list = Array.from(this.shadowRoot.querySelectorAll('[_id="materieldetailspage_18"]')); return list; }    __registerTemplateAction() { super.__registerTemplateAction();this.__getStatic().__template.setActions({
   "content": {
     "materieldetailspage_0°@HTML": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod3())}`,
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4())}`,
       "once": true
     },
-    "materieldetailspage_12°show": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9())}`,
+    "materieldetailspage_13°show": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10())}`,
       "once": true
     }
   },
   "injection": [
-    {
-      "id": "materieldetailspage_4",
-      "injectionName": "form",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod4(),
-      "once": true
-    },
     {
       "id": "materieldetailspage_5",
       "injectionName": "form",
@@ -18343,113 +18441,134 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
     },
     {
       "id": "materieldetailspage_6",
-      "injectionName": "variations",
+      "injectionName": "form",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod6(),
       "once": true
     },
     {
-      "id": "materieldetailspage_8",
-      "injectionName": "form",
+      "id": "materieldetailspage_7",
+      "injectionName": "variations",
       "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod7(),
+      "once": true
+    },
+    {
+      "id": "materieldetailspage_9",
+      "injectionName": "form",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
       "once": true
     }
   ],
   "pressEvents": [
     {
-      "id": "materieldetailspage_1",
-      "onPress": (e, pressInstance, c) => { c.comp.duplicate(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_2",
-      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_3",
-      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
-    },
-    {
-      "id": "materieldetailspage_7",
+      "id": "materieldetailspage_8",
       "onPress": (e, pressInstance, c) => { c.comp.unsetToutMonde(e, pressInstance); }
     },
     {
-      "id": "materieldetailspage_9",
+      "id": "materieldetailspage_10",
       "onPress": (e, pressInstance, c) => { c.comp.setToutMonde(e, pressInstance); }
     }
   ]
 });const templ0 = new Aventus.Template(this);templ0.setTemplate(`
-                        <av-equipe-tags _id="materieldetailspage_11"></av-equipe-tags>
-                    `);templ0.setActions({
-  "injection": [
+            <div class="actions">
+                <av-icon-action color="info" icon="tab_duplicate" _id="materieldetailspage_2">Dupliquer</av-icon-action>
+                <av-icon-action color="error" icon="delete" _id="materieldetailspage_3">Supprimer</av-icon-action>
+                <av-icon-action color="success" icon="save" _id="materieldetailspage_4">Enregistrer</av-icon-action>
+            </div>
+        `);templ0.setActions({
+  "pressEvents": [
     {
-      "id": "materieldetailspage_11",
-      "injectionName": "equipes",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod8(),
-      "once": true
+      "id": "materieldetailspage_2",
+      "onPress": (e, pressInstance, c) => { c.comp.duplicate(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_3",
+      "onPress": (e, pressInstance, c) => { c.comp.destroy(e, pressInstance); }
+    },
+    {
+      "id": "materieldetailspage_4",
+      "onPress": (e, pressInstance, c) => { c.comp.save(e, pressInstance); }
     }
   ]
 });this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_10',
+                    anchorId: 'materieldetailspage_1',
                     parts: [{once: true,
                     condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod0(),
                     template: templ0
                 }]
             });const templ1 = new Aventus.Template(this);templ1.setTemplate(`
+                        <av-equipe-tags _id="materieldetailspage_12"></av-equipe-tags>
+                    `);templ1.setActions({
+  "injection": [
+    {
+      "id": "materieldetailspage_12",
+      "injectionName": "equipes",
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod9(),
+      "once": true
+    }
+  ]
+});this.__getStatic().__template.addIf({
+                    anchorId: 'materieldetailspage_11',
+                    parts: [{once: true,
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
+                    template: templ1
+                }]
+            });const templ2 = new Aventus.Template(this);templ2.setTemplate(`
     <div class="card by-equipe">
         <div class="header">
             <div class="title">Liste dans les équipes</div>
             <div class="actions">
-                <av-icon-action _id="materieldetailspage_14"></av-icon-action>
-                <av-input placeholder="Recherche" _id="materieldetailspage_15"></av-input>
+                <av-icon-action _id="materieldetailspage_15"></av-icon-action>
+                <av-input placeholder="Recherche" _id="materieldetailspage_16"></av-input>
             </div>
         </div>
         <div class="body">
             <div class="list">
-                <template _id="materieldetailspage_16"></template>
+                <template _id="materieldetailspage_17"></template>
             </div>
         </div>
     </div>
-`);templ1.setActions({
+`);templ2.setActions({
   "content": {
-    "materieldetailspage_14°icon": {
-      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod10())}`
+    "materieldetailspage_15°icon": {
+      "fct": (c) => `${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11())}`
     },
-    "materieldetailspage_14°@HTML": {
-      "fct": (c) => `\n                    ${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod11())}\n                `
+    "materieldetailspage_15°@HTML": {
+      "fct": (c) => `\n                    ${c.print(c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12())}\n                `
     }
   },
   "events": [
     {
       "eventName": "onChange",
-      "id": "materieldetailspage_15",
+      "id": "materieldetailspage_16",
       "fct": (c, ...args) => c.comp.search.apply(c.comp, ...args),
       "isCallback": true
     }
   ],
   "pressEvents": [
     {
-      "id": "materieldetailspage_14",
+      "id": "materieldetailspage_15",
       "onPress": (e, pressInstance, c) => { c.comp.toggleVide(e, pressInstance); }
     }
   ]
-});const templ2 = new Aventus.Template(this);templ2.setTemplate(`
-                    <av-inventaire-list-item _id="materieldetailspage_17"></av-inventaire-list-item>
-                `);templ2.setActions({
+});const templ3 = new Aventus.Template(this);templ3.setTemplate(`
+                    <av-inventaire-list-item _id="materieldetailspage_18"></av-inventaire-list-item>
+                `);templ3.setActions({
   "injection": [
     {
-      "id": "materieldetailspage_17",
+      "id": "materieldetailspage_18",
       "injectionName": "inventaire",
-      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod12(c.data.inventaire),
+      "inject": (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod13(c.data.inventaire),
       "once": true
     }
   ]
-});templ1.addLoop({
-                    anchorId: 'materieldetailspage_16',
-                    template: templ2,
+});templ2.addLoop({
+                    anchorId: 'materieldetailspage_17',
+                    template: templ3,
                 simple:{data: "this.inventaires",item:"inventaire"}});this.__getStatic().__template.addIf({
-                    anchorId: 'materieldetailspage_13',
+                    anchorId: 'materieldetailspage_14',
                     parts: [{
-                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod1(),
-                    template: templ1
+                    condition: (c) => c.comp.__7aaf46e464a5fd1841ddce2cf63e5dfemethod2(),
+                    template: templ2
                 }]
             }); }
     getClassName() {
@@ -18657,40 +18776,43 @@ const MaterielDetailsPage = class MaterielDetailsPage extends Page {
             this.router?.navigate('/materiel/' + clone.id);
         }
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod3() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
         return this.objName;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
         return this.is_saving;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod10() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11() {
         return this.voir_vide ? 'visibility' : 'visibility_off';
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod11() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod12() {
         return this.voir_vide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides';
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod0() {
-        return !this.form.item.tout_monde;
+        return isAdmin();
     }
     __7aaf46e464a5fd1841ddce2cf63e5dfemethod1() {
+        return !this.form.item.tout_monde;
+    }
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod2() {
         return this.form.item?.id;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod4() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
         return this.form.parts.image;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod5() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
         return this.form.parts.nom;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod6() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
         return this.form.item.variations_groupes;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod7() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
         return this.form.parts.tout_monde;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod8() {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod9() {
         return this.form.item.equipes;
     }
-    __7aaf46e464a5fd1841ddce2cf63e5dfemethod12(inventaire) {
+    __7aaf46e464a5fd1841ddce2cf63e5dfemethod13(inventaire) {
         return inventaire;
     }
 }
@@ -19420,8 +19542,10 @@ const Main = class Main extends Aventus.Navigation.Router {
         this.addRoute("/equipes/{id:number}", EquipeDetailsPage);
         this.addRoute("/materiel", MaterielPage);
         this.addRoute("/materiel/{id:number}", MaterielDetailsPage);
-        this.addRoute("/utilisateurs", UsersPage);
-        this.addRoute("/variations", VariationsPage);
+        if (isAdmin()) {
+            this.addRoute("/utilisateurs", UsersPage);
+            this.addRoute("/variations", VariationsPage);
+        }
     }
     getSlugs(pattern) {
         if (!pattern)

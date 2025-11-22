@@ -6,6 +6,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\VariationGroupeTemplate\VariationGroupeTemplateController;
 use App\Http\Middlewares\IsConnected;
 use Aventus\Laraventus\Routes\Route;
+use  App\Models\User;
 
 Route::get('/login', function () {
     return view('login');
@@ -40,6 +41,7 @@ Route::middleware(IsConnected::class)->group(function () {
 
 
     Route::match(["get"], '/{any}', function () {
-        return view('index');
+        $user = User::$current;
+        return view('index', ["id_role" => $user->id_role->value]);
     })->where('any', '.*');
 });

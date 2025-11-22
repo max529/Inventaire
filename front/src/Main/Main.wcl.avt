@@ -47,8 +47,10 @@ export class Main extends Router implements Aventus.DefaultComponent {
         this.addRoute("/equipes/{id:number}", EquipeDetailsPage);
         this.addRoute("/materiel", MaterielPage);
         this.addRoute("/materiel/{id:number}", MaterielDetailsPage);
-        this.addRoute("/utilisateurs", UsersPage);
-        this.addRoute("/variations", VariationsPage);
+        if(isAdmin()) {
+            this.addRoute("/utilisateurs", UsersPage);
+            this.addRoute("/variations", VariationsPage);
+        }
     }
 
     public override getSlugs(pattern?: string) {

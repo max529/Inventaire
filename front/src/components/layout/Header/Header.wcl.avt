@@ -68,6 +68,7 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
             this.hasInstall = Platform.device != 'pc';
         });
     }
+
     //#endregion
 
 }

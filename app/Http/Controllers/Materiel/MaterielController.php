@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers\Materiel;
 
+use App\Http\Controllers\AdminModelController;
 use App\Models\Materiel;
-use App\Models\MaterielVariation;
-use App\Models\MaterielVariationGroupe;
-use App\Models\Variation;
-use App\Models\VariationGroupe;
 use App\Services\MaterielService;
-use Aventus\Laraventus\Controllers\ModelController;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as SupportCollection;
 
 /**
- * @extends ModelController<Materiel, MaterielRequest, MaterielResource>
+ * @extends AdminModelController<Materiel, MaterielRequest, MaterielResource>
  */
-class MaterielController extends ModelController
+class MaterielController extends AdminModelController
 {
     public function __construct(
         private MaterielService $materielService,

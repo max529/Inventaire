@@ -1,0 +1,3 @@
+function isAdmin() {
+    return window['id_role'] == 1;
+}

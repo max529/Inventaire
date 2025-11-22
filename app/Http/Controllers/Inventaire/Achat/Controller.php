@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventaire\Achat;
 
+use App\Http\Middlewares\IsAdmin;
 use App\Http\Middlewares\Transaction;
 use App\Models\Achat;
 use App\Models\Inventaire;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 #[Rename("InventaireAchatController")]
 class Controller
 {
+    #[IsAdmin]
     #[Transaction]
     public function request(Request $request): Inventaire
     {

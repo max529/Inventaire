@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventaire\Mouvement;
 
+use App\Http\Middlewares\IsAdmin;
 use App\Http\Middlewares\Transaction;
 use App\Models\Inventaire;
 use App\Models\Mouvement;
@@ -16,6 +17,7 @@ class Controller
     /**
      * @return Inventaire[]
      */
+    #[IsAdmin]
     #[Transaction]
     public function request(Request $request): array
     {

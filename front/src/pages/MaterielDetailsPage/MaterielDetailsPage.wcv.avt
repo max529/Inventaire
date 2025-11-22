@@ -1,11 +1,13 @@
 <div class="card">
     <div class="header">
         <div class="title">{{ this.objName }}</div>
-        <div class="actions">
-            <av-icon-action color="info" @press="duplicate" icon="tab_duplicate">Dupliquer</av-icon-action>
-            <av-icon-action color="error" @press="destroy" icon="delete">Supprimer</av-icon-action>
-            <av-icon-action color="success" @press="save" icon="save">Enregistrer</av-icon-action>
-        </div>
+        if(isAdmin()) {
+            <div class="actions">
+                <av-icon-action color="info" @press="duplicate" icon="tab_duplicate">Dupliquer</av-icon-action>
+                <av-icon-action color="error" @press="destroy" icon="delete">Supprimer</av-icon-action>
+                <av-icon-action color="success" @press="save" icon="save">Enregistrer</av-icon-action>
+            </div>
+        }
     </div>
     <div class="body">
         <av-row>

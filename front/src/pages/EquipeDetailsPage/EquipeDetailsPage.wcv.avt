@@ -1,10 +1,12 @@
 <div class="card">
     <div class="header">
         <div class="title">Equipe : {{ this.item.nom }}</div>
-        <div class="actions">
-            <av-icon-action color="neutral" icon="edit" @press="editItem">Edition</av-icon-action>
-            <av-icon-action color="error" icon="delete" @press="deleteItem">Suppression</av-icon-action>
-        </div>
+        if(isAdmin()) {
+            <div class="actions">
+                <av-icon-action color="neutral" icon="edit" @press="editItem">Edition</av-icon-action>
+                <av-icon-action color="error" icon="delete" @press="deleteItem">Suppression</av-icon-action>
+            </div>
+        }
     </div>
 
     <div class="body">
