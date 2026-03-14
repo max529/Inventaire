@@ -1,0 +1,5 @@
+L'utilisateur standard ne peut pas :
+ - acceder au menu des utilisateurs + des variations
+ - ajouter / editer / supprimer des équipes
+ - faire des achats / transferts / pertes de materiel
+ - ajouter / dupliquer / editer / supprimer du matériel

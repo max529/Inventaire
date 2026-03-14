@@ -13,3 +13,5 @@
 <div class="footer">
     <av-button @press="reject">Fermer</av-button>
 </div>
+
+<av-loading></av-loading>

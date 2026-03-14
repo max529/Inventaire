@@ -1,6 +1,7 @@
 :host {
 	.content {
 		justify-content: flex-start;
+		min-height: calc(100vh - 200px);
 	}
 
 	.card {
@@ -11,6 +12,7 @@
 		flex-direction: column;
 		padding: 24px;
 		width: 100%;
+		position: relative;
 
 		.header {
 			align-items: center;
@@ -70,8 +72,8 @@
 		}
 
 	}
+	
 }
-
 
 @media screen and (max-width:660px) {
 	:host {

@@ -1,4 +1,4 @@
-<?php $version = "1.0.2"; ?>
+<?php $version = "1.0.5"; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +22,14 @@
     <?php
     if (env('APP_ENV') == 'local') {
     ?>
-    <script src="http://127.0.0.1:8080/?get_injected_code" async></script>
+        <script src="http://127.0.0.1:8080/?get_injected_code" async></script>
+        <!-- https://github.com/liriliri/eruda -->
+        <!-- <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+        <script>
+            eruda.init();
+        </script> -->
+        <!-- https://github.com/liriliri/chii -->
+        <!--<script src="//10.0.0.213:8080/target.js"></script> -->
     <?php
     }
     ?>

@@ -17,7 +17,7 @@
         </div>
         <div class="modification">
             <div class="actions">
-                if(this.equipe.stock && isAdmin()) {
+                if(this.equipe?.stock && isAdmin()) {
                     <av-icon-action color="accent" icon="attach_money" @press="achat">Achat</av-icon-action>
                 }
                 if(isAdmin()) {

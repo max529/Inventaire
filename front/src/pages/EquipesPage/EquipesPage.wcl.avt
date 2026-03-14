@@ -47,6 +47,7 @@ export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
      * 
      */
     protected search() {
+        console.log("inside");
         if(this.searchEl.value) {
             for(let item of this.list) {
                 item.visible = StringTools.contains(item.item.nom, this.searchEl.value);
@@ -73,7 +74,7 @@ export class EquipesPage extends PageFull implements Aventus.DefaultComponent {
         list.sort((a, b) => {
             if(a.stock && !b.stock) return -1;
             if(!a.stock && b.stock) return 1;
-            return a.nom.localeCompare(b.nom)
+            return a.nom.localeCompare(b.nom);
         });
 
         for(let item of list) {

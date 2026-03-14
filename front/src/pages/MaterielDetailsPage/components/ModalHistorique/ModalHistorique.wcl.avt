@@ -5,6 +5,7 @@ import type { MaterielResource } from "../../../../generated/app/Http/Controller
 import type { EquipeResource } from "../../../../generated/app/Http/Controllers/Equipe/EquipeResource.lib.avt";
 import type { MaterielVariationResource } from "../../../../generated/app/Http/Controllers/Materiel/MaterielVariationResource.lib.avt";
 import type { HistoriqueInfo } from "../../../../generated/app/Http/Controllers/Inventaire/Historique/HistoriqueInfo.lib.avt";
+import { Loading } from "../../../../components/display/Loading/Loading.wcl.avt";
 
 export class ModalHistorique extends Modal<void> implements Aventus.DefaultComponent {
 
@@ -152,7 +153,11 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
 
     protected override postCreation(): void {
         super.postCreation();
-        this.loadData(0);
+        const loader = this.shadowRoot.querySelector<Loading>("av-loading")!
+        loader.show = true;
+        this.loadData(0).then(() => {
+            loader.show = false;
+        })
     }
     //#endregion
 

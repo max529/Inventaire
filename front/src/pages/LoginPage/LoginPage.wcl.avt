@@ -1,11 +1,12 @@
-import { PageFormRoute } from "Aventus@UI:Aventus.Navigation.package.avt";
 import { Required } from "Aventus@UI:Aventus.Form.Validators.package.avt";
 import { AuthLoginController } from "../../generated/app/Http/Controllers/Auth/Login/Controller.lib.avt";
 import type { Response } from "../../generated/app/Http/Controllers/Auth/Login/Response.lib.avt";
 import type { Request } from "../../generated/app/Http/Controllers/Auth/Login/Request.lib.avt";
 import { Alert } from "../../components/interaction/Alert/Alert.wcl.avt";
+import { FormHandlerController } from "Aventus@UI:Aventus.Form.package.avt";
+import { Page } from "Aventus@UI:Aventus.Navigation.package.avt";
 
-export class LoginPage extends PageFormRoute<typeof AuthLoginController> implements Aventus.DefaultComponent {
+export class LoginPage extends Page implements Aventus.DefaultComponent {
 
     //#region static
 
@@ -20,11 +21,39 @@ export class LoginPage extends PageFormRoute<typeof AuthLoginController> impleme
     //#region variables
     @Watch()
     public error?: string;
+
+    public form: FormHandlerController<AuthLoginController>;
     //#endregion
 
 
     //#region constructor
-
+    public constructor() {
+        super();
+        this.form = FormHandlerController.create(
+            AuthLoginController,
+            {
+                nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
+                mot_passe: new Required("Le mot de passe est requis"),
+            },
+            {
+                onSuccess: (result) => {
+                    window.location.href = "/";
+                },
+                onServerFallback: (errors) => {
+                    if(errors.some(p => p.code == 422)) {
+                        this.error = "Informations non valides";
+                    }
+                    else {
+                        let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
+                        Alert.open({
+                            title: "Erreur",
+                            content: msg,
+                        });
+                    }
+                }
+            }
+        );
+    }
     //#endregion
 
 
@@ -34,52 +63,12 @@ export class LoginPage extends PageFormRoute<typeof AuthLoginController> impleme
     /**
      * @inheritdoc
      */
-    public override route(): typeof AuthLoginController {
-        return AuthLoginController;
-    }
-    /**
-     * @inheritdoc
-     */
-    public override onResult(result: Aventus.ResultWithError<Response, Aventus.GenericError<any>> | null): Aventus.Asyncable<void> {
-        if(result?.result) {
-            window.location.href = "/";
-        }
-    }
-    /**
-     * @inheritdoc
-     */
-    protected override formSchema(): Aventus.Form.FormSchema<Request> {
-        return {
-            nom_utilisateur: new Required("Le nom d'utilisateur est requis"),
-            mot_passe: new Required("Le mot de passe est requis"),
-        };
-    }
-
-    /**
-     * @inheritdoc
-     */
     public override configure(): Aventus.Asyncable<Aventus.Navigation.Page.PageConfig> {
         return {
-            
+
         };
     }
 
-    protected override formConfig(): Aventus.Form.FormHandlerConfig<Request> {
-        return {
-            handleExecuteNoInputError: (errors) => {
-                if(errors.some(p => p.code == 422)) {
-                    this.error = "Informations non valides";
-                }
-                else {
-                    let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
-                    Alert.open({
-                        title: "Erreur",
-                        content: msg,
-                    });
-                }
-            }
-        };
-    }
 
     protected clearError() {
         this.error = undefined;

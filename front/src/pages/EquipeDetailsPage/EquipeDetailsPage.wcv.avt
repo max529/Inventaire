@@ -13,16 +13,22 @@
         <div class="title">
             <span>Liste de matériel</span>
             <div class="actions">
-                <av-icon-action icon="{{this.voirVide ? 'visibility' : 'visibility_off'}}" @press="toggleVide">
-                    {{ this.voirVide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides'}}
+                <av-icon-action icon="{{ this.voirVide ? 'visibility' : 'visibility_off' }}" @press="toggleVide">
+                    {{ this.voirVide ? 'Ne voir que les inventaires pleins' : 'Voir les inventaires vides' }}
                 </av-icon-action>
                 <av-input placeholder="Recherche" @change="search" @element="searchEl"></av-input>
-        </div>
+            </div>
         </div>
         <div class="list">
-            for(let inventaire of this.inventaires) {
-                <av-inventaire-equipe-list-item :inventaire="inventaire" :equipe="this.item"  @element="listItems"></av-inventaire-equipe-list-item>
+            if(this.item) {
+                for(let inventaire of this.inventaires) { 
+                    <av-inventaire-equipe-list-item :inventaire="inventaire" :equipe="this.item"
+                        @element="listItems"></av-inventaire-equipe-list-item>
+                }
             }
+
         </div>
     </div>
+
+    <av-loading show="{{this.isLoading}}"></av-loading>
 </div>

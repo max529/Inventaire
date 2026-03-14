@@ -152,4 +152,3 @@
 
 }
 
-:host([is_saving]) {}

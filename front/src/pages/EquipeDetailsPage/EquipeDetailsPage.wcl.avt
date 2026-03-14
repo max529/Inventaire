@@ -38,6 +38,9 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
     @Signal()
     public voirVide: boolean = false;
 
+    @Signal()
+    public isLoading: boolean = true;
+
     @ViewElement()
     protected searchEl!: Input;
     @ViewElement()
@@ -46,7 +49,10 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
 
 
     //#region constructor
-
+    public constructor() {
+        super();
+        this.isLoading = true;
+    }
     //#endregion
 
 
@@ -62,15 +68,6 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
             return "/";
 
         this.item = equipe;
-
-
-
-        const result = await this.loadInventaire(equipe.id);
-        if(!result) {
-            return "/";
-        }
-
-
         return true;
     }
 
@@ -105,6 +102,8 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
                 }
             }
         }
+       
+        this.isLoading = false;
         this.inventaires = inventaires;
         return true;
     }
@@ -158,7 +157,7 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
                 item.style.display = "none";
                 continue;
             }
-            if(StringTools.contains(this.item.nom, txt)) {
+            if(StringTools.contains(item.inventaire.materiel.nom, txt)) {
                 item.style.display = "";
             }
             else {
@@ -197,6 +196,11 @@ export class EquipeDetailsPage extends Page implements Aventus.DefaultComponent 
         if(needSearch) {
             this.search();
         }
+    }
+
+    protected override postCreation(): void {
+        super.postCreation();
+        this.loadInventaire(this.item.id);
     }
 
     //#endregion

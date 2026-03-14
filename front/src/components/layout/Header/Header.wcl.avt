@@ -13,6 +13,9 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
     //#region props
     @Attribute()
     public open_menu!: boolean;
+
+    @Attribute()
+    public open_sub_menu!: boolean;
     //#endregion
 
 
@@ -44,6 +47,14 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
     }
 
     /**
+    * 
+    */
+    protected toggleSubMenu(e: Event) {
+        e.stopPropagation();
+        this.open_sub_menu = !this.open_sub_menu;
+    }
+
+    /**
      * 
      */
     protected async logout() {
@@ -57,7 +68,7 @@ export class Header extends Aventus.WebComponent implements Aventus.DefaultCompo
     protected async installApp() {
         PWA.onDownloaded.add(async () => {
             this.hasInstall = false;
-        })
+        });
         await PWA.download();
     }
 

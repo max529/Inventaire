@@ -18,6 +18,7 @@ Route::get('/logout', function () {
 
 Route::post('/login', [\App\Http\Controllers\Auth\Login\Controller::class, "request"]);
 Route::post('/logout', [\App\Http\Controllers\Auth\Logout\Controller::class, "request"]);
+// Route::get('/temp', [FormatImgController::class, "request"]);
 
 
 Route::middleware(IsConnected::class)->group(function () {

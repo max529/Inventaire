@@ -36,7 +36,7 @@
             </av-col>
         </av-row>
     </div>
-    <av-loading show="{{this.is_saving}}"></av-loading>
+    <av-loading show="{{this.isSaving}}"></av-loading>
 </div>
 
 if(this.form.item?.id) {
@@ -57,5 +57,6 @@ if(this.form.item?.id) {
                 }
             </div>
         </div>
+        <av-loading show="{{this.isLoading}}"></av-loading>
     </div>
 }

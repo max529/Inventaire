@@ -100,6 +100,8 @@
 	}
 }
 
+
+
 @media screen and (max-width:700px) {
 	:host {
 		.content {
@@ -139,16 +141,17 @@
 
 				.sub-menu {
 					padding: 0;
+
 					span {
 						display: none;
 					}
 
 					.sub-menu-items {
-						display: flex;
-						position: relative;
 						box-shadow: none;
-						top: auto;
+						display: flex;
 						left: auto;
+						position: relative;
+						top: auto;
 
 						.item {
 							height: fit-content;
@@ -195,6 +198,18 @@
 					.sub-menu-items {
 						display: flex;
 					}
+				}
+			}
+		}
+	}
+}
+
+@media (not (hover: hover)) {
+	:host([open_sub_menu]) {
+		.content {
+			.menu {
+				.sub-menu-items {
+					display: flex;
 				}
 			}
 		}

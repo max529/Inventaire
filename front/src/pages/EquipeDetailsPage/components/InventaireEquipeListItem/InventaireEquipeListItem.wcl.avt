@@ -23,8 +23,16 @@ export class InventaireEquipeListItem extends Aventus.WebComponent implements Av
     @Watch()
     public inventaire!: Inventaire;
 
+    private _equipe!: EquipeResource;
+    
     @Injectable()
-    public equipe!: EquipeResource;
+    public get equipe(): EquipeResource {
+        return this._equipe;
+    }
+    public set equipe(value: EquipeResource) {
+        this._equipe = value;
+    }
+
     //#endregion
 
 

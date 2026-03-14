@@ -35,7 +35,10 @@ export class Input extends FormElement<string> implements Aventus.DefaultCompone
 
 
     //#region constructor
-
+    public constructor() {
+        super();
+        console.log("constructor input")
+    }
     //#endregion
 
 
@@ -74,6 +77,7 @@ export class Input extends FormElement<string> implements Aventus.DefaultCompone
     * 
     */
     protected onInput() {
+        console.log("insiiide");
         this.triggerChange(this.inputEl.value);
     }
 

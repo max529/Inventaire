@@ -33,8 +33,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
 
     //#region props
-    @Property()
-    private is_saving: boolean = false;
+
     //#endregion
 
 
@@ -48,6 +47,10 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
     public objName: string = "";
     @Signal()
     public voir_vide: boolean = false;
+    @Signal()
+    public isLoading: boolean = true;
+    @Signal()
+    public isSaving: boolean = false;
 
     private slugId: number = 0;
 
@@ -106,9 +109,6 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
 
             this.form.item = this.itemToRequest(item);
             this.objName = this.form.item.nom;
-
-
-            await this.loadInventaire(id);
         }
         return true;
     }
@@ -220,8 +220,8 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
      * 
      */
     protected async save() {
-        if(this.is_saving) return;
-        this.is_saving = true;
+        if(this.isSaving) return;
+        this.isSaving = true;
         const result = await this.form.execute(MaterielRAM.getInstance().saveWithError);
 
         if(result.result) {
@@ -241,7 +241,7 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
                 await this.loadInventaire(this.item.id);
             }
         }
-        this.is_saving = false;
+        this.isSaving = false;
     }
 
 
@@ -311,6 +311,16 @@ export class MaterielDetailsPage extends Page implements Aventus.DefaultComponen
         }
     }
 
+    protected override postCreation(): void {
+        super.postCreation();
+        if(this.slugId != 0) {
+            this.isLoading = true;
+            this.loadInventaire(this.slugId).then(() => {
+                this.isLoading = false;
+            });
+
+        }
+    }
     //#endregion
 
 }

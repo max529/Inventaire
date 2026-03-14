@@ -91,7 +91,7 @@ export class Main extends Router implements Aventus.DefaultComponent {
             closeWithClick: false
         });
         Form.configure({
-            handleExecuteNoInputError: (errors) => {
+            onServerFallback: (errors) => {
                 if(errors.length > 0) {
                     let msg = errors.map(p => p.message.replace(/\n/g, '<br/>')).join("<br/>");
                     Alert.open({
@@ -100,7 +100,7 @@ export class Main extends Router implements Aventus.DefaultComponent {
                     });
                 }
             },
-            handleValidateNoInputError: (errors) => {
+            onValidateFallback: (errors) => {
                 const li: string[] = [];
                 for(let key in errors) {
                     if(errors[key]) {
