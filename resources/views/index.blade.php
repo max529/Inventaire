@@ -1,4 +1,4 @@
-<?php $version = "1.0.5"; ?>
+<?php $version = "1.0.6"; ?>
 
 <!DOCTYPE html>
 <html lang="en">

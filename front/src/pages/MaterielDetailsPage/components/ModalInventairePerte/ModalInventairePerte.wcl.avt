@@ -31,6 +31,8 @@ export class ModalInventairePerte extends Modal<Inventaire> implements Aventus.D
     public comment: string = "";
     @Signal()
     public equipe!: EquipeResource;
+    @Signal()
+    public loading: boolean = false;
 
     @ViewElement()
     protected inputEl!: Input;
@@ -86,7 +88,9 @@ export class ModalInventairePerte extends Modal<Inventaire> implements Aventus.D
         if(nb == null) return;
 
         if(!this.equipe) return;
-
+        if(this.loading) return;
+        
+        this.loading = true;
         const result = await Process.execute(new InventairePerteController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
@@ -97,6 +101,8 @@ export class ModalInventairePerte extends Modal<Inventaire> implements Aventus.D
         if(result) {
             this.resolve(result);
         }
+        this.loading = false;
+
     }
 
     /**

@@ -128,7 +128,7 @@ export class ModalHistorique extends Modal<void> implements Aventus.DefaultCompo
             }
             txt += "</div>";
         }
-        txt += "<div class=\"comment\">" + historique.commentaire + "</div>";
+        txt += "<div class=\"comment\">" + (historique.commentaire ?? '') + "</div>";
         txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
         return txt;
     }

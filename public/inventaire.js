@@ -3418,6 +3418,7 @@ let TemplateInstance=class TemplateInstance {
         });
         this.firstRenderCb.push(() => {
             for (const el of this._components[injection.id]) {
+                customElements.upgrade(el);
                 el[injection.injectionName] = computed.value;
             }
         });
@@ -3453,6 +3454,7 @@ let TemplateInstance=class TemplateInstance {
         });
         this.firstRenderCb.push(() => {
             for (const el of this._components[binding.id]) {
+                customElements.upgrade(el);
                 el[binding.injectionName] = computed.value;
             }
         });
@@ -3478,6 +3480,7 @@ let TemplateInstance=class TemplateInstance {
         else {
             this.firstRenderCb.push(() => {
                 for (var el of this._components[binding.id]) {
+                    customElements.upgrade(el);
                     for (let fct of binding.eventNames) {
                         el.addEventListener(fct, (e) => {
                             let valueToSet = getValueFromObject(binding.injectionName, e.target);
@@ -13913,7 +13916,7 @@ const Button = class Button extends Aventus.Form.ButtonElement {
     set 'link'(val) { this.setBoolAttr('link', val) }get 'active'() { return this.getBoolAttr('active') }
     set 'active'(val) { this.setBoolAttr('active', val) }get 'disabled'() { return this.getBoolAttr('disabled') }
     set 'disabled'(val) { this.setBoolAttr('disabled', val) }get 'loading'() { return this.getBoolAttr('loading') }
-    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=neutral]){--btn-color: var(--color-neutral);--btn-fg: var(--color-neutral-content)}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=accent]){--btn-color: var(--color-accent);--btn-fg: var(--color-accent-content)}:host([color=info]){--btn-color: var(--color-info);--btn-fg: var(--color-info-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    set 'loading'(val) { this.setBoolAttr('loading', val) }    static __style = `:host{--tw-prose-links: var(--btn-fg);--size: calc(var(--size-field, .25rem)*10);--btn-bg: var(--btn-color, var(--color-base-200));--btn-fg: var(--color-base-content);--btn-p: 1rem;--btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth)*5%));--btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000), 0 4px 3px -2px color-mix(in oklab, var(--btn-bg)calc(var(--depth)*30%), #0000);align-items:center;background-color:var(--btn-bg);border-color:var(--btn-border);border-end-end-radius:var(--join-ee, var(--radius-field));border-end-start-radius:var(--join-es, var(--radius-field));border-start-end-radius:var(--join-se, var(--radius-field));border-start-start-radius:var(--join-ss, var(--radius-field));border-style:solid;border-width:var(--border);box-shadow:0 .5px 0 .5px oklch(100% 0 0/calc(var(--depth) * 6%)) inset,var(--btn-shadow);color:var(--btn-fg);cursor:pointer;display:inline-flex;flex-shrink:0;flex-wrap:nowrap;font-size:var(--fontsize, 0.875rem);font-weight:600;gap:.375rem;height:var(--size);justify-content:center;outline-color:var(--btn-color, var(--color-base-content));outline-offset:2px;padding-inline:var(--btn-p);position:relative;text-align:center;text-shadow:0 .5px oklch(100% 0 0/calc(var(--depth) * 0.15));touch-action:manipulation;transition-duration:var(--transition-duration);transition-property:color,background-color,border-color,box-shadow;transition-timing-function:var(--bezier);-webkit-user-select:none;user-select:none;vertical-align:middle;webkit-user-select:none}:host .loader-mask{align-items:center;align-items:stretch;display:none;inset:.5rem 1rem;justify-content:center;position:absolute}:host .loader-mask .loader{animation:rotation 1s linear infinite;height:100%;aspect-ratio:1;border:2px solid var(--btn-fg);border-bottom-color:rgba(0,0,0,0);border-radius:50000px;display:block;max-height:100%;max-width:100%}:host([loading]) slot{opacity:0;visibility:hidden}:host([loading]) .loader-mask{display:flex}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:hover){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:hover){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:focus-visible){isolation:isolate;outline-style:solid;outline-width:2px}:host(:active:not([active])){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);translate:0 .5px}@supports(color: color-mix(in lab, red, red)){:host(:active:not([active])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 5%);--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host(:disabled),:host([disabled]){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host(:disabled:not([link])),:host(:disabled:not([ghost])),:host([disabled]:not([link])),:host([disabled]:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host(:disabled),:host([disabled]){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host(:disabled:hover),:host([disabled]:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host(:disabled:hover),:host([disabled]:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([color=neutral]){--btn-color: var(--color-neutral);--btn-fg: var(--color-neutral-content)}:host([color=primary]){--btn-color: var(--color-primary);--btn-fg: var(--color-primary-content)}:host([color=secondary]){--btn-color: var(--color-secondary);--btn-fg: var(--color-secondary-content)}:host([color=accent]){--btn-color: var(--color-accent);--btn-fg: var(--color-accent-content)}:host([color=info]){--btn-color: var(--color-info);--btn-fg: var(--color-info-content)}:host([color=success]){--btn-color: var(--color-success);--btn-fg: var(--color-success-content)}:host([color=warning]){--btn-color: var(--color-warning);--btn-fg: var(--color-warning-content)}:host([color=error]){--btn-color: var(--color-error);--btn-fg: var(--color-error-content)}:host([active]){--btn-bg: color-mix(in srgb, var(--btn-color, var(--color-base-200)), #000 7%);--btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);isolation:isolate}@supports(color: color-mix(in lab, red, red)){:host([active]){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%)}}:host([disabled]),:host(:disabled){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);pointer-events:none}:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in srgb, var(--color-base-content) 10%, transparent);box-shadow:none}@supports(color: color-mix(in lab, red, red)){:host([disabled]:not([link])),:host([disabled]:not([ghost])),:host(:disabled:not([link])),:host(:disabled:not([ghost])){background-color:color-mix(in oklab, var(--color-base-content) 10%, transparent)}:host([disabled]),:host([disabled]),:host(:disabled),:host(:disabled){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000)}}@media(hover: hover){@supports(color: color-mix(in lab, red, red)){:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-fg: color-mix(in oklch, var(--color-base-content)20%, #0000);background-color:color-mix(in oklab, var(--color-neutral) 20%, transparent)}}:host([disabled]:hover),:host([disabled]:hover),:host(:disabled:hover),:host(:disabled:hover){--btn-border: #0000;--btn-fg: color-mix(in srgb, var(--color-base-content)20%, #0000);background-color:color-mix(in srgb, var(--color-neutral) 20%, transparent);pointer-events:none}}:host([outline]:not([active])),:host([outline]:not(:hover)),:host([outline]:not(:active:focus)),:host([outline]:not(:focus-visible)),:host([outline]:not(:disabled)),:host([outline]:not([disabled])),:host([outline]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@media(hover: none){:host([outline]:not([active]):hover),:host([outline]:not(:active:focus):hover),:host([outline]:not(:focus-visible):hover),:host([outline]:not(:disabled):hover),:host([outline]:not([disabled]):hover),:host([outline]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}}:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color)}@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active])),:host([soft]:not(:hover)),:host([soft]:not(:active:focus)),:host([soft]:not(:focus-visible)),:host([soft]:not(:disabled)),:host([soft]:not([disabled])){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}@media(hover: none){@supports(color: color-mix(in lab, red, red)){:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([soft]:not([active]):hover),:host([soft]:not(:active:focus):hover),:host([soft]:not(:focus-visible):hover),:host([soft]:not(:disabled):hover),:host([soft]:not([disabled]:hover)){--btn-shadow: "";--btn-fg: var(--btn-color, var(--color-base-content));--btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-content))8%, var(--color-base-100));--btn-border: color-mix(in oklab, var(--btn-color, var(--color-base-content))10%, var(--color-base-100))}}:host([dash]:not([active])),:host([dash]:not(:hover)),:host([dash]:not(:active:focus)),:host([dash]:not(:focus-visible)),:host([dash]:not(:disabled)),:host([dash]:not([disabled])),:host([dash]:not(:checked)){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}@media(hover: none){:host([dash]:not([active]):hover),:host([dash]:not(:active:focus):hover),:host([dash]:not(:focus-visible):hover),:host([dash]:not(:disabled):hover),:host([dash]:not([disabled]):hover),:host([dash]:not(:checked):hover){--btn-shadow: "";--btn-bg: #0000;--btn-fg: var(--btn-color);--btn-border: var(--btn-color);border-style:dashed}}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000}:host([ghost]:not([active])),:host([ghost]:not(:hover)),:host([ghost]:not(:active:focus)),:host([ghost]:not(:focus-visible)),:host([ghost]:not(:disabled)),:host([ghost]:not([disabled])){--btn-fg: currentColor;outline-color:currentColor}@media(hover: none){:host([ghost]:not([active]):hover),:host([ghost]:not(:active):hover),:host([ghost]:not(:focus-visible):hover),:host([ghost]:not(:disabled):hover),:host([ghost]:not([disabled]):hover){--btn-shadow: "";--btn-bg: #0000;--btn-border: #0000;--btn-fg: currentColor}}:host([link]){--btn-border: #0000;--btn-bg: #0000;--btn-fg: var(--color-primary);--btn-shadow: "";outline-color:currentColor;text-decoration-line:underline}:host([link][active]),:host([link]:hover),:host([link]:active:focus),:host([link]:focus-visible){--btn-border: #0000;--btn-bg: #0000;text-decoration-line:underline}@media(hover: none){:host([link][active]:hover),:host([link]:active:hover),:host([link]:focus-visible:hover),:host([link]:disabled:hover),:host([link][disabled]:hover){text-decoration-line:none}}@keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
     __getStatic() {
         return Button;
     }
@@ -16291,7 +16294,12 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
 					}
 					set 'equipe'(val) {
 						this.__signals["equipe"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+					}get 'loading'() {
+						return this.__signals["loading"].value;
+					}
+					set 'loading'(val) {
+						this.__signals["loading"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null;this.__signals["loading"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
     __getStatic() {
         return ModalInventaireAchat;
@@ -16318,6 +16326,10 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
   "content": {
     "modalinventaireachat_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__4efee192411d842bca24f09a939e11e0method0())}`,
+      "once": true
+    },
+    "modalinventaireachat_4°loading": {
+      "fct": (c) => `${c.print(c.comp.__4efee192411d842bca24f09a939e11e0method5())}`,
       "once": true
     }
   },
@@ -16366,8 +16378,8 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     getClassName() {
         return "ModalInventaireAchat";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined;s["loading"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe');this.__correctGetter('loading'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -16403,6 +16415,9 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
             return;
         if (!this.equipe)
             return;
+        if (this.loading)
+            return;
+        this.loading = true;
         const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Achat.InventaireAchatController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
@@ -16412,6 +16427,7 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
         if (result) {
             this.resolve(result);
         }
+        this.loading = false;
     }
     select() {
         this.inputEl.select();
@@ -16433,6 +16449,9 @@ const ModalInventaireAchat = class ModalInventaireAchat extends Modal {
     }
     __4efee192411d842bca24f09a939e11e0method0() {
         return this.getTitle();
+    }
+    __4efee192411d842bca24f09a939e11e0method5() {
+        return this.loading;
     }
     __4efee192411d842bca24f09a939e11e0method1() {
         return this.nb;
@@ -16647,7 +16666,7 @@ const ModalHistorique = class ModalHistorique extends Modal {
             }
             txt += "</div>";
         }
-        txt += "<div class=\"comment\">" + historique.commentaire + "</div>";
+        txt += "<div class=\"comment\">" + (historique.commentaire ?? '') + "</div>";
         txt += "<div class=\"small\">par " + historique.par + " le " + this.getLastUpdate(historique) + "</div>";
         return txt;
     }
@@ -16742,7 +16761,12 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
 					}
 					set 'equipe'(val) {
 						this.__signals["equipe"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null; super.__registerSignalsActions();  }
+					}get 'loading'() {
+						return this.__signals["loading"].value;
+					}
+					set 'loading'(val) {
+						this.__signals["loading"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipe"] = null;this.__signals["loading"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .footer{display:flex;justify-content:flex-end;margin-top:2rem;gap:.5rem}`;
     __getStatic() {
         return ModalInventairePerte;
@@ -16769,6 +16793,10 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
   "content": {
     "modalinventaireperte_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__3c04e62a0c816dca149557743a338609method0())}`,
+      "once": true
+    },
+    "modalinventaireperte_4°loading": {
+      "fct": (c) => `${c.print(c.comp.__3c04e62a0c816dca149557743a338609method5())}`,
       "once": true
     }
   },
@@ -16817,8 +16845,8 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
     getClassName() {
         return "ModalInventairePerte";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipe"] = undefined;s["loading"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipe');this.__correctGetter('loading'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -16854,6 +16882,9 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
             return;
         if (!this.equipe)
             return;
+        if (this.loading)
+            return;
+        this.loading = true;
         const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Perte.InventairePerteController().request({
             id_equipe: this.equipe.id,
             id_materiel_variation: this.variation.id,
@@ -16863,6 +16894,7 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
         if (result) {
             this.resolve(result);
         }
+        this.loading = false;
     }
     select() {
         this.inputEl.select();
@@ -16884,6 +16916,9 @@ const ModalInventairePerte = class ModalInventairePerte extends Modal {
     }
     __3c04e62a0c816dca149557743a338609method0() {
         return this.getTitle();
+    }
+    __3c04e62a0c816dca149557743a338609method5() {
+        return this.loading;
     }
     __3c04e62a0c816dca149557743a338609method1() {
         return this.nb;
@@ -17484,7 +17519,12 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
 					}
 					set 'equipeEntree'(val) {
 						this.__signals["equipeEntree"].value = val;
-					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipeSortie"] = null;this.__signals["equipeEntree"] = null; super.__registerSignalsActions();  }
+					}get 'loading'() {
+						return this.__signals["loading"].value;
+					}
+					set 'loading'(val) {
+						this.__signals["loading"].value = val;
+					}    __registerSignalsActions() { this.__signals["variation"] = null;this.__signals["nb"] = null;this.__signals["comment"] = null;this.__signals["equipeSortie"] = null;this.__signals["equipeEntree"] = null;this.__signals["loading"] = null; super.__registerSignalsActions();  }
     static __style = `:host .title{font-size:var(--font-size-md);margin-bottom:16px}:host .form{display:flex;flex-direction:column;gap:12px}:host .form .btn{align-items:center;display:flex;justify-content:center}:host .footer{display:flex;gap:.5rem;justify-content:flex-end;margin-top:2rem}`;
     __getStatic() {
         return ModalInventaireMouvement;
@@ -17511,6 +17551,10 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
   "content": {
     "modalinventairemouvement_0°@HTML": {
       "fct": (c) => `${c.print(c.comp.__86aa5df7aefa315fd11dd30e333e28b4method0())}`,
+      "once": true
+    },
+    "modalinventairemouvement_7°loading": {
+      "fct": (c) => `${c.print(c.comp.__86aa5df7aefa315fd11dd30e333e28b4method9())}`,
       "once": true
     }
   },
@@ -17585,8 +17629,8 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
     getClassName() {
         return "ModalInventaireMouvement";
     }
-    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipeSortie"] = undefined;s["equipeEntree"] = undefined; }
-    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipeSortie');this.__correctGetter('equipeEntree'); }
+    __defaultValuesSignal(s) { super.__defaultValuesSignal(s); s["variation"] = undefined;s["nb"] = 0;s["comment"] = "";s["equipeSortie"] = undefined;s["equipeEntree"] = undefined;s["loading"] = false; }
+    __upgradeAttributes() { super.__upgradeAttributes(); this.__correctGetter('variation');this.__correctGetter('nb');this.__correctGetter('comment');this.__correctGetter('equipeSortie');this.__correctGetter('equipeEntree');this.__correctGetter('loading'); }
     configure() {
         return {
             title: "Mise à jour de l'inventaire"
@@ -17629,6 +17673,9 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
             return;
         if (!this.equipeSortie)
             return;
+        if (this.loading)
+            return;
+        this.loading = true;
         const result = await Aventus.Process.execute(new App.Http.Controllers.Inventaire.Mouvement.InventaireMouvementController().request({
             id_equipe_entree: this.equipeEntree.id,
             id_equipe_sortie: this.equipeSortie.id,
@@ -17639,6 +17686,7 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
         if (result) {
             this.resolve(result);
         }
+        this.loading = false;
     }
     select() {
         this.inputEl.select();
@@ -17670,6 +17718,9 @@ const ModalInventaireMouvement = class ModalInventaireMouvement extends Modal {
     }
     __86aa5df7aefa315fd11dd30e333e28b4method0() {
         return this.getTitle();
+    }
+    __86aa5df7aefa315fd11dd30e333e28b4method9() {
+        return this.loading;
     }
     __86aa5df7aefa315fd11dd30e333e28b4method1() {
         return this.equipeSortie;

@@ -12,5 +12,5 @@
 
 <div class="footer">
     <av-button @press="reject">Annuler</av-button>
-    <av-button @press="save" color="primary">Enregistrer</av-button>
+    <av-button @press="save" color="primary" loading="{{this.loading}}">Enregistrer</av-button>
 </div>
